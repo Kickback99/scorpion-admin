@@ -13,7 +13,7 @@ const routes = [
         {path:'/article/manage',component:() =>import('@/views/article/ArticleManage.vue')},
         {path:'/user/info',component:() =>import('@/views/user/userInfo.vue')},
         {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
-        {path:'/user/ResetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
+        {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
     ]}
 ]
 
