@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div>
         主页布局
     </div>
@@ -10,4 +10,4 @@
 
 <style lang="scss" scoped>
 
-</style>
+</style> -->
