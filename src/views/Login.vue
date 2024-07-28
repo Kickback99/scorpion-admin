@@ -116,7 +116,7 @@
       ],
         password : [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { pattern:/^\S{6,15}$/,message:'密码必须是 6-15位 的非空字符',trigger:'blur'}
+          { pattern:/^\S{4,15}$/,message:'密码必须是 4-15位 的非空字符',trigger:'blur'}
         ],
         // 自定义校验规则
         repassword: [

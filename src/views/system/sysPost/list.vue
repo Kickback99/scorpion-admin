@@ -1,6 +1,6 @@
-<!-- <template>
+<template>
     <div>
-        主页布局
+        <p>部门管理</p>
     </div>
 </template>
 
@@ -10,4 +10,4 @@
 
 <style lang="scss" scoped>
 
-</style> -->
+</style>

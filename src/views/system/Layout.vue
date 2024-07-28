@@ -1,6 +1,7 @@
-<!-- <template>
+<template>
     <div>
-        主页布局
+        <p>主页布局</p>
+        <router-view></router-view>
     </div>
 </template>
 
@@ -10,4 +11,4 @@
 
 <style lang="scss" scoped>
 
-</style> -->
+</style>

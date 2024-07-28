@@ -14,7 +14,7 @@ instance.interceptors.request.use(
     config => {
         const tokenStore =  useTokenStore()
         if(tokenStore.token){
-            config.headers.Authorization = tokenStore.token
+            config.headers.token = tokenStore.token
         }
 
         return config
@@ -26,9 +26,25 @@ instance.interceptors.request.use(
 //添加响应拦截器
 instance.interceptors.response.use(
     res=>{
-        if(res.data.code === 0){
+        if(res.data.code === 0 || res.data.code === 200){
             return res.data
         }
+        
+
+       //匹配状态码为40开头的正则 
+       let regex = /^40[0-9]$/
+
+       if(regex.test(res.data.code)) {
+
+            if(res.data.code === 401){
+                // 如果状态码为401，则表示未登录
+                ElMessage.error(res.data.msg || '重新登录')
+                router.push('/login')
+
+            }else ElMessage.error(res.data.msg)
+
+            return Promise.reject(res.data)
+       }
 
         ElMessage.error(res.data.message || '服务异常')
         return Promise.reject(res.data)
