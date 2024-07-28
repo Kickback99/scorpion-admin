@@ -7,6 +7,8 @@ const baseURL = '/api';
 const instance = axios.create({baseURL})
 import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
+import router from '@/router';
+
 
 
 //添加请求拦截器
@@ -39,6 +41,8 @@ instance.interceptors.response.use(
             if(res.data.code === 401){
                 // 如果状态码为401，则表示未登录
                 ElMessage.error(res.data.msg || '重新登录')
+                const tokenStore = useTokenStore()
+                tokenStore.removeToken()
                 router.push('/login')
 
             }else ElMessage.error(res.data.msg)

@@ -26,14 +26,17 @@ const routes = [
     ]} */
 ]
 
+const modules = import.meta.glob('../views/system/**/*.vue')
+
 function routesHandler(router){
     return router.map(route => {
         if(route.component === 'Layout'){
             route.component = Layout
         }else {
             const compName = route.component
-            // 帮我把这段代码，使用import.meta.glob的方式实现动态懒加载
-            route.component = () => import(`@/views/system/${compName}.vue`)
+            const path = `../views/${compName}.vue`
+            route.component = modules[path]
+            // route.component = () => import(`@/views/system/${compName}.vue`)
         }
 
         // 处理children
@@ -53,7 +56,6 @@ const loadMenu = async(to,next) => {
 
     // 添加路由
     asyncRoutes.forEach(r => {
-        console.log('路由',r)
         router.addRoute(r)
     })
    
@@ -95,7 +97,6 @@ router.beforeEach((to, from, next) => {
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
-        console.log(123)
         return next()
     }
 
