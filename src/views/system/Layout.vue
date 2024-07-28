@@ -14,7 +14,14 @@
       </el-aside>
       <el-container>
         <el-header>Header</el-header>
-        <el-main><router-view></router-view></el-main>
+        <el-main>
+          <el-breadcrumb separator=">">
+              <el-breadcrumb-item :to="{ path: r.path === '/system'?'/system/sysUser':r.path }" v-for="r in breadList">
+                {{ r.meta.title }}
+              </el-breadcrumb-item>
+          </el-breadcrumb>
+          <router-view/>
+        </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
     </el-container>
@@ -24,10 +31,24 @@
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
 import {useUserStore} from '@/store/user'
-import { ref } from 'vue';
+import { ref,watch } from 'vue';
 const userStore = useUserStore()
 const listData = ref([])
 listData.value = userStore.userMenu
+
+const breadList = ref([])
+
+//路由对象--获取路由参数
+import { useRoute } from 'vue-router'
+const route = useRoute()
+
+watch(route, () => getBreadList());
+
+function getBreadList(){
+  breadList.value =  route.matched
+}
+
+getBreadList()
 
 </script>
 
