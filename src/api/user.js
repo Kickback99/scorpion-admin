@@ -10,12 +10,20 @@ export const userRegisterService = (registerData) =>{
     return request.post('/user/register',params)
 }
 
-export const userLoginService = (loginData) =>{
-    const params = new URLSearchParams();
+export const userLoginService = (params) =>{
+
+    return request.post('/users/login',params)
+
+
+    /* const params = new URLSearchParams();
 
     for(let key in loginData){
         params.append(key,loginData[key])
     }
 
-    return request.post('/user/login',params)
+    return request.post('/user/login',params) */
+}
+
+export const userInfoService = () => {
+    return request.get('/users/info')
 }
