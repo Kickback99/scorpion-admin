@@ -58,7 +58,7 @@ const loadMenu = async(to,next) => {
     asyncRoutes.forEach(r => {
         router.addRoute(r)
     })
-   
+
     
     //保存菜单，避免路由鉴权重复执行
     userStore.setUserMenu(res.data.routers)
