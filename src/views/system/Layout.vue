@@ -1,19 +1,46 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="250px">
+      <el-aside width="220px">
         <el-menu router
-      active-text-color="#ffd04b" 
-          background-color="darkslategray" 
+      active-text-color="palegreen" 
+          background-color="transparent" 
           :default-active="handelUrl"
-          text-color="#fff"
+          text-color="666"
           mode="vertical"
         >
           <menu-tree :listData="listData"></menu-tree>
         </el-menu>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
+        <el-header>
+          <div><h2>{{userStore.username}}</h2></div>
+                <el-dropdown @command="handleCommand">
+                        <span class="el-dropdown_box">
+                            <el-avatar :src=" userStore.avatar || avatar" />
+                            <el-icon>
+                                    <arrow-down />
+                            </el-icon>
+                        </span>
+                        <!-- 折叠的下拉部分 -->
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                            <el-dropdown-item command="profile" :icon="User"
+                                >基本资料</el-dropdown-item
+                            >
+                            <el-dropdown-item command="avatar" :icon="Crop"
+                                >更换头像</el-dropdown-item
+                            >
+                            <el-dropdown-item command="password" :icon="EditPen"
+                                >重置密码</el-dropdown-item
+                            >
+                            <el-dropdown-item command="logout" :icon="SwitchButton"
+                                >退出登录</el-dropdown-item
+                            >
+                            </el-dropdown-menu>
+                        </template>
+                </el-dropdown>
+        </el-header>
         <el-main>
           <el-breadcrumb separator=">">
               <el-breadcrumb-item :to="{ path: r.path === '/system'?'/system/sysUser':r.path }" v-for="r in breadList">
@@ -31,28 +58,68 @@
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
 import {useUserStore} from '@/store/user'
+import {useTokenStore} from '@/store/token'
 import { ref,watch } from 'vue';
+import {ArrowDown} from '@element-plus/icons-vue'
+import avatar from '@/assets/avatar.jpg'
+import {userLogoutService} from '@/api/user'
+import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const listData = ref([])
 listData.value = userStore.userMenu
 
-const breadList = ref([])
+
 
 //路由对象--获取路由参数
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 
-watch(route, () => getBreadList());
+const router = useRouter()
+
+// 面包屑
+
+const breadList = ref([])
 
 function getBreadList(){
   breadList.value =  route.matched
 }
+getBreadList()
+
+watch(route, () => getBreadList());
 
 const handelUrl = ref('/')
 handelUrl.value = route.path 
 
+const tokenStore = useTokenStore()
 
-getBreadList()
+// 处理下拉事件
+const handleCommand = async(key) => {
+  if(key === 'logout'){
+    // 发送注销请求
+    const res = await userLogoutService()
+    ElMessage.success(res.msg)
+    console.log('清空前',router.getRoutes())
+    // 清空动态路由数据
+    remove(userStore.userMenu)
+    console.log('清空后',router.getRoutes())
+    // 清空菜单
+    userStore.userMenu = []
+    // 清空token
+    tokenStore.removeToken()
+    // 跳转到登录页
+    router.replace('/login')
+  }
+}
+
+
+const remove  = (res) => {
+    res.forEach(item => {
+        router.removeRoute(item.name)
+        if(item.children && item.children.length > 0) {
+         remove(item.children)
+    }
+    })
+}
 
 </script>
 
@@ -61,7 +128,25 @@ getBreadList()
   height: 100vh;
 }
 
+.el-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .el-icon{
+            margin-left: 10px;
+        }
+    .el-dropdown_box {
+      display: flex;
+      align-items: center;
+      outline: none;
+      &:active,
+      &:hover {
+        outline: none;
+      }
+    }
+}
+
 .el-aside {
-  background-color: #232323;
+  background-color: coral;
 }
 </style>
