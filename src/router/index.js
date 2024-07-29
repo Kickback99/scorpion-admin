@@ -29,11 +29,14 @@ const routes = [
 
 const modules = import.meta.glob('../views/system/**/*.vue')
 
+// 处理前端需要的路由规则格式
 function routesHandler(router){
     return router.map(route => {
         if(route.component === 'Layout'){
             route.component = Layout
+            route.name = 'system'
         }else {
+            route.name = route.path
             const compName = route.component
             const path = `../views/${compName}.vue`
             route.component = modules[path]
@@ -52,8 +55,12 @@ function routesHandler(router){
 const loadMenu = async(to,next) => {
     const userStore = useUserStore()
     const res = await userInfoService()
+    //保存菜单，避免路由鉴权重复执行
+    userStore.setUserMenu(menusNameHandler(res.data.routers))
     const asyncRoutes = routesHandler(res.data.routers)
 
+    console.log('后端返回',res.data.routers)
+    
     console.log('路由数据',asyncRoutes)
 
     // 添加路由
@@ -61,12 +68,30 @@ const loadMenu = async(to,next) => {
         router.addRoute(r)
     })
 
+    console.log(router.getRoutes())
+
     
-    //保存菜单，避免路由鉴权重复执行
-    userStore.setUserMenu(res.data.routers)
+  
 
     next({...to,replace:true})
 }
+
+// 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
+function menusNameHandler(menus){
+    return menus.map(route => {
+        if(route.component === 'Layout'){
+            route.name = 'system'
+        }else {
+            route.name = route.path
+        }
+
+        // 处理children
+        if(route.children && route.children.length > 0){
+            route.children = menusNameHandler(route.children)
+        }
+        return route
+    })
+} 
 
 // 创建路由对象
 

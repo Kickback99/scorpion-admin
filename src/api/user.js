@@ -27,3 +27,7 @@ export const userLoginService = (params) =>{
 export const userInfoService = () => {
     return request.get('/users/info')
 }
+
+export const userLogoutService = () => {
+    return request.get("/users/logout")
+}

@@ -43,7 +43,7 @@ instance.interceptors.response.use(
                 ElMessage.error(res.data.msg || '重新登录')
                 const tokenStore = useTokenStore()
                 tokenStore.removeToken()
-                router.push('/login')
+                router.replace('/login')
 
             }else ElMessage.error(res.data.msg)
 
