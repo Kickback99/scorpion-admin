@@ -1,7 +1,7 @@
 <template>
         <!--多级菜单-->
         <div v-for="menu in listData">
-            <el-menu-item :index="`/system/${menu.path}`" v-if="menu.children == null || menu.children.length == 0">
+            <el-menu-item :index="handleChildren(menu)" v-if="menu.children == null || menu.children.length == 0">
                     <el-icon><Aim /></el-icon> <span>{{menu.meta.title}}</span>
             </el-menu-item>
 
@@ -17,6 +17,12 @@
 
 <script setup>
 defineProps(['listData'])
+
+const handleChildren = (menu) => {
+        
+    return menu.path.includes('Log') === true ? `/system/log/${menu.path}`:`/system/${menu.path}`
+ }
+
 </script>
 
 <style scoped lang="scss">
