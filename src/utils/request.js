@@ -7,7 +7,9 @@ const baseURL = '/api';
 const instance = axios.create({baseURL})
 import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
+import { useUserStore } from '@/store/user';
 import router from '@/router';
+import { clearRoute } from './clearRoute';
 
 
 
@@ -39,10 +41,20 @@ instance.interceptors.response.use(
        if(regex.test(res.data.code)) {
 
             if(res.data.code === 401){
-                // 如果状态码为401，则表示未登录
-                ElMessage.error(res.data.msg || '重新登录')
+                // 处理token过期或者篡改
                 const tokenStore = useTokenStore()
+                const userStore = useUserStore()
+                // 清空token
                 tokenStore.removeToken()
+                // 清空动态路由数据
+                clearRoute(userStore.userMenu)    
+                // 清空菜单
+                userStore.userMenu = []
+                // 清空用户名
+                userStore.username = ''
+                // 提示信息
+                ElMessage.success(res.data.msg)
+                // 跳转到登录页
                 router.replace('/login')
 
             }else ElMessage.error(res.data.msg)
