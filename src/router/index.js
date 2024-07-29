@@ -36,6 +36,7 @@ function routesHandler(router){
             const compName = route.component
             const path = `../views/${compName}.vue`
             route.component = modules[path]
+            console.log(modules[path])
             // route.component = () => import(`@/views/system/${compName}.vue`)
         }
 
