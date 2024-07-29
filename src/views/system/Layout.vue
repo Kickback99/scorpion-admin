@@ -89,6 +89,11 @@ watch(route, () => getBreadList());
 
 const handelUrl = ref('/')
 handelUrl.value = route.path 
+watch(()=>route.path,()=>{
+  handelUrl.value = route.path 
+})
+
+
 
 const tokenStore = useTokenStore()
 
@@ -97,15 +102,19 @@ const handleCommand = async(key) => {
   if(key === 'logout'){
     // 发送注销请求
     const res = await userLogoutService()
-    ElMessage.success(res.msg)
+    // 清空token
+    tokenStore.removeToken()
+    
     console.log('清空前',router.getRoutes())
     // 清空动态路由数据
     remove(userStore.userMenu)
     console.log('清空后',router.getRoutes())
     // 清空菜单
     userStore.userMenu = []
-    // 清空token
-    tokenStore.removeToken()
+    // 清空用户名
+    userStore.username = ''
+    // 提示信息
+    ElMessage.success(res.msg)
     // 跳转到登录页
     router.replace('/login')
   }
