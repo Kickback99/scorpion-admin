@@ -72,6 +72,7 @@ listData.value = userStore.userMenu
 
 //路由对象--获取路由参数
 import { useRoute, useRouter } from 'vue-router'
+import { clearRoute } from '@/utils/clearRoute';
 const route = useRoute()
 
 const router = useRouter()
@@ -99,15 +100,15 @@ const tokenStore = useTokenStore()
 
 // 处理下拉事件
 const handleCommand = async(key) => {
+  console.log('下拉事件执行了')
   if(key === 'logout'){
     // 发送注销请求
     const res = await userLogoutService()
     // 清空token
     tokenStore.removeToken()
-    
     console.log('清空前',router.getRoutes())
     // 清空动态路由数据
-    remove(userStore.userMenu)
+    clearRoute(userStore.userMenu)
     console.log('清空后',router.getRoutes())
     // 清空菜单
     userStore.userMenu = []
@@ -121,14 +122,6 @@ const handleCommand = async(key) => {
 }
 
 
-const remove  = (res) => {
-    res.forEach(item => {
-        router.removeRoute(item.name)
-        if(item.children && item.children.length > 0) {
-         remove(item.children)
-    }
-    })
-}
 
 </script>
 
