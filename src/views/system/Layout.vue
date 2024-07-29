@@ -5,7 +5,7 @@
         <el-menu router
       active-text-color="#ffd04b" 
           background-color="darkslategray" 
-          :default-active="$route.path"
+          :default-active="handelUrl"
           text-color="#fff"
           mode="vertical"
         >
@@ -47,6 +47,10 @@ watch(route, () => getBreadList());
 function getBreadList(){
   breadList.value =  route.matched
 }
+
+const handelUrl = ref('/')
+handelUrl.value = route.path 
+
 
 getBreadList()
 

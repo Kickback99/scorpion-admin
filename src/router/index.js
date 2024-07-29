@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {userInfoService} from '@/api/user'
 import Layout from '@/views/system/Layout.vue'
 import {useUserStore} from '@/store/user'
+import { ElMessage } from 'element-plus'
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -85,13 +86,14 @@ router.beforeEach((to, from, next) => {
 
     // 白名单放行
     if(whiteList.includes(to.path)){
+        
       return next();
     }
 
     // 验证有无token
 
     if(!getToken()) {
-        console.log('无token')
+        ElMessage.error('请重新登录')
         return next('/login')
     }
 
