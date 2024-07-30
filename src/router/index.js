@@ -120,12 +120,11 @@ router.beforeEach((to, from, next) => {
 
     // 白名单放行
     if(whiteList.includes(to.path)){
-        console.log('被放行了')
       return next();
     }
 
     // 如果没有token跳转到登录页
-    if(!tokenStore.token) {
+    if(!tokenStore.token && to.path != '/login') {
         ElMessage.error('请重新登录')
         return next('/login')
     }
