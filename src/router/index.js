@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {userInfoService} from '@/api/user'
 import Layout from '@/views/system/Layout.vue'
 import {useUserStore} from '@/store/user'
+import {useTokenStore} from '@/store/token'
 import { ElMessage } from 'element-plus'
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -109,15 +110,22 @@ router.beforeEach((to, from, next) => {
 
     const userStore = useUserStore()
 
+    const tokenStore = useTokenStore()
+
+    // 已登录不能输入登录地址回到登录页
+    if(to.path === '/login' && tokenStore.token) {
+        ElMessage.warning('请先退出登录')
+        return next(from.fullPath);
+    }
+
     // 白名单放行
     if(whiteList.includes(to.path)){
-        
+        console.log('被放行了')
       return next();
     }
 
-    // 验证有无token
-
-    if(!getToken()) {
+    // 如果没有token跳转到登录页
+    if(!tokenStore.token) {
         ElMessage.error('请重新登录')
         return next('/login')
     }
