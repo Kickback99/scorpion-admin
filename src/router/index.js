@@ -28,26 +28,47 @@ const routes = [
     ]} */
 ]
 
-const modules = import.meta.glob('../views/system/**/*.vue')
+const sysModules = import.meta.glob('../views/system/**/*.vue')
+const conModules = import.meta.glob('../views/content/**/*.vue')
 
 // 处理前端需要的路由规则格式
-function routesHandler(router){
+function routesHandler(router,parentType=null){
     return router.map(route => {
-        if(route.component === 'Layout'){
+        // 为顶层路由设置type属性
+        if(route.path === '/system'){
             route.component = Layout
             route.name = 'system'
+            route.type = 'system'
+        }else if(route.path === '/content' ){
+            route.component = Layout
+            route.name = 'content'
+            route.type = 'content'
         }else {
+        // 如果是子路由，继承父路由的type属性
+            route.type = parentType
+            // 根据父路由的type来决定使用哪个模块导入
+            const modules = parentType === 'system'?sysModules:conModules;
+            if(modules){
+                route.name = route.path
+                const compName = route.component
+                const path = `../views/${compName}.vue`
+                route.component = modules[path]
+            }
+        }
+        
+        //comment：历史代码
+        /* else {
             route.name = route.path
             const compName = route.component
             const path = `../views/${compName}.vue`
             route.component = modules[path]
             console.log(modules[path])
             // route.component = () => import(`@/views/system/${compName}.vue`)
-        }
+        } */
 
         // 处理children
         if(route.children && route.children.length > 0){
-            route.children = routesHandler(route.children)
+            route.children = routesHandler(route.children,route.type)
         }
         return route
     })
@@ -80,11 +101,21 @@ const loadMenu = async(to,next) => {
 // 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
 function menusNameHandler(menus){
     return menus.map(route => {
-        if(route.component === 'Layout'){
+
+        if(route.path === '/system'){
             route.name = 'system'
+        }else if(route.path === '/content'){
+            route.name = 'content'
         }else {
             route.name = route.path
         }
+
+        //comment：历史代码
+       /*  if(route.component === 'Layout'){
+            route.name = 'system'
+        }else {
+            route.name = route.path
+        } */
 
         // 处理children
         if(route.children && route.children.length > 0){
