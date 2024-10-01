@@ -19,8 +19,13 @@
 defineProps(['listData'])
 
 const handleChildren = (menu) => {
-        
-    return menu.path.includes('Log') === true ? `/system/log/${menu.path}`:`/system/${menu.path}`
+    // 根据 type 来决定添加哪个前缀
+    const prefix = menu.type === 'system'?'system':'content'
+    if(menu.path.includes('Log')) {
+        // 如果路径中包含 log，则添加 log 父路径
+        return `/${prefix}/log/${menu.path}`
+    }else return `/${prefix}/${menu.path}`
+    // return menu.path.includes('Log') === true ? `/system/log/${menu.path}`:`/system/${menu.path}`
  }
 
 </script>
