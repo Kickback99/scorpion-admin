@@ -78,7 +78,7 @@ const loadMenu = async(to,next) => {
     const userStore = useUserStore()
     const res = await userInfoService()
     //保存菜单，避免路由鉴权重复执行
-    userStore.setUserMenu(menusNameHandler(res.data.routers))
+    userStore.setUserMenu(res.data.routers)
     const asyncRoutes = routesHandler(res.data.routers)
 
     console.log('后端返回',res.data.routers)
