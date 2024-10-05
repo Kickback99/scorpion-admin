@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {userInfoService} from '@/api/user'
-import Layout from '@/views/system/Layout.vue'
+import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
 import { ElMessage } from 'element-plus'
