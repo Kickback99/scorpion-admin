@@ -2,11 +2,43 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+import Icons from 'unplugin-icons/vite'
+import IconsResolver from 'unplugin-icons/resolver'
+import path from 'path'
+
+// pathSrc 是给自动导入图标库使用的
+const pathSrc = path.relative(__dirname,'src')
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    //element plus 自动导入插件
+    AutoImport({
+      imports:['vue','vue-router'],
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [
+        ElementPlusResolver(),
+        // 自动导入图标组件
+        IconsResolver({
+          // prefix: 'i', 默认为i，所以可以不用声明
+          enabledCollections:['ep','ant-design'] //指定图标集合，@iconify-json/ep 是 Element plus 的图标库
+
+      }),
+      ],
+      dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
+    }),
+
+    // 开启Icons图标自动下载
+    Icons({
+      autoInstall: true,
+    }),
   ],
   resolve: {
     alias: {

@@ -49,7 +49,9 @@
           </el-breadcrumb>
           <router-view/>
         </el-main>
-        <el-footer>Footer</el-footer>
+        <el-footer>Footer
+          <el-button @click="handleClick">Default</el-button>
+        </el-footer>
       </el-container>
     </el-container>
   </div>
@@ -63,16 +65,19 @@ import { ref,watch } from 'vue';
 import {ArrowDown} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
 import {userLogoutService} from '@/api/user'
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const listData = ref([])
 listData.value = userStore.userMenu
 
-
+const handleClick = () =>{
+  ElMessage.success('成功点击')
+}
 
 //路由对象--获取路由参数
 import { useRoute, useRouter } from 'vue-router'
 import { clearRoute } from '@/utils/clearRoute';
+// import { ElMessage } from 'element-plus';
 const route = useRoute()
 
 const router = useRouter()
