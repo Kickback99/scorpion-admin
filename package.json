@@ -17,8 +17,13 @@
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@iconify-json/ant-design": "^1.2.1",
+    "@iconify-json/ep": "^1.2.0",
     "@vitejs/plugin-vue": "^4.5.2",
     "sass": "^1.70.0",
+    "unplugin-auto-import": "^0.18.3",
+    "unplugin-icons": "^0.19.3",
+    "unplugin-vue-components": "^0.27.4",
     "vite": "^5.0.10"
   }
 }
