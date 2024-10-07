@@ -76,6 +76,7 @@ function routesHandler(router,parentType=null){
 
 const loadMenu = async(to,next) => {
     const userStore = useUserStore()
+    console.log('请求菜单')
     const res = await userInfoService()
     //保存菜单，避免路由鉴权重复执行
     userStore.setUserMenu(res.data.routers)
@@ -139,30 +140,35 @@ const getToken = () => {
 const whiteList = ['/login','/register','/404','/401']
 router.beforeEach((to, from, next) => {
 
+    console.log(to.path)
+    console.log('路由前置守卫执行')
     const userStore = useUserStore()
 
     const tokenStore = useTokenStore()
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
+        console.log('已登录不能输入登录地址回到登录页')
         ElMessage.warning('请先退出登录')
         return next(from.fullPath);
     }
 
     // 白名单放行
     if(whiteList.includes(to.path)){
+        console.log('白名单放行')
       return next();
     }
 
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
-        ElMessage.error('请重新登录')
+        ElMessage.error('如果没有token跳转到登录页')
         return next('/login')
     }
 
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
+        console.log('已登录，有菜单')
         return next()
     }
 
