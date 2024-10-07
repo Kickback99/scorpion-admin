@@ -140,7 +140,7 @@ const getToken = () => {
 const whiteList = ['/login','/register','/404','/401']
 router.beforeEach((to, from, next) => {
 
-    console.log(to.path)
+    console.log(to)
     console.log('路由前置守卫执行')
     const userStore = useUserStore()
 
@@ -162,8 +162,18 @@ router.beforeEach((to, from, next) => {
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
         ElMessage.error('如果没有token跳转到登录页')
-        return next('/login')
+        if(to.path != '/login' && !localStorage.getItem('originalRouteQuery')){
+            // 保存原始路由的查询参数到本地存储
+            const path = to.path
+            const query =  to.query
+            localStorage.setItem('originalRouteQuery', JSON.stringify({path,query}));
+        }
+        console.log('最终的',localStorage.getItem('originalRouteQuery'))
+        // 重定向到登录页面
+        return next('/login');
     }
+
+
 
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){

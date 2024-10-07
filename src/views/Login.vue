@@ -145,7 +145,18 @@
     console.log(res.data)
     tokenStore.setToken(res.data)
     ElMessage.success('登录成功')
-    router.push('/')
+    // 从本地存储中获取原始路由的查询参数
+    const originalRouteQuery = JSON.parse(localStorage.getItem('originalRouteQuery'));
+     // 如果存在保存的路由信息，则重定向到该路由
+      if (originalRouteQuery) {
+        // 使用带有查询参数的路径重定向用户
+        router.push({ path: originalRouteQuery.path, query: originalRouteQuery.query });
+        // 清除保存的路由信息
+        localStorage.removeItem('originalRouteQuery');
+      } else {
+        // 如果没有保存的路由信息，可以重定向到首页或其他默认页面
+        router.push('/');
+      }
   }
   
   </script>
