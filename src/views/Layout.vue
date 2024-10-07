@@ -113,7 +113,7 @@ const handleCommand = async(key) => {
     // 清空用户名
     userStore.username = ''
     // 提示信息
-    ElMessage.success(res.msg)
+    ElMessage.success(res.message)
     // 跳转到登录页
     router.replace('/login')
   }

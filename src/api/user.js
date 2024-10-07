@@ -12,7 +12,7 @@ export const userRegisterService = (registerData) =>{
 
 export const userLoginService = (params) =>{
 
-    return request.post('/users/login',params)
+    return request.post('/admin/login',params)
 
 
     /* const params = new URLSearchParams();
@@ -25,9 +25,9 @@ export const userLoginService = (params) =>{
 }
 
 export const userInfoService = () => {
-    return request.get('/users/info')
+    return request.get('/admin/userDetailInfo')
 }
 
 export const userLogoutService = () => {
-    return request.get("/users/logout")
+    return request.get("/admin/logout")
 }
