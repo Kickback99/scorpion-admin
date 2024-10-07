@@ -18,7 +18,7 @@ instance.interceptors.request.use(
     config => {
         const tokenStore =  useTokenStore()
         if(tokenStore.token){
-            config.headers.token = tokenStore.token
+            config.headers.authorization = tokenStore.token
         }
 
         return config
@@ -31,6 +31,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     res=>{
         if(res.data.code === 0 || res.data.code === 200){
+            console.log('哈哈')
             return res.data
         }
         
@@ -41,6 +42,7 @@ instance.interceptors.response.use(
        if(regex.test(res.data.code)) {
 
             if(res.data.code === 401){
+                console.log('响应拦截器执行...')
                 // 处理token过期或者篡改
                 const tokenStore = useTokenStore()
                 const userStore = useUserStore()
@@ -53,20 +55,21 @@ instance.interceptors.response.use(
                 // 清空用户名
                 userStore.username = ''
                 // 提示信息
-                ElMessage.success(res.data.msg)
+                ElMessage.success(res.data.message)
                 // 跳转到登录页
                 router.replace('/login')
 
-            }else ElMessage.error(res.data.msg)
+            }else ElMessage.error(res.data.message)
 
             return Promise.reject(res.data)
        }
 
-        ElMessage.error(res.data.message || '服务异常')
+        ElMessage.error(res.data.message || '业务失败')
         return Promise.reject(res.data)
     },
     err=>{
         alert('服务异常');
+        console.log('请求异常执行...')
         return Promise.reject(err);//异步的状态转化成失败的状态
     }
 )
