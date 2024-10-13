@@ -62,7 +62,7 @@ import {useTokenStore} from '@/store/token'
 import { ref,watch } from 'vue';
 import {ArrowDown} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
-import {userLogoutService} from '@/api/user'
+import {adminLogoutApi} from '@/api/admin'
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const listData = ref([])
@@ -101,7 +101,7 @@ const handleCommand = async(key) => {
   console.log('下拉事件执行了')
   if(key === 'logout'){
     // 发送注销请求
-    const res = await userLogoutService()
+    const res = await adminLogoutApi()
     // 清空token
     tokenStore.removeToken()
     console.log('清空前',router.getRoutes())
