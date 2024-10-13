@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {userInfoService} from '@/api/user'
+import {userInfoApi} from '@/api/admin'
 import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
@@ -77,7 +77,7 @@ function routesHandler(router,parentType=null){
 const loadMenu = async(to,next) => {
     const userStore = useUserStore()
     console.log('请求菜单')
-    const res = await userInfoService()
+    const res = await userInfoApi()
     //保存菜单，避免路由鉴权重复执行
     userStore.setUserMenu(res.data.routers)
     const asyncRoutes = routesHandler(res.data.routers)
