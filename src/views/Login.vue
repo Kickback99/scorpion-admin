@@ -84,7 +84,7 @@
   import {ref} from 'vue'
   import { ElMessage } from 'element-plus'
   import {User,Lock} from '@element-plus/icons-vue'
-  import {userRegisterService,userLoginService} from '@/api/user'
+  import {userRegisterService,adminLoginApi} from '@/api/admin'
   import {useTokenStore} from '@/store/token'
   const tokenStore = useTokenStore()
   const ruleFormRef = ref(null)
@@ -141,7 +141,7 @@
   //t_user_request：用户登录请求
   const loginEve = async() =>{
     await ruleFormRef.value.validate()
-    const res = await userLoginService(formData.value)
+    const res = await adminLoginApi(formData.value)
     console.log(res.data)
     tokenStore.setToken(res.data)
     ElMessage.success('登录成功')
