@@ -46,14 +46,16 @@
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" />
-            <el-table-column label="操作" width="100">
+            <el-table-column label="操作" width="150">
                 <template #default="{row,$index}">
                 <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
                 <el-button type="danger" :icon="Delete" @click="removeUsers(row.id)"  circle plain/>
+                <el-button type="danger" :icon="User" @click="showAllocRoles(row)"  circle plain/>
                 </template>
             </el-table-column>
         </el-table>
 
+        <!-- 文章新增和修改弹层 -->
         <el-dialog v-model="dialogVisible" :title="title" width="30%">
             <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
                 :size="formSize" status-icon label-width="100px" style="padding-right: 35px;">
@@ -87,6 +89,42 @@
                 </span>
             </template>
         </el-dialog>
+
+        <!-- 用户分配角色弹层 -->
+        <el-dialog v-model="allocRolesVisible" title="分配角色" >
+            <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
+                :size="formSize" status-icon>
+                <el-form-item label="用户名">
+                    <el-input :prefix-icon="User" disabled v-model="formData.username" />
+                </el-form-item>
+
+                <el-form-item label="角色列表">
+                    <el-checkbox
+                        v-model="checkAll"
+                        :indeterminate="isIndeterminate"
+                        @change="handleCheckAllChange"
+                        >
+                        全选
+                    </el-checkbox>
+                    <el-checkbox-group
+                    v-model="checkedCities"
+                    @change="handleCheckedCitiesChange"
+                    >
+                    <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">
+                        {{ role.roleName }}
+                    </el-checkbox>
+                    </el-checkbox-group>
+                    </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="doAllocRoles">确认</el-button>
+                    <el-button @click="allocRolesVisible = false">
+                        取消
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
  
         <!-- 分页 -->
         <el-pagination
@@ -107,10 +145,12 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh} from '@element-plus/icons-vue'
+import {Edit,Delete,Refresh,User} from '@element-plus/icons-vue'
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
+import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 
 const params = ref({
     pageNum :1,
@@ -304,7 +344,57 @@ const rules = {
     ],
   }
 
+// 分配角色相关
 
+
+const checkAll = ref(false) //控制大复选框的全选和半选
+const isIndeterminate = ref(false) //判断当前状态是否半选
+const checkedCities = ref([]) //选中的数组集合
+const allRoles = ref([]) //全部的数组集合
+const allocRolesVisible = ref(false)
+
+// 展示分配角色
+const showAllocRoles = async(row) =>{
+    formData.value.username = row.username
+    formData.value.id = row.id
+    allocRolesVisible.value = true
+    const res = await allocRolesApi(row.id)
+    // 把所有角色集合赋值给 allRoles
+    allRoles.value = res.data.allRoles
+    // 把对应用户id的角色ids存入 checkedCities
+    checkedCities.value = res.data.userRoleIds
+    console.log(checkedCities.value)
+    checkAll.value = allRoles.value.length === checkedCities.value.length
+    isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
+}
+
+  //大复选框的事件回调
+  const handleCheckAllChange = (val) => {
+    console.log(val)
+    checkedCities.value = val ? allRoles.value.map(item => item.id) : []
+    isIndeterminate.value = false
+  }
+  //小复选框的事件回调
+  const handleCheckedCitiesChange = (value) => {
+    console.log(value)
+    const checkedCount = value.length
+    checkAll.value = checkedCount === allRoles.value.length && allRoles.length>0
+    isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.value.length
+  }
+
+//为用户分配角色
+const doAllocRoles = async() => {
+    let userRoleData = {
+        userId:formData.value.id,
+        roleIdList: checkedCities.value
+    }
+
+    await doAllocRolesApi(userRoleData)
+    ElMessage.success("分配角色成功")
+    allocRolesVisible.value = false
+    render()
+
+}
 
 
 </script>

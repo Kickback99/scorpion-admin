@@ -16,7 +16,11 @@ export const modifyApi = (params) => http.put('/admin/system/roles',params)
 
 // 分页查询全部角色
 export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/roles/${pageNum}/${pageSize}`,{params:searchData})
-// export const listApi = (params) => http.get(`/admin/system/roles/${params.pageNum}/${params.pageSize}`,{params:{roleName:params.roleName}})
 
 
+// 获取用户角色数据
+export const allocRolesApi = (userId) => http.get(`/admin/system/roles/assign/${userId}`)
+
+// 给用户分配角色
+export const doAllocRolesApi = (userRoleData) => http.post(`/admin/system/roles/assign`,userRoleData)
 
