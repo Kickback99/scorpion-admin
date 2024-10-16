@@ -1,5 +1,6 @@
 <template>
-    <div class="layout">
+    <!-- 工具条 -->
+    <div class="toolbar">
         <el-form
         inline
         :model="formData"
@@ -101,7 +102,7 @@ const params = ref({
 const total = ref(null)
 
 
-//角色分页列表
+// t_role_request：角色列表请求
 const render = async() => {
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     tableData.value = res.data.items
@@ -131,6 +132,7 @@ const onCurrentChange = (page) => {
     render()
 }
 
+// t_role_request：删除角色请求
 const removeRole = async(row) =>{
     await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
       type: 'warning',
@@ -180,6 +182,7 @@ const onReset = () => {
 
 
     // 新增角色请求
+    // t_role_request：新增角色请求
     const addRole = async() => {
         await ruleFormRef.value.validate()
         const res = await addApi(dialogData.value)
@@ -192,6 +195,7 @@ const onReset = () => {
     }
 
     // 修改角色请求
+    // t_role_request：修改角色请求
     const modifyRole = async() =>{
         await ruleFormRef.value.validate()
         await modifyApi(dialogData.value)
@@ -222,7 +226,7 @@ const onReset = () => {
 </script>
 
 <style lang="scss" scoped>
-.layout {
+.toolbar {
     display: flex;
     justify-content: space-between
 }
