@@ -63,7 +63,9 @@
           <el-form-item label="图标" prop="icon" v-if="formModel.type !== 2">
             <el-select v-model="formModel.icon" clearable>
               <el-option v-for="item in iconList" :key="item.class" :label="item.class" :value="item.class">
-                <el-
+              <span style="float: left;">
+               <i :class="item.class"></i>  <!-- 如果动态显示图标，这里添加判断 -->
+              </span>
                 <span style="padding-left: 6px;">{{ item.class }}</span>
               </el-option>
             </el-select>
