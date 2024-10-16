@@ -1,151 +1,156 @@
 <template>
-        <el-button @click="toggleSelection()">清空表格</el-button>
-        <el-button color="#626aef" :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
-<el-form
-    inline
-    class="demo-ruleForm"
-    :size="formSize"
-    status-icon
+    <div class="layout">
+        <el-form
+            inline
+            class="demo-ruleForm"
+            :size="formSize"
+            status-icon
+            >
+            <el-form-item>
+            <el-input :prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
+            </el-form-item>
+
+            <el-form-item>
+                <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
+            </el-form-item>
+
+            <el-form-item>
+            <el-button :icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
+            <el-button :icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="right">
+            <el-button :icon="Delete" color="#626aef" plain :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
+            <el-button :icon="Plus" type="success" plain  :dark="isDark" @click="addDialog">新增</el-button>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- 表格 -->
+    <el-table :data="tableData" style="width: 100%"
+    ref="multipleTableRef"
+    @selection-change="removeMultiple"
+    stripe="1"
+    border
     >
-    <el-form-item label="用户搜索">
-      <el-input :prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
-    </el-form-item>
+        <el-table-column type="selection" :selectable="selectable" width="55" />
+        <el-table-column type="index" label="序号" width="100" />
+        <el-table-column prop="username" label="用户名" />
+        <el-table-column prop="nickname" label="呢称" />
+        <el-table-column prop="phone" label="手机" />
+        <el-table-column label="类型">
+            <template #default="{row}">
+                {{ row.type === 1 ? '后台用户':'前台用户' }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态">
+            <template #default="{row}">
+                <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/>
+            </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column label="操作" width="150">
+            <template #default="{row,$index}">
+            <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
+            <el-button type="danger" :icon="Delete" @click="removeUsers(row.id)"  circle plain/>
+            <el-button type="danger" :icon="User" @click="showAllocRoles(row)"  circle plain/>
+            </template>
+        </el-table-column>
+    </el-table>
 
-    <el-form-item label="用户类型">
-        <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
-    </el-form-item>
+    <!-- 文章新增和修改弹层 -->
+    <el-dialog v-model="dialogVisible" :title="title" width="30%">
+        <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
+            :size="formSize" status-icon label-width="100px" style="padding-right: 35px;">
+            <el-form-item label="用户名" prop="username">
+                <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
+            </el-form-item>
 
-    <el-form-item>
-      <el-button @click="onSearch" type="primary">搜索</el-button>
-      <el-button :icon="Refresh" size="mini" @click="onReset">重置</el-button>
-    </el-form-item>
-  </el-form>
+            <el-form-item label="呢称" prop="nickname">
+                <el-input :prefix-icon="User" placeholder="请输入呢称" v-model="formData.nickname" />
+            </el-form-item>
 
-    <MainContainer title="用户管理">
-        <template #right>
-            <el-button type="primary" @click="addDialog">新增用户</el-button>
+            <el-form-item label="手机号" prop="phone">
+                <el-input :prefix-icon="User" placeholder="请输入手机号" v-model="formData.phone" />
+            </el-form-item>
+
+            <el-form-item label="邮箱" prop="email">
+                <el-input :prefix-icon="User" placeholder="请输入邮箱" v-model="formData.email" />
+            </el-form-item>
+
+            <el-form-item label="用户类型">
+                <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
+            </el-form-item>
+
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="title==='新增用户'?addUser():modifyUser()">确认</el-button>
+                <el-button type="primary" @click="dialogVisible = false">
+                    取消
+                </el-button>
+            </span>
         </template>
-        <!-- 表格 -->
-        <el-table :data="tableData" style="width: 100%"
-        ref="multipleTableRef"
-        @selection-change="removeMultiple"
-        >
-            <el-table-column type="selection" :selectable="selectable" width="55" />
-            <el-table-column type="index" label="序号" width="100" />
-            <el-table-column prop="username" label="用户名" />
-            <el-table-column prop="nickname" label="呢称" />
-            <el-table-column prop="phone" label="手机" />
-            <el-table-column label="类型">
-                <template #default="{row}">
-                    {{ row.type === 1 ? '后台用户':'前台用户' }}
-                </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态">
-                <template #default="{row}">
-                    <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" />
-            <el-table-column label="操作" width="150">
-                <template #default="{row,$index}">
-                <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-                <el-button type="danger" :icon="Delete" @click="removeUsers(row.id)"  circle plain/>
-                <el-button type="danger" :icon="User" @click="showAllocRoles(row)"  circle plain/>
-                </template>
-            </el-table-column>
-        </el-table>
+    </el-dialog>
 
-        <!-- 文章新增和修改弹层 -->
-        <el-dialog v-model="dialogVisible" :title="title" width="30%">
-            <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
-                :size="formSize" status-icon label-width="100px" style="padding-right: 35px;">
-                <el-form-item label="用户名" prop="username">
-                    <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
-                </el-form-item>
+    <!-- 用户分配角色弹层 -->
+    <el-dialog v-model="allocRolesVisible" title="分配角色" >
+        <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
+            :size="formSize" status-icon>
+            <el-form-item label="用户名">
+                <el-input :prefix-icon="User" disabled v-model="formData.username" />
+            </el-form-item>
 
-                <el-form-item label="呢称" prop="nickname">
-                    <el-input :prefix-icon="User" placeholder="请输入呢称" v-model="formData.nickname" />
-                </el-form-item>
-
-                <el-form-item label="手机号" prop="phone">
-                    <el-input :prefix-icon="User" placeholder="请输入手机号" v-model="formData.phone" />
-                </el-form-item>
-
-                <el-form-item label="邮箱" prop="email">
-                    <el-input :prefix-icon="User" placeholder="请输入邮箱" v-model="formData.email" />
-                </el-form-item>
-
-                <el-form-item label="用户类型">
-                    <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
-                </el-form-item>
-
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="title==='新增用户'?addUser():modifyUser()">确认</el-button>
-                    <el-button type="primary" @click="dialogVisible = false">
-                        取消
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
-
-        <!-- 用户分配角色弹层 -->
-        <el-dialog v-model="allocRolesVisible" title="分配角色" >
-            <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
-                :size="formSize" status-icon>
-                <el-form-item label="用户名">
-                    <el-input :prefix-icon="User" disabled v-model="formData.username" />
-                </el-form-item>
-
-                <el-form-item label="角色列表">
-                    <el-checkbox
-                        v-model="checkAll"
-                        :indeterminate="isIndeterminate"
-                        @change="handleCheckAllChange"
-                        >
-                        全选
-                    </el-checkbox>
-                    <el-checkbox-group
-                    v-model="checkedCities"
-                    @change="handleCheckedCitiesChange"
+            <el-form-item label="角色列表">
+                <el-checkbox
+                    v-model="checkAll"
+                    :indeterminate="isIndeterminate"
+                    @change="handleCheckAllChange"
                     >
-                    <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">
-                        {{ role.roleName }}
-                    </el-checkbox>
-                    </el-checkbox-group>
-                    </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button type="primary" @click="doAllocRoles">确认</el-button>
-                    <el-button @click="allocRolesVisible = false">
-                        取消
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
- 
-        <!-- 分页 -->
-        <el-pagination
-		v-model:current-page="params.pageNum"
-		v-model:page-size="params.pageSize"
-		:page-sizes="[2,3,5,10]"
-		:small="false"
-		:disabled="false"
-		:background="false"
-		layout="jumper, total, sizes, prev, pager, next"
-		:total="total"
-		@size-change="onSizeChange"
-		@current-change="onCurrentChange"
-        style="margin-top: 20px; justify-content: flex-end;"
-		/>
+                    全选
+                </el-checkbox>
+                <el-checkbox-group
+                v-model="checkedCities"
+                @change="handleCheckedCitiesChange"
+                >
+                <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">
+                    {{ role.roleName }}
+                </el-checkbox>
+                </el-checkbox-group>
+                </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" @click="doAllocRoles">确认</el-button>
+                <el-button @click="allocRolesVisible = false">
+                    取消
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
 
-    </MainContainer>
+    <!-- 分页 -->
+    <el-pagination
+    v-model:current-page="params.pageNum"
+    v-model:page-size="params.pageSize"
+    :page-sizes="[2,3,5,10]"
+    :small="false"
+    :disabled="false"
+    :background="false"
+    layout="jumper, total, sizes, prev, pager, next"
+    :total="total"
+    @size-change="onSizeChange"
+    @current-change="onCurrentChange"
+    style="margin-top: 20px; justify-content: flex-end;"
+    />
+
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User} from '@element-plus/icons-vue'
+import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
@@ -261,7 +266,7 @@ const removeUsers = async(ids) =>{
 //用户状态
 const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
-    ElMessage.success('更改成功')
+    row.status === 1 ? ElMessage.success('用户已激活'):ElMessage.error('用户已禁用')
     render()
 }
 
@@ -400,5 +405,8 @@ const doAllocRoles = async() => {
 </script>
 
 <style lang="scss" scoped>
-
+.layout {
+    display: flex;
+    justify-content: space-between;
+}
 </style>

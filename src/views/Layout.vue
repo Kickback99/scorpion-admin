@@ -42,11 +42,11 @@
                 </el-dropdown>
         </el-header>
         <el-main>
-          <el-breadcrumb separator=">">
+          <!-- <el-breadcrumb separator=">">
               <el-breadcrumb-item :to="{ path: r.path === '/system'?'/system/sysUser':r.path }" v-for="r in breadList">
                 {{ r.meta.title }}
               </el-breadcrumb-item>
-          </el-breadcrumb>
+          </el-breadcrumb> -->
           <router-view/>
         </el-main>
         <el-footer>Footer</el-footer>

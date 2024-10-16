@@ -1,62 +1,61 @@
 <template>
-
-<el-form
-    inline
-    :model="formData"
-    label-width="120px"
-    class="demo-ruleForm"
-    :size="formSize"
-    status-icon
-    >
-    <el-form-item label="角色搜索" prop="roleName">
-      <el-input :prefix-icon="User"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
-    </el-form-item>
-
-
-    <el-form-item>
-      <el-button @click="onSearch" type="primary">搜索</el-button>
-      <el-button :icon="Refresh" size="mini" @click="onReset">重置</el-button>
-    </el-form-item>
-  </el-form>
-
-    <MainContainer title="角色管理">
-        <template #right>
-            <el-button type="primary" @click="addDialog">新增角色</el-button>
-        </template>
-
-        <!-- 表格 -->
-        <el-table :data="tableData" style="width: 100%">
-            <el-table-column type="index" label="序号" width="100" />
-            <el-table-column prop="roleName" label="角色名称" />
-            <el-table-column prop="roleCode" label="角色编码" />
-            <el-table-column prop="createTime" label="创建时间" />
-            <el-table-column label="操作" width="100">
-                <template #default="{row,$index}">
-                <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-                <el-button type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
-                </template>
-            </el-table-column>
-        </el-table>
-
-        <!-- 弹层 -->
-        <el-dialog
-        v-model="dialogVisible"
-        :title="title"
-        width="30%"
+    <div class="layout">
+        <el-form
+        inline
+        :model="formData"
+        label-width="120px"
+        class="demo-ruleForm"
+        :size="formSize"
+        status-icon
         >
-            <!-- 弹层内容 -->
-            <el-form 
-            :model="dialogData" 
-            label-width="120px" 
-            ref="ruleFormRef"  
-            :rules="rules" style="padding-right: 40px;">
-                <el-form-item label="角色名称" prop="roleName">
-                    <el-input v-model="dialogData.roleName" placeholder="请输入角色名称"/>
-                </el-form-item>
-                <el-form-item label="角色编码" prop="roleCode">
-                    <el-input v-model="dialogData.roleCode" placeholder="请输入角色编码"/>
-                </el-form-item>
-            </el-form>
+        <el-form-item  prop="roleName">
+        <el-input :prefix-icon="User"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
+        </el-form-item>
+
+
+        <el-form-item>
+        <el-button :icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
+        <el-button :icon="Refresh" size="mini" @click="onReset" type="warning" plain >重置</el-button>
+        </el-form-item>
+        </el-form>
+        <div class="right">
+            <el-button :icon="Plus" type="success" @click="addDialog" plain>新增</el-button>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <el-table :data="tableData" style="width: 100%" border stripe>
+        <el-table-column type="index" label="序号" width="100" />
+        <el-table-column prop="roleName" label="角色名称" />
+        <el-table-column prop="roleCode" label="角色编码" />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column label="操作" width="110">
+            <template #default="{row,$index}">
+            <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
+            <el-button type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <!-- 弹层 -->
+    <el-dialog
+    v-model="dialogVisible"
+    :title="title"
+    width="30%"
+    >
+        <!-- 弹层内容 -->
+        <el-form 
+        :model="dialogData" 
+        label-width="120px" 
+        ref="ruleFormRef"  
+        :rules="rules" style="padding-right: 40px;">
+            <el-form-item label="角色名称" prop="roleName">
+                <el-input v-model="dialogData.roleName" placeholder="请输入角色名称"/>
+            </el-form-item>
+            <el-form-item label="角色编码" prop="roleCode">
+                <el-input v-model="dialogData.roleCode" placeholder="请输入角色编码"/>
+            </el-form-item>
+        </el-form>
 
         <template #footer>
             <span class="dialog-footer">
@@ -66,29 +65,27 @@
                 </el-button>
             </span>
         </template>
-        </el-dialog>
+    </el-dialog>
 
-        <!-- 分页 -->
-        <el-pagination
-		v-model:current-page="params.pageNum"
-		v-model:page-size="params.pageSize"
-		:page-sizes="[2,3,5,10]"
-		:small="false"
-		:disabled="false"
-		:background="false"
-		layout="jumper, total, sizes, prev, pager, next"
-		:total="total"
-		@size-change="onSizeChange"
-		@current-change="onCurrentChange"
-        style="margin-top: 20px; justify-content: flex-end;"
-		/>
+    <!-- 分页 -->
+    <el-pagination
+    v-model:current-page="params.pageNum"
+    v-model:page-size="params.pageSize"
+    :page-sizes="[2,3,5,10]"
+    :small="false"
+    :disabled="false"
+    :background="false"
+    layout="jumper, total, sizes, prev, pager, next"
+    :total="total"
+    @size-change="onSizeChange"
+    @current-change="onCurrentChange"
+    style="margin-top: 20px; justify-content: flex-end;"
+    />
         
-    </MainContainer>
 </template>
 
 <script setup>
-import MainContainer from '@/components/MainContainer.vue';
-import {Edit,Delete,Refresh} from '@element-plus/icons-vue'
+import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import { ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
 import { ElMessage} from 'element-plus';
@@ -225,5 +222,8 @@ const onReset = () => {
 </script>
 
 <style lang="scss" scoped>
-
+.layout {
+    display: flex;
+    justify-content: space-between
+}
 </style>
