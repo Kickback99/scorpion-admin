@@ -56,7 +56,7 @@
             <template #default="{row,$index}">
             <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
             <el-button type="danger" :icon="Delete" @click="removeUsers(row.id)"  circle plain/>
-            <el-button type="danger" :icon="User" @click="showAllocRoles(row)"  circle plain/>
+            <el-button type="warning" :icon="User" @click="showAllocRoles(row)"  circle plain/>
             </template>
         </el-table-column>
     </el-table>
@@ -358,7 +358,7 @@ const checkedCities = ref([]) //选中的数组集合
 const allRoles = ref([]) //全部的数组集合
 const allocRolesVisible = ref(false)
 
-// 展示分配角色
+// t_user_request：获取用户角色数据请求
 const showAllocRoles = async(row) =>{
     formData.value.username = row.username
     formData.value.id = row.id
@@ -387,7 +387,7 @@ const showAllocRoles = async(row) =>{
     isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.value.length
   }
 
-//为用户分配角色
+// t_user_request：为用户分配角色请求
 const doAllocRoles = async() => {
     let userRoleData = {
         userId:formData.value.id,

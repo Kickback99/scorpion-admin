@@ -46,6 +46,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElTree: typeof import('element-plus/es')['ElTree']
     IEpQuestionFilled: typeof import('~icons/ep/question-filled')['default']
     IEpSettin: typeof import('~icons/ep/settin')['default']
     IEpSetting: typeof import('~icons/ep/setting')['default']

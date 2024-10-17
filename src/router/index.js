@@ -52,6 +52,8 @@ function routesHandler(router,parentType=null){
                 route.name = route.path
                 const compName = route.component
                 const path = `../views/${compName}.vue`
+                console.log('到底加载的是哪个组件--------')
+                console.log(modules[path])
                 route.component = modules[path]
             }
         }
