@@ -30,10 +30,11 @@
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="110">
+        <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
             <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
             <el-button type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
+            <el-button type="warning" :icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
             </template>
         </el-table-column>
     </el-table>
@@ -86,10 +87,11 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
+import {Edit,Delete,Refresh,User,Search,Plus,Baseball} from '@element-plus/icons-vue'
 import { ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
 import { ElMessage} from 'element-plus';
+import router from '@/router';
 const tableData = ref([])
 
 const searchData = ref({})
@@ -220,8 +222,10 @@ const onReset = () => {
         ],
     }
 
-
-
+//跳转到分配菜单权限路由页面
+const showAssignAuth = (row) =>{
+    router.push('/system/assignAuth?id='+row.id+'&roleName='+row.roleName)
+}
 
 </script>
 
