@@ -20,8 +20,8 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button :icon="Delete" color="#626aef" plain :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
-            <el-button :icon="Plus" type="success" plain  :dark="isDark" @click="addDialog">新增</el-button>
+            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('bnt.sysUser.remove')" :icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
+            <el-button @click="addDialog" :disabled="$hasPerm('bnt.sysUser.add')" :icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
         </div>
     </div>
 
@@ -54,9 +54,9 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
-            <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-            <el-button type="danger" :icon="Delete" @click="removeUsers(row.id)"  circle plain/>
-            <el-button type="warning" :icon="User" @click="showAllocRoles(row)"  circle plain/>
+            <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" :icon="Edit"  circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysUser.remove')" @click="removeUsers(row.id)" type="danger" :icon="Delete"   circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" :icon="User"   circle plain/>
             </template>
         </el-table-column>
     </el-table>
@@ -156,6 +156,9 @@ import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+// 按钮级别权限控制
+import { getCurrentInstance } from 'vue';
+const {auth} = getCurrentInstance()
 
 const params = ref({
     pageNum :1,

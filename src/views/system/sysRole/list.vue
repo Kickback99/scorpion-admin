@@ -20,7 +20,7 @@
         </el-form-item>
         </el-form>
         <div class="right">
-            <el-button :icon="Plus" type="success" @click="addDialog" plain>新增</el-button>
+            <el-button :disabled="$hasPerm('bnt.sysRole.add')" @click="addDialog" :icon="Plus" type="success" plain>新增</el-button>
         </div>
     </div>
 
@@ -32,9 +32,9 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
-            <el-button type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-            <el-button type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
-            <el-button type="warning" :icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysRole.update')" type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysRole.assignAuth')" type="warning" :icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
             </template>
         </el-table-column>
     </el-table>
