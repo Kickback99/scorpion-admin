@@ -82,6 +82,8 @@ const loadMenu = async(to,next) => {
     const res = await userInfoApi()
     //保存菜单，避免路由鉴权重复执行
     userStore.setUserMenu(res.data.routers)
+    // 把用户按钮权限存进store
+    userStore.setUserPerm(res.data.permissions)
     const asyncRoutes = routesHandler(res.data.routers)
 
     console.log('后端返回',res.data.routers)

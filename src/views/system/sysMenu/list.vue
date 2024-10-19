@@ -1,8 +1,8 @@
 <template>
         <!-- 工具条 -->
          <div class="toolbar">
-            <el-button :icon="Plus" type="success" @click="addDir" plain>新增</el-button>
-            <el-button :icon="delete" color="#626aef" :dark="isDark" @click="deleteSelectRows()" plain>批量删除</el-button>
+            <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
+            <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button>
          </div>
         
 
@@ -33,9 +33,9 @@
         <el-table-column prop="createTime" label="创建时间" width="160"/>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{row}">
-            <el-button v-if="row.type !== 2" @click="addMenuButton(row)" type="success" circle plain  :icon="Plus" size="mini"/>
-            <el-button type="primary" circle plain  :icon="Edit" size="mini" @click="editMenu(row)" />
-            <el-button @click="removeMenu(row.id)" type="danger"  circle plain :icon="Delete" size="mini" title="删除" :disabled="row.children.length > 0"/>
+            <el-button v-if="row.type !== 2" @click="addMenuButton(row)" :disabled="$hasPerm('bnt.sysMenu.add')"  type="success" circle plain  :icon="Plus" size="mini"/>
+            <el-button  @click="editMenu(row)" :disabled="$hasPerm('bnt.sysMenu.update')"  type="primary" circle plain  :icon="Edit" size="mini" />
+            <el-button @click="removeMenu(row.id)" :disabled="row.children.length > 0"  type="danger"  circle plain :icon="Delete" size="mini" title="删除" />
           </template>
         </el-table-column>
     </el-table>

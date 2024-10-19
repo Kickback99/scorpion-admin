@@ -1,11 +1,11 @@
 <template>
         <!--多级菜单-->
         <div v-for="menu in listData">
-            <el-menu-item :index="handleChildren(menu)" v-if="menu.children == null || menu.children.length == 0">
+            <el-menu-item :index="handleChildren(menu)" v-if="handleMenuVisible(menu)">
                     <el-icon><Aim /></el-icon> <span>{{menu.meta.title}}</span>
             </el-menu-item>
 
-            <el-sub-menu :index="`/system/${menu.path}`" v-else>
+            <el-sub-menu :index="`/system/${menu.path}`" v-else-if="menu.hidden ===false">
             <template #title>
                 <el-icon><Aim /></el-icon> <span>{{ menu.meta.title }}</span>
             </template>
@@ -17,6 +17,12 @@
 
 <script setup>
 defineProps(['listData'])
+
+const handleMenuVisible = (menu) => {
+    if((menu.children == null || menu.children.length == 0) && menu.hidden === false){
+        return true
+    }
+}
 
 const handleChildren = (menu) => {
     // 根据 type 来决定添加哪个前缀
