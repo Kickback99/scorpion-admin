@@ -22,4 +22,16 @@ app.use(pinia.use(persist)) //安装pinia插件
 /* app.use(ElementPlus,{
     locale:zhCn
 }) */
+
+// 使用自定义指定来控制按钮权限的移除
+// import {directiveList} from '@/directives'
+
+// directiveList(app)
+
+// 使用全局属性注入来控制按钮权限的禁用
+
+import { hasPermissions } from '@/utils/permissions'
+
+app.config.globalProperties.$hasPerm =  hasPermissions
+
 app.mount('#app')
