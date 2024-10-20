@@ -34,7 +34,7 @@ const conModules = import.meta.glob('../views/content/**/*.vue')
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
     return router.map(route => {
-        // 为顶层路由设置type属性
+        // 处理顶层路由：为顶层路由设置type属性
         if(route.path === '/system'){
             route.component = Layout
             route.name = 'system'
@@ -48,6 +48,16 @@ function routesHandler(router,parentType=null){
             route.type = parentType
             // 根据父路由的type来决定使用哪个模块导入
             const modules = parentType === 'system'?sysModules:conModules;
+
+            // 处理二级子菜单：为这些孩子构建新的属性(parentPath，level)便于menu来添加父级路径
+            if(route.children != null && route.component == 'ParentView'){
+                let parent = route.path
+                route.children.map(item => {
+                    item.parentPath = parent
+                    item.level = true
+                })
+            }
+            // 子路由
             if(modules){
                 route.name = route.path
                 const compName = route.component
