@@ -34,11 +34,13 @@ export default defineConfig({
     vue(),
     //element plus 自动导入插件
     AutoImport({
+      // 自动导入 Vue 和 Vue-router 相关函数，如 ref, reactive, createRouter 等
       imports:['vue','vue-router'],
       resolvers: [ElementPlusResolver()],
     }),
     Components({
       resolvers: [
+        // 自动导入 Element Plus 相关函数，如：ElMessage, ElMessageBox... (带样式)
         ElementPlusResolver(),
         // 自动导入图标组件
         IconsResolver({

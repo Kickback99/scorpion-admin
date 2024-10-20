@@ -1,4 +1,8 @@
 <template>
+  <!-- <Test></Test> -->
+  	<el-icon size="40px">
+      <el-icon-edit></el-icon-edit>
+		</el-icon>
         <!-- 工具条 -->
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
