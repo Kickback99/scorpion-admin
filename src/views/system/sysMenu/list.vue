@@ -1,8 +1,4 @@
 <template>
-  <!-- <Test></Test> -->
-  	<el-icon size="40px">
-      <el-icon-edit></el-icon-edit>
-		</el-icon>
         <!-- 工具条 -->
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
@@ -22,7 +18,7 @@
         <el-table-column prop="name" label="菜单名称" width="160"/>
         <el-table-column label="图标">
           <template #default="{row}">
-            <i :class="row.icon"></i>
+            <Icon :icon="row.icon == null ? 'ep:user':row.icon" />
           </template>
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" width="160"/>
@@ -129,6 +125,7 @@
 </template>
 
 <script setup>
+import { Icon } from '@iconify/vue';
 import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,modifyApi,removeApi,statusApi} from '@/api/sysmenu'
 
