@@ -1,5 +1,5 @@
 <template>
-        <!-- 工具条 -->
+        <SvgIcon icon="tag" color="green"></SvgIcon>
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
             <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button>
@@ -126,6 +126,7 @@
 
 <script setup>
 import { Icon } from '@iconify/vue';
+import {useRenderIcon} from '@/components/MyIcon/src/hook'
 import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,modifyApi,removeApi,statusApi} from '@/api/sysmenu'
 
