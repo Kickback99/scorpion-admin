@@ -23,6 +23,32 @@ app.use(pinia.use(persist)) //安装pinia插件
     locale:zhCn
 }) */
 
+//导入字体图标
+// import "./assets/Iconfont/demo/iconfont.css"
+// import "./assets/Iconfont/demo/iconfont.js"
+
+// 动态导入iconfont目录下的所有字体图标
+const modules = import.meta.glob('./assets/iconfont/**/*.{js,css}');
+
+for (const path in modules) {
+  console.log('嘎嘎')
+  console.log(modules)
+  modules[path]();
+}
+
+// 引入svg脚本
+import 'virtual:svg-icons-register'
+
+// 全局注册@iconify/vue图标库
+import {
+    IconifyOffline,
+    IconifyOnline,
+    Iconfont
+  } from "./components/MyIcon";
+  app.component("IconifyOffline", IconifyOffline);
+  app.component("IconifyOnline", IconifyOnline);
+  app.component("Iconfont", Iconfont);
+
 // 使用自定义指定来控制按钮权限的移除
 // import {directiveList} from '@/directives'
 

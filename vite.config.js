@@ -8,6 +8,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 
 // pathSrc 是给自动导入图标库使用的
@@ -32,6 +33,19 @@ export default defineConfig({
     },
   plugins: [
     vue(),
+    // svg组件
+    createSvgIconsPlugin({
+      iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+      symbolId: 'icon-[dir]-[name]',
+      svgoOptions:{
+        plugins:[
+          {
+            name:'removeAttrs',
+            params:{attrs:["class","data-name","fill","stroke"]}
+          }
+        ]
+      }
+    }),
     //element plus 自动导入插件
     AutoImport({
       // 自动导入 Vue 和 Vue-router 相关函数，如 ref, reactive, createRouter 等
