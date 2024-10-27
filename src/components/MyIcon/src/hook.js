@@ -1,19 +1,19 @@
 import { h, defineComponent} from "vue";
-import { IconifyOnline, IconifyOffline, Iconfont } from "../index";
+import { IconifyOnline, IconifyOffline, IconFont } from "../index";
 
 /**
- * 支持 `iconfont`、自定义 `svg` 以及 `iconify` 中所有的图标
+ * 支持 `IconFont`、自定义 `svg` 以及 `iconify` 中所有的图标
  * @see 点击查看文档图标篇 {@link https://pure-admin.github.io/pure-admin-doc/pages/icon/}
  * @param icon 必传 图标
  * @param attrs 可选 iconType 属性
  * @returns Component
  */
 export function useRenderIcon(icon,attrs) {
-  // iconfont
+  // IconFont
   const ifReg = /^IF-/;
   // typeof icon === "function" 属于SVG
   if (ifReg.test(icon)) {
-    // iconfont
+    // IconFont
     const name = icon.split(ifReg)[1];
     const iconName = name.slice(
       0,
@@ -21,9 +21,9 @@ export function useRenderIcon(icon,attrs) {
     );
     const iconType = name.slice(name.indexOf(" ") + 1, name.length);
     return defineComponent({
-      name: "Iconfont",
+      name: "IconFont",
       render() {
-        return h(Iconfont, {
+        return h(IconFont, {
           icon: iconName,
           iconType,
           ...attrs
