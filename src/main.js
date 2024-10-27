@@ -1,4 +1,4 @@
-import './assets/main.scss'
+import './assets/style/main.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -8,6 +8,9 @@ import router from './router'
 import {createPinia} from 'pinia'
 // 导入持久化插件
 import persist from 'pinia-plugin-persistedstate'
+
+// 导入tailwindcss
+import './assets/style/tailwind.css'
 
 // 完整导入
 /* import ElementPlus from 'element-plus'
@@ -43,11 +46,11 @@ import 'virtual:svg-icons-register'
 import {
     IconifyOffline,
     IconifyOnline,
-    Iconfont
+    IconFont
   } from "./components/MyIcon";
   app.component("IconifyOffline", IconifyOffline);
   app.component("IconifyOnline", IconifyOnline);
-  app.component("Iconfont", Iconfont);
+  app.component("IconFont", IconFont);
 
 // 使用自定义指定来控制按钮权限的移除
 // import {directiveList} from '@/directives'

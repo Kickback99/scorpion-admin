@@ -1,5 +1,5 @@
 <template>
-        <SvgIcon icon="tag" color="green"></SvgIcon>
+        <Test class="w-[200px]"></Test>
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
             <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button>
@@ -18,7 +18,8 @@
         <el-table-column prop="name" label="菜单名称" width="160"/>
         <el-table-column label="图标">
           <template #default="{row}">
-            <Icon :icon="row.icon == null ? 'ep:user':row.icon" />
+            <!-- <Icon :icon="row.icon == null ? 'ep:user':row.icon" /> -->
+             <IconifyOffline :icon="back"></IconifyOffline>
           </template>
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" width="160"/>
@@ -61,14 +62,15 @@
             <el-input v-model="formModel.name"/>
           </el-form-item>
           <el-form-item label="图标" prop="icon" v-if="formModel.type !== 2">
-            <el-select v-model="formModel.icon" clearable>
+<!--             <el-select v-model="formModel.icon" clearable>
               <el-option v-for="item in iconList" :key="item.class" :label="item.class" :value="item.class">
               <span style="float: left;">
-               <i :class="item.class"></i>  <!-- 如果动态显示图标，这里添加判断 -->
+               <i :class="item.class"></i>
               </span>
                 <span style="padding-left: 6px;">{{ item.class }}</span>
               </el-option>
-            </el-select>
+            </el-select> -->
+            <IconSelect v-model="icon" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
             <el-input-number v-model="formModel.sortValue" controls-position="right" :min="0" />
@@ -125,11 +127,13 @@
 </template>
 
 <script setup>
+import Test from '@/test/Test.vue'
+import { IconSelect } from "@/components/MyIcon";
 import { Icon } from '@iconify/vue';
 import {useRenderIcon} from '@/components/MyIcon/src/hook'
 import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,modifyApi,removeApi,statusApi} from '@/api/sysmenu'
-
+const icon = ref("ep:add-location");
 const tableData = ref([])
 
 // t_menu_request：菜单树形列表请求
