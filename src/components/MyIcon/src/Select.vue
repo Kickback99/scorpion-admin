@@ -56,14 +56,17 @@ const tabsList = [
       70
       105 
   */
-const pageList = computed(() =>
-  copyIconList[currentActiveType.value]
+const pageList = computed(() =>{
+  console.log(currentActiveType.value)
+  return copyIconList[currentActiveType.value]
     .filter(i => i.includes(filterValue.value))
     .slice(
       (currentPage.value - 1) * pageSize.value,
       currentPage.value * pageSize.value
     )
-);
+}
+)
+
 // 选中的图标样式
 const iconItemStyle = computed(() => {
   return item => {
@@ -77,14 +80,30 @@ const iconItemStyle = computed(() => {
 });
 
 // 把inputValue.value的值赋值给currentActiveType.value和icon.value
+const tabNames = tabsList.map(item => {
+  return item.name
+})
+
 function setVal() {
-  // 提取:号之前的字符串
-  currentActiveType.value = inputValue.value.substring(
+  if(startsWithAnyPrefix(inputValue.value,tabNames)){
+// 提取:号之前的字符串
+currentActiveType.value = inputValue.value.substring(
     0,
     inputValue.value.indexOf(":") + 1
   );
     // 提取:号之后的字符串
   icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
+  }
+}
+
+/**
+ * 检查输入字符串是否以指定的前缀数组中的任何一个开始
+ * @param {string} input - 用户输入的字符串
+ * @param {string[]} prefixes - 前缀数组
+ * @returns {boolean} 如果输入字符串以任何一个前缀开始，则返回 true，否则返回 false
+ */
+ function startsWithAnyPrefix(input, prefixes) {
+  return prefixes.some(prefix => input.startsWith(prefix));
 }
 
 // popover弹出层显示之前调用，回显图标所在的当前页
