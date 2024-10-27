@@ -1,5 +1,4 @@
 <template>
-        <Test class="w-[200px]"></Test>
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
             <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button>
@@ -19,7 +18,7 @@
         <el-table-column label="图标">
           <template #default="{row}">
             <!-- <Icon :icon="row.icon == null ? 'ep:user':row.icon" /> -->
-             <IconifyOffline :icon="back"></IconifyOffline>
+             <IconifyOffline :icon="row.icon"></IconifyOffline>
           </template>
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" width="160"/>
@@ -46,6 +45,7 @@
     v-model="dialogVisible"
     :title="title"
     width="30%"
+    @close="onCancel"
   >
   <el-form ref="dataForm" :model="formModel" label-width="150px" size="small" style="padding-right: 40px;">
           <el-form-item label="所属上级" v-if="formModel.parentName">
@@ -70,7 +70,7 @@
                 <span style="padding-left: 6px;">{{ item.class }}</span>
               </el-option>
             </el-select> -->
-            <IconSelect v-model="icon" class="w-[200px]" />
+            <IconSelect v-model="formModel.icon" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
             <el-input-number v-model="formModel.sortValue" controls-position="right" :min="0" />
@@ -118,7 +118,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="addOrModify">确认</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
+        <el-button type="primary" @click="onCancel">
           取消
         </el-button>
       </span>
@@ -261,12 +261,20 @@ const addMenuButton = (row) => {
         
     }
 }
+let baseIcon;
 
 const editMenu = (row) =>{
     title.value = '修改菜单'
     dialogVisible.value = true
+    baseIcon =  row.icon
     formModel.value =  row
     typeDisabled.value = true
+}
+
+// 弹层取消事件
+const onCancel = () => {
+  dialogVisible.value = false
+  formModel.value.icon = baseIcon
 }
 
 // 弹层确认事件：添加或修改
