@@ -86,14 +86,14 @@ const tabNames = tabsList.map(item => {
 
 function setVal() {
   if(startsWithAnyPrefix(inputValue.value,tabNames)){
-// 提取:号之前的字符串
-currentActiveType.value = inputValue.value.substring(
-    0,
-    inputValue.value.indexOf(":") + 1
-  );
-    // 提取:号之后的字符串
-  icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
-  }
+    // 提取:号之前的字符串
+    currentActiveType.value = inputValue.value.substring(
+        0,
+        inputValue.value.indexOf(":") + 1
+      );
+        // 提取:号之后的字符串
+      icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
+      }
 }
 
 /**
