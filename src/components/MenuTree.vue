@@ -2,12 +2,12 @@
         <!--多级菜单-->
         <div v-for="menu in listData">
             <el-menu-item :index="handleChildren(menu)" v-if="handleMenuVisible(menu)">
-                    <el-icon><Aim /></el-icon> <span>{{menu.meta.title}}</span>
+                <el-icon><IconifyOffline :icon="menu.meta.icon"></IconifyOffline></el-icon> <span>{{menu.meta.title}}</span>
             </el-menu-item>
 
             <el-sub-menu :index="`/system/${menu.path}`" v-else-if="menu.hidden ===false">
             <template #title>
-                <el-icon><Aim /></el-icon> <span>{{ menu.meta.title }}</span>
+                <el-icon><IconifyOffline :icon="menu.meta.icon"></IconifyOffline></el-icon> <span>{{ menu.meta.title }}</span>
             </template>
             <!--展开的每一个菜单项-->
                 <menu-tree :listData="menu.children"></menu-tree>
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import {useRenderIcon} from '@/components/MyIcon/src/hook'
 defineProps(['listData'])
 
 const handleMenuVisible = (menu) => {

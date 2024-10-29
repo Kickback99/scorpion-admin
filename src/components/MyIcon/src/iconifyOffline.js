@@ -4,6 +4,7 @@ import { getIcon } from '@iconify/vue';
 
 import Check from "@iconify-icons/ep/check";
 import Bell from "@iconify-icons/ep/bell";
+import { addSingleIcon } from "./iconifySingleOffilne";
 addIcon("check", Check);
 addIcon("bell", Bell);
 
@@ -25,9 +26,14 @@ export default defineComponent({
   render() {
     if (typeof this.icon === "object") addIcon(this.icon, this.icon);
     // 如果传入的图标中包含":"，则getIcon来离线加载图标
-    if(this.icon?.includes(':')) {
+    /* if(this.icon?.includes(':')) {
       console.log('触发了')
       renderIcon(this.icon)
+    } */
+    // 如果传入的图标中包含":"，则调用函数来离线加载图标
+    if(this.icon?.includes(':')) {
+      console.log('触发了')
+      addSingleIcon(this.icon)
     }
     const attrs = this.$attrs;
     return h(

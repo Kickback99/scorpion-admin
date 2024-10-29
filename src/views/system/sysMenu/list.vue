@@ -18,7 +18,7 @@
         <el-table-column label="图标">
           <template #default="{row}">
             <!-- <Icon :icon="row.icon == null ? 'ep:user':row.icon" /> -->
-             <IconifyOffline :icon="row.icon"></IconifyOffline>
+             <el-icon><IconifyOffline :icon="row.icon"></IconifyOffline></el-icon>
           </template>
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" width="160"/>
