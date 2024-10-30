@@ -24,15 +24,18 @@ export default defineComponent({
     }
   },
   render() {
-    if (typeof this.icon === "object") addIcon(this.icon, this.icon);
+    if (typeof this.icon === "object"){
+      console.log('是对象')
+      addIcon(this.icon, this.icon);
+    } 
     // 如果传入的图标中包含":"，则getIcon来离线加载图标
     /* if(this.icon?.includes(':')) {
       console.log('触发了')
       renderIcon(this.icon)
     } */
     // 如果传入的图标中包含":"，则调用函数来离线加载图标
-    if(this.icon?.includes(':')) {
-      console.log('触发了')
+    else if(this.icon?.includes(':')) {
+      console.log('是字符串')
       addSingleIcon(this.icon)
     }
     const attrs = this.$attrs;
