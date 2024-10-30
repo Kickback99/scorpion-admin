@@ -70,6 +70,7 @@
                 <span style="padding-left: 6px;">{{ item.class }}</span>
               </el-option>
             </el-select> -->
+            <!-- t_question：菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search -->
             <IconSelect v-model="formModel.icon" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
@@ -266,6 +267,7 @@ let baseIcon;
 const editMenu = (row) =>{
     title.value = '修改菜单'
     dialogVisible.value = true
+    console.log(row.icon)
     baseIcon =  row.icon
     formModel.value =  row
     typeDisabled.value = true

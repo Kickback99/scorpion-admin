@@ -3,6 +3,11 @@ import { IconJson } from "@/components/MyIcon/data";
 import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
 import { ref, computed, watch } from "vue";
 
+const search = {
+  "width": 1024,
+  "height": 1024,
+  "body": "<path fill=\"currentColor\" d=\"m795.904 750.72l124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704a352 352 0 0 0 0 704\"/>"
+}
 
 defineOptions({
   name: "IconSelect"
@@ -79,11 +84,12 @@ const iconItemStyle = computed(() => {
   };
 });
 
-// 把inputValue.value的值赋值给currentActiveType.value和icon.value
+
 const tabNames = tabsList.map(item => {
   return item.name
 })
 
+// 把inputValue.value的值赋值给currentActiveType.value和icon.value
 function setVal() {
   if(startsWithAnyPrefix(inputValue.value,tabNames)){
     // 提取:号之前的字符串
@@ -189,7 +195,7 @@ watch(
               class="w-[40px] h-[32px] cursor-pointer flex justify-center items-center"
             >
             <!-- 如果icon数据属性不存在，则显示一个离线图标 -->
-              <IconifyOffline v-if="!icon" :icon="check" />
+              <IconifyOffline v-if="!icon" :icon=search />
             <!-- 如果icon数据属性存在，则显示一个在线图标 -->
               <IconifyOnline v-else :icon="inputValue" />
             </div>
