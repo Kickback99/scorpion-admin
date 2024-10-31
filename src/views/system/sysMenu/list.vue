@@ -70,8 +70,8 @@
                 <span style="padding-left: 6px;">{{ item.class }}</span>
               </el-option>
             </el-select> -->
-            <!-- t_question：菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search -->
-            <IconSelect v-model="formModel.icon" class="w-[200px]" />
+            <!-- 菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search(已解决) -->
+            <IconSelect v-model="formModel.icon" ref="iconRef" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
             <el-input-number v-model="formModel.sortValue" controls-position="right" :min="0" />
@@ -134,8 +134,9 @@ import { Icon } from '@iconify/vue';
 import {useRenderIcon} from '@/components/MyIcon/src/hook'
 import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,modifyApi,removeApi,statusApi} from '@/api/sysmenu'
-const icon = ref("ep:add-location");
 const tableData = ref([])
+import { isAllEmpty } from "@pureadmin/utils";
+const iconRef = ref()
 
 // t_menu_request：菜单树形列表请求
 const render = async() => {
@@ -267,6 +268,10 @@ let baseIcon;
 const editMenu = (row) =>{
     title.value = '修改菜单'
     dialogVisible.value = true
+    if(row.type != 2 && isAllEmpty(row.icon)){
+      iconRef.value.removeIcon()
+      // console.log(iconRef.value)
+    }
     console.log(row.icon)
     baseIcon =  row.icon
     formModel.value =  row

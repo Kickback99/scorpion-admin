@@ -150,6 +150,18 @@ function onClear() {
   inputValue.value = "";
 }
 
+// 向外部暴露一个removeIcon，用于删除icon.value的值
+const removeIcon = () => {
+  console.log('删除icon中')
+  icon.value = ''
+}
+
+defineExpose({
+  removeIcon
+})
+
+
+
 // 当 pageList.value 发生变化时，重新计算 totalPage.value的值，totalPage.value的值根据过滤的元素决定
 watch(
   () => pageList.value,
