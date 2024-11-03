@@ -9,6 +9,9 @@
           text-color="666"
           mode="vertical"
         >
+          <el-menu-item index="/index">
+                   <el-icon> <IconifyOffline :icon="Home"></IconifyOffline> </el-icon> <span>首页</span> 
+          </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
         </el-menu>
       </el-aside>
@@ -63,6 +66,7 @@ import { ref,watch } from 'vue';
 import {ArrowDown} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
 import {adminLogoutApi} from '@/api/admin'
+import Home from "@iconify-icons/ep/home-filled";
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const listData = ref([])

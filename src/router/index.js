@@ -15,7 +15,11 @@ const route = useRoute() */
 const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
-    { path:'/',redirect:'/system'}
+    { path:'/',redirect:'/index',
+    component:Layout,
+    children:[
+        {path:'/index',component:() => import('@/views/home/index.vue')},
+    ]}
 /*     {
     path:'/',
     component:() => import('@/views/Layout.vue'),
