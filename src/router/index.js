@@ -15,10 +15,15 @@ const route = useRoute() */
 const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
-    { path:'/',redirect:'/index',
+    { path:'/',redirect:'/index',meta:{
+        hidden:true
+    },
     component:Layout,
     children:[
-        {path:'/index',component:() => import('@/views/home/index.vue')},
+        {path:'/index',component:() => import('@/views/home/index.vue'),
+            meta:{
+               title:'首页'     
+        }},
     ]}
 /*     {
     path:'/',
@@ -100,14 +105,17 @@ const loadMenu = async(to,next) => {
     userStore.setUserPerm(res.data.permissions)
     const asyncRoutes = routesHandler(res.data.routers)
 
-    console.log('后端返回',res.data.routers)
+    /* console.log('后端返回',res.data.routers)
     
-    console.log('路由数据',asyncRoutes)
+    console.log('路由数据',asyncRoutes) */
 
     // 添加路由
     asyncRoutes.forEach(r => {
         router.addRoute(r)
     })
+
+    router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
+    router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
 
     console.log(router.getRoutes())
 

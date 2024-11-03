@@ -1,0 +1,7 @@
+$color:navy;
+@mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
+    display: flex;
+    justify-content:$row;
+    align-items: $col;
+    align-content:$multiCol
+}

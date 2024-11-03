@@ -20,5 +20,14 @@ export default defineConfig({
         }
       }
     },
+    // scss全局变量
+    css:{
+      preprocessorOptions:{
+        scss:{
+          javascriptEnabled:true,
+          additionalData:'@import "./src/assets/style/global.scss";'
+        }
+      }
+    },
   plugins:getPlugins()
 })
