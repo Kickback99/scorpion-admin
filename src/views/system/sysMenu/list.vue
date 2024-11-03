@@ -136,6 +136,7 @@ import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
 import {listApi,addApi,modifyApi,removeApi,statusApi} from '@/api/sysmenu'
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
+import { nextTick } from 'vue';
 const iconRef = ref()
 
 // t_menu_request：菜单树形列表请求
@@ -268,10 +269,13 @@ let baseIcon;
 const editMenu = (row) =>{
     title.value = '修改菜单'
     dialogVisible.value = true
-    if(row.type != 2 && isAllEmpty(row.icon)){
+    console.log(row.type)
+    nextTick(()=>{
+      if(row.type != 2 && isAllEmpty(row.icon)){
       iconRef.value.removeIcon()
       // console.log(iconRef.value)
     }
+    })
     console.log(row.icon)
     baseIcon =  row.icon
     formModel.value =  row
