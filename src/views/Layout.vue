@@ -17,39 +17,9 @@
       </el-aside>
       <el-container>
         <el-header>
-          <div><h2>{{userStore.username}}</h2></div>
-                <el-dropdown @command="handleCommand">
-                        <span class="el-dropdown_box">
-                            <el-avatar :src=" userStore.avatar || avatar" />
-                            <el-icon>
-                                    <arrow-down />
-                            </el-icon>
-                        </span>
-                        <!-- 折叠的下拉部分 -->
-                        <template #dropdown>
-                            <el-dropdown-menu>
-                            <el-dropdown-item command="profile" :icon="User"
-                                >基本资料</el-dropdown-item
-                            >
-                            <el-dropdown-item command="avatar" :icon="Crop"
-                                >更换头像</el-dropdown-item
-                            >
-                            <el-dropdown-item command="password" :icon="EditPen"
-                                >重置密码</el-dropdown-item
-                            >
-                            <el-dropdown-item command="logout" :icon="SwitchButton"
-                                >退出登录</el-dropdown-item
-                            >
-                            </el-dropdown-menu>
-                        </template>
-                </el-dropdown>
+            <TopBar></TopBar>
         </el-header>
         <el-main>
-          <!-- <el-breadcrumb separator=">">
-              <el-breadcrumb-item :to="{ path: r.path === '/system'?'/system/sysUser':r.path }" v-for="r in breadList">
-                {{ r.meta.title }}
-              </el-breadcrumb-item>
-          </el-breadcrumb> -->
           <router-view/>
         </el-main>
         <el-footer>Footer</el-footer>
@@ -63,10 +33,8 @@ import MenuTree from '@/components/MenuTree.vue';
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
 import { ref,watch } from 'vue';
-import {ArrowDown} from '@element-plus/icons-vue'
-import avatar from '@/assets/avatar.jpg'
 import {adminLogoutApi} from '@/api/admin'
-import Home from "@iconify-icons/ep/home-filled";
+
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const listData = ref([])
@@ -136,18 +104,7 @@ const handleCommand = async(key) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  .el-icon{
-            margin-left: 10px;
-        }
-    .el-dropdown_box {
-      display: flex;
-      align-items: center;
-      outline: none;
-      &:active,
-      &:hover {
-        outline: none;
-      }
-    }
+
 }
 
 .el-aside {
