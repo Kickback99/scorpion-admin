@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# 忽略自动生成的类型声明文件
 auto-imports.d.ts
 
 node_modules
