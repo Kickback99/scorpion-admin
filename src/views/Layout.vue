@@ -36,8 +36,10 @@ import { nextTick, ref,watch } from 'vue';
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
-const listData = ref([])
-listData.value = userStore.userMenu
+
+const listData = computed(()=>
+  userStore.userMenu
+)
 
 //路由对象--获取路由参数
 import { useRoute, useRouter } from 'vue-router'
