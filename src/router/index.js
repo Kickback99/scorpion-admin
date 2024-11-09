@@ -94,7 +94,7 @@ function routesHandler(router,parentType=null){
     })
 }
 
-const loadMenu = async(to,next) => {
+export const loadMenu = async() => {
     const userStore = useUserStore()
     console.log('请求菜单')
     const res = await userInfoApi()
@@ -117,7 +117,6 @@ const loadMenu = async(to,next) => {
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
 
     console.log(router.getRoutes())
-    next({...to,replace:true})
 }
 
 // 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
@@ -204,7 +203,9 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 加载菜单
-    loadMenu(to,next)
+    loadMenu().then(()=>{
+        next({...to,replace:true})
+    })
 });
 
 // 将路由对象暴露出去
