@@ -1,14 +1,14 @@
 <template>
     <div class="left">
         <el-breadcrumb :separator-icon="ArrowRight">
-            <el-breadcrumb-item   v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden" :to="item.patch" 
+            <el-breadcrumb-item   v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden" :to="item.path" 
             class="breadcrumb"
             >
                 <el-icon>
                     <IconifyOffline :icon="item.meta.icon || Home"></IconifyOffline>
                 </el-icon>
                 <span>{{ item.meta.title }}</span>
-                <button @click="queryRouter(item)">查看当前路径的path</button>
+                <!-- <button @click="queryRouter(item)">查看当前路由</button> -->
             </el-breadcrumb-item>
         </el-breadcrumb>
         <br>

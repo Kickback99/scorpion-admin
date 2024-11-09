@@ -48,10 +48,16 @@ function routesHandler(router,parentType=null){
             route.component = Layout
             route.name = 'system'
             route.type = 'system'
+            if(route.children && route.children.length > 0){
+                route.redirect = `${route.path}/${route.children[0].path}`
+            }
         }else if(route.path === '/content' ){
             route.component = Layout
             route.name = 'content'
             route.type = 'content'
+            if(route.children && route.children.length > 0){
+                route.redirect = route.children[0].path
+            }
         }else {
         // 如果是子路由，继承父路由的type属性
             route.type = parentType
@@ -61,6 +67,7 @@ function routesHandler(router,parentType=null){
             // 处理二级子菜单：为这些孩子构建新的属性(parentPath，level)便于menu来添加父级路径
             if(route.children != null && route.component == 'ParentView'){
                 let parent = route.path
+                route.redirect = route.children[0].path
                 route.children.map(item => {
                     item.parentPath = parent
                     item.level = true
@@ -105,9 +112,9 @@ const loadMenu = async(to,next) => {
     userStore.setUserPerm(res.data.permissions)
     const asyncRoutes = routesHandler(res.data.routers)
 
-    /* console.log('后端返回',res.data.routers)
+    console.log('后端返回',res.data.routers)
     
-    console.log('路由数据',asyncRoutes) */
+    console.log('路由数据',asyncRoutes)
 
     // 添加路由
     asyncRoutes.forEach(r => {
