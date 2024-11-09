@@ -44,20 +44,11 @@ const conModules = import.meta.glob('../views/content/**/*.vue')
 function routesHandler(router,parentType=null){
     return router.map(route => {
         // 处理顶层路由：为顶层路由设置type属性
-        if(route.path === '/system'){
-            route.component = Layout
-            route.name = 'system'
-            route.type = 'system'
-            if(route.children && route.children.length > 0){
-                route.redirect = `${route.path}/${route.children[0].path}`
-            }
-        }else if(route.path === '/content' ){
-            route.component = Layout
-            route.name = 'content'
-            route.type = 'content'
-            if(route.children && route.children.length > 0){
-                route.redirect = route.children[0].path
-            }
+        if(route.component === 'Layout'){
+              route.component = Layout
+              const newStr =  route.path.substring(1)
+              route.name = newStr
+              route.type = newStr
         }else {
         // 如果是子路由，继承父路由的type属性
             route.type = parentType
@@ -96,6 +87,7 @@ function routesHandler(router,parentType=null){
 
         // 处理children
         if(route.children && route.children.length > 0){
+            route.redirect = `${route.path}/${route.children[0].path}`
             route.children = routesHandler(route.children,route.type)
         }
         return route
@@ -125,10 +117,6 @@ const loadMenu = async(to,next) => {
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
 
     console.log(router.getRoutes())
-
-    
-  
-
     next({...to,replace:true})
 }
 
