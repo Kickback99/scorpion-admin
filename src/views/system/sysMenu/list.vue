@@ -138,6 +138,11 @@ const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
 import { nextTick } from 'vue';
 const iconRef = ref()
+import { clearRoute } from '@/utils/clearRoute';
+import {useUserStore} from '@/store/user'
+import { loadMenu } from '@/router';
+
+const userStore = useUserStore()
 
 // t_menu_request：菜单树形列表请求
 const render = async() => {
@@ -313,6 +318,8 @@ const modifyMenu = async() => {
     dialogVisible.value = false
     ElMessage.success('修改成功')
     render()
+    clearRoute(userStore.userMenu)
+    await loadMenu()
 }
 </script>
 
