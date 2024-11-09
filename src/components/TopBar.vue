@@ -1,15 +1,17 @@
 <template>
     <div class="left">
         <el-breadcrumb :separator-icon="ArrowRight">
-            <el-breadcrumb-item  to="item.patch" v-for="(item, index) in route.matched" v-show="!item.meta.hidden" :key="index"
+            <el-breadcrumb-item   v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden" :to="item.patch" 
             class="breadcrumb"
             >
                 <el-icon>
                     <IconifyOffline :icon="item.meta.icon || Home"></IconifyOffline>
                 </el-icon>
                 <span>{{ item.meta.title }}</span>
+                <button @click="queryRouter(item)">查看当前路径的path</button>
             </el-breadcrumb-item>
         </el-breadcrumb>
+        <br>
     </div>
     <div class="right">
         <div class="buttons">
@@ -50,6 +52,11 @@ import { useRoute } from 'vue-router';
 const userStore = useUserStore()
 
 const route =  useRoute()
+
+const queryRouter = (item) =>{
+    console.log(item.path)
+}
+
 
 </script>
 
