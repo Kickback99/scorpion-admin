@@ -49,6 +49,10 @@ function routesHandler(router,parentType=null){
               const newStr =  route.path.substring(1)
               route.name = newStr
               route.type = newStr
+            //   route.redirect = `${route.path}/${route.children[0].path}` //这样处理会报错
+              if(route.children && route.children.length > 0){
+                  route.redirect = `${route.path}/${route.children[0].path}`
+              }
         }else {
         // 如果是子路由，继承父路由的type属性
             route.type = parentType
@@ -87,7 +91,6 @@ function routesHandler(router,parentType=null){
 
         // 处理children
         if(route.children && route.children.length > 0){
-            route.redirect = `${route.path}/${route.children[0].path}`
             route.children = routesHandler(route.children,route.type)
         }
         return route
@@ -117,6 +120,7 @@ export const loadMenu = async() => {
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
 
     console.log(router.getRoutes())
+
 }
 
 // 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
