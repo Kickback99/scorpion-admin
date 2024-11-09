@@ -283,7 +283,7 @@ const editMenu = (row) =>{
     })
     console.log(row.icon)
     baseIcon =  row.icon
-    formModel.value =  row
+    formModel.value =  {...row}
     typeDisabled.value = true
 }
 
