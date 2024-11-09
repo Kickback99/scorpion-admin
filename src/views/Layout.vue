@@ -17,10 +17,10 @@
       </el-aside>
       <el-container>
         <el-header>
-            <TopBar></TopBar>
+            <TabBar></TabBar>
         </el-header>
         <el-main>
-          <router-view/>
+          <router-view v-if="isDestroy"/>
         </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
@@ -30,8 +30,9 @@
 
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
+import { useSettingStore } from '@/store/setting';
 import {useUserStore} from '@/store/user'
-import { ref,watch } from 'vue';
+import { nextTick, ref,watch } from 'vue';
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
@@ -42,18 +43,32 @@ listData.value = userStore.userMenu
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 
+// 处理刷新业务
+
+const isDestroy = ref(true)
+
+const settingStore = useSettingStore()
+
+watch(()=>settingStore.refresh,()=>{
+  isDestroy.value = false
+  nextTick(()=>{
+    isDestroy.value = true
+  })
+})
+
 
 // 面包屑
 
-const breadList = ref([])
+/* const breadList = ref([])
 
 function getBreadList(){
   breadList.value =  route.matched
 }
 getBreadList()
 
-watch(route, () => getBreadList());
+watch(route, () => getBreadList()); */
 
+// 处理菜单的默认展开
 const handelUrl = ref('/')
 handelUrl.value = route.path 
 watch(()=>route.path,()=>{
