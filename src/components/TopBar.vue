@@ -48,14 +48,45 @@ FullScreen,
 Setting} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
 import { useUserStore } from '@/store/user'
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter} from 'vue-router';
+import {useTokenStore} from '@/store/token'
+import {adminLogoutApi} from '@/api/admin'
+import { clearRoute } from '@/utils/clearRoute';
+
 const userStore = useUserStore()
+const tokenStore = useTokenStore()
 
 const route =  useRoute()
+const router = useRouter()
 
 const queryRouter = (item) =>{
     console.log(item.path)
 }
+
+// 处理下拉事件
+const handleCommand = async(key) => {
+  console.log('下拉事件执行了')
+  if(key === 'logout'){
+    // 发送注销请求
+    const res = await adminLogoutApi()
+    // 清空token
+    tokenStore.removeToken()
+    console.log('清空前',router.getRoutes())
+    // 清空动态路由数据
+    clearRoute(userStore.userMenu)
+    console.log('清空后',router.getRoutes())
+    // 清空菜单
+    userStore.userMenu = []
+    // 清空用户名
+    userStore.username = ''
+    // 提示信息
+    ElMessage.success(res.message)
+    // 跳转到登录页
+    router.replace('/login')
+  }
+}
+
+
 
 
 </script>
