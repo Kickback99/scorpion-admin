@@ -31,9 +31,7 @@
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
 import {useUserStore} from '@/store/user'
-import {useTokenStore} from '@/store/token'
 import { ref,watch } from 'vue';
-import {adminLogoutApi} from '@/api/admin'
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
@@ -42,10 +40,8 @@ listData.value = userStore.userMenu
 
 //路由对象--获取路由参数
 import { useRoute, useRouter } from 'vue-router'
-import { clearRoute } from '@/utils/clearRoute';
 const route = useRoute()
 
-const router = useRouter()
 
 // 面包屑
 
@@ -63,33 +59,6 @@ handelUrl.value = route.path
 watch(()=>route.path,()=>{
   handelUrl.value = route.path 
 })
-
-
-
-const tokenStore = useTokenStore()
-
-// 处理下拉事件
-const handleCommand = async(key) => {
-  console.log('下拉事件执行了')
-  if(key === 'logout'){
-    // 发送注销请求
-    const res = await adminLogoutApi()
-    // 清空token
-    tokenStore.removeToken()
-    console.log('清空前',router.getRoutes())
-    // 清空动态路由数据
-    clearRoute(userStore.userMenu)
-    console.log('清空后',router.getRoutes())
-    // 清空菜单
-    userStore.userMenu = []
-    // 清空用户名
-    userStore.username = ''
-    // 提示信息
-    ElMessage.success(res.message)
-    // 跳转到登录页
-    router.replace('/login')
-  }
-}
 
 
 
