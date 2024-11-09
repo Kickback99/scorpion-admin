@@ -15,8 +15,8 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button circle :icon="Refresh"></el-button>
-            <el-button circle :icon="FullScreen"></el-button>
+            <el-button circle :icon="Refresh" @click="modifyRefresh"></el-button>
+            <el-button circle :icon="FullScreen" @click="fullScreen"></el-button>
             <el-button circle :icon="Setting"></el-button>
         </div>
         <el-dropdown @command="handleCommand">
@@ -48,6 +48,7 @@ FullScreen,
 Setting} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
 import { useUserStore } from '@/store/user'
+import {useSettingStore} from '@/store/setting'
 import { useRoute,useRouter} from 'vue-router';
 import {useTokenStore} from '@/store/token'
 import {adminLogoutApi} from '@/api/admin'
@@ -61,6 +62,22 @@ const router = useRouter()
 
 const queryRouter = (item) =>{
     console.log(item.path)
+}
+
+// 处理刷新业务
+const settingStore =  useSettingStore()
+
+const modifyRefresh = () =>{
+    settingStore.refresh = !settingStore.refresh
+}
+
+// 处理全屏
+const fullScreen = () => {
+    let full = document.fullscreenElement
+    // 切换全屏模式，是全屏则为true，不是则为false
+    if(!full) {
+        document.documentElement.requestFullscreen()
+    }else document.exitFullscreen()
 }
 
 // 处理下拉事件
