@@ -318,8 +318,10 @@ const modifyMenu = async() => {
     dialogVisible.value = false
     ElMessage.success('修改成功')
     render()
+    // 清空路由
     clearRoute(userStore.userMenu)
-    await loadMenu()
+    // 重新加载路由配置文件和pinia数据
+    loadMenu()
 }
 </script>
 
