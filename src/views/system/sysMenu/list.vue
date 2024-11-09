@@ -269,7 +269,7 @@ const addMenuButton = (row) => {
         
     }
 }
-let baseIcon;
+// let baseIcon;
 
 const editMenu = (row) =>{
     title.value = '修改菜单'
@@ -282,7 +282,7 @@ const editMenu = (row) =>{
     }
     })
     console.log(row.icon)
-    baseIcon =  row.icon
+    // baseIcon =  row.icon
     formModel.value =  {...row}
     typeDisabled.value = true
 }
@@ -290,7 +290,7 @@ const editMenu = (row) =>{
 // 弹层取消事件
 const onCancel = () => {
   dialogVisible.value = false
-  formModel.value.icon = baseIcon
+  // formModel.value.icon = baseIcon
 }
 
 // 弹层确认事件：添加或修改
