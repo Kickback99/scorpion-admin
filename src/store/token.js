@@ -1,3 +1,4 @@
+import { userInfoApi } from '@/api/admin'
 import {defineStore} from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -7,6 +8,9 @@ import { computed, ref } from 'vue'
 export const useTokenStore = defineStore('token',()=>{
     // 声明数据 state ref()
     const token = ref('')
+
+    const userInfo = ref({})
+    const roleNames = ref([])
   
 
     // 声明操作数据的方法 actions (函数)
@@ -18,11 +22,17 @@ export const useTokenStore = defineStore('token',()=>{
         token.value = ''
     }
 
+    const setUserInfo = async() => {
+        const res = await userInfoApi()
+        userInfo.value = res.data.userInfo
+        roleNames.value = res.data.roleNames
+    }
+
 
     // 声明基于数据的计算属性 getters (computed)
    
     return {
-        token,setToken,removeToken
+        token,setToken,removeToken,userInfo,roleNames,setUserInfo
     }
 },{
 	persist: true,  // 开启当前仓库的持久化
