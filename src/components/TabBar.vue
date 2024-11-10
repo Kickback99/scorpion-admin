@@ -23,7 +23,7 @@
             <span class="el-dropdown_box">
                 <el-avatar :src="tokenStore.userInfo.avatar || avatar" />
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
-                {{ tokenStore.roleNames[0]}}
+                  {{ displayName }}
                 <el-icon>
                     <arrow-down />
                 </el-icon>
@@ -55,13 +55,19 @@ import { useRoute,useRouter} from 'vue-router';
 import {useTokenStore} from '@/store/token'
 import {adminLogoutApi} from '@/api/admin'
 import { clearRoute } from '@/utils/clearRoute';
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
 
 const route =  useRoute()
 const router = useRouter()
+
+const displayName = computed(()=>{
+    if(tokenStore.roleNames && tokenStore.roleNames.length >0)return tokenStore.roleNames[0]
+    else if(tokenStore.userInfo.nickname) return tokenStore.userInfo.nickname
+    else return tokenStore.userInfo.username
+})
 
 /* const queryRouter = (item) =>{
     console.log(item.path)
