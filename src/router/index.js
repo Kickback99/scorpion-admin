@@ -97,7 +97,7 @@ function routesHandler(router,parentType=null){
     })
 }
 
-export const loadMenu = async(next) => {
+export const loadMenu = async(next,to) => {
     const userStore = useUserStore()
     console.log('请求菜单')
     const res = await userInfoApi()
@@ -116,11 +116,11 @@ export const loadMenu = async(next) => {
         asyncRoutes.forEach(r => {
             router.addRoute(r)
         })
-    }else {
-        next()
     }
+
     router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
+
 
     console.log(router.getRoutes())
 
@@ -201,7 +201,6 @@ router.beforeEach((to, from, next) => {
     }
 
 
-
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
@@ -210,9 +209,17 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 加载菜单
-    loadMenu(next).then(()=>{
+    loadMenu(next,to).then(()=>{
         next({...to,replace:true})
     })
+
+        //t_handle：处理前后台用户的逻辑
+        // 后台用户，没有菜单，跳到首页
+        // 前台用户，跳到404
+    if(to.path === '/index'){
+        console.log('放首页')
+        return next()
+    }
 });
 
 // 将路由对象暴露出去

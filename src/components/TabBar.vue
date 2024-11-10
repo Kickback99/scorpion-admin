@@ -113,7 +113,7 @@ const handleCommand = async(key) => {
     // 提示信息
     ElMessage.success(res.message)
     // 跳转到登录页
-    router.replace('/login')
+    router.push({path:'/login',query:{redirect:route.path}})
   }
 }
 
