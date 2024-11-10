@@ -21,7 +21,9 @@
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
-                <el-avatar :src="userStore.avatar || avatar" />
+                <el-avatar :src="tokenStore.userInfo.avatar || avatar" />
+                <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
+                {{ tokenStore.roleNames[0]}}
                 <el-icon>
                     <arrow-down />
                 </el-icon>
@@ -53,6 +55,7 @@ import { useRoute,useRouter} from 'vue-router';
 import {useTokenStore} from '@/store/token'
 import {adminLogoutApi} from '@/api/admin'
 import { clearRoute } from '@/utils/clearRoute';
+import { onMounted } from "vue";
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
@@ -60,9 +63,14 @@ const tokenStore = useTokenStore()
 const route =  useRoute()
 const router = useRouter()
 
-const queryRouter = (item) =>{
+/* const queryRouter = (item) =>{
     console.log(item.path)
-}
+} */
+
+// 获取用户信息
+onMounted(()=>{
+    tokenStore.setUserInfo()
+})
 
 // 处理刷新业务
 const settingStore =  useSettingStore()
@@ -115,8 +123,11 @@ const handleCommand = async(key) => {
     display: flex;
     align-items: center;
     outline: none;
+    .el-avatar {
+        margin-right: 5px;
+    }
     .el-icon {
-    margin-left: 10px;
+    margin-left: 5px;
 }
 }
 .left {
