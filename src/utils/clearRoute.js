@@ -7,4 +7,6 @@ export const clearRoute = (res) => {
             clearRoute(item.children)
         }
     })
+    router.removeRoute('NotFound')
+    router.removeRoute('404')
 }

@@ -89,8 +89,9 @@
   const tokenStore = useTokenStore()
   const ruleFormRef = ref(null)
   const isRegister = ref(false)
-  import { useRouter } from 'vue-router'; //编程式导航需要引入useRouter
+  import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
   const router = useRouter()
+  const route = useRoute()
   
   // 绑定表单数据
     const formData = ref({
@@ -150,12 +151,15 @@
      // 如果存在保存的路由信息，则重定向到该路由
       if (originalRouteQuery) {
         // 使用带有查询参数的路径重定向用户
+        console.log('从本地跳转')
         router.push({ path: originalRouteQuery.path, query: originalRouteQuery.query });
         // 清除保存的路由信息
         localStorage.removeItem('originalRouteQuery');
       } else {
         // 如果没有保存的路由信息，可以重定向到首页或其他默认页面
-        router.push('/');
+        console.log('开始重定向')
+        let redirect = route.query.redirect
+        router.push({path: redirect || '/'});
       }
   }
   
