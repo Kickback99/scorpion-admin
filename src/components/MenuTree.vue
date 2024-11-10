@@ -1,6 +1,5 @@
 <template>
         <!--多级菜单-->
-        <template v-if="listData">
             <template v-for="menu in listData">
             <el-menu-item :index="handleChildren(menu)" v-if="handleMenuVisible(menu)">
                 <el-icon><IconifyOffline :icon="menu.meta.icon"></IconifyOffline></el-icon> <span>{{menu.meta.title}}</span>
@@ -13,7 +12,6 @@
             <!--展开的每一个菜单项-->
                 <menu-tree :listData="menu.children"></menu-tree>
             </el-sub-menu>
-        </template>
         </template>
 
 </template>

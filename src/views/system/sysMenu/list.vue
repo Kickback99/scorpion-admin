@@ -27,7 +27,9 @@
         <el-table-column prop="sortValue" label="排序" width="60"/>
         <el-table-column label="状态" width="80">
             <template #default="{row}">
-                <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/>
+                <!-- <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/> -->
+                 <el-button v-if="row.status ===1" type="success" plain size="small">启用</el-button>
+                 <el-button v-else type="danger" plain size="small">禁用</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160"/>
@@ -196,12 +198,12 @@ const deleteSelectRows = () => {
 }
 
 //  t_menu_request：更改菜单状态请求
-const modifySwitch = async(row) =>{
+/* const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
     row.status === 1 ? ElMessage.success('菜单已激活'):ElMessage.error('菜单已禁用')
     //t_question：菜单状态被禁用了，强制刷新路由
     window.location.reload()
-}
+} */
 
 // 弹层相关
 
