@@ -97,25 +97,28 @@ function routesHandler(router,parentType=null){
     })
 }
 
-export const loadMenu = async() => {
+export const loadMenu = async(next) => {
     const userStore = useUserStore()
     console.log('请求菜单')
     const res = await userInfoApi()
-    //保存菜单，避免路由鉴权重复执行
-    userStore.setUserMenu(res.data.routers)
-    // 把用户按钮权限存进store
-    userStore.setUserPerm(res.data.permissions)
-    const asyncRoutes = routesHandler(res.data.routers)
+    if(res.data.routers.length > 0){
+        //保存菜单，避免路由鉴权重复执行
+        userStore.setUserMenu(res.data.routers)
+        // 把用户按钮权限存进store
+        userStore.setUserPerm(res.data.permissions)
+        const asyncRoutes = routesHandler(res.data.routers)
 
-    console.log('后端返回',res.data.routers)
-    
-    console.log('路由数据',asyncRoutes)
+        console.log('后端返回',res.data.routers)
 
-    // 添加路由
-    asyncRoutes.forEach(r => {
-        router.addRoute(r)
-    })
+        console.log('路由数据',asyncRoutes)
 
+        // 添加路由
+        asyncRoutes.forEach(r => {
+            router.addRoute(r)
+        })
+    }else {
+        next()
+    }
     router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
 
@@ -207,7 +210,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 加载菜单
-    loadMenu().then(()=>{
+    loadMenu(next).then(()=>{
         next({...to,replace:true})
     })
 });

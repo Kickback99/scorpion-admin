@@ -1,6 +1,7 @@
 <template>
         <!--多级菜单-->
-        <template v-for="menu in listData">
+        <template v-if="listData">
+            <template v-for="menu in listData">
             <el-menu-item :index="handleChildren(menu)" v-if="handleMenuVisible(menu)">
                 <el-icon><IconifyOffline :icon="menu.meta.icon"></IconifyOffline></el-icon> <span>{{menu.meta.title}}</span>
             </el-menu-item>
@@ -13,6 +14,8 @@
                 <menu-tree :listData="menu.children"></menu-tree>
             </el-sub-menu>
         </template>
+        </template>
+
 </template>
 
 <script setup>
