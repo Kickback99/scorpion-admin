@@ -189,7 +189,7 @@ router.beforeEach((to, from, next) => {
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
         ElMessage.error('如果没有token跳转到登录页')
-        if(to.path != '/login' && !localStorage.getItem('originalRouteQuery')){
+        if(to.path != '/login' && to.path != '/index' && !localStorage.getItem('originalRouteQuery')){
             // 保存原始路由的查询参数到本地存储
             const path = to.path
             const query =  to.query
