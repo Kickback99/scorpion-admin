@@ -100,6 +100,7 @@ function routesHandler(router,parentType=null){
 export const loadMenu = async(next,to) => {
     const userStore = useUserStore()
     console.log('请求菜单')
+    // t_user_request：获取用户权限请求
     const res = await userInfoApi()
     if(res.data.routers.length > 0){
         //保存菜单，避免路由鉴权重复执行
