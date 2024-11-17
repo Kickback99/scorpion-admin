@@ -23,16 +23,22 @@ export const useTokenStore = defineStore('token',()=>{
     }
 
     const setUserInfo = async() => {
+        // t_user_request：获取用户信息请求
         const res = await userInfoApi()
         userInfo.value = res.data.userInfo
         roleNames.value = res.data.roleNames
+    }
+
+    const removeUserInfo = () => {
+        userInfo.value = {},
+        roleNames.value = []
     }
 
 
     // 声明基于数据的计算属性 getters (computed)
    
     return {
-        token,setToken,removeToken,userInfo,roleNames,setUserInfo
+        token,setToken,removeToken,userInfo,roleNames,setUserInfo,removeUserInfo
     }
 },{
 	persist: true,  // 开启当前仓库的持久化
