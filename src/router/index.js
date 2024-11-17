@@ -116,6 +116,10 @@ export const loadMenu = async(next,to) => {
         asyncRoutes.forEach(r => {
             router.addRoute(r)
         })
+    }else {
+        router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
+        router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
+        return Promise.reject('该用户无菜单权限...')
     }
 
     router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
@@ -164,14 +168,21 @@ const getToken = () => {
     return localStorage.getItem('token')
 }
 
-const whiteList = ['/login','/register','/404','/401']
-router.beforeEach((to, from, next) => {
+let count = 1;
 
+const whiteList = ['/login','/register','/401']
+router.beforeEach((to, from, next) => {
+    ++count;
     console.log(to)
     console.log('路由前置守卫执行')
     const userStore = useUserStore()
 
     const tokenStore = useTokenStore()
+
+    if(to.path === '/404' && count === 3){
+        next()
+    }
+
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
@@ -209,17 +220,26 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 加载菜单
-    loadMenu(next,to).then(()=>{
-        next({...to,replace:true})
-    })
+    loadMenu(next,to).then(
+        ()=>{next({...to,replace:true})
+    }).catch(
+        ()=>{
+            if(to.path === '/index'){
+                next()
+            }else {
+                console.log('开始重定向')
+                next('/404')
+            }
+        }
+    )
 
         //t_handle：处理前后台用户的逻辑
         // 后台用户，没有菜单，跳到首页
         // 前台用户，跳到404
-    if(to.path === '/index'){
+    /* if(to.path === '/index'){
         console.log('放首页')
         return next()
-    }
+    } */
 });
 
 // 将路由对象暴露出去
