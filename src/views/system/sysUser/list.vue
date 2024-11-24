@@ -55,7 +55,11 @@
         <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
             <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" :icon="Edit"  circle plain/>
-            <el-button :disabled="$hasPerm('bnt.sysUser.remove')" @click="removeUsers(row.id)" type="danger" :icon="Delete"   circle plain/>
+            <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" :icon="WarnTriangleFilled">
+                <template #reference>
+                    <el-button :disabled="$hasPerm('bnt.sysUser.remove')" type="danger" :icon="Delete"   circle plain/>
+                </template>
+            </el-popconfirm>
             <el-button :disabled="$hasPerm('bnt.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" :icon="User"   circle plain/>
             </template>
         </el-table-column>
@@ -150,7 +154,7 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User,Search,Plus} from '@element-plus/icons-vue'
+import {Edit,Delete,Refresh,User,Search,Plus,WarnTriangleFilled} from '@element-plus/icons-vue'
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
@@ -257,14 +261,9 @@ const deleteSelectRows = () => {
 
 // t_user_request：用户删除请求
 const removeUsers = async(ids) =>{
-    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
-      type: 'warning',
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
-    })
     await removeApi(ids)
     ElMessage.success('删除成功')
-    render()
+    render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
 }
 
 //  t_user_request：更改用户状态请求
