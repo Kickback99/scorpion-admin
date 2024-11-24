@@ -189,7 +189,8 @@ const onReset = () => {
 const tableData = ref([])
 
 // t_user_request：用户列表请求
-const render = async() =>{
+const render = async(pager = 1) =>{
+    params.value.pageNum =  pager
     const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     console.log('请求用户列表')
     console.log(res.data)
@@ -204,7 +205,7 @@ render()
 const onSizeChange = (size) => {
     //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
-    params.value.pageNum = 1
+    // params.value.pageNum = 1
     //更新每页条数
     params.value.pageSize = size
     //重新渲染
@@ -214,9 +215,9 @@ const onSizeChange = (size) => {
 const onCurrentChange = (page) => {
     //console.log(`onCurrentChange：当前第${size}页`)
     //更新当前页
-    params.value.pageNum = page
+    // params.value.pageNum = page
     //重新渲染
-    render()
+    render(page)
 }
 
 // 批量删除相关
@@ -322,7 +323,7 @@ const modifyUser = async() => {
     await modifyApi(formData.value)
     dialogVisible.value = false
     ElMessage.success('修改成功')
-    render()
+    render(params.value.pageNum)
 }
 
 
