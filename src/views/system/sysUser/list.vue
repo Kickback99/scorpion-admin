@@ -349,7 +349,7 @@ const modifyUser = async() => {
 const rules = {
     username : [    
       { required: true, message: '请输入用户名', trigger: 'blur' },
-      { min: 3, max: 10, message: '用户名必须是 3-5位 的字符', trigger: 'blur' },
+      { min: 3, max: 15, message: '用户名必须是 3-15位 的字符', trigger: 'blur' },
   ],
     nickname : [
       { required: false, trigger: 'blur' },
