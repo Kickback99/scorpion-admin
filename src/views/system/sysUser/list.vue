@@ -37,22 +37,22 @@
     border
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="nickname" label="呢称" />
-        <el-table-column prop="phone" label="手机" />
-        <el-table-column label="类型">
+        <el-table-column type="index" label="序号" width="100" align="center" />
+        <el-table-column prop="username" label="用户名" align="center" />
+        <el-table-column prop="nickname" label="呢称" align="center" />
+        <el-table-column prop="phone" label="手机" align="center" />
+        <el-table-column label="类型" align="center ">
             <template #default="{row}">
                 {{ row.type === 1 ? '后台用户':'前台用户' }}
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="status" label="状态" align="center">
             <template #default="{row}">
                 <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="150">
+        <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
+        <el-table-column label="操作" width="150" aligin="center" >
             <template #default="{row,$index}">
             <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" :icon="Edit"  circle plain/>
             <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" :icon="WarnTriangleFilled">
@@ -144,7 +144,7 @@
     :small="false"
     :disabled="false"
     :background="false"
-    layout="jumper, total, sizes, prev, pager, next"
+    layout="prev, pager, next, jumper, ->,sizes,total"
     :total="total"
     @size-change="onSizeChange"
     @current-change="onCurrentChange"
@@ -158,7 +158,7 @@ import {Edit,Delete,Refresh,User,Search,Plus,WarnTriangleFilled} from '@element-
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
@@ -291,11 +291,21 @@ const formData = ref({
 
 const title = ref('')
 
+//校验相关
+const ruleFormRef = ref(null)
+
     //新增弹层
 const addDialog = () =>{
     dialogVisible.value = true
     title.value = '新增用户'
     formData.value = {...defaultData}
+    // 重置上一次的表单验证
+    nextTick(()=>{
+        ruleFormRef.value.clearValidate('username')
+        ruleFormRef.value.clearValidate('nickname')
+        ruleFormRef.value.clearValidate('phone')
+        ruleFormRef.value.clearValidate('email')
+    })
 }
 
     //修改用户
@@ -303,7 +313,13 @@ const editDialog = (row) =>{
     dialogVisible.value = true
     title.value = '编辑用户'
     formData.value = {...row,type:row.type.toString()}
-
+    // 重置上一次的表单验证
+        nextTick(()=>{
+        ruleFormRef.value.clearValidate('username')
+        ruleFormRef.value.clearValidate('nickname')
+        ruleFormRef.value.clearValidate('phone')
+        ruleFormRef.value.clearValidate('email')
+    })
 }
 
 // t_user_request：用户添加请求
@@ -327,8 +343,7 @@ const modifyUser = async() => {
 
 
 
-    //校验相关
-const ruleFormRef = ref(null)
+
 
 // 绑定表单校验规则
 const rules = {
