@@ -40,6 +40,7 @@
         <el-table-column type="index" label="序号" width="100" align="center" />
         <el-table-column prop="username" label="用户名" align="center" />
         <el-table-column prop="nickname" label="呢称" align="center" />
+        <el-table-column prop="roleNames" label="用户角色" align="center" show-overflow-tooltip/>
         <el-table-column prop="phone" label="手机" align="center" />
         <el-table-column label="类型" align="center ">
             <template #default="{row}">
