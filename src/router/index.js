@@ -97,11 +97,15 @@ function routesHandler(router,parentType=null){
     })
 }
 
-export const loadMenu = async(next,to) => {
+export const loadMenu = async(loadUserInfo = true) => {
     const userStore = useUserStore()
     console.log('请求菜单')
     // t_user_request：获取用户权限请求
     const res = await userInfoApi()
+    if(loadUserInfo){
+        userStore.setUserInfo(res.data.userInfo)
+        userStore.setRoleNames(res.data.roleNames)
+    }
     if(res.data.routers.length > 0){
         //保存菜单，避免路由鉴权重复执行
         userStore.setUserMenu(res.data.routers)
@@ -221,7 +225,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 加载菜单
-    loadMenu(next,to).then(
+    loadMenu().then(
         ()=>{next({...to,replace:true})
     }).catch(
         ()=>{

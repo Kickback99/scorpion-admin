@@ -21,7 +21,7 @@
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
-                <el-avatar :src="tokenStore.userInfo.avatar || avatar" />
+                <el-avatar :src="userStore.userInfo.avatar || avatar" />
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
                   {{ displayName }}
                 <el-icon>
@@ -54,7 +54,8 @@ import {useSettingStore} from '@/store/setting'
 import { useRoute,useRouter} from 'vue-router';
 import {useTokenStore} from '@/store/token'
 import {adminLogoutApi} from '@/api/admin'
-import { clearRoute } from '@/utils/clearRoute';
+import { clearRoute } from '@/utils/remove';
+import { clearUserInfo } from '@/utils/remove';
 import { computed, onMounted } from "vue";
 
 const userStore = useUserStore()
@@ -64,19 +65,14 @@ const route =  useRoute()
 const router = useRouter()
 
 const displayName = computed(()=>{
-    if(tokenStore.roleNames && tokenStore.roleNames.length >0)return tokenStore.roleNames[0]
-    else if(tokenStore.userInfo.nickname) return tokenStore.userInfo.nickname
-    else return tokenStore.userInfo.username
+    if(userStore.roleNames && userStore.roleNames.length >0)return userStore.roleNames[0]
+    else if(userStore.userInfo.nickname) return userStore.userInfo.nickname
+    else return userStore.userInfo.username
 })
 
 /* const queryRouter = (item) =>{
     console.log(item.path)
 } */
-
-// 获取用户信息
-onMounted(()=>{
-    tokenStore.setUserInfo()
-})
 
 // 处理刷新业务
 const settingStore =  useSettingStore()
@@ -103,6 +99,8 @@ const handleCommand = async(key) => {
     // 清空token
     tokenStore.removeToken()
     console.log('清空前',router.getRoutes())
+    // 清空用户信息
+    clearUserInfo()
     // 清空动态路由数据
     clearRoute(userStore.userMenu)
     console.log('清空后',router.getRoutes())
