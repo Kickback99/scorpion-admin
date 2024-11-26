@@ -140,7 +140,7 @@ const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
 import { nextTick } from 'vue';
 const iconRef = ref()
-import { clearRoute } from '@/utils/clearRoute';
+import { clearRoute } from '@/utils/remove';
 import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
 
@@ -323,7 +323,7 @@ const modifyMenu = async() => {
     // 清空路由
     clearRoute(userStore.userMenu)
     // 重新加载路由配置文件和pinia数据
-    loadMenu()
+    loadMenu(false)
 }
 </script>
 

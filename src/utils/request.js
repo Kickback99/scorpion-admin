@@ -9,7 +9,8 @@ import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
 import { useUserStore } from '@/store/user';
 import router from '@/router';
-import { clearRoute } from './clearRoute';
+import { clearRoute } from './remove';
+import { clearUserInfo } from './remove';
 
 
 
@@ -48,6 +49,8 @@ instance.interceptors.response.use(
                 const userStore = useUserStore()
                 // 清空token
                 tokenStore.removeToken()
+                // 清空用户信息
+                clearUserInfo()
                 // 清空动态路由数据
                 clearRoute(userStore.userMenu)    
                 // 清空菜单

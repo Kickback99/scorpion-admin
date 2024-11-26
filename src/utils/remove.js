@@ -1,5 +1,5 @@
 import router from "@/router"
-import { useTokenStore } from "@/store/token"
+import {useUserStore} from '@/store/user'
 
 export const clearRoute = (res) => {
     res.forEach(item => {
@@ -8,10 +8,13 @@ export const clearRoute = (res) => {
             clearRoute(item.children)
         }
     })
-    const tokenStore = useTokenStore()
-    // 删除用户信息
-    tokenStore.removeUserInfo()
     // 删除404路由
     router.removeRoute('NotFound')
     router.removeRoute('404')
+}
+
+export const clearUserInfo = () => {
+    const userStore = useUserStore()
+    // 删除用户信息
+    userStore.removeUserInfo()
 }
