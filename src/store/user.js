@@ -4,7 +4,9 @@ export const useUserStore = defineStore({
     id:'user',
     state:()=>({
         userMenu:[],
-        userPerm:[]
+        userPerm:[],
+        userInfo:{},
+        roleNames:[]
     }),
     actions:{
         setUserMenu(menuData){
@@ -12,6 +14,12 @@ export const useUserStore = defineStore({
         },
         setUserPerm(menuData){
             this.userPerm = menuData
+        },
+        setUserInfo(userInfo){
+            this.userInfo = userInfo
+        },
+        setRoleNames(roleNames){
+            this.roleNames = roleNames
         }
     }
 })
