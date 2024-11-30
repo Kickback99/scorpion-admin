@@ -33,7 +33,11 @@
         <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
             <el-button :disabled="$hasPerm('bnt.sysRole.update')" type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-            <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete" @click="removeRole(row)"  circle plain/>
+            <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
+                <template #reference>
+                    <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete"  circle plain/>
+                </template>
+            </el-popconfirm>
             <el-button :disabled="$hasPerm('bnt.sysRole.assignAuth')" type="warning" :icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
             </template>
         </el-table-column>
@@ -77,7 +81,7 @@
     :small="false"
     :disabled="false"
     :background="false"
-    layout="jumper, total, sizes, prev, pager, next"
+    layout="prev, pager, next, jumper, ->,sizes,total"
     :total="total"
     @size-change="onSizeChange"
     @current-change="onCurrentChange"
@@ -87,8 +91,8 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User,Search,Plus,Baseball} from '@element-plus/icons-vue'
-import { ref } from 'vue';
+import {Edit,Delete,Refresh,User,Search,Plus,Baseball,WarnTriangleFilled} from '@element-plus/icons-vue'
+import { nextTick, ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
 import { ElMessage} from 'element-plus';
 import router from '@/router';
@@ -105,7 +109,8 @@ const total = ref(null)
 
 
 // t_role_request：角色列表请求
-const render = async() => {
+const render = async(pager = 1) => {
+    params.value.pageNum =  pager
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     tableData.value = res.data.items
     console.log(res.data.items)
@@ -119,7 +124,7 @@ render()
 const onSizeChange = (size) => {
     //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
-    params.value.pageNum = 1
+    // params.value.pageNum = 1
     //更新每页条数
     params.value.pageSize = size
     //重新渲染
@@ -129,22 +134,17 @@ const onSizeChange = (size) => {
 const onCurrentChange = (page) => {
     //console.log(`onCurrentChange：当前第${size}页`)
     //更新当前页
-    params.value.pageNum = page
+    // params.value.pageNum = page
     //重新渲染
-    render()
+    render(page)
 }
 
 // t_role_request：删除角色请求
-const removeRole = async(row) =>{
-    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
-      type: 'warning',
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
-    })
-    await removeApi(row.id)
+const removeRole = async(id) =>{
+    await removeApi(id)
     ElMessage.success('删除成功')
     //重新渲染
-    render()
+    render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
 
 }
 
@@ -161,6 +161,9 @@ const onReset = () => {
     render()
 }
 
+    // 校验相关
+    const ruleFormRef = ref(null)
+
 // 弹层相关
 
     const dialogVisible = ref(false)
@@ -173,6 +176,11 @@ const onReset = () => {
         dialogVisible.value = true
         title.value = '新增角色'
         dialogData.value = {}
+        // 重置上一次的表单验证
+        nextTick(()=>{
+            ruleFormRef.value.clearValidate("roleName")
+            ruleFormRef.value.clearValidate("roleCode")
+        })
     }
 
     // 修改角色弹层
@@ -180,6 +188,11 @@ const onReset = () => {
         dialogVisible.value = true
         title.value = '编辑角色'
         dialogData.value = {...row}
+        // 重置上一次的表单验证
+        nextTick(()=>{
+            ruleFormRef.value.clearValidate("roleName")
+            ruleFormRef.value.clearValidate("roleCode")
+        })
     }
 
 
@@ -190,9 +203,9 @@ const onReset = () => {
         const res = await addApi(dialogData.value)
         console.log('增加请求')
         console.log(res)
+        dialogVisible.value = false
         ElMessage.success('添加成功')
         render()
-        dialogVisible.value = false
 
     }
 
@@ -201,14 +214,13 @@ const onReset = () => {
     const modifyRole = async() =>{
         await ruleFormRef.value.validate()
         await modifyApi(dialogData.value)
-        ElMessage.success('修改成功')
-        render()
         dialogVisible.value = false
+        ElMessage.success('修改成功')
+        render(params.value.pageNum)
 
     }
 
-    // 校验相关
-    const ruleFormRef = ref(null)
+
 
     // 绑定表单校验规则
     const rules = {
@@ -217,7 +229,7 @@ const onReset = () => {
         {pattern:/^\S{1,7}$/, message: '角色名必须是 1- 7 位非空字符', trigger: 'blur' },
     ],
         roleCode : [
-        { required: true, message: '请输入角色编码', trigger: 'blur' },
+        { required: false, message: '请输入角色编码', trigger: 'blur' },
         { pattern:/^[a-zA-Z0-9]{1,10}$/,message:'角色编码 必须是 1-10 位的字母或数字',trigger:'blur'}
         ],
     }
