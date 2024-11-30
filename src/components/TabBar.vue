@@ -17,7 +17,21 @@
         <div class="buttons">
             <el-button circle :icon="Refresh" @click="modifyRefresh"></el-button>
             <el-button circle :icon="FullScreen" @click="fullScreen"></el-button>
-            <el-button circle :icon="Setting"></el-button>
+            <el-popover
+    placement="bottom"
+    :width="300"
+    :height="700"
+    trigger="hover"
+  >
+    <template #reference>
+        <el-button circle :icon="Setting"></el-button>
+    </template>
+    <el-form> 
+    <el-form-item>
+        <el-color-picker v-model="color" show-alpha :predefine="predefineColors" @change="setColor" @active-change="currentColor" :teleported=false  />
+    </el-form-item>
+  </el-form>
+  </el-popover>
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
@@ -56,7 +70,7 @@ import {useTokenStore} from '@/store/token'
 import {adminLogoutApi} from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { clearUserInfo } from '@/utils/remove';
-import { computed, onMounted } from "vue";
+import { computed, onMounted,ref } from "vue";
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
@@ -115,7 +129,34 @@ const handleCommand = async(key) => {
   }
 }
 
+// 颜色选择器
+const color = ref(settingStore.menuTextColor)
+const predefineColors = ref([
+  '#ff4500',
+  '#ff8c00',
+  '#ffd700',
+  '#90ee90',
+  '#00ced1',
+  '#1e90ff',
+  '#c71585',
+  'rgba(255, 69, 0, 0.68)',
+  'rgb(255, 120, 0)',
+  'hsv(51, 100, 98)',
+  'hsva(120, 40, 94, 0.5)',
+  'hsl(181, 100%, 37%)',
+  'hsla(209, 100%, 56%, 0.73)',
+  '#c7158577',
+])
 
+// 点击确定后的颜色
+const setColor = () => {
+    settingStore.setMenuTextColor(color.value)
+}
+
+// 当前激活的颜色
+const currentColor = (color) => {
+    settingStore.setMenuTextColor(color)
+}
 
 
 </script>

@@ -7,7 +7,7 @@
       active-text-color="palegreen" 
           background-color="transparent" 
           :default-active="handelUrl"
-          text-color="666"
+          :text-color="finalColor"
           mode="vertical"
         >
           <el-menu-item index="/index">
@@ -32,14 +32,21 @@
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
 import TabBar from '@/components/TabBar.vue';
-import { useSettingStore } from '@/store/setting';
 import {useUserStore} from '@/store/user'
-import { nextTick, onMounted, ref,watch } from 'vue';
+import { computed, nextTick, onMounted, ref,watch } from 'vue';
+import {useSettingStore} from '@/store/setting'
 
+// 方式一：使用css变量动态设置el-menu的text-color属性值
+// const textColor = ref('')
 
 /* onMounted(()=>{
-  textColor.value = variable.menuTextColor
+  const styles =  getComputedStyle(document.documentElement)
+  textColor.value = styles.getPropertyValue('--text')
 }) */
+
+// 方式二：使用颜色选择器和pinia仓库动态设置el-menu的text-color属性值
+const settingStore =  useSettingStore()
+const finalColor =  computed(()=>settingStore.menuTextColor)
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
@@ -56,7 +63,6 @@ const route = useRoute()
 
 const isDestroy = ref(true)
 
-const settingStore = useSettingStore()
 
 watch(()=>settingStore.refresh,()=>{
   isDestroy.value = false
