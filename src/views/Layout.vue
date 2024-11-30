@@ -3,6 +3,7 @@
     <el-container>
       <el-aside width="220px">
         <el-menu router
+        popper-class="menuList"
       active-text-color="palegreen" 
           background-color="transparent" 
           :default-active="handelUrl"
@@ -33,7 +34,12 @@ import MenuTree from '@/components/MenuTree.vue';
 import TabBar from '@/components/TabBar.vue';
 import { useSettingStore } from '@/store/setting';
 import {useUserStore} from '@/store/user'
-import { nextTick, ref,watch } from 'vue';
+import { nextTick, onMounted, ref,watch } from 'vue';
+
+
+/* onMounted(()=>{
+  textColor.value = variable.menuTextColor
+}) */
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
@@ -88,13 +94,16 @@ watch(()=>route.path,()=>{
 }
 
 .el-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex(space-between,center,null)
 
 }
 
 .el-aside {
-  background-color: coral;
+  background-color: $menu-background;
 }
+
+ /*  .el-menu-item,.el-sub-menu__title{
+    color:$menu-color
+  } */
+
 </style>

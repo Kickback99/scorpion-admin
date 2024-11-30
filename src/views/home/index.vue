@@ -16,7 +16,7 @@
         .left {
             width: 50px;
             height: 200px;
-            background: $color;
+            background: coral;
 
         }
         .right {

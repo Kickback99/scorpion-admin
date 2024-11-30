@@ -1,7 +1,16 @@
-$color:navy;
+// 左侧导航背景栏颜色
+$menu-background:slateblue;
+$menu-color:white;
+
+/* :export {
+    menuTextColor:$menu-color;
+} */
+
+// flex函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
     display: flex;
     justify-content:$row;
     align-items: $col;
     align-content:$multiCol
 }
+
