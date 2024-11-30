@@ -6,11 +6,14 @@
         
 
         <!-- 表格 -->
-        <el-table :data="tableData" style="width: 100%;" border stripe
+        <el-table
+        v-loading="loading" 
+        :data="tableData" style="width: 100%;"
         row-key="id"
         :tree-props="treeProps"
         ref="multipleTableRef"
         @selection-change="removeMultiple"
+        border stripe
         >
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column prop="name" label="菜单名称" width="160"/>
@@ -145,11 +148,18 @@ import { loadMenu } from '@/router';
 
 const userStore = useUserStore()
 
+// 默认关闭loading
+const loading = ref(false)
+
 // t_menu_request：菜单树形列表请求
 const render = async() => {
+     // 开启loading动效
+     loading.value = true
      const res = await listApi()
      console.log(res)
      tableData.value = res.data
+     // 关闭loading动效
+     loading.value = false
 }
 
 render()
