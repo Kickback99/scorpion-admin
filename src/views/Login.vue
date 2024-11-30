@@ -67,7 +67,7 @@
           </div>
       </el-form-item>
       <el-form-item>
-        <el-button @click="loginEve" auto-insert-space type="primary" class="button">登录</el-button>
+        <el-button :loading="loading" @click="loginEve" auto-insert-space type="primary" class="button">登录</el-button>
       </el-form-item>
       <el-form-item class="flex">
       <el-link type="info" :underline="false" @click="isRegister = true;clearRegisterData()">
@@ -140,12 +140,18 @@
   }
   
   //t_user_request：用户登录请求
+
+  const loading = ref(false)
+
   const loginEve = async() =>{
     await ruleFormRef.value.validate()
+    loading.value = true
+    try {
     const res = await adminLoginApi(formData.value)
     console.log(res.data)
     tokenStore.setToken(res.data)
     ElMessage.success('登录成功')
+    loading.value = false
     // 从本地存储中获取原始路由的查询参数
     const originalRouteQuery = JSON.parse(localStorage.getItem('originalRouteQuery'));
      // 如果存在保存的路由信息，则重定向到该路由
@@ -161,6 +167,10 @@
         let redirect = route.query.redirect
         router.push({path: redirect || '/'});
       }
+    } catch (error) {
+      loading.value = false
+    }
+    
   }
   
   </script>
