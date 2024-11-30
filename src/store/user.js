@@ -20,6 +20,10 @@ export const useUserStore = defineStore({
         },
         setRoleNames(roleNames){
             this.roleNames = roleNames
+        },
+        setRemoveUserInfo(){
+            this.userInfo = {},
+            this.roleNames = []
         }
     }
 })

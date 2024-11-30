@@ -16,5 +16,5 @@ export const clearRoute = (res) => {
 export const clearUserInfo = () => {
     const userStore = useUserStore()
     // 删除用户信息
-    userStore.removeUserInfo()
+    userStore.setRemoveUserInfo()
 }

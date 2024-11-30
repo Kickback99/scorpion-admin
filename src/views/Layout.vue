@@ -30,6 +30,7 @@
 
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
+import TabBar from '@/components/TabBar.vue';
 import { useSettingStore } from '@/store/setting';
 import {useUserStore} from '@/store/user'
 import { nextTick, ref,watch } from 'vue';
