@@ -6,6 +6,10 @@ $menu-color:white;
     menuTextColor:$menu-color;
 } */
 
+:root{
+    --text:#FFFFFF;
+}
+
 // flex函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
     display: flex;
