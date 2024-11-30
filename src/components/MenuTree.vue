@@ -39,5 +39,8 @@ const handleChildren = (menu) => {
 </script>
 
 <style scoped lang="scss">
+  /* .el-menu-item,.el-sub-menu__title span,i{
+    color:$menu-color;
+  } */
 
 </style>
