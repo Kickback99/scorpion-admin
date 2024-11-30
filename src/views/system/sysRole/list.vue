@@ -25,7 +25,11 @@
     </div>
 
     <!-- 表格 -->
-    <el-table :data="tableData" style="width: 100%" border stripe>
+    <el-table 
+    v-loading="loading"
+    :data="tableData" 
+    style="width: 100%" 
+    border stripe>
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
@@ -107,15 +111,22 @@ const params = ref({
 
 const total = ref(null)
 
+// 默认关闭loading
+const loading = ref(false)
+
 
 // t_role_request：角色列表请求
 const render = async(pager = 1) => {
+    // 开启loading动效
+    loading.value = true
     params.value.pageNum =  pager
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     tableData.value = res.data.items
     console.log(res.data.items)
     console.log('表格数据')
     total.value = res.data.total
+    // 关闭loading动效
+    loading.value = false
 }
 
 render()

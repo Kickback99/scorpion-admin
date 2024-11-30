@@ -30,7 +30,10 @@
 
 
     <!-- 表格 -->
-    <el-table :data="tableData" style="width: 100%"
+    <el-table 
+    v-loading="loading"
+    :data="tableData" 
+    style="width: 100%"
     ref="multipleTableRef"
     @selection-change="removeMultiple"
     stripe="1"
@@ -173,6 +176,9 @@ const params = ref({
 const total = ref(null)
 
 
+// 默认关闭loading
+const loading = ref(false)
+
 //搜索相关
 const searchData = ref({
     
@@ -195,12 +201,16 @@ const tableData = ref([])
 
 // t_user_request：用户列表请求
 const render = async(pager = 1) =>{
+    // 开启loading动效
+    loading.value = true
     params.value.pageNum =  pager
     const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     console.log('请求用户列表')
     console.log(res.data)
     tableData.value = res.data.items
     total.value = res.data.total
+    // 关闭loading动效
+    loading.value = false
 }
 
 render()
