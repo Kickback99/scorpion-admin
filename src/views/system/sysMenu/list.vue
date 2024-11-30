@@ -8,7 +8,6 @@
         <!-- 表格 -->
         <el-table :data="tableData" style="width: 100%;" border stripe
         row-key="id"
-        :default-expand-all="true"
         :tree-props="treeProps"
         ref="multipleTableRef"
         @selection-change="removeMultiple"
