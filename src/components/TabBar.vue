@@ -312,7 +312,15 @@ const changeColor = () => {
     // 如果dark为真，给html标签添加dark类
     dark.value ? html.className = 'dark' : html.className = ''
     const selected = colorStore.themes.find((item)=> item.value === colorModule.value)
+    console.log(selected)
+    console.log(colorModule.value)
+   nextTick(()=>{
+    bg.value = selected.bg
+    color.value = selected.textColor
+    active.value = selected.active
+   })
     batchSetMenu(selected)
+
 }
 
 const dialogVisible = ref(false)
