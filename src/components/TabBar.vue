@@ -1,9 +1,8 @@
 <template>
     <div class="left">
         <el-breadcrumb :separator-icon="ArrowRight">
-            <el-breadcrumb-item   v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden" :to="item.path" 
-            class="breadcrumb"
-            >
+            <el-breadcrumb-item v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden"
+                :to="item.path" class="breadcrumb">
                 <el-icon>
                     <IconifyOffline :icon="item.meta.icon || Home"></IconifyOffline>
                 </el-icon>
@@ -17,27 +16,35 @@
         <div class="buttons">
             <el-button circle :icon="Refresh" @click="modifyRefresh"></el-button>
             <el-button circle :icon="FullScreen" @click="fullScreen"></el-button>
-            <el-popover
-    placement="bottom"
-    :width="300"
-    :height="700"
-    trigger="hover"
-  >
-    <template #reference>
-        <el-button circle :icon="Setting"></el-button>
-    </template>
-    <el-form> 
-    <el-form-item>
-        <el-color-picker v-model="color" show-alpha :predefine="predefineColors" @change="setColor" @active-change="currentColor" :teleported=false  />
-    </el-form-item>
-  </el-form>
-  </el-popover>
+            <el-popover placement="bottom" :width="150" trigger="hover">
+                <template #reference>
+                    <el-button circle :icon="Setting"></el-button>
+                </template>
+                <el-form>
+                    <el-form-item label="菜单背景">
+                        <el-color-picker v-model="bg" show-alpha :predefine="predefineColors" @change="setBg"
+                            @active-change="currentBg" :teleported=false />
+                    </el-form-item>
+                    <el-form-item label="菜单文本">
+                        <el-color-picker v-model="color" show-alpha :predefine="predefineColors" @change="setColor"
+                            @active-change="currentColor" :teleported=false />
+                    </el-form-item>
+                    <el-form-item label="菜单高亮">
+                        <el-color-picker v-model="active" show-alpha :predefine="predefineColors" @change="setActive"
+                            @active-change="currentActive" :teleported=false />
+                    </el-form-item>
+                    <el-divider border-style="dashed" />
+                    <el-form-item label="暗黑模式">
+                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt :active-icon="Sunny" :inactive-icon="Moon" />
+                    </el-form-item>
+                </el-form>
+            </el-popover>
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
                 <el-avatar :src="userStore.userInfo.avatar || avatar" />
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
-                  {{ displayName }}
+                {{ displayName }}
                 <el-icon>
                     <arrow-down />
                 </el-icon>
@@ -57,30 +64,36 @@
 
 <script setup>
 import Home from "@iconify-icons/ep/home-filled";
-import { ArrowDown,
-ArrowRight,
-Refresh,
-FullScreen,
-Setting} from '@element-plus/icons-vue'
+import {
+    ArrowDown,
+    ArrowRight,
+    Refresh,
+    FullScreen,
+    Setting,
+    Moon,
+    Sunny
+} from '@element-plus/icons-vue'
 import avatar from '@/assets/avatar.jpg'
 import { useUserStore } from '@/store/user'
-import {useSettingStore} from '@/store/setting'
-import { useRoute,useRouter} from 'vue-router';
-import {useTokenStore} from '@/store/token'
-import {adminLogoutApi} from '@/api/admin'
+import { useSettingStore } from '@/store/setting'
+import { useRoute, useRouter } from 'vue-router';
+import { useTokenStore } from '@/store/token'
+import { useColorStore } from '@/store/color'
+import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { clearUserInfo } from '@/utils/remove';
-import { computed, onMounted,ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
+const colorStore = useColorStore()
 
-const route =  useRoute()
+const route = useRoute()
 const router = useRouter()
 
-const displayName = computed(()=>{
-    if(userStore.roleNames && userStore.roleNames.length >0)return userStore.roleNames[0]
-    else if(userStore.userInfo.nickname) return userStore.userInfo.nickname
+const displayName = computed(() => {
+    if (userStore.roleNames && userStore.roleNames.length > 0) return userStore.roleNames[0]
+    else if (userStore.userInfo.nickname) return userStore.userInfo.nickname
     else return userStore.userInfo.username
 })
 
@@ -89,9 +102,9 @@ const displayName = computed(()=>{
 } */
 
 // 处理刷新业务
-const settingStore =  useSettingStore()
+const settingStore = useSettingStore()
 
-const modifyRefresh = () =>{
+const modifyRefresh = () => {
     settingStore.refresh = !settingStore.refresh
 }
 
@@ -99,88 +112,126 @@ const modifyRefresh = () =>{
 const fullScreen = () => {
     let full = document.fullscreenElement
     // 切换全屏模式，是全屏则为true，不是则为false
-    if(!full) {
+    if (!full) {
         document.documentElement.requestFullscreen()
-    }else document.exitFullscreen()
+    } else document.exitFullscreen()
 }
 
 // 处理下拉事件
-const handleCommand = async(key) => {
-  console.log('下拉事件执行了')
-  if(key === 'logout'){
-    // 发送注销请求
-    const res = await adminLogoutApi()
-    // 清空token
-    tokenStore.removeToken()
-    console.log('清空前',router.getRoutes())
-    // 清空用户信息
-    clearUserInfo()
-    // 清空动态路由数据
-    clearRoute(userStore.userMenu)
-    console.log('清空后',router.getRoutes())
-    // 清空菜单
-    userStore.userMenu = []
-    // 清空用户名
-    userStore.username = ''
-    // 提示信息
-    ElMessage.success(res.message)
-    // 跳转到登录页
-    router.push({path:'/login',query:{redirect:route.path}})
-  }
+const handleCommand = async (key) => {
+    console.log('下拉事件执行了')
+    if (key === 'logout') {
+        // 发送注销请求
+        const res = await adminLogoutApi()
+        // 清空token
+        tokenStore.removeToken()
+        console.log('清空前', router.getRoutes())
+        // 清空用户信息
+        clearUserInfo()
+        // 清空动态路由数据
+        clearRoute(userStore.userMenu)
+        console.log('清空后', router.getRoutes())
+        // 清空菜单
+        userStore.userMenu = []
+        // 清空用户名
+        userStore.username = ''
+        // 提示信息
+        ElMessage.success(res.message)
+        // 跳转到登录页
+        router.push({ path: '/login', query: { redirect: route.path } })
+    }
 }
 
 // 颜色选择器
-const color = ref(settingStore.menuTextColor)
 const predefineColors = ref([
-  '#ff4500',
-  '#ff8c00',
-  '#ffd700',
-  '#90ee90',
-  '#00ced1',
-  '#1e90ff',
-  '#c71585',
-  'rgba(255, 69, 0, 0.68)',
-  'rgb(255, 120, 0)',
-  'hsv(51, 100, 98)',
-  'hsva(120, 40, 94, 0.5)',
-  'hsl(181, 100%, 37%)',
-  'hsla(209, 100%, 56%, 0.73)',
-  '#c7158577',
+    '#ff4500',
+    '#ff8c00',
+    '#ffd700',
+    '#90ee90',
+    '#00ced1',
+    '#1e90ff',
+    '#c71585',
+    'rgba(255, 69, 0, 0.68)',
+    'rgb(255, 120, 0)',
+    'hsv(51, 100, 98)',
+    'hsva(120, 40, 94, 0.5)',
+    'hsl(181, 100%, 37%)',
+    'hsla(209, 100%, 56%, 0.73)',
+    '#c7158577',
 ])
 
+// 菜单背景颜色
+const bg = ref(colorStore.menuBg)
+const setBg = () => {
+    colorStore.setMenuBg(bg.value)
+}
+
+const currentBg = (color) => {
+    colorStore.setMenuBg(color)
+}
+
+// 菜单文本颜色
+const color = ref(colorStore.menuTextColor)
 // 点击确定后的颜色
 const setColor = () => {
-    settingStore.setMenuTextColor(color.value)
+    console.log('change事件触发了...')
+    colorStore.setMenuTextColor(color.value)
 }
 
 // 当前激活的颜色
 const currentColor = (color) => {
-    settingStore.setMenuTextColor(color)
+    console.log('active-change事件触发了...')
+    colorStore.setMenuTextColor(color)
 }
 
+// 菜单激活颜色
+const active = ref(colorStore.menuActive)
+
+const setActive = () => {
+    colorStore.setMenuActive(active.value)
+}
+
+const currentActive = (color) => {
+    colorStore.setMenuActive(color)
+}
+
+// 暗黑模式切换
+const dark = ref(false)
+
+const toggleDark = () =>{
+    // 获取html根节点
+    const html =  document.documentElement
+    // 如果dark为真，给html标签添加dark类
+    dark.value?html.className = 'dark':html.className=''
+
+}
 
 </script>
 
 <style scoped lang="scss">
-
-
 .el-dropdown_box {
     display: flex;
     align-items: center;
     outline: none;
+
     .el-avatar {
         margin-right: 5px;
     }
+
     .el-icon {
-    margin-left: 5px;
+        margin-left: 5px;
+    }
 }
-}
+
 .left {
     .breadcrumb {
-        .el-icon, span{
+
+        .el-icon,
+        span {
             font-size: 15px;
             vertical-align: middle;
         }
+
         .el-icon {
             margin-right: 2px
         }
@@ -188,7 +239,8 @@ const currentColor = (color) => {
 }
 
 .right {
-    @include flex(null,center,null);
+    @include flex(null, center, null);
+
     .buttons {
         margin-right: 20px;
     }
