@@ -23,7 +23,7 @@
                 <el-form>
                     <el-form-item label="菜单背景">
                         <el-color-picker v-model="bg" show-alpha :predefine="predefineColors" @change="setBg"
-                            @active-change="currentBg" :teleported=false />
+                            @active-change="currentBg" @clear="resetColor" :teleported=false />
                     </el-form-item>
                     <el-form-item label="菜单文本">
                         <el-color-picker v-model="color" show-alpha :predefine="predefineColors" @change="setColor"
@@ -162,49 +162,73 @@ const predefineColors = ref([
 
 // 菜单背景颜色
 const bg = ref(colorStore.menuBg)
-const setBg = () => {
-    colorStore.setMenuBg(bg.value)
-}
+    const setBg = () => {
+        colorStore.setMenuBg(bg.value)
+    }
 
-const currentBg = (color) => {
-    colorStore.setMenuBg(color)
-}
+    const currentBg = (color) => {
+        colorStore.setMenuBg(color)
+    }
 
 // 菜单文本颜色
 const color = ref(colorStore.menuTextColor)
-// 点击确定后的颜色
-const setColor = () => {
-    console.log('change事件触发了...')
-    colorStore.setMenuTextColor(color.value)
-}
+    // 点击确定后的颜色
+    const setColor = () => {
+        console.log('change事件触发了...')
+        colorStore.setMenuTextColor(color.value)
+    }
 
-// 当前激活的颜色
-const currentColor = (color) => {
-    console.log('active-change事件触发了...')
-    colorStore.setMenuTextColor(color)
-}
+    // 当前激活的颜色
+    const currentColor = (color) => {
+        console.log('active-change事件触发了...')
+        colorStore.setMenuTextColor(color)
+    }
 
 // 菜单激活颜色
-const active = ref(colorStore.menuActive)
+    const active = ref(colorStore.menuActive)
 
-const setActive = () => {
-    colorStore.setMenuActive(active.value)
+    const setActive = () => {
+        colorStore.setMenuActive(active.value)
+    }
+
+    const currentActive = (color) => {
+        colorStore.setMenuActive(color)
+    }
+
+// 菜单颜色重置
+const resetColor = () => {
+    console.log('哈哈')
+    colorStore.resetMenuBg()
+    bg.value = colorStore.menuBg
 }
 
-const currentActive = (color) => {
-    colorStore.setMenuActive(color)
+let cacheColor = {
+    menuBg:'',
+    menuTextColor:'',
+    menuActive:''
 }
 
 // 暗黑模式切换
 const dark = ref(false)
 
-const toggleDark = () =>{
-    // 获取html根节点
-    const html =  document.documentElement
-    // 如果dark为真，给html标签添加dark类
-    dark.value?html.className = 'dark':html.className=''
-
-}
+    const toggleDark = () =>{
+        // 获取html根节点
+        const html =  document.documentElement
+        // 如果dark为真，给html标签添加dark类
+        dark.value?html.className = 'dark':html.className=''
+        if(dark.value){
+            cacheColor.menuBg = colorStore.menuBg
+            cacheColor.menuTextColor  =  colorStore.menuTextColor
+            cacheColor.menuActive = colorStore.menuActive
+            colorStore.setMenuBg('black')
+            colorStore.setMenuTextColor('white')
+            colorStore.setMenuActive('gold')
+        }else {
+            colorStore.setMenuBg(cacheColor.menuBg),
+            colorStore.setMenuTextColor(cacheColor.menuTextColor),
+            colorStore.setMenuActive(cacheColor.menuActive)
+        }
+    }
 
 </script>
 
