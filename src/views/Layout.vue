@@ -1,10 +1,10 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="220px">
+      <el-aside width="220px" :style="{backgroundColor: finalBg}">
         <el-menu router
         popper-class="menuList"
-      active-text-color="palegreen" 
+          :active-text-color="finalActive" 
           background-color="transparent" 
           :default-active="handelUrl"
           :text-color="finalColor"
@@ -34,6 +34,7 @@ import MenuTree from '@/components/MenuTree.vue';
 import TabBar from '@/components/TabBar.vue';
 import {useUserStore} from '@/store/user'
 import { computed, nextTick, onMounted, ref,watch } from 'vue';
+import {useColorStore} from '@/store/color'
 import {useSettingStore} from '@/store/setting'
 
 // 方式一：使用css变量动态设置el-menu的text-color属性值
@@ -45,8 +46,14 @@ import {useSettingStore} from '@/store/setting'
 }) */
 
 // 方式二：使用颜色选择器和pinia仓库动态设置el-menu的text-color属性值
-const settingStore =  useSettingStore()
-const finalColor =  computed(()=>settingStore.menuTextColor)
+const colorStore = useColorStore()
+const finalColor =  computed(()=>colorStore.menuTextColor)
+
+// 菜单背景颜色
+const finalBg = computed(()=>colorStore.menuBg)
+
+// 菜单高亮颜色
+const finalActive = computed(()=>colorStore.menuActive)
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
@@ -63,7 +70,7 @@ const route = useRoute()
 
 const isDestroy = ref(true)
 
-
+const settingStore =  useSettingStore()
 watch(()=>settingStore.refresh,()=>{
   isDestroy.value = false
   nextTick(()=>{

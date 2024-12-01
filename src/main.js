@@ -12,6 +12,9 @@ import persist from 'pinia-plugin-persistedstate'
 // 导入tailwindcss
 import './assets/style/tailwind.css'
 
+// element 暗黑模式样式
+import 'element-plus/theme-chalk/dark/css-vars.css'
+
 // 完整导入
 /* import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
