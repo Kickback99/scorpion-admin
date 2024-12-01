@@ -1,8 +1,8 @@
 // 浅黑菜单的样式
 export const darkMenu = {
-    bg:'black',
-    textColor:'white',
-    active:'gold'
+    bg:'rgba(0,0,0,1)',
+    textColor:'rgba(255,255,255,1)',
+    active:'rgba(255,215,0,1)'
 }
 
 
