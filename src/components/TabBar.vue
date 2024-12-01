@@ -22,8 +22,8 @@
                 </template>
                 <el-form>
                     <el-form-item label="暗黑模式">
-                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt :active-icon="Sunny"
-                            :inactive-icon="Moon" />
+                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt :active-icon="Moon"
+                            :inactive-icon="Sunny" />
                     </el-form-item>
                     <el-divider border-style="dashed" />
                     <el-form-item>
@@ -266,9 +266,10 @@ const toggleDark = () => {
     dark.value ? html.className = 'dark' : html.className = ''
     if (dark.value) {
         colorStore.storageColors()
-        colorStore.setMenuBg(darkMenu.bg)
+      /*   colorStore.setMenuBg(darkMenu.bg)
         colorStore.setMenuTextColor(darkMenu.textColor)
-        colorStore.setMenuActive(darkMenu.active)
+        colorStore.setMenuActive(darkMenu.active) */
+        batchSetMenu(darkMenu)
         console.log(colorStore.menuBg)
         cacheColorModule = colorModule.value
         colorModule.value = ''
