@@ -3,7 +3,6 @@
     <el-container>
       <el-aside width="220px" :style="{backgroundColor: finalBg}">
         <el-menu router
-        popper-class="menuList"
           :active-text-color="finalActive" 
           background-color="transparent" 
           :default-active="handelUrl"
