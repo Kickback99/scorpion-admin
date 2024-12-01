@@ -5,14 +5,14 @@ export const useColorStore = defineStore({
     state:()=>({
         menuBg:'red',
         menuTextColor:'rgba(19, 206, 102, 0.8)',
-        menuActive:'yellow'
+        menuActive:'yellow',
     }),
     actions:{
-        setMenuTextColor(data){
-            this.menuTextColor = data
-        },
         setMenuBg(data){
             this.menuBg = data
+        },
+        setMenuTextColor(data){
+            this.menuTextColor = data
         },
         setMenuActive(data){
             this.menuActive = data
