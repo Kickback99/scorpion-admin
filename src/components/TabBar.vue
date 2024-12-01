@@ -37,18 +37,6 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item>
-                        <template #label>
-                            <el-button type="primary" :icon="Plus" size="small" @click="addColor" plain />
-                            <el-tooltip content="应用当前主题设置" placement="top">
-                                <el-icon>
-                                    <i-ep-questionFilled></i-ep-questionFilled>
-                                </el-icon>
-                            </el-tooltip>
-                            <el-button type="primary" :icon="Refresh" size="small" @click="resetColor" plain
-                                style="margin-left: 10px;" />
-                        </template>
-                    </el-form-item>
                     <el-form-item label="菜单背景">
                         <el-color-picker :show-clear="false" v-model="bg" popper-class="colorPic" show-alpha
                             :predefine="predefineColors" @change="setBg" @active-change="currentBg" :teleported=false />
@@ -60,6 +48,18 @@
                     <el-form-item label="菜单高亮">
                         <el-color-picker v-model="active" show-alpha :predefine="predefineColors" @change="setActive"
                             @active-change="currentActive" :teleported=false />
+                    </el-form-item>
+                    <el-form-item>
+                        <template #label>
+                            <el-button type="primary" :icon="Plus" size="small" @click="addColor" plain />
+                            <el-tooltip content="应用当前主题设置" placement="top">
+                                <el-icon>
+                                    <i-ep-questionFilled></i-ep-questionFilled>
+                                </el-icon>
+                            </el-tooltip>
+                            <el-button type="primary" :icon="Refresh" size="small" @click="resetColor" plain
+                                style="margin-left: 10px;" />
+                        </template>
                     </el-form-item>
                 </el-form>
             </el-popover>
@@ -257,6 +257,8 @@ const currentActive = (color) => {
 // 暗黑模式切换
 const dark = ref(false)
 let cacheColorModule = ''
+
+const collectColor = {}
 const toggleDark = () => {
     // 获取html根节点
     const html = document.documentElement
@@ -267,6 +269,7 @@ const toggleDark = () => {
         colorStore.setMenuBg(darkMenu.bg)
         colorStore.setMenuTextColor(darkMenu.textColor)
         colorStore.setMenuActive(darkMenu.active)
+        console.log(colorStore.menuBg)
         cacheColorModule = colorModule.value
         colorModule.value = ''
     } else {
@@ -277,6 +280,9 @@ const toggleDark = () => {
         colorStore.setMenuTextColor(colorStore.storageColors.menuTextColor),
         colorStore.setMenuActive(colorStore.storageColors.menuActive)
     }
+    bg.value = colorStore.menuBg
+    color.value = colorStore.menuTextColor
+    active.value = colorStore.menuActive
 }
 
 // 主题颜色
@@ -314,11 +320,9 @@ const changeColor = () => {
     const selected = colorStore.themes.find((item)=> item.value === colorModule.value)
     console.log(selected)
     console.log(colorModule.value)
-   nextTick(()=>{
     bg.value = selected.bg
     color.value = selected.textColor
     active.value = selected.active
-   })
     batchSetMenu(selected)
 
 }
