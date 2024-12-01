@@ -280,9 +280,9 @@ const toggleDark = () => {
         colorStore.setMenuTextColor(colorStore.storageColors.menuTextColor),
         colorStore.setMenuActive(colorStore.storageColors.menuActive)
     }
-    bg.value = colorStore.menuBg
-    color.value = colorStore.menuTextColor
-    active.value = colorStore.menuActive
+        bg.value = colorStore.menuBg
+        color.value = colorStore.menuTextColor
+        active.value = colorStore.menuActive
 }
 
 // 主题颜色
