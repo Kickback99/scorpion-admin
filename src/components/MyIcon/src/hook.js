@@ -5,10 +5,11 @@ import { IconifyOnline, IconifyOffline, IconFont } from "../index";
  * 支持 `IconFont`、自定义 `svg` 以及 `iconify` 中所有的图标
  * @see 点击查看文档图标篇 {@link https://pure-admin.github.io/pure-admin-doc/pages/icon/}
  * @param icon 必传 图标
+ * @param offline 布尔值，默认true为Offline，否则online
  * @param attrs 可选 iconType 属性
  * @returns Component
  */
-export function useRenderIcon(icon,attrs) {
+export function useRenderIcon(icon,offline=true,attrs) {
   // IconFont
   const ifReg = /^IF-/;
   // typeof icon === "function" 属于SVG
@@ -49,7 +50,7 @@ export function useRenderIcon(icon,attrs) {
       name: "Icon",
       render() {
         const IconifyIcon =
-          icon && icon.includes(":") ? IconifyOnline : IconifyOffline;
+          icon && offline ?  IconifyOffline : IconifyOnline
         return h(IconifyIcon, {
           icon: icon,
           ...attrs

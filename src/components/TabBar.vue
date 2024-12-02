@@ -51,14 +51,10 @@
                     </el-form-item>
                     <el-form-item>
                         <template #label>
-                            <el-button type="primary" :icon="Plus" size="small" @click="addColor" plain />
-                            <el-tooltip content="应用当前主题设置" placement="top">
-                                <el-icon>
-                                    <i-ep-questionFilled></i-ep-questionFilled>
-                                </el-icon>
+                            <el-tooltip content="保存当前主题设置" placement="top">
+                                <el-button type="primary" :icon="useRenderIcon('ri:save-3-fill')" size="small" @click="addColor" plain circle/>
                             </el-tooltip>
-                            <el-button type="primary" :icon="Refresh" size="small" @click="resetColor" plain
-                                style="margin-left: 10px;" />
+                            <el-button type="primary" :icon="Refresh" size="small" @click="resetColor" plain circle/>
                         </template>
                     </el-form-item>
                 </el-form>
@@ -133,6 +129,7 @@ import { clearRoute } from '@/utils/remove';
 import { clearUserInfo } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref } from "vue";
 import { darkMenu,menuThemeArr } from '@/assets/common/variable'
+import { useRenderIcon } from "./MyIcon/src/hook";
 
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
