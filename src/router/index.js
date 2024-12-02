@@ -4,6 +4,11 @@ import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
 import { ElMessage } from 'element-plus'
+// 引入进度条
+import nprogress from 'nprogress'
+// 引入进度条样式
+import "nprogress/nprogress.css"
+
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -177,6 +182,7 @@ let count = 1;
 
 const whiteList = ['/login','/register','/401']
 router.beforeEach((to, from, next) => {
+    nprogress.start()
     ++count;
     console.log(to)
     console.log('路由前置守卫执行')
@@ -246,6 +252,10 @@ router.beforeEach((to, from, next) => {
         return next()
     } */
 });
+
+router.afterEach((to, from) => {
+    nprogress.done()
+})
 
 // 将路由对象暴露出去
 export default router
