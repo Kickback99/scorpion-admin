@@ -84,12 +84,24 @@ const save = async () => {
     loading.value = true
     ElMessage.success('分配权限成功')
     router.push('/system/sysRole')
-    if(userStore.userInfo.id != 1){
+    /* if(userStore.userInfo.id != 1){
         // 清空路由
         clearRoute(userStore.userMenu)
         // 重新加载路由配置文件和pinia数据
-        loadMenu(false)
-    }
+        try {
+          await loadMenu(false)
+        } catch (error) {
+          ElMessage.success(error)
+          //重新加载菜单方式一
+          router.push('/')
+          userStore.removeUserAuth()
+
+          //重新加载菜单方式二
+          router.push('/').then(()=>{
+            window.location.reload()
+          })
+        }
+    } */
 
 };
 
