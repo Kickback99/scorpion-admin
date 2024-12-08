@@ -21,6 +21,10 @@ export const useUserStore = defineStore({
         setRoleNames(roleNames){
             this.roleNames = roleNames
         },
+        removeUserAuth(){
+            this.userMenu = []
+            this.userPerm = []
+        },
         setRemoveUserInfo(){
             this.userInfo = {},
             this.roleNames = []
