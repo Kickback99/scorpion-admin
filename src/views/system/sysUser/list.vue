@@ -170,6 +170,7 @@ import { useUserStore } from '@/store/user';
 const {auth} = getCurrentInstance()
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
+import { useRouter } from 'vue-router';
 
 const params = ref({
     pageNum :1,
@@ -420,6 +421,7 @@ const showAllocRoles = async(row) =>{
   }
 
 const userStore = useUserStore()
+const router =  useRouter()
 
 // t_user_request：为用户分配角色请求
 const doAllocRoles = async() => {
@@ -431,12 +433,24 @@ const doAllocRoles = async() => {
     await doAllocRolesApi(userRoleData)
     ElMessage.success("分配角色成功")
     allocRolesVisible.value = false
-    if(userStore.userInfo.id != 1){
+    /* if(userStore.userInfo.id != 1){
         // 清空路由
         clearRoute(userStore.userMenu)
         // 重新加载路由配置文件和pinia数据
-        loadMenu(false)
-    }
+        try {
+          await loadMenu(false)
+        } catch (error) {
+          ElMessage.error(error)
+          //重新加载菜单方式一
+          router.push('/')
+          userStore.removeUserAuth()
+
+          //重新加载菜单方式二
+          router.push('/').then(()=>{
+            window.location.reload()
+          })
+        }
+    } */
     render()
 
 }
