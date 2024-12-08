@@ -166,7 +166,10 @@ import { nextTick, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
+import { useUserStore } from '@/store/user';
 const {auth} = getCurrentInstance()
+import { clearRoute } from '@/utils/remove';
+import { loadMenu } from '@/router';
 
 const params = ref({
     pageNum :1,
@@ -416,6 +419,8 @@ const showAllocRoles = async(row) =>{
     isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.value.length
   }
 
+const userStore = useUserStore()
+
 // t_user_request：为用户分配角色请求
 const doAllocRoles = async() => {
     let userRoleData = {
@@ -426,6 +431,12 @@ const doAllocRoles = async() => {
     await doAllocRolesApi(userRoleData)
     ElMessage.success("分配角色成功")
     allocRolesVisible.value = false
+    if(userStore.userInfo.id != 1){
+        // 清空路由
+        clearRoute(userStore.userMenu)
+        // 重新加载路由配置文件和pinia数据
+        loadMenu(false)
+    }
     render()
 
 }

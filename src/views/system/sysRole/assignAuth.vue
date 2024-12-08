@@ -23,6 +23,9 @@
 import { ref} from 'vue';
 import {allocMenusApi,doAllocMenusApi} from '@/api/sysmenu';
 import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/store/user';
+import { clearRoute } from '@/utils/remove';
+import { loadMenu } from '@/router';
 const route = useRoute()
 const router = useRouter()
 
@@ -63,6 +66,8 @@ const getCheckedIds = (auths, initArr = []) => {
         }, initArr)
 };
 
+const userStore = useUserStore()
+
 //t_role_request: 为角色分配菜单请求
 const save = async () => {
     // 获得当前所有选中包括上级所组成的数组
@@ -79,6 +84,13 @@ const save = async () => {
     loading.value = true
     ElMessage.success('分配权限成功')
     router.push('/system/sysRole')
+    if(userStore.userInfo.id != 1){
+        // 清空路由
+        clearRoute(userStore.userMenu)
+        // 重新加载路由配置文件和pinia数据
+        loadMenu(false)
+    }
+
 };
 
 </script>
