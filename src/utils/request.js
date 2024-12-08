@@ -4,7 +4,7 @@
 import axios from 'axios';
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = '/api';
-const instance = axios.create({baseURL})
+const instance = axios.create({baseURL,timeout:4000})
 import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
 import { useUserStore } from '@/store/user';
