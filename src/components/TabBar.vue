@@ -179,7 +179,7 @@ const handleCommand = async (key) => {
         clearRoute(userStore.userMenu)
         console.log('清空后', router.getRoutes())
         // 清空菜单
-        userStore.userMenu = []
+        userStore.removeUserAuth()
         // 清空用户名
         userStore.username = ''
         // 提示信息
