@@ -160,6 +160,7 @@
         console.log('从本地跳转')
         if(originalRouteQuery.path === '/404'){
           router.push('/')
+          localStorage.removeItem('originalRouteQuery');
           return;
         }
         router.push({ path: originalRouteQuery.path, query: originalRouteQuery.query });
