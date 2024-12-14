@@ -31,7 +31,7 @@
                             <el-option v-for="(item,index) in colorStore.themes" :key="index" :value="item.value" :label="item.label">
                                 <span style="display: flex; align-items: center;">
                                     {{ item.label }}
-                                    <el-button type="text" :disabled="index<2" :icon="Delete" @click.stop="removeOption(item)"
+                                    <el-button type="text" v-if="index >= menuThemeArr.length" :icon="Delete" @click.stop="removeOption(item)"
                                         style="margin-left: 8px;"></el-button>
                                 </span>
                             </el-option>
