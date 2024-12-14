@@ -158,6 +158,10 @@
       if (originalRouteQuery) {
         // 使用带有查询参数的路径重定向用户
         console.log('从本地跳转')
+        if(originalRouteQuery.path === '/404'){
+          router.push('/')
+          return;
+        }
         router.push({ path: originalRouteQuery.path, query: originalRouteQuery.query });
         // 清除保存的路由信息
         localStorage.removeItem('originalRouteQuery');
