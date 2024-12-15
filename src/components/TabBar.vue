@@ -118,7 +118,7 @@ import {
     Sunny,
     Plus
 } from '@element-plus/icons-vue'
-import avatar from '@/assets/avatar.jpg'
+import avatar from '@/assets/images/avatar.jpg'
 import { useUserStore } from '@/store/user'
 import { useSettingStore } from '@/store/setting'
 import { useRoute, useRouter } from 'vue-router';
