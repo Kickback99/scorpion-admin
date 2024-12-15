@@ -10,6 +10,11 @@
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 </script>
 
-<style scoped lang="scss">
-
+<style  lang="scss">
+ html,body,#app{
+    height: 100%;
+ }
+ .app-container{
+    padding:20px
+ }
 </style>
