@@ -2,6 +2,9 @@
 $menu-background:slateblue;
 $menu-color:white;
 
+// 登录页背景
+$login-bg:url("../assets/images/wallhaven-g75r7d.jpg");
+
 /* :export {
     menuTextColor:$menu-color;
 } */
@@ -19,3 +22,22 @@ $menu-color:white;
     align-content:$multiCol
 }
 
+@mixin ellipsis(){
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@mixin line-clamp-3(){
+	display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+@mixin line-clamp-3($num){
+	display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $num;
+    overflow: hidden;
+}

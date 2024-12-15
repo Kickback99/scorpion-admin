@@ -1,6 +1,6 @@
 import http from '@/utils/request'
 
-export const userRegisterService = (registerData) =>{
+/* export const userRegisterService = (registerData) =>{
     const params = new URLSearchParams();
 
     for(let key in registerData){
@@ -8,7 +8,7 @@ export const userRegisterService = (registerData) =>{
     }
 
     return http.post('/user/register',params)
-}
+} */
 
 //用户登录
 export const adminLoginApi = (params) =>{
