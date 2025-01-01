@@ -1,13 +1,14 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="220px" :style="{backgroundColor: finalBg}">
+      <el-aside width="220px" :style="{backgroundColor: finalBg}" :class="{fold:settingStore.isCollapse?true:false}">
         <el-menu router
           :active-text-color="finalActive" 
           background-color="transparent" 
           :default-active="handelUrl"
           :text-color="finalColor"
           mode="vertical"
+          :collapse="settingStore.isCollapse"
         >
           <el-menu-item index="/index">
                    <el-icon> <IconifyOffline :icon="Home"></IconifyOffline> </el-icon> <span>首页</span> 
@@ -111,7 +112,22 @@ watch(()=>route.path,()=>{
 }
 
 .el-aside {
+  // width: auto;
   background-color: $menu-background;
+  transition: .3s;
+  .el-menu {
+    border-right: none;
+    &.el-menu--collapse {
+      width: 60px;
+    }
+  }
+  /* &.fold {
+    width: 60px;
+  } */
+}
+
+.el-aside:has(.el-menu.el-menu--collapse){
+  width: 60px;
 }
 
  /*  .el-menu-item,.el-sub-menu__title{
