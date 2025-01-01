@@ -5,7 +5,11 @@ export const useSettingStore = defineStore({
     state:()=>({
         refresh:false,
         menuTextColor:'rgba(19, 206, 102, 0.8)',
-        // 菜单折叠
+        // 项目logo
+        logo:'',
+        // 项目标题
+        title:'蝎子博客管理系统',
+        // 菜单默认是否折叠
         isCollapse:false
         
     }),
