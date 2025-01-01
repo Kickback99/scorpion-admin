@@ -1,12 +1,12 @@
 <template>
     <div class="logo">
-        <img :src="settingStore.logo" alt="">
+        <img :src="settingStore.logo" alt="" :style="{marginLeft:settingStore.isCollapse?27 +'px': '0'}">
         <p> {{ settingStore.title }} </p>
     </div>
 </template>
 
 <script setup>
-import { useSettingStore } from '@/store/setting';
+import { useSettingStore } from '@/setting';
 
 const settingStore = useSettingStore()
 </script>
@@ -16,11 +16,17 @@ const settingStore = useSettingStore()
         @include flex(center,center,null);
         color: white;
         font-weight: bold;
-        margin-top: 20px;
+        margin: 20px 0;
+        height: $base-menu-logo-height;
+        padding: 5px 0;
         gap: 10px;
             img {
                 width: 50px;
                 border-radius: 50%;
+            }
+
+            p {
+                font-size:17px;
             }
 
     }
