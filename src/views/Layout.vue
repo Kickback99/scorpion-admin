@@ -3,6 +3,7 @@
     <el-container>
       <el-aside :style="{backgroundColor: finalBg}">
           <Logo></Logo>
+          <el-scrollbar class=scrollbar>
         <el-menu router
           :active-text-color="finalActive" 
           background-color="transparent" 
@@ -17,13 +18,16 @@
           </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
         </el-menu>
+      </el-scrollbar>
       </el-aside>
       <el-container>
         <el-header>
             <TabBar></TabBar>
         </el-header>
         <el-main>
-          <router-view v-if="isDestroy"/>
+            <el-scrollbar>
+            <router-view v-if="isDestroy"/>
+          </el-scrollbar>
         </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
@@ -120,6 +124,9 @@ watch(()=>route.path,()=>{
   width: auto;
   background-color: $menu-background;
   height: 100vh;
+  &::-webkit-scrollbar {
+    width: 0;
+  }
   .el-menu {
     border-right: none;
     &.el-menu--collapse {
@@ -134,6 +141,16 @@ watch(()=>route.path,()=>{
 .el-aside:has(.el-menu.el-menu--collapse){
   width: $menu-min-width;
 }
+
+// 滚动条样式
+
+.scrollbar {
+  height: calc(100vh - $base-menu-logo-height);
+}
+
+/* .content-scrollbar {
+  max-height: calc(100vh - 50px);
+} */
 
  /*  .el-menu-item,.el-sub-menu__title{
     color:$menu-color
