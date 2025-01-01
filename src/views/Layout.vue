@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="220px" :style="{backgroundColor: finalBg}">
+      <el-aside :style="{backgroundColor: finalBg}">
         
         <el-menu router
           :active-text-color="finalActive" 
@@ -113,12 +113,15 @@ watch(()=>route.path,()=>{
 }
 
 .el-aside {
+  width: auto;
   background-color: $menu-background;
-  transition: width .3s;
   .el-menu {
     border-right: none;
     &.el-menu--collapse {
       width: $menu-min-width;
+    }
+    &:not(.el-menu--collapse){
+      width: 220px;
     }
   }
 }
