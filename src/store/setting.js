@@ -4,7 +4,10 @@ export const useSettingStore = defineStore({
     id:'setting',
     state:()=>({
         refresh:false,
-        menuTextColor:'rgba(19, 206, 102, 0.8)'
+        menuTextColor:'rgba(19, 206, 102, 0.8)',
+        // 菜单折叠
+        isCollapse:false
+        
     }),
     actions:{
         setMenuTextColor(data){
