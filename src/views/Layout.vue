@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-aside :style="{backgroundColor: finalBg}">
-        
+          <Logo></Logo>
         <el-menu router
           :active-text-color="finalActive" 
           background-color="transparent" 
@@ -37,6 +37,9 @@ import {useUserStore} from '@/store/user'
 import { computed, nextTick, onMounted, ref,watch } from 'vue';
 import {useColorStore} from '@/store/color'
 import {useSettingStore} from '@/store/setting'
+//路由对象--获取路由参数
+import { useRoute } from 'vue-router'
+import Logo from '@/components/logo/index.vue';
 
 // 方式一：使用css变量动态设置el-menu的text-color属性值
 // const textColor = ref('')
@@ -63,8 +66,8 @@ const listData = computed(()=>
   userStore.userMenu
 )
 
-//路由对象--获取路由参数
-import { useRoute, useRouter } from 'vue-router'
+
+
 const route = useRoute()
 
 // 处理刷新业务
