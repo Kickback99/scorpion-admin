@@ -1,7 +1,8 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="220px" :style="{backgroundColor: finalBg}" :class="{fold:settingStore.isCollapse?true:false}">
+      <el-aside width="220px" :style="{backgroundColor: finalBg}">
+        
         <el-menu router
           :active-text-color="finalActive" 
           background-color="transparent" 
@@ -112,22 +113,18 @@ watch(()=>route.path,()=>{
 }
 
 .el-aside {
-  // width: auto;
   background-color: $menu-background;
-  transition: .3s;
+  transition: width .3s;
   .el-menu {
     border-right: none;
     &.el-menu--collapse {
-      width: 60px;
+      width: $menu-min-width;
     }
   }
-  /* &.fold {
-    width: 60px;
-  } */
 }
 
 .el-aside:has(.el-menu.el-menu--collapse){
-  width: 60px;
+  width: $menu-min-width;
 }
 
  /*  .el-menu-item,.el-sub-menu__title{
