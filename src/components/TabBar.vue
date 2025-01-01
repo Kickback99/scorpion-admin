@@ -126,7 +126,7 @@ import {
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/images/avatar.png'
 import { useUserStore } from '@/store/user'
-import { useSettingStore } from '@/store/setting'
+import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
 import { useColorStore } from '@/store/color'

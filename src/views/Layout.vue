@@ -10,9 +10,10 @@
           :text-color="finalColor"
           mode="vertical"
           :collapse="settingStore.isCollapse"
+          :collapse-transition="false"
         >
           <el-menu-item index="/index">
-                   <el-icon> <IconifyOffline :icon="Home"></IconifyOffline> </el-icon> <span>首页</span> 
+                   <el-icon> <IconifyOffline :icon="'ep:home-filled'"></IconifyOffline> </el-icon> <span>首页</span> 
           </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
         </el-menu>
@@ -36,7 +37,7 @@ import TabBar from '@/components/TabBar.vue';
 import {useUserStore} from '@/store/user'
 import { computed, nextTick, onMounted, ref,watch } from 'vue';
 import {useColorStore} from '@/store/color'
-import {useSettingStore} from '@/store/setting'
+import {useSettingStore} from '@/setting'
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
 import Logo from '@/components/logo/index.vue';
@@ -118,6 +119,7 @@ watch(()=>route.path,()=>{
 .el-aside {
   width: auto;
   background-color: $menu-background;
+  height: 100vh;
   .el-menu {
     border-right: none;
     &.el-menu--collapse {
