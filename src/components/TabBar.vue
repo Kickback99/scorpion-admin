@@ -1,5 +1,10 @@
 <template>
     <div class="left">
+        <!-- 折叠 -->
+        <el-icon style="margin-right: 10px;" @click="stringStore.isCollapse = !stringStore.isCollapse">
+            <component :is="stringStore.isCollapse?Expand:Fold"></component>
+        </el-icon>
+        <!-- 面包屑 -->
         <el-breadcrumb :separator-icon="ArrowRight">
             <el-breadcrumb-item v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden"
                 :to="item.path" class="breadcrumb">
@@ -108,6 +113,8 @@
 <script setup>
 import Home from "@iconify-icons/ep/home-filled";
 import {
+    Expand,
+    Fold,
     Delete,
     ArrowDown,
     ArrowRight,
@@ -116,7 +123,6 @@ import {
     Setting,
     Moon,
     Sunny,
-    Plus
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/images/avatar.png'
 import { useUserStore } from '@/store/user'
@@ -147,6 +153,9 @@ const displayName = computed(() => {
 /* const queryRouter = (item) =>{
     console.log(item.path)
 } */
+
+// 处理菜单折叠
+const stringStore = useSettingStore()
 
 // 处理刷新业务
 const settingStore = useSettingStore()
@@ -448,6 +457,7 @@ const rules = {
 }
 
 .left {
+    @include flex(null, center, null);
     .breadcrumb {
 
         .el-icon,
