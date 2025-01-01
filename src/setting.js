@@ -6,9 +6,9 @@ export const useSettingStore = defineStore({
         refresh:false,
         menuTextColor:'rgba(19, 206, 102, 0.8)',
         // 项目logo
-        logo:'',
+        logo:'/src/assets/images/avatar-wz1.jpg',
         // 项目标题
-        title:'蝎子博客管理系统',
+        title:'蝎子博客管理',
         // 菜单默认是否折叠
         isCollapse:false
         
