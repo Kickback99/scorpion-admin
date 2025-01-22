@@ -220,6 +220,7 @@ const predefineColors = ref([
 
 // 菜单背景颜色
 const bg = ref(colorStore.menuBg)
+// 点击确定后的颜色
 const setBg = () => {
     colorStore.setMenuBg(bg.value)
     initColorModule()
@@ -245,7 +246,7 @@ const currentColor = (color) => {
 
 // 菜单激活颜色
 const active = ref(colorStore.menuActive)
-
+// 点击确定后的颜色
 const setActive = () => {
     colorStore.setMenuActive(active.value)
 }
@@ -305,6 +306,7 @@ onMounted(()=>{
     initColorModule()
 })
 
+// 初始化下拉列表的选中项
 const  initColorModule = () => {
     if(!dark.value){
         const currentTheme = colorStore.themes.find(item => item.bg === colorStore.menuBg)
