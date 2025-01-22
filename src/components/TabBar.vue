@@ -32,7 +32,7 @@
                     </el-form-item>
                     <el-divider border-style="dashed" />
                     <el-form-item>
-                        <el-select v-model="colorModule" placeholder="请选择主题色" @change="changeColor" size="small" :teleported=false>
+                        <el-select v-model="colorModule" ref="selectRef" placeholder="请选择主题色" @change="changeColor" size="small" :teleported=false>
                             <el-option v-for="(item,index) in colorStore.themes" :key="index" :value="item.value" :label="item.label">
                                 <span style="display: flex; align-items: center;">
                                     {{ item.label }}
@@ -425,6 +425,8 @@ const rules = {
     colorStore.setMenuActive(data.active)
  }
 
+ const selectRef = ref(null) // 引用 select 元素
+
    // 删除选项的方法
    const removeOption = async(item) => {
     await ElMessageBox.confirm(`你确认要删除${item.label}吗`,'温馨提示', {
@@ -435,9 +437,11 @@ const rules = {
     const index = colorStore.themes.indexOf(item);
     if (index !== -1) {
         colorStore.themes.splice(index, 1);
-      if (colorModule.value === item.value) {
+      /* if (colorModule.value === item.value) {
         colorModule.value = '';
-      }
+      } */
+     colorModule.value = menuThemeArr[0].value
+     selectRef.value.$emit('change');
     }
   };
 
