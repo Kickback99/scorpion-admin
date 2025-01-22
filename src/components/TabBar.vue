@@ -31,6 +31,11 @@
                             :inactive-icon="Sunny" />
                     </el-form-item>
                     <el-divider border-style="dashed" />
+                    <el-form-item label="菜单标题">
+                        <el-color-picker :show-clear="false" v-model="logoTitleColor" popper-class="colorPic" show-alpha
+                            :predefine="predefineColors" @change="setLogoTitleColor" @active-change="currentLogoTitleColor" :teleported=false />
+                    </el-form-item>
+                    <el-divider border-style="dashed" />
                     <el-form-item>
                         <el-select v-model="colorModule" ref="selectRef" placeholder="请选择主题色" @change="changeColor" size="small" :teleported=false>
                             <el-option v-for="(item,index) in colorStore.themes" :key="index" :value="item.value" :label="item.label">
@@ -201,7 +206,7 @@ const handleCommand = async (key) => {
 // 颜色选择器
 const predefineColors = ref([
     '#333333',
-    '#eeeeee',
+    '#ffffff',
     '#ff4500',
     '#ff8c00',
     '#ffd700',
@@ -217,6 +222,18 @@ const predefineColors = ref([
     'hsla(209, 100%, 56%, 0.73)',
     '#c7158577',
 ])
+
+// 菜单标题颜色
+const logoTitleColor = ref(colorStore.logoTitleColor)
+// 点击确定后的颜色
+const setLogoTitleColor = () => {
+    colorStore.setLogoTitleColor(logoTitleColor.value)
+}
+
+const currentLogoTitleColor = () =>{
+    colorStore.setLogoTitleColor(logoTitleColor.value)
+}
+
 
 // 菜单背景颜色
 const bg = ref(colorStore.menuBg)

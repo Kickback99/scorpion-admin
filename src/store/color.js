@@ -9,6 +9,7 @@ export const useColorStore = defineStore({
             menuBg:initTheme.bg,
             menuTextColor:initTheme.textColor,
             menuActive:initTheme.active,
+            logoTitleColor:'rgba(255,255,255,1)',
             themes:[...menuThemeArr],
             storageColors:{
                 menuBg:'',
@@ -27,6 +28,9 @@ export const useColorStore = defineStore({
         setMenuActive(data){
             this.menuActive = data
         },
+        setLogoTitleColor(data){
+            this.logoTitleColor = data
+        },
         storageColors(){
             this.storageColors.menuBg = this.menuBg
             this.storageColors.menuTextColor =  this.menuTextColor
@@ -37,6 +41,7 @@ export const useColorStore = defineStore({
         },
         resetThemes(){
             this.themes = [...menuThemeArr]
+            this.logoTextColor = 'rgba(255,255,255,1)'
         }
         
     },
