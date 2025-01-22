@@ -6,7 +6,7 @@
           <el-scrollbar class=scrollbar>
         <el-menu router
           :active-text-color="finalActive" 
-          background-color="transparent" 
+          :background-color="finalBg" 
           :default-active="handelUrl"
           :text-color="finalColor"
           mode="vertical"
