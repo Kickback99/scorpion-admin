@@ -34,7 +34,12 @@
           :icon="Plus" type="primary" circle plain size="small" />
           
           <el-button  v-if="data.isSave && isLastChild(node,data) "  @click="handleSave($event,node,data)">确定</el-button>   
-            
+          <el-button v-if="data.isCheck"
+          @click="handleCheck(data)"
+          >修改</el-button>
+          <el-button v-if="data.isCheck" 
+          @click="cancelCheck(node,data)">关闭</el-button>
+
           <!-- 编辑 -->
           <el-button style="margin-left: 8px" 
           @click="edit(data)"  :icon="Edit" 
@@ -98,7 +103,8 @@ const append = (node,data) =>{
     name: '',
     children: null,
     flag: true,
-    isSave: false
+    isSave: false,
+    isCheck:false
   })
 
   subData.value.push({
@@ -140,11 +146,13 @@ const handleBlur = (node,data) => {
         subItem.name = data.name
     }
 
+    
 
   // 隐藏输入框
    setTimeout(() => {
     data.flag = false
     data.isSave = true
+    data.isCheck = true
    }, 200);
 
 
@@ -182,9 +190,29 @@ const handleSave = async(e,node,data) => {
     if(subData.value.length >0){
       await addApi(subData.value)
       ElMessage.success('添加成功')
+      subData.value = []
     }else ElMessage.error('添加失败')
+
+    render()
+    expandKey.value = [node.parent.data.id]
+
     
-}   
+} 
+
+const handleCheck = (data) => {
+  data.flag = true
+  data.isCheck = false
+}
+
+const cancelCheck = (node,data) => {
+        // 移除新增的子节点
+        const index = node.parent.data.children.indexOf(data)
+        if (index > -1) {
+        node.parent.data.children.splice(index, 1)
+        }
+
+        delete category[data.id]
+}
 
 // 判断当前节点是否为最后一个子节点
 const isLastChild = (node, data) => {
