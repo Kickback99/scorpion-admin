@@ -30,10 +30,18 @@
           <!-- <span else>{{ node.label }}</span> -->
           <!-- 新增 -->
           <el-button  style="margin-left: 8px" 
-          v-if="node.level <= 1" @click="append(node,data)" 
+          v-if="node.level <= 1 && allShow" @click="append(node,data)" 
           :icon="Plus" type="primary" circle plain size="small" />
           
+
+          <!-- 批量添加 -->
+          <el-button v-if="data.isSave && isLastChild(node,data) " @click="batchAdd(node,data)">添加</el-button>
+
+          <!-- 提交服务器 -->
           <el-button  v-if="data.isSave && isLastChild(node,data) "  @click="handleSave($event,node,data)">确定</el-button>   
+
+
+
           <el-button v-if="data.isCheck"
           @click="handleCheck(data)"
           >修改</el-button>
@@ -41,11 +49,11 @@
           @click="cancelCheck(node,data)">关闭</el-button>
 
           <!-- 编辑 -->
-          <el-button style="margin-left: 8px" 
+          <el-button v-if="allShow" style="margin-left: 8px" 
           @click="edit(data)"  :icon="Edit" 
           type="primary" circle plain size="small" />
           <!-- 删除 -->
-          <el-popconfirm v-if="data.children === null || data.children.length === 0" @confirm="remove(node, data)" :title="`你确定要删除 ${data.name} 吗`"  width="250px" :icon="WarnTriangleFilled">
+          <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow" @confirm="remove(node, data)" :title="`你确定要删除 ${data.name} 吗`"  width="250px" :icon="WarnTriangleFilled">
             <template #reference>
             <el-button style="margin-left: 8px" type="danger" circle plain size="small" :icon="Delete"/>
             </template>
@@ -92,7 +100,14 @@ render()
 const category = reactive({
 })
 
+let beforeCount = 0
+
 const append = (node,data) =>{
+
+
+  beforeCount = data.children.length
+
+  allShow.value = false
   // 初始化 category 对象
   node.expanded = true
   const newId = Date.now()
@@ -135,6 +150,8 @@ const handleBlur = (node,data) => {
         }
 
         delete category[data.id]
+
+        allShow.value = true
 
         return;
     }
@@ -179,6 +196,9 @@ const edit = (data) => {
     console.log(data)
 }
 
+// 全部按钮的开关
+const allShow = ref(true)
+
 const handleSave = async(e,node,data) => {
     data.isSave  = false
     e.stopPropagation()
@@ -205,6 +225,7 @@ const handleCheck = (data) => {
 }
 
 const cancelCheck = (node,data) => {
+    
         // 移除新增的子节点
         const index = node.parent.data.children.indexOf(data)
         if (index > -1) {
@@ -212,6 +233,13 @@ const cancelCheck = (node,data) => {
         }
 
         delete category[data.id]
+
+        console.log(node.parent.data.children.length)
+
+        // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
+        if(beforeCount === node.parent.data.children.length){
+          allShow.value = true
+        }
 }
 
 // 判断当前节点是否为最后一个子节点
@@ -222,6 +250,30 @@ const isLastChild = (node, data) => {
   return children.indexOf(data) === children.length - 1
 }
 
+
+// 批量添加
+const batchAdd = (node,data) =>{
+  console.log(node)
+  const newId = Date.now()
+
+  // 向当前节点的 children 数组中添加一个新的子节点
+  node.parent.data.children.push({
+    id: newId,
+    name: '',
+    children: null,
+    flag: true,
+    isSave: false,
+    isCheck:false
+  })
+
+  subData.value.push({
+    subId:newId,
+    name:'',
+    pid:node.parent.data.id
+  })
+
+  category[newId] = ""
+}
     
 </script>
 
