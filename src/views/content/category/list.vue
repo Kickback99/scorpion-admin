@@ -34,17 +34,33 @@
           :icon="Plus" type="primary" circle plain size="small" />
           
 
-          <!-- 批量添加 -->
-          <el-button v-if="data.isSave && isLastChild(node,data) " @click="batchAdd(node,data)">添加</el-button>
+          <!-- 批量添加按钮显示 -->
+           <!-- 
+            只有以下3个条件满足才显示
+              只有是新增模式
+              确定按钮显示
+              最后一个子节点
+           -->
+          <el-button v-if="!isEdit && data.isSave && isLastChild(node,data) " @click="batchAdd(node,data)">添加</el-button>
 
-          <!-- 提交服务器 -->
-          <el-button  v-if="data.isSave && isLastChild(node,data) "  @click="handleSave($event,node,data)">确定</el-button>   
+          
+          <!-- 确定按钮：提交服务器 -->
+           <!-- 
+            如果是新增模式：
+              data.isSave && isLastChild(node,data)
+              确定按钮的显示，是否为最后一个子节点
+            如果是编辑模式：
+              data.isSave && currentEditID === data.id
+              确定按钮的显示，是否是当前编辑行
+           -->
+          <el-button  v-if="!isEdit?data.isSave && isLastChild(node,data):data.isSave && currentEditID === data.id "  @click="handleSave($event,node,data)">确定</el-button>   
 
 
 
           <el-button v-if="data.isCheck"
           @click="handleCheck(data)"
           >修改</el-button>
+          
           <el-button v-if="data.isCheck" 
           @click="cancelCheck(node,data)">关闭</el-button>
 
@@ -73,7 +89,7 @@
 
 <script setup>
 import {Plus,Delete,WarnTriangleFilled,Edit} from '@element-plus/icons-vue'
-import { addApi, listApi } from '@/api/concategory';
+import { addApi, listApi, modifyApi } from '@/api/concategory';
 import { reactive, ref } from 'vue';
 import { ElMessage} from 'element-plus';
 
@@ -90,9 +106,16 @@ const defaultProps = {
   label: 'name',
 }
 
+let nativeData = []
+
 const render = async() => {
     const res = await listApi()
     cateData.value = res.data
+    // 同一个地址
+    // nativeData = [ ...res.data ]
+
+    // 不同的地址
+    nativeData = JSON.parse(JSON.stringify(res.data))
 }
 
 render()
@@ -130,8 +153,12 @@ const append = (node,data) =>{
 
   category[newId] = ""
 }
+// 当前编辑行
+const currentEditID = ref(null)
 
 const handleBlur = (node,data) => {
+  // currentEditID.value = data.id
+
 /*     console.log(data)
     console.log(category) */
 
@@ -141,6 +168,11 @@ const handleBlur = (node,data) => {
 
     // 非法判断
     if( category[data.id].trim() === ''){
+      if(isEdit.value){
+        const nativeName = revertData(node.level,data)
+        data.name = nativeName
+        category[data.id] = nativeName
+      }else {
         console.log('输入为空')
     ElMessage.error('请输入内容')
         // 移除新增的子节点
@@ -155,6 +187,9 @@ const handleBlur = (node,data) => {
 
         return;
     }
+  }
+
+
 
       // 更新子分类名称
     data.name = category[data.id]
@@ -175,6 +210,25 @@ const handleBlur = (node,data) => {
 
 }
 
+// 还原原始数据的方法
+const revertData = (level,data) => {
+    if(level ===1){
+      const cate = nativeData.find(item => item.id === data.id)
+      return cate.name
+    }else {
+      console.log('还原子分类')
+      /* console.log(level)
+      console.log(data) */
+      const cate = nativeData.find(item => item.id === data.pid)
+      // console.log(cate)
+      if(cate.children != null && cate.children.length > 0){
+        const subCate = cate.children.find(item => item.id === data.id)
+        console.log(subCate.name)
+        return subCate.name
+      }
+    }
+}
+
 const confirm = async(event) => {
     event.stopPropagation()
     console.log(category.value)
@@ -191,8 +245,14 @@ const remove = (node,data) => {
     expandKey.value = [node.parent.data.id]
 }
 
+// 控制当前是否在编辑
+const isEdit = ref(false)
 const edit = (data) => {
+  console.log(data)
+  currentEditID.value = data.id
+    isEdit.value = true
     data.flag = true
+    category[data.id] = data.name
     console.log(data)
 }
 
@@ -207,11 +267,29 @@ const handleSave = async(e,node,data) => {
         return {...item}
     }) */
 
-    if(subData.value.length >0){
-      await addApi(subData.value)
-      ElMessage.success('添加成功')
-      subData.value = []
-    }else ElMessage.error('添加失败')
+
+
+    
+    if(isEdit.value){
+      console.log('修改提交服务器')
+      const cateNames = []
+        for(const prop in category){
+           cateNames.push({
+              id:prop,
+              name:category[prop]
+            })		
+          }
+          console.log(cateNames)
+          await modifyApi(cateNames)
+          ElMessage.success('修改成功')
+      }else {
+          if(subData.value.length >0){
+        await addApi(subData.value)
+        ElMessage.success('添加成功')
+        allShow.value = true
+        subData.value = []
+      }else ElMessage.error('添加失败')
+      }
 
     render()
     expandKey.value = [node.parent.data.id]
@@ -222,9 +300,17 @@ const handleSave = async(e,node,data) => {
 const handleCheck = (data) => {
   data.flag = true
   data.isCheck = false
+  currentEditID.value = data.id
 }
 
 const cancelCheck = (node,data) => {
+    // 编辑还原新增的子节点
+      if(isEdit.value){
+        const nativeName = revertData(node.level,data)
+        data.name = nativeName
+        category[data.id] = nativeName
+        return;
+      }
     
         // 移除新增的子节点
         const index = node.parent.data.children.indexOf(data)
@@ -256,13 +342,16 @@ const batchAdd = (node,data) =>{
   console.log(node)
   const newId = Date.now()
 
-  // 向当前节点的 children 数组中添加一个新的子节点
+  // 向父节点的 children 数组中添加一个新的子节点
   node.parent.data.children.push({
     id: newId,
     name: '',
     children: null,
+    // 控制span和输入框的切换
     flag: true,
+    // 控制确定按钮的切换
     isSave: false,
+    // 控制修改和关闭的切换
     isCheck:false
   })
 
