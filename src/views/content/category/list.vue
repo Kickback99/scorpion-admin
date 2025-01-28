@@ -48,7 +48,7 @@
 
         <el-button v-if="data.isCheck" @click="handleCheck(data)">修改</el-button>
 
-        <el-button v-if="data.isReset" @click="cancelCheck(node, data)">关闭</el-button>
+        <el-button v-if="data.isReset" @click="cancelCheck($event,node, data)">关闭</el-button>
 
         <!-- 编辑 -->
         <!-- 
@@ -168,6 +168,10 @@ const append = (node, data) => {
     pid: data.id
   })
 
+  nextTick(()=>{
+    focusInput(newId)
+  })
+
   category[newId] = ""
 }
 // 当前编辑行
@@ -181,7 +185,6 @@ const differentArr = []
 
 // 输入框相同的分类名字，存储到这里
 const sameArr = []
-
 const handleBlur = (node, data) => {
   // console.log(node, data)
   // currentEditID.value = data.id
@@ -194,26 +197,24 @@ const handleBlur = (node, data) => {
    } */
 
   // 非法判断1
-  if (category[data.id].trim() === '') {
+  console.log('blur事件',category[data.id])
+  if (category[data.id]?.trim() === '') {
+    console.log('空值处理')
     if (isEdit.value) {
       // 编辑事件的空值处理
       const nativeName = revertData(node.level, data)
       data.name = nativeName
       category[data.id] = nativeName
+      return;
     } else {
       // 新增事件的空值处理
-      console.log('输入为空')
+      // console.log('输入为空')
       ElMessage.error('请输入内容')
       // 移除新增的子节点
-      const index = node.parent.data.children.indexOf(data)
-      if (index > -1) {
-        node.parent.data.children.splice(index, 1)
-        subData.value.pop()
+      const afterCount = removeElement(node,data)
+      if(beforeCount === afterCount){
+        allShow.value = true
       }
-
-      delete category[data.id]
-
-      allShow.value = true
       return;
     }
   }
@@ -227,11 +228,25 @@ const handleBlur = (node, data) => {
     const name = revertData(node.level, data)
 
     if (name != category[data.id]) {
-      differentArr.push(data.id)
-    } else sameArr.push(data.id)
+      let isRepeat;
+      if(differentArr.length > 0 ){
+        isRepeat = differentArr.find(item => item === data.id)
+      }
+      if(!isRepeat && currentRevetId.value != data.id ) differentArr.push(data.id)
 
-    /* console.log(differentArr)
-    console.log(sameArr) */
+    } else {
+      let isRepeat;
+      if(sameArr.length > 0){
+        isRepeat = sameArr.find(item => item === data.id)
+      }
+      if(!isRepeat && currentRevetId.value != data.id)  {
+        sameArr.push(data.id)
+        console.log('正在push中...')
+      }
+    }
+
+    console.log('push',differentArr)
+    console.log('push',sameArr)
 
   } else {
     console.log(node.parent.data.children)
@@ -245,18 +260,10 @@ const handleBlur = (node, data) => {
     })
 
     // console.log(isDuplicate)
-
     let afterCount;
     if (isDuplicate) {
-      const index = node.parent.data.children.indexOf(data)
-      if(index > -1 ) {
-        afterCount = node.parent.data.children.length -1
-        console.log(afterCount)
-        node.parent.data.children.splice(index,1)
-        subData.value.pop()
+        afterCount = removeElement(node,data)
         ElMessage.error('分类名不能重复')
-        delete category[data.id]
-      }
     }
 
       // console.log(data)
@@ -279,15 +286,38 @@ const handleBlur = (node, data) => {
 
 
   // 隐藏输入框
-  setTimeout(() => {
-    data.flag = false
-    data.isSave = true
-    data.isCheck = true
-    data.isReset = true
-  }, 200);
-
-
+    setTimeout(() => {
+      data.flag = false
+      data.isSave = true
+      data.isCheck = true
+      data.isReset = true
+    }, 200);
 }
+
+const removeElement = (node,data,specific=false) => {
+  let afterCount
+  const childList = node.parent.data.children
+  const index = childList.indexOf(data)
+  if(index > -1){
+    // 删除为空和重复的非法元素
+    afterCount = childList.length-1
+    !specific?subData.value.pop():removeSpecificElement(data)
+    childList.splice(index,1)
+    delete category[data.id]
+    return afterCount
+  }
+}
+
+// 删除 subData 指定的元素
+const removeSpecificElement = (data) => {
+  const subCate = subData.value.find(item => item.subId === data.id)
+  const index = subData.value.indexOf(subCate)
+  if(index > -1){
+    subData.value.splice(index,1)
+  }
+}
+
+
 
 // 还原原始数据的方法
 const revertData = (level, data) => {
@@ -295,8 +325,8 @@ const revertData = (level, data) => {
     const cate = nativeData.find(item => item.id === (level === true ? data : data.id))
     return cate.name
   } else {
-    console.log(level, data)
-    console.log('还原子分类')
+    // console.log(level, data)
+    // console.log('还原子分类')
     /* console.log(level)
     console.log(data) */
     if (level === false) {
@@ -304,14 +334,14 @@ const revertData = (level, data) => {
         if (item.children && item.children.length > 0) {
           const subCate = item.children.find(child => child.id === data);
           if (subCate) {
-            console.log('子分类对象', subCate);
+            // console.log('子分类对象', subCate);
             return subCate.name; // 这里的 return 会终止 revertData 函数
           }
         }
       }
     } else {
       const cate = nativeData.find(item => item.id === (level === false ? data : data.pid))
-      console.log('找不到的', cate)
+      // console.log('找不到的', cate)
       // console.log(cate)
       if (cate?.children != null && cate.children.length > 0) {
         const subCate = cate.children.find(item => item.id === (level === false ? data : data.id))
@@ -347,12 +377,16 @@ const handleEdit = (node, data) => {
   isEdit.value = true
   data.flag = true
   data.isSave = true
-  data.isReset = true
+  data.isReset = false
   data.isEdit = false
+  //视图数据 点击了哪个编辑按钮，就隐藏哪个编辑按钮，
   if (currentEditID.value == data.id) {
     data.isEdit = true
   }
-  console.log(node, data)
+  nextTick(()=>{
+    focusInput(data.id)
+  })
+  // console.log(node, data)
   allShow.value = false
   category[data.id] = data.name
 }
@@ -435,14 +469,35 @@ const handleExpand = (node) => {
 const handleCheck = (data) => {
   data.flag = true
   data.isCheck = false
-  data.isReset = true
+  data.isReset = false
   data.isSave = true
   currentEditID.value = data.id
+  nextTick(()=>{
+    focusInput(data.id)
+  })
 }
 
-const cancelCheck = (node, data) => {
+// 聚焦输入框的函数
+const focusInput = (id) => {
+  if(inputRefs.value[id]){
+    inputRefs.value[id].focus()
+  }
+}
+
+
+const currentRevetId = ref(null)
+
+const cancelCheck = (e,node, data) => {
+  e.stopPropagation()
   // 编辑还原数据的事件
   if (isEdit.value) {
+    data.isCheck = false
+    data.isReset = false
+    data.flag = true
+    nextTick(()=>{
+          console.log(456)
+          focusInput(data.id)
+        })
     differentArr.forEach((item, index) => {
       if (item === data.id) {
         const nativeName = revertData(node.level, data)
@@ -454,19 +509,25 @@ const cancelCheck = (node, data) => {
     })
 
     sameArr.forEach((item, index) => {
+      console.log('重复数据？')
       if (item === data.id) {
         ElMessage.success('数据一致，撤销失败')
         sameArr.splice(index, 1)
       }
     })
+    console.log('pop',sameArr)
+
+    currentRevetId.value = data.id
 
     if (differentArr.length === 0 && sameArr.length === 0) {
       ElMessage.success('已回到最初始的数据')
       render()
+      currentRevetId.value = null
       allShow.value = true
       const arr = handleExpand(node)
       expandKey.value = [...arr]
     }
+
 
     /* const nativeName = revertData(node.level,data)
     if(category[data.id] != nativeName){
@@ -486,21 +547,16 @@ const cancelCheck = (node, data) => {
 
   // 新增还原数据的事件
   // 移除新增的子节点
-  const index = node.parent.data.children.indexOf(data)
-  if (index > -1) {
-    node.parent.data.children.splice(index, 1)
-  }
-
-  delete category[data.id]
-
-  console.log(node.parent.data.children.length)
+  let afterCount
+  afterCount = removeElement(node,data,true)
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
-  if (beforeCount === node.parent.data.children.length) {
+  if (beforeCount === afterCount) {
     console.log('没有新增的元素')
     allShow.value = true
   }
 }
+
 
 // 判断当前节点是否为最后一个子节点
 const isLastChild = (node, data) => {
@@ -535,6 +591,10 @@ const batchAdd = (node, data) => {
     subId: newId,
     name: '',
     pid: node.parent.data.id
+  })
+
+  nextTick(()=>{
+    focusInput(newId)
   })
 
   category[newId] = ""
