@@ -43,19 +43,22 @@
             如果是新增模式：
               data.isSave && isLastChild(node,data)
               确定按钮的显示，是否为最后一个子节点
-            如果是编辑模式：
+            如果是编辑模式(两个条件之一满足就显示)：
               data.isSave && currentEditID === data.id
+              data.isSave && isLast === data.id
               确定按钮的显示，是否是当前编辑行
            -->
         <el-button 
         style="margin-left: 8px"
-        v-if="!isEdit ? data.isSave && isLastChild(node, data) : (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
+        v-if="!isEdit ? data.isSave && isLastChild(node, data) : 
+        (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
         :disabled="!isEdit?false:handleDisabled(data)"
         :icon="Check"
         type="success" circle plain size="small"
           @click="handleSave($event, node, data)" />
 
 
+        <!-- 虚拟按钮：修改 -->
 
         <el-button v-if="data.isCheck" 
         :icon="Edit"
@@ -63,12 +66,18 @@
         type="warning" circle plain size="small"
         @click="handleCheck(data)" />
 
+        <!-- 虚拟按钮：恢复 -->
+          <!-- 
+            如果是新增模式：data.isReset
+            如果是编辑模式：data.isReset  && handleInclude(data.id)
+          -->
+
         <el-button 
-        v-if="!isEdit?data.isReset:(data.isReset && isUnequal && handleInclude(data.id))" 
+        v-if="!isEdit?data.isReset:(data.isReset  && handleInclude(data.id))" 
         :icon="!isEdit?Close:Refresh"
         color="#626aef"
         circle plain size="small"
-        @click="cancelCheck($event,node, data)" />
+        @click="handleRevert($event,node, data)" />
 
         <!-- 编辑 -->
         <!-- 
@@ -198,7 +207,7 @@ const append = (node, data) => {
 const currentEditID = ref(null)
 // 控制当前是否在编辑
 const isEdit = ref(false)
-
+// 数组中的最后一个元素
 const isLast = ref(null)
 
 // blur事件触发的时候存储differentArr和sameArr，等到点击撤销按钮的时候校验
@@ -208,7 +217,6 @@ const differentArr = []
 // 输入框相同的分类名字，存储到这里
 // const sameArr = []
 
-const isUnequal = ref(false)
 const handleBlur = (node, data) => {
   // console.log(node, data)
   // currentEditID.value = data.id
@@ -268,8 +276,8 @@ const handleBlur = (node, data) => {
 
     const name = revertData(node.level, data)
 
+    // 不重复的逻辑
     if (name != category[data.id]) {
-      isUnequal.value = true 
       let isRepeat;
       if(differentArr.length > 0 ){
         isRepeat = differentArr.find(item => item === data.id)
@@ -278,6 +286,7 @@ const handleBlur = (node, data) => {
       if(!isRepeat ) differentArr.push(data.id)
 
     }else {
+      // 重复的逻辑
       if(differentArr.length === 0){
         allShow.value = true
       }else {
@@ -340,7 +349,7 @@ const handleBlur = (node, data) => {
   }
 
 
-  // 更新子分类名称
+  // 更新子分类名称(针对新增模式，往 subData 数据赋值，提交服务器)
   data.name = category[data.id]
   const subItem = subData.value.find(item => item.subId === data.id)
   if (subItem) {
@@ -349,11 +358,15 @@ const handleBlur = (node, data) => {
 
 
 
-  // 隐藏输入框
+
     setTimeout(() => {
+      // 隐藏输入框
       data.flag = false
+      // 显示确定按钮
       data.isSave = true
+      // 显示虚拟修改按钮
       data.isCheck = true
+      // 显示虚拟恢复按钮
       data.isReset = true
     }, 200);
 }
@@ -376,7 +389,7 @@ const removeElement = (node,data,specific=false) => {
   }
 }
 
-// 删除 subData 指定的元素
+// 删除 subData 指定的元素，针对handleRevert
 const removeSpecificElement = (data) => {
   const subCate = subData.value.find(item => item.subId === data.id)
   const index = subData.value.indexOf(subCate)
@@ -442,6 +455,7 @@ const remove = (node, data) => {
 
 const handleEdit = (node, data) => {
   currentEditID.value = data.id
+  // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
   isLast.value  = null
   isEdit.value = true
@@ -478,7 +492,8 @@ const handleSave = async (e, node, data) => {
   if (isEdit.value) {
     const cateNames = []
     for (const prop in category) {
-      const flag = nativeData.find(item => item.id === prop * 1)
+      // t_handle:待删除(重复的查找)
+      /* const flag = nativeData.find(item => item.id === prop * 1)
       let isDuplicate;
 
       if (flag) {
@@ -492,16 +507,19 @@ const handleSave = async (e, node, data) => {
         const arr = handleExpand(node, data)
         expandKey.value = [...arr]
         return;
-      }
-
+      } */
+      
       cateNames.push({
         id: prop,
         name: category[prop]
       })
     }
-
+    console.log(cateNames)
     await modifyApi(cateNames)
     ElMessage.success('修改成功')
+    render()
+    const arr = handleExpand(node, data)
+    expandKey.value = [...arr]
     allShow.value = true
 
   } //新增事件的提交
@@ -545,9 +563,12 @@ const handleCheck = (data) => {
   isLast.value = null 
   differentArr.forEach((item, index) => {
       if (item === data.id) {
+        // 点击修改，激活确定按钮
+        isDisabled.value = false
         differentArr.splice(index, 1)
       }
     })
+    console.log('删除后',differentArr)
   nextTick(()=>{
     focusInput(data.id)
   })
@@ -563,7 +584,7 @@ const focusInput = (id) => {
 
 const currentRevertId = ref(null)
 
-const cancelCheck = (e,node, data) => {
+const handleRevert = (e,node, data) => {
   e.stopPropagation()
   // 编辑还原数据的事件
   if (isEdit.value) {
@@ -581,6 +602,8 @@ const cancelCheck = (e,node, data) => {
         const nativeName = revertData(node.level, data)
         data.name = nativeName
         category[data.id] = nativeName
+        // 点击恢复按钮，禁用确定按钮
+        isDisabled.value = true
         ElMessage.success('数据恢复成功')
         differentArr.splice(index, 1)
       }
@@ -673,11 +696,14 @@ const handleInput = (node,data) => {
 
       const name = revertData(node.level, data)
       if (name != category[data.id]) {
+        // 如果名字不重复，就不禁用确定按钮
         isDisabled.value = false
       } else {
+        // 如果名字重复，就禁用确定按钮
         isDisabled.value = true
       }
       if (!category[data.id].trim()) {
+        // 如果输入为空，就禁用确定按钮
         isDisabled.value = true
       }
     }
