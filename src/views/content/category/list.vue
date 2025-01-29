@@ -16,7 +16,7 @@
         <el-input :ref="setInputRef(data.id)" v-if="data.flag" 
         @blur="handleBlur(node, data)" v-model="category[data.id]"
         @input="handleInput(node,data)"
-          placeholder="请输入子分类名，按回车保存" size="small" @keyup.enter="confirm" />
+          :placeholder="handleComment()" size="small" @keyup.enter="confirm($event,node,data)" />
         <span v-else>{{ node.label }}</span>
         <!-- <span else>{{ node.label }}</span> -->
         <!-- 新增 -->
@@ -31,7 +31,7 @@
               确定按钮显示
               最后一个子节点
            -->
-        <el-button v-if="!isEdit && data.isSave && isLastChild(node, data)" 
+        <el-button v-if="handleAdd(node,data)" 
           style="margin-left: 8px"
         :icon="Plus"
         type="primary" circle plain size="small"
@@ -50,7 +50,7 @@
            -->
         <el-button 
         style="margin-left: 8px"
-        v-if="!isEdit ? data.isSave && isLastChild(node, data) : 
+        v-if="!isEdit ? handleAdd(node,data) : 
         (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
         :disabled="!isEdit?false:handleDisabled(data)"
         :icon="Check"
@@ -171,9 +171,11 @@ let beforeCount = 0
 
 const append = (node, data) => {
 
-
+  isEnd.value = null
+  isNormal.value = true
+  isReturn.value = false
   beforeCount = data.children.length
-  console.log('beforeCount',beforeCount)
+  // console.log('beforeCount',beforeCount)
 
   allShow.value = false
   // 初始化 category 对象
@@ -217,6 +219,12 @@ const differentArr = []
 // 输入框相同的分类名字，存储到这里
 // const sameArr = []
 
+// 过滤满足不为空和不重名的数组
+// 注意，filter后会返回一个新数组，所以这里只能用let声明
+let filterArr = []
+
+const isReturn = ref(false)
+
 const handleBlur = (node, data) => {
   // console.log(node, data)
   // currentEditID.value = data.id
@@ -254,16 +262,19 @@ const handleBlur = (node, data) => {
       data.isCheck = false
       data.isReset = false
       delete category[data.id]
+      isReturn.value = true
       return;
     } else {
       // 新增事件的空值处理
       // console.log('输入为空')
       ElMessage.error('请输入内容')
+      removeFilter(data.id)
       // 移除新增的子节点
       const afterCount = removeElement(node,data)
       if(beforeCount === afterCount){
         allShow.value = true
       }
+      isReturn.value = true
       return;
     }
   }
@@ -304,6 +315,7 @@ const handleBlur = (node, data) => {
       data.isCheck = false
       data.isReset = false
       delete category[data.id]
+      isReturn.value = true
       return;
     }
     
@@ -335,8 +347,15 @@ const handleBlur = (node, data) => {
     // console.log(isDuplicate)
     let afterCount;
     if (isDuplicate) {
+        removeFilter(data.id)
+        console.log('filter-pop后',filterArr)
         afterCount = removeElement(node,data)
         ElMessage.error('分类名不能重复')
+        isReturn.value = true
+        // isNormal.value = true
+    }else {
+      filterArr.push(data.id)
+      console.log(filterArr,'filterArr')
     }
 
       // console.log(data)
@@ -346,6 +365,9 @@ const handleBlur = (node, data) => {
           allShow.value = true
           return;
         }
+
+
+
   }
 
 
@@ -364,11 +386,23 @@ const handleBlur = (node, data) => {
       data.flag = false
       // 显示确定按钮
       data.isSave = true
+      console.log('handleBlur',data)
       // 显示虚拟修改按钮
       data.isCheck = true
       // 显示虚拟恢复按钮
       data.isReset = true
     }, 200);
+}
+
+const handleAdd = (node,data) => {
+
+  if(isEnd.value) {
+   return  isEnd.value === data.id
+}
+
+  if(isNormal.value){
+    return !isEdit.value && data.isSave && isLastChild(node, data)
+  }else return !isEdit.value && data.isSave && currentEditID.value === data.id
 }
 
 const handleInclude = (id) => {
@@ -402,45 +436,35 @@ const removeSpecificElement = (data) => {
 
 // 还原原始数据的方法
 const revertData = (level, data) => {
-  if (level === 1 || level === true) {
-    const cate = nativeData.find(item => item.id === (level === true ? data : data.id))
+  if (level === 1) {
+    const cate = nativeData.find(item => item.id === data.id)
     return cate.name
   } else {
-    // console.log(level, data)
-    // console.log('还原子分类')
-    /* console.log(level)
-    console.log(data) */
-    if (level === false) {
-      for (const item of nativeData) {
-        if (item.children && item.children.length > 0) {
-          const subCate = item.children.find(child => child.id === data);
-          if (subCate) {
-            // console.log('子分类对象', subCate);
-            return subCate.name; // 这里的 return 会终止 revertData 函数
-          }
-        }
-      }
-    } else {
-      const cate = nativeData.find(item => item.id === (level === false ? data : data.pid))
+      const cate = nativeData.find(item => item.id === data.pid)
       // console.log('找不到的', cate)
       // console.log(cate)
       if (cate?.children != null && cate.children.length > 0) {
-        const subCate = cate.children.find(item => item.id === (level === false ? data : data.id))
+        const subCate = cate.children.find(item => item.id === data.id)
         // console.log(subCate.name)
         return subCate?.name
       }
     }
-  }
 }
 
 
 // t_handle: 键盘事件
-const confirm = async (event) => {
-  event.stopPropagation()
-  console.log(category.value)
-  await addApi(category.value)
-  render()
-  expandKey.value = [category.value.pid]
+const confirm = async (e,node,data) => {
+  if(inputRefs.value[data.id]){
+    inputRefs.value[data.id].blur()
+  }
+
+  if(isReturn.value){
+    return;
+  }
+  data.isSave = false
+  console.log('键盘事件')
+
+  handleSave(e,node,data)
 }
 
 const expandKey = ref([])
@@ -454,6 +478,7 @@ const remove = (node, data) => {
 
 
 const handleEdit = (node, data) => {
+  isReturn.value = false
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -473,6 +498,9 @@ const handleEdit = (node, data) => {
   // console.log(node, data)
   allShow.value = false
   category[data.id] = data.name
+
+  const arr = Object.keys(category)
+  console.log('arr',arr)
 }
 
 // 全部按钮的开关
@@ -480,7 +508,6 @@ const handleEdit = (node, data) => {
 const allShow = ref(true)
 
 const handleSave = async (e, node, data) => {
-  console.log('修改提交服务器', node, data)
   data.isSave = false
   e.stopPropagation()
   /* const newSubData = subData.value.map(item =>{
@@ -517,21 +544,16 @@ const handleSave = async (e, node, data) => {
     console.log(cateNames)
     await modifyApi(cateNames)
     ElMessage.success('修改成功')
-    render()
-    const arr = handleExpand(node, data)
-    expandKey.value = [...arr]
-    allShow.value = true
 
   } //新增事件的提交
   else {
     if (subData.value.length > 0) {
       await addApi(subData.value)
       ElMessage.success('添加成功')
-      allShow.value = true
       subData.value = []
     } else ElMessage.error('添加失败')
   }
-  console.log('有没有到这里')
+  allShow.value = true
   render()
   const arr = handleExpand(node)
   expandKey.value = [...arr]
@@ -554,12 +576,28 @@ const handleExpand = (node) => {
   return arr
 }
 
+// 正常模式和特殊模式以及数组末尾模式切换(针对新增模式，会影响确定按钮和批量添加按钮的显示)
+// 默认正常模式，用户点击新增和批量添加按钮，都是正常模式
+// 用户点击虚拟修改按钮，即切换为特殊模式，
+// 点击关闭按钮，即为数组末尾模式
+/* 
+  正常模式：条件：非编辑模式，确定按钮，是否为最后一个子节点
+  特殊模式：条件：非编辑模式，确定按钮，是否为当前编辑行
+  数组末尾模式：条件：isEnd.value有值
+    handleBlur函数会筛选出不为空和不重复的节点放到一个filterArr数组中(重复的节点也算在内)
+    当点击关闭时，handleRevert函数会删除filterArr数组对应id的节点，然后在把数组最后一个元素赋值给isEnd.value
+    最后判断 isEnd.value 属于哪个节点
+
+*/
+const isNormal = ref(true)
+
+
 const handleCheck = (data) => {
-  data.flag = true
-  data.isCheck = false
-  data.isReset = false
-  data.isSave = true
   currentEditID.value = data.id
+  isReturn.value = false
+  data.flag = true
+  if(isEdit.value){
+  data.isSave = true
   isLast.value = null 
   differentArr.forEach((item, index) => {
       if (item === data.id) {
@@ -569,6 +607,15 @@ const handleCheck = (data) => {
       }
     })
     console.log('删除后',differentArr)
+  }else {
+    isEnd.value = null
+    data.isSave = false
+    isNormal.value = false
+    
+  }
+  data.isCheck = false
+  data.isReset = false
+
   nextTick(()=>{
     focusInput(data.id)
   })
@@ -584,10 +631,14 @@ const focusInput = (id) => {
 
 const currentRevertId = ref(null)
 
+// 点击虚拟关闭按钮，确定按钮和批量添加按钮根据filterArr数组中的最后一个来显示
+const isEnd = ref(null)
+
 const handleRevert = (e,node, data) => {
   e.stopPropagation()
   // 编辑还原数据的事件
   if (isEdit.value) {
+    isReturn.value = false
     currentEditID.value = data.id
     isLast.value = null
     data.isCheck = false
@@ -648,16 +699,33 @@ const handleRevert = (e,node, data) => {
     return;
   }
 
+    // 移除filter数据
+    console.log('删除按钮',data.id)
+    removeFilter(data.id)
+
+  console.log('filter-pop后',filterArr)
+
   // 新增还原数据的事件
   // 移除新增的子节点
   let afterCount
   afterCount = removeElement(node,data,true)
 
+
+  
+
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (beforeCount === afterCount) {
-    console.log('没有新增的元素')
+    ElMessage.error('回到最原始的数据')
     allShow.value = true
   }
+}
+
+const removeFilter = (id) => {
+filterArr = filterArr.filter(item => item != id)
+
+  filterArr.forEach(item => {
+      isEnd.value = item 
+  })
 }
 
 // t_current：控制按钮的禁用
@@ -728,6 +796,9 @@ const isLastChild = (node, data) => {
 // 批量添加
 const batchAdd = (node, data) => {
   console.log(node)
+  isNormal.value = true
+  isEnd.value = null 
+  isReturn.value = false
   const newId = Date.now()
 
   // 向父节点的 children 数组中添加一个新的子节点
@@ -756,6 +827,21 @@ const batchAdd = (node, data) => {
   })
 
   category[newId] = ""
+}
+
+const handleComment = () => {
+
+  // 编辑模式
+  if(isEdit.value){
+     return Object.keys(category).length < 2 ? '请输入子分类名，按回车修改' : '请输入子分类名，按回车批量修改'
+  }else {
+  // 新增模式
+    if(subData.value.length >1){
+    return '请输入子分类名，按回车批量保存'
+  }else return '请输入子分类名，按回车保存'
+
+  }
+
 }
 
 </script>
