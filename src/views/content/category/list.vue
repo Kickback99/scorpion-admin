@@ -13,7 +13,9 @@
     :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
     <template #default="{ node, data }">
       <span class="custom-tree-node">
-        <el-input :ref="setInputRef(data.id)" v-if="data.flag" @blur="handleBlur(node, data)" v-model="category[data.id]"
+        <el-input :ref="setInputRef(data.id)" v-if="data.flag" 
+        @blur="handleBlur(node, data)" v-model="category[data.id]"
+        @input="handleInput(node,data)"
           placeholder="请输入子分类名，按回车保存" size="small" @keyup.enter="confirm" />
         <span v-else>{{ node.label }}</span>
         <!-- <span else>{{ node.label }}</span> -->
@@ -29,7 +31,11 @@
               确定按钮显示
               最后一个子节点
            -->
-        <el-button v-if="!isEdit && data.isSave && isLastChild(node, data)" @click="batchAdd(node, data)">添加</el-button>
+        <el-button v-if="!isEdit && data.isSave && isLastChild(node, data)" 
+          style="margin-left: 8px"
+        :icon="Plus"
+        type="primary" circle plain size="small"
+        @click="batchAdd(node, data)" />
 
 
         <!-- 确定按钮：提交服务器 -->
@@ -41,14 +47,28 @@
               data.isSave && currentEditID === data.id
               确定按钮的显示，是否是当前编辑行
            -->
-        <el-button v-if="!isEdit ? data.isSave && isLastChild(node, data) : data.isSave && currentEditID === data.id"
-          @click="handleSave($event, node, data)">确定</el-button>
+        <el-button 
+        style="margin-left: 8px"
+        v-if="!isEdit ? data.isSave && isLastChild(node, data) : (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
+        :disabled="!isEdit?false:handleDisabled(data)"
+        :icon="Check"
+        type="success" circle plain size="small"
+          @click="handleSave($event, node, data)" />
 
 
 
-        <el-button v-if="data.isCheck" @click="handleCheck(data)">修改</el-button>
+        <el-button v-if="data.isCheck" 
+        :icon="Edit"
+        style="margin-left: 8px"
+        type="warning" circle plain size="small"
+        @click="handleCheck(data)" />
 
-        <el-button v-if="data.isReset" @click="cancelCheck($event,node, data)">关闭</el-button>
+        <el-button 
+        v-if="!isEdit?data.isReset:(data.isReset && isUnequal && handleInclude(data.id))" 
+        :icon="!isEdit?Close:Refresh"
+        color="#626aef"
+        circle plain size="small"
+        @click="cancelCheck($event,node, data)" />
 
         <!-- 编辑 -->
         <!-- 
@@ -81,7 +101,7 @@
 </template>
 
 <script setup>
-import { Plus, Delete, WarnTriangleFilled, Edit } from '@element-plus/icons-vue'
+import { Plus, Delete, WarnTriangleFilled, Edit,Check,Close,Refresh } from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi } from '@/api/concategory';
 import { nextTick, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -179,12 +199,16 @@ const currentEditID = ref(null)
 // 控制当前是否在编辑
 const isEdit = ref(false)
 
+const isLast = ref(null)
+
 // blur事件触发的时候存储differentArr和sameArr，等到点击撤销按钮的时候校验
 // 输入框不相同的分类名字，存储到这里
 const differentArr = []
 
 // 输入框相同的分类名字，存储到这里
-const sameArr = []
+// const sameArr = []
+
+const isUnequal = ref(false)
 const handleBlur = (node, data) => {
   // console.log(node, data)
   // currentEditID.value = data.id
@@ -205,6 +229,23 @@ const handleBlur = (node, data) => {
       const nativeName = revertData(node.level, data)
       data.name = nativeName
       category[data.id] = nativeName
+      if(differentArr.length === 0){
+        allShow.value = true
+      }else {
+        differentArr.forEach((item,index) => {
+          if(index === differentArr.length -1) {
+            isLast.value = item
+            console.log('最后一个元素到底是谁',item)
+          }
+        })
+      }
+      ElMessage.error('分类名不能重复')
+      data.isEdit = false
+      data.flag = false
+      data.isSave = false
+      data.isCheck = false
+      data.isReset = false
+      delete category[data.id]
       return;
     } else {
       // 新增事件的空值处理
@@ -228,29 +269,52 @@ const handleBlur = (node, data) => {
     const name = revertData(node.level, data)
 
     if (name != category[data.id]) {
+      isUnequal.value = true 
       let isRepeat;
       if(differentArr.length > 0 ){
         isRepeat = differentArr.find(item => item === data.id)
       }
-      if(!isRepeat && currentRevetId.value != data.id ) differentArr.push(data.id)
+      // if(!isRepeat && currentRevertId.value != data.id ) differentArr.push(data.id)
+      if(!isRepeat ) differentArr.push(data.id)
 
-    } else {
+    }else {
+      if(differentArr.length === 0){
+        allShow.value = true
+      }else {
+        differentArr.forEach((item,index) => {
+          if(index === differentArr.length -1) {
+            isLast.value = item
+            console.log('最后一个元素到底是谁',item)
+          }
+        })
+      }
+      ElMessage.error('分类名不能重复')
+      data.isEdit = false
+      data.flag = false
+      data.isSave = false
+      data.isCheck = false
+      data.isReset = false
+      delete category[data.id]
+      return;
+    }
+    
+    
+    /* else {
       let isRepeat;
       if(sameArr.length > 0){
         isRepeat = sameArr.find(item => item === data.id)
       }
-      if(!isRepeat && currentRevetId.value != data.id)  {
+      if(!isRepeat && currentRevertId.value != data.id)  {
         sameArr.push(data.id)
-        console.log('正在push中...')
       }
-    }
+    } */
 
     console.log('push',differentArr)
-    console.log('push',sameArr)
+    // console.log('push',sameArr)
 
   } else {
     console.log(node.parent.data.children)
-    // t_current：排除名字相同的子分类
+    // 排除名字相同的子分类
     const isDuplicate = node.parent.data.children.find(item => {
       // 把自己排除
       if (data.id != item.id) {
@@ -292,6 +356,10 @@ const handleBlur = (node, data) => {
       data.isCheck = true
       data.isReset = true
     }, 200);
+}
+
+const handleInclude = (id) => {
+  return differentArr.some(item => item=== id)
 }
 
 const removeElement = (node,data,specific=false) => {
@@ -353,7 +421,7 @@ const revertData = (level, data) => {
 }
 
 
-
+// t_handle: 键盘事件
 const confirm = async (event) => {
   event.stopPropagation()
   console.log(category.value)
@@ -374,6 +442,8 @@ const remove = (node, data) => {
 
 const handleEdit = (node, data) => {
   currentEditID.value = data.id
+  isDisabled.value = true
+  isLast.value  = null
   isEdit.value = true
   data.flag = true
   data.isSave = true
@@ -472,6 +542,12 @@ const handleCheck = (data) => {
   data.isReset = false
   data.isSave = true
   currentEditID.value = data.id
+  isLast.value = null 
+  differentArr.forEach((item, index) => {
+      if (item === data.id) {
+        differentArr.splice(index, 1)
+      }
+    })
   nextTick(()=>{
     focusInput(data.id)
   })
@@ -485,14 +561,16 @@ const focusInput = (id) => {
 }
 
 
-const currentRevetId = ref(null)
+const currentRevertId = ref(null)
 
 const cancelCheck = (e,node, data) => {
   e.stopPropagation()
   // 编辑还原数据的事件
   if (isEdit.value) {
+    currentEditID.value = data.id
+    isLast.value = null
     data.isCheck = false
-    data.isReset = false
+    // data.isReset = false
     data.flag = true
     nextTick(()=>{
           console.log(456)
@@ -508,25 +586,27 @@ const cancelCheck = (e,node, data) => {
       }
     })
 
-    sameArr.forEach((item, index) => {
+    /* sameArr.forEach((item, index) => {
       console.log('重复数据？')
       if (item === data.id) {
         ElMessage.success('数据一致，撤销失败')
         sameArr.splice(index, 1)
       }
     })
-    console.log('pop',sameArr)
+    console.log('pop',sameArr) */
 
-    currentRevetId.value = data.id
+    console.log('pop',differentArr)
 
-    if (differentArr.length === 0 && sameArr.length === 0) {
+    // currentRevertId.value = data.id
+
+    /* if (differentArr.length === 0 ) {
       ElMessage.success('已回到最初始的数据')
       render()
-      currentRevetId.value = null
+      currentRevertId.value = null
       allShow.value = true
       const arr = handleExpand(node)
       expandKey.value = [...arr]
-    }
+    } */
 
 
     /* const nativeName = revertData(node.level,data)
@@ -557,6 +637,58 @@ const cancelCheck = (e,node, data) => {
   }
 }
 
+// t_current：控制按钮的禁用
+const isDisabled = ref(true)
+
+const handleDisabled = (data) => {
+  if(data.flag === false){
+    return false
+  }else {
+    if(isDisabled.value){
+      return true
+    }else {
+      return false
+    }
+  }
+}
+
+// 定义延迟时间（毫秒）
+const delay = 300
+
+// 定义一个变量来存储定时器ID
+let debounceTimer = null
+
+const handleInput = (node,data) => {
+
+     // 每次输入时，清除之前的定时器
+     if (debounceTimer !== null) {
+      clearTimeout(debounceTimer)
+    }
+
+  // 设置一个新的定时器
+  debounceTimer = setTimeout(() => {
+    // 在这里可以添加你需要执行的逻辑，例如发送请求
+    console.log('延迟后的输入内容:', category[data.id])
+    if (isEdit.value) {
+
+      const name = revertData(node.level, data)
+      if (name != category[data.id]) {
+        isDisabled.value = false
+      } else {
+        isDisabled.value = true
+      }
+      if (!category[data.id].trim()) {
+        isDisabled.value = true
+      }
+    }
+    // 清除定时器ID
+    debounceTimer = null
+  }, delay)
+
+
+  
+
+}
 
 // 判断当前节点是否为最后一个子节点
 const isLastChild = (node, data) => {
