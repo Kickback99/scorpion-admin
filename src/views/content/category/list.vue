@@ -170,8 +170,8 @@ const category = reactive({
 let beforeCount = 0
 
 const append = (node, data) => {
-
   isEnd.value = null
+  isNative.value = true
   isNormal.value = true
   
   beforeCount = data.children.length
@@ -407,7 +407,7 @@ const handleBlur = (node, data) => {
 const handleAdd = (node,data) => {
 
   if(isEnd.value) {
-   return  isEnd.value === data.id
+   return  isNative.value ?!isEdit.value && data.isSave && isLastChild(node, data) : isEnd.value === data.id
 }
 
   if(isNormal.value){
@@ -601,6 +601,14 @@ const handleExpand = (node) => {
 */
 const isNormal = ref(true)
 
+// isNative作用：告诉程序删除(handleRevert)的时候是按照正常模式删除还是排序模式删除
+/* 
+  监控用户有没有点击虚拟修改按钮
+  只要用户没有点击虚拟修改，就按照最后一个节点，即正常模式的删除
+  如果用户点击了虚拟修改，就按照排序模式  isEnd.vue，即排序模式的删除
+*/
+const isNative = ref(true)
+
 
 const handleCheck = (data) => {
   currentEditID.value = data.id
@@ -621,6 +629,7 @@ const handleCheck = (data) => {
     isEnd.value = null
     data.isSave = false
     isNormal.value = false
+    isNative.value = false
     
   }
   data.isCheck = false
@@ -712,6 +721,10 @@ const handleRevert = (e,node, data) => {
     // 移除filter数据
     console.log('删除按钮',data.id)
     removeFilter(data.id)
+
+    if(isNative.value){
+      console.log('正常模式的删除')
+    }else console.log('特殊模式的删除')
 
   console.log('filter-pop后',filterArr)
 
@@ -811,7 +824,6 @@ const batchAdd = (node, data) => {
   console.log(node)
   isNormal.value = true
   isEnd.value = null 
-  
   const newId = Date.now()
 
   // 向父节点的 children 数组中添加一个新的子节点
