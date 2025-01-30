@@ -173,7 +173,7 @@ const append = (node, data) => {
 
   isEnd.value = null
   isNormal.value = true
-  isReturn.value = false
+  
   beforeCount = data.children.length
   // console.log('beforeCount',beforeCount)
 
@@ -209,10 +209,10 @@ const append = (node, data) => {
 const currentEditID = ref(null)
 // 控制当前是否在编辑
 const isEdit = ref(false)
-// 数组中的最后一个元素
+// 数组中的最后一个元素，需要参考differentArr数组
 const isLast = ref(null)
 
-// blur事件触发的时候存储differentArr和sameArr，等到点击撤销按钮的时候校验
+// blur事件触发的时候存储differentArr和sameArr，等到点击撤销按钮还有虚拟修改按钮的时候校验
 // 输入框不相同的分类名字，存储到这里
 const differentArr = []
 
@@ -223,9 +223,14 @@ const differentArr = []
 // 注意，filter后会返回一个新数组，所以这里只能用let声明
 let filterArr = []
 
+// isReturn用来控制键盘事件执行blur事件之后是否执行后续代码(提交服务器)
+// 在 handleBlur 函数，如果空值还有重复 isReturn 的值则为true，键盘事件将不在执行后续代码
+// 以上了设置为false的原因是为了重置数据
 const isReturn = ref(false)
 
+
 const handleBlur = (node, data) => {
+  isReturn.value = false
   // console.log(node, data)
   // currentEditID.value = data.id
 
@@ -255,7 +260,7 @@ const handleBlur = (node, data) => {
           }
         })
       }
-      ElMessage.error('分类名不能重复')
+      ElMessage.error('请输入内容')
       data.isEdit = false
       data.flag = false
       data.isSave = false
@@ -268,7 +273,9 @@ const handleBlur = (node, data) => {
       // 新增事件的空值处理
       // console.log('输入为空')
       ElMessage.error('请输入内容')
-      removeFilter(data.id)
+      if(!isNormal.value){
+        removeFilter(data.id)
+      }
       // 移除新增的子节点
       const afterCount = removeElement(node,data)
       if(beforeCount === afterCount){
@@ -347,13 +354,16 @@ const handleBlur = (node, data) => {
     // console.log(isDuplicate)
     let afterCount;
     if (isDuplicate) {
-        removeFilter(data.id)
+        if(!isNormal.value){
+          removeFilter(data.id)
+        }
         console.log('filter-pop后',filterArr)
         afterCount = removeElement(node,data)
         ElMessage.error('分类名不能重复')
         isReturn.value = true
         // isNormal.value = true
     }else {
+      // 代码走到这里，说明非空并且不重复
       filterArr.push(data.id)
       console.log(filterArr,'filterArr')
     }
@@ -478,7 +488,7 @@ const remove = (node, data) => {
 
 
 const handleEdit = (node, data) => {
-  isReturn.value = false
+  
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -576,14 +586,14 @@ const handleExpand = (node) => {
   return arr
 }
 
-// 正常模式和特殊模式以及数组末尾模式切换(针对新增模式，会影响确定按钮和批量添加按钮的显示)
+// 正常模式和特殊模式以及排序模式切换(针对新增模式，会影响确定按钮和批量添加按钮的显示)
 // 默认正常模式，用户点击新增和批量添加按钮，都是正常模式
 // 用户点击虚拟修改按钮，即切换为特殊模式，
-// 点击关闭按钮，即为数组末尾模式
+// 点击关闭按钮，排序模式是数组末尾模式
 /* 
   正常模式：条件：非编辑模式，确定按钮，是否为最后一个子节点
-  特殊模式：条件：非编辑模式，确定按钮，是否为当前编辑行
-  数组末尾模式：条件：isEnd.value有值
+  特殊模式：条件：非编辑模式，确定按钮，是否为当前节点(当前编辑行)
+  排序模式：条件：isEnd.value有值
     handleBlur函数会筛选出不为空和不重复的节点放到一个filterArr数组中(重复的节点也算在内)
     当点击关闭时，handleRevert函数会删除filterArr数组对应id的节点，然后在把数组最后一个元素赋值给isEnd.value
     最后判断 isEnd.value 属于哪个节点
@@ -594,7 +604,7 @@ const isNormal = ref(true)
 
 const handleCheck = (data) => {
   currentEditID.value = data.id
-  isReturn.value = false
+  
   data.flag = true
   if(isEdit.value){
   data.isSave = true
@@ -638,7 +648,7 @@ const handleRevert = (e,node, data) => {
   e.stopPropagation()
   // 编辑还原数据的事件
   if (isEdit.value) {
-    isReturn.value = false
+    
     currentEditID.value = data.id
     isLast.value = null
     data.isCheck = false
@@ -721,10 +731,13 @@ const handleRevert = (e,node, data) => {
 }
 
 const removeFilter = (id) => {
+  console.log('走filter')
 filterArr = filterArr.filter(item => item != id)
 
-  filterArr.forEach(item => {
+  filterArr.forEach((item,index) => {
+    if(index === filterArr.length - 1){
       isEnd.value = item 
+    }
   })
 }
 
@@ -798,7 +811,7 @@ const batchAdd = (node, data) => {
   console.log(node)
   isNormal.value = true
   isEnd.value = null 
-  isReturn.value = false
+  
   const newId = Date.now()
 
   // 向父节点的 children 数组中添加一个新的子节点
