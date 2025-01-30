@@ -261,6 +261,7 @@ const handleBlur = (node, data) => {
         })
       }
       ElMessage.error('请输入内容')
+      isEdit.value = false
       data.isEdit = false
       data.flag = false
       data.isSave = false
@@ -306,6 +307,7 @@ const handleBlur = (node, data) => {
     }else {
       // 重复的逻辑
       if(differentArr.length === 0){
+        console.log('重复拉..........')
         allShow.value = true
       }else {
         differentArr.forEach((item,index) => {
@@ -316,6 +318,7 @@ const handleBlur = (node, data) => {
         })
       }
       ElMessage.error('分类名不能重复')
+      isEdit.value = false
       data.isEdit = false
       data.flag = false
       data.isSave = false
