@@ -10,7 +10,8 @@
 
   <!-- 树形展示 -->
   <el-tree style="max-width: 600px" :data="cateData" :props="defaultProps" show-checkbox node-key="id"
-    :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
+  draggable  :allow-drop="allowDrop" @node-drop="handleDrop"
+  :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
     <template #default="{ node, data }">
       <span class="custom-tree-node">
         <el-input :ref="setInputRef(data.id)" v-if="data.flag" 
@@ -134,6 +135,12 @@ const setInputRef = (id) => {
   }
 }
 
+
+
+const updateNodes = ref([])
+const expandKey = ref([])
+
+
 const defaultProps = {
   children: 'children',
   label: 'name',
@@ -144,6 +151,8 @@ let nativeData = []
 const render = async () => {
   const res = await listApi()
   cateData.value = res.data
+  console.log('render中...')
+  console.log(res.data)
   // 同一个地址
   // nativeData = [ ...res.data ]
 
@@ -160,6 +169,8 @@ const render = async () => {
         delete category[k]
     }
   }
+
+
 }
 
 render()
@@ -168,6 +179,86 @@ const category = reactive({
 })
 
 let beforeCount = 0
+
+// 拖拽节点规则
+const allowDrop = (draggingNode, dropNode, type) => {
+  const draggingLevel = draggingNode.level;
+  const droppingLevel = dropNode.level;
+
+  // 获取拖拽节点和目标节点的子节点
+  const hasDraggingChildren = draggingNode.childNodes && draggingNode.childNodes.length > 0;
+
+  if (type === 'inner') {
+    // 允许2级节点拖拽到1级节点内部
+    if (draggingLevel === 2 && droppingLevel === 1) {
+      return true;
+    }
+    // 当1级节点没有子节点时，允许将其拖拽到其他1级节点内部
+    if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
+      return true;
+    }
+    // 其他情况不允许拖拽
+    return false;
+  } else if (type === 'prev' || type === 'next') {
+    // 允许2级节点拖拽到1级节点的前后
+    if (draggingLevel === 2 && droppingLevel === 1) {
+      return true;
+    }
+    // 当1级节点没有子节点时，允许将其拖拽到其他1级节点的前后
+    if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
+      return true;
+    }
+    // 允许1级节点之间互相拖拽（无论是否有子节点）
+    if (draggingLevel === 1 && droppingLevel === 1) {
+      return true;
+    }
+    // 允许2级节点之间互相拖拽
+    if (draggingLevel === 2 && droppingLevel === 2) {
+      return true;
+    }
+    // 其他情况不允许拖拽
+    return false;
+  }
+  // 其他情况不允许拖拽
+  return false;
+}
+
+// 收集拖拽节点数据提交服务器
+const handleDrop = async(
+  draggingNode,
+  dropNode,
+  dropType,
+  ev,
+) => {
+
+
+  let pid = -1;
+  let siblings = []
+  console.log('tree drop:', draggingNode,dropNode,dropType)
+  if(dropType === "before" || dropType === "after"){
+     pid = dropNode.parent.data.id === undefined ? -1 :dropNode.parent.data.id
+     siblings = dropNode.parent.childNodes
+  }else {
+    pid = dropNode.data.id
+    siblings = dropNode.childNodes
+  }
+
+  siblings.forEach((item,index) => {
+    // 如果遍历的是当前正在拖拽的节点，就新增一个属性父id
+    if(item.data.id === draggingNode.data.id){
+      updateNodes.value.push({id:item.data.id,sort:index,pid})
+    // 其他节点则正常排序
+    }else updateNodes.value.push({id:item.data.id,sort:index})
+  })
+
+  // 提交服务器
+  await modifyApi(updateNodes.value)
+  ElMessage.success('节点拖拽成功')
+  render()
+  updateNodes.value = []	
+  expandKey.value = [pid]
+}
+
 
 const append = (node, data) => {
   isEnd.value = null
@@ -225,7 +316,7 @@ let filterArr = []
 
 // isReturn用来控制键盘事件执行blur事件之后是否执行后续代码(提交服务器)
 // 在 handleBlur 函数，如果空值还有重复 isReturn 的值则为true，键盘事件将不在执行后续代码
-// 以上了设置为false的原因是为了重置数据
+// 一上来设置为false的原因是为了重置数据
 const isReturn = ref(false)
 
 
@@ -252,6 +343,8 @@ const handleBlur = (node, data) => {
       category[data.id] = nativeName
       if(differentArr.length === 0){
         allShow.value = true
+        console.log('different为空了')
+        isEdit.value = false
       }else {
         differentArr.forEach((item,index) => {
           if(index === differentArr.length -1) {
@@ -259,12 +352,12 @@ const handleBlur = (node, data) => {
             console.log('最后一个元素到底是谁',item)
           }
         })
+        isEdit.value = true
       }
       ElMessage.error('请输入内容')
-      isEdit.value = false
+      data.isSave = false
       data.isEdit = false
       data.flag = false
-      data.isSave = false
       data.isCheck = false
       data.isReset = false
       delete category[data.id]
@@ -307,8 +400,9 @@ const handleBlur = (node, data) => {
     }else {
       // 重复的逻辑
       if(differentArr.length === 0){
-        console.log('重复拉..........')
+        console.log('different重复拉..........')
         allShow.value = true
+        isEdit.value = false
       }else {
         differentArr.forEach((item,index) => {
           if(index === differentArr.length -1) {
@@ -316,9 +410,9 @@ const handleBlur = (node, data) => {
             console.log('最后一个元素到底是谁',item)
           }
         })
+        isEdit.value = true
       }
       ElMessage.error('分类名不能重复')
-      isEdit.value = false
       data.isEdit = false
       data.flag = false
       data.isSave = false
@@ -480,7 +574,7 @@ const confirm = async (e,node,data) => {
   handleSave(e,node,data)
 }
 
-const expandKey = ref([])
+
 
 const remove = (node, data) => {
   console.log(node, data)
@@ -869,7 +963,6 @@ const handleComment = () => {
   }else return '请输入子分类名，按回车保存'
 
   }
-
 }
 
 </script>
