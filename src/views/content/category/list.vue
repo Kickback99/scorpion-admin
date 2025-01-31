@@ -381,6 +381,7 @@ const append = (node, data) => {
   isDraggable.value = false
   const arr = disabledCheckboxes(node.data.children)
   node.data.children = [...arr]
+  Object.assign(node.data,{...node.data,disabled:true})
 
   console.log('append-----------------------') //可以打印
   
