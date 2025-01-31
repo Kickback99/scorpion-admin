@@ -1,16 +1,18 @@
 <template>
-  <div>
+ <!--  <div>
     <p>分类管理</p>
-  </div>
+  </div> -->
 
+  <el-button type="danger" @click="batchDelete">批量删除</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree style="max-width: 600px" :data="cateData" :props="defaultProps" show-checkbox node-key="id"
-  draggable  :allow-drop="allowDrop" @node-drop="handleDrop"
+  <el-tree style="max-width: 600px" :data="cateData" :props="defaultProps" 
+  show-checkbox  node-key="id" @check-change="handleChecked" @check="getCheck"
+  :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
   :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
     <template #default="{ node, data }">
       <span class="custom-tree-node">
@@ -92,11 +94,14 @@
           @click="handleEdit(node, data)" :icon="Edit" type="primary" circle plain size="small" />
         <!-- 删除 -->
         <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow"
-          @confirm="remove(node, data)" :title="`你确定要删除 ${data.name} 吗`" width="250px" :icon="WarnTriangleFilled">
+          @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" :icon="WarnTriangleFilled">
           <template #reference>
             <el-button style="margin-left: 8px" type="danger" circle plain size="small" :icon="Delete" />
           </template>
         </el-popconfirm>
+        <el-button v-if="handleRemove(data)" @click="batchRemove(node,data,false)" 
+        type="danger" style="margin-left: 8px;"  circle plain size="small" :icon="Delete" />
+
 
         <!-- <el-popconfirm v-if="data.children === null || data.children.length === 0" :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
                 <template #reference>
@@ -107,12 +112,12 @@
       </span>
     </template>
   </el-tree>
-  <el-button @click="confirm">确定</el-button>
+  <!-- <el-button>确定</el-button> -->
 </template>
 
 <script setup>
 import { Plus, Delete, WarnTriangleFilled, Edit,Check,Close,Refresh } from '@element-plus/icons-vue'
-import { addApi, listApi, modifyApi } from '@/api/concategory';
+import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
 import { nextTick, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
@@ -122,9 +127,72 @@ defineOptions({
 
 const cateData = ref([])
 
+// 全部按钮的开关
+// 除了编辑按钮额外处理，其他按钮的显示隐藏都依赖这个数据
+const allShow = ref(true)
+
 const subData = ref([])
 
 const inputRefs = ref({})
+
+const treeRef = ref()
+
+const isDraggable  = ref(true)
+
+const batchDelete = () => {
+  console.log(treeRef.value.getCheckedKeys())
+}
+
+const isChecked = ref(false)
+
+// 用户选择大的复选框(父节点)，该函数会被调用多次，只要选择子节点才会触发1次
+const handleChecked = (checkedNode,checked,) => {
+
+
+}
+
+// 只要勾选了至少1个或者1个都没勾选，才会调用，且只调用1次
+const getCheck = (checkedNodes,checkedObj) => { 
+  isDraggable.value = checkedObj.checkedKeys.length
+}
+
+const handleRemove = (data) => {
+  const getCheckedKeys = treeRef.value.getCheckedKeys()
+  const getCheckedNodes = treeRef.value.getCheckedNodes()
+  if(getCheckedKeys.length >0){
+    allShow.value = false
+    console.log('handleRemove调用了..........',allShow.value)
+    if(Array.isArray(getCheckedNodes[0].children)){
+       return data.id === getCheckedKeys[0]
+    }else return data.id === getCheckedKeys[getCheckedKeys.length -1]
+  }else {
+    allShow.value = true
+  }
+
+}
+
+const batchRemove = async(node,data,isFlag) => {
+  if(isFlag){
+    await removeApi(data.id) 
+    ElMessage.success('删除成功')
+  }else {
+    await ElMessageBox.confirm('你确认要进行批量删除么','温馨提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    const getCheckedKeys = treeRef.value.getCheckedKeys()
+    await removeApi(getCheckedKeys)
+    ElMessage.success('批量删除成功')
+  }
+  // t_question 这里写 allShow.value = true 为什么不会生效，在render函数里面写就有效
+  // allShow.value = true
+  // treeRef.value.getCheckedKeys().splice(0)
+  // console.log(treeRef.value.getCheckedKeys())
+  render()
+  const arr = handleExpand(node)
+  expandKey.value = [...arr]
+}
 
 // 设置ref的函数
 const setInputRef = (id) => {
@@ -134,7 +202,6 @@ const setInputRef = (id) => {
     }
   }
 }
-
 
 
 const updateNodes = ref([])
@@ -162,6 +229,12 @@ const render = async () => {
 
   // 结束编辑
   isEdit.value = false
+
+  // 显示所有
+  allShow.value = true
+
+  // 启用拖拽
+  isDraggable.value = true
 
   // 重置数据
   if(Reflect.ownKeys(category).length >0){
@@ -233,7 +306,7 @@ const handleDrop = async(
 
 
   let pid = -1;
-  let siblings = []
+  let siblings = [] 
   console.log('tree drop:', draggingNode,dropNode,dropType)
   if(dropType === "before" || dropType === "after"){
      pid = dropNode.parent.data.id === undefined ? -1 :dropNode.parent.data.id
@@ -243,12 +316,22 @@ const handleDrop = async(
     siblings = dropNode.childNodes
   }
 
-  siblings.forEach((item,index) => {
+  const total = siblings.length
+
+  // 使用forEach实现
+  /* siblings.forEach((item,index) => {
     // 如果遍历的是当前正在拖拽的节点，就新增一个属性父id
     if(item.data.id === draggingNode.data.id){
       updateNodes.value.push({id:item.data.id,sort:index,pid})
     // 其他节点则正常排序
     }else updateNodes.value.push({id:item.data.id,sort:index})
+  }) */
+
+  // 使用map实现
+  updateNodes.value = siblings.map((item,index) => {
+       // 如果遍历的是当前正在拖拽的节点，就新增一个属性父id，否则其他节点正常排序
+    if((item.data.id === draggingNode.data.id)) return {id:item.data.id,sort:total-index-1,pid}
+    else return {id:item.data.id,sort:total-index-1}
   })
 
   // 提交服务器
@@ -264,6 +347,7 @@ const append = (node, data) => {
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
+  isDraggable.value = false
   
   beforeCount = data.children.length
   // console.log('beforeCount',beforeCount)
@@ -342,6 +426,8 @@ const handleBlur = (node, data) => {
       data.name = nativeName
       category[data.id] = nativeName
       if(differentArr.length === 0){
+        // t_reset：handleBlur初始化(编辑模式)
+        isDraggable.value = true
         allShow.value = true
         console.log('different为空了')
         isEdit.value = false
@@ -374,6 +460,9 @@ const handleBlur = (node, data) => {
       const afterCount = removeElement(node,data)
       if(beforeCount === afterCount){
         allShow.value = true
+        // t_reset：handleBlur初始化(新增模式)
+        isDraggable.value = true
+        
       }
       isReturn.value = true
       return;
@@ -400,7 +489,8 @@ const handleBlur = (node, data) => {
     }else {
       // 重复的逻辑
       if(differentArr.length === 0){
-        console.log('different重复拉..........')
+        // t_reset：handleBlur初始化(编辑模式)
+        isDraggable.value = true
         allShow.value = true
         isEdit.value = false
       }else {
@@ -469,6 +559,8 @@ const handleBlur = (node, data) => {
         // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
         if (beforeCount === afterCount) {
           console.log('没有新增的元素')
+            // t_reset：handleBlur初始化(新增模式)
+          isDraggable.value = true
           allShow.value = true
           return;
         }
@@ -576,16 +668,9 @@ const confirm = async (e,node,data) => {
 
 
 
-const remove = (node, data) => {
-  console.log(node, data)
-  render()
-  expandKey.value = [node.parent.data.id]
-}
-
-
 
 const handleEdit = (node, data) => {
-  
+  isDraggable.value = false
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -610,9 +695,7 @@ const handleEdit = (node, data) => {
   console.log('arr',arr)
 }
 
-// 全部按钮的开关
-// 除了编辑按钮额外处理，其他按钮的显示隐藏都依赖这个数据
-const allShow = ref(true)
+
 
 const handleSave = async (e, node, data) => {
   data.isSave = false
@@ -661,6 +744,8 @@ const handleSave = async (e, node, data) => {
     } else ElMessage.error('添加失败')
   }
   allShow.value = true
+  // t_reset：handleSave初始化(新增编辑模式)
+  isDraggable.value = true
   render()
   const arr = handleExpand(node)
   expandKey.value = [...arr]
@@ -836,6 +921,8 @@ const handleRevert = (e,node, data) => {
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (beforeCount === afterCount) {
     ElMessage.error('回到最原始的数据')
+    // t_reset：handleRevert初始化(新增模式)
+    isDraggable.value = true
     allShow.value = true
   }
 }
@@ -919,6 +1006,7 @@ const isLastChild = (node, data) => {
 // 批量添加
 const batchAdd = (node, data) => {
   console.log(node)
+  isDraggable.value = false
   isNormal.value = true
   isEnd.value = null 
   const newId = Date.now()
@@ -955,12 +1043,12 @@ const handleComment = () => {
 
   // 编辑模式
   if(isEdit.value){
-     return Object.keys(category).length < 2 ? '请输入子分类名，按回车修改' : '请输入子分类名，按回车批量修改'
+     return Object.keys(category).length < 2 ? '按回车修改' : '按回车批量修改'
   }else {
   // 新增模式
     if(subData.value.length >1){
-    return '请输入子分类名，按回车批量保存'
-  }else return '请输入子分类名，按回车保存'
+    return '按回车批量保存'
+  }else return '按回车保存'
 
   }
 }
