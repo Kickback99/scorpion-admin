@@ -11,7 +11,8 @@
 
   <!-- 树形展示 -->
   <el-tree style="max-width: 600px" :data="cateData" :props="defaultProps" 
-  show-checkbox  node-key="id" @check-change="handleChecked" @check="getCheck"
+  show-checkbox  
+  node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
   :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
     <template #default="{ node, data }">
@@ -99,7 +100,7 @@
             <el-button style="margin-left: 8px" type="danger" circle plain size="small" :icon="Delete" />
           </template>
         </el-popconfirm>
-        <el-button v-if="handleRemove(data)" @click="batchRemove(node,data,false)" 
+        <el-button v-if="checkedIds == data.id" @click="batchRemove(node,data,false)" 
         type="danger" style="margin-left: 8px;"  circle plain size="small" :icon="Delete" />
 
 
@@ -118,7 +119,7 @@
 <script setup>
 import { Plus, Delete, WarnTriangleFilled, Edit,Check,Close,Refresh } from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
-import { nextTick, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
 defineOptions({
@@ -139,11 +140,12 @@ const treeRef = ref()
 
 const isDraggable  = ref(true)
 
+const isCheckboxDisabled = ref(false)
+
 const batchDelete = () => {
   console.log(treeRef.value.getCheckedKeys())
 }
 
-const isChecked = ref(false)
 
 // 用户选择大的复选框(父节点)，该函数会被调用多次，只要选择子节点才会触发1次
 const handleChecked = (checkedNode,checked,) => {
@@ -151,12 +153,34 @@ const handleChecked = (checkedNode,checked,) => {
 
 }
 
+const checkedIds = ref(null)
+
 // 只要勾选了至少1个或者1个都没勾选，才会调用，且只调用1次
-const getCheck = (checkedNodes,checkedObj) => { 
-  isDraggable.value = checkedObj.checkedKeys.length
+const getCheck = (checkedNodes,{checkedKeys}) => { 
+  isDraggable.value = checkedKeys.length === 0
+  // 有没有选中
+  if(checkedKeys.length > 0){
+    console.log(checkedKeys)
+    allShow.value = false
+     const isDuplicate = cateData.value.find(item => item.id === checkedKeys[0])
+    if(isDuplicate){
+      // 选择了大的复选框，就选择最前面的id
+      checkedIds.value = checkedKeys[0]
+    }else {
+      // 选择的是子节点的父选框，那就选择最后1个id
+      checkedIds.value = checkedKeys[checkedKeys.length-1]
+    }
+    // 没有选中
+  }else {
+    allShow.value = true
+  }
+
+
+
+
 }
 
-const handleRemove = (data) => {
+/* const handleRemove = (data) => {
   const getCheckedKeys = treeRef.value.getCheckedKeys()
   const getCheckedNodes = treeRef.value.getCheckedNodes()
   if(getCheckedKeys.length >0){
@@ -169,7 +193,7 @@ const handleRemove = (data) => {
     allShow.value = true
   }
 
-}
+} */
 
 const batchRemove = async(node,data,isFlag) => {
   if(isFlag){
@@ -211,6 +235,7 @@ const expandKey = ref([])
 const defaultProps = {
   children: 'children',
   label: 'name',
+  disabled : 'disabled'
 }
 
 let nativeData = []
@@ -218,6 +243,8 @@ let nativeData = []
 const render = async () => {
   const res = await listApi()
   cateData.value = res.data
+/*   const originData = res.data
+  cateData.value = modifyDisabled(originData,isCheckboxDisabled.value) */
   console.log('render中...')
   console.log(res.data)
   // 同一个地址
@@ -243,8 +270,11 @@ const render = async () => {
     }
   }
 
-
 }
+
+/* const processData = computed(()=>{
+  return modifyDisabled(cateData.value,isCheckboxDisabled.value)
+}) */
 
 render()
 
@@ -344,10 +374,15 @@ const handleDrop = async(
 
 
 const append = (node, data) => {
+  console.log(node,data)
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
   isDraggable.value = false
+  const arr = disabledCheckboxes(node.data.children)
+  node.data.children = [...arr]
+
+  console.log('append-----------------------') //可以打印
   
   beforeCount = data.children.length
   // console.log('beforeCount',beforeCount)
@@ -357,6 +392,7 @@ const append = (node, data) => {
   node.expanded = true
   const newId = Date.now()
 
+  // 这里出现问题了，不会执行
   // 向当前节点的 children 数组中添加一个新的子节点
   data.children.push({
     id: newId,
@@ -365,7 +401,8 @@ const append = (node, data) => {
     flag: true,
     isSave: false,
     isCheck: false,
-    isReset: false
+    isReset: false,
+    disabled:true
   })
 
   subData.value.push({
@@ -404,6 +441,27 @@ let filterArr = []
 const isReturn = ref(false)
 
 
+const modifyDisabled = (data,disabled) => {
+  return data.map(item => {
+    const newItem = { ...item, disabled };
+    if (item.children && item.children.length > 0) {
+      newItem.children = modifyDisabled(item.children, disabled);
+    }
+    return newItem;
+  });
+}
+
+const enabledCheckboxes = ()  => {
+    isCheckboxDisabled.value = false
+    cateData.value = modifyDisabled(cateData.value,isCheckboxDisabled.value)
+}
+
+const disabledCheckboxes = (data) => {
+  isCheckboxDisabled.value = true
+  return modifyDisabled(data,isCheckboxDisabled.value)
+}
+
+
 const handleBlur = (node, data) => {
   isReturn.value = false
   // console.log(node, data)
@@ -428,6 +486,8 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
+        // 启用复选框
+        enabledCheckboxes()
         allShow.value = true
         console.log('different为空了')
         isEdit.value = false
@@ -462,6 +522,8 @@ const handleBlur = (node, data) => {
         allShow.value = true
         // t_reset：handleBlur初始化(新增模式)
         isDraggable.value = true
+        // 启用复选框
+        enabledCheckboxes()
         
       }
       isReturn.value = true
@@ -491,6 +553,8 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
+        // 启用复选框
+        enabledCheckboxes()
         allShow.value = true
         isEdit.value = false
       }else {
@@ -561,6 +625,8 @@ const handleBlur = (node, data) => {
           console.log('没有新增的元素')
             // t_reset：handleBlur初始化(新增模式)
           isDraggable.value = true
+          // 启用复选框
+          enabledCheckboxes()
           allShow.value = true
           return;
         }
@@ -670,7 +736,9 @@ const confirm = async (e,node,data) => {
 
 
 const handleEdit = (node, data) => {
+  console.log(data)
   isDraggable.value = false
+  disabledCheckboxes()
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -690,9 +758,6 @@ const handleEdit = (node, data) => {
   // console.log(node, data)
   allShow.value = false
   category[data.id] = data.name
-
-  const arr = Object.keys(category)
-  console.log('arr',arr)
 }
 
 
@@ -746,6 +811,8 @@ const handleSave = async (e, node, data) => {
   allShow.value = true
   // t_reset：handleSave初始化(新增编辑模式)
   isDraggable.value = true
+  // 启用复选框
+  enabledCheckboxes()
   render()
   const arr = handleExpand(node)
   expandKey.value = [...arr]
@@ -923,6 +990,8 @@ const handleRevert = (e,node, data) => {
     ElMessage.error('回到最原始的数据')
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
+    // 启用复选框
+    enabledCheckboxes()
     allShow.value = true
   }
 }
@@ -1007,6 +1076,8 @@ const isLastChild = (node, data) => {
 const batchAdd = (node, data) => {
   console.log(node)
   isDraggable.value = false
+  //禁用复选框
+  disabledCheckboxes()
   isNormal.value = true
   isEnd.value = null 
   const newId = Date.now()
