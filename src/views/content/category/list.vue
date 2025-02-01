@@ -3,7 +3,7 @@
     <p>分类管理</p>
   </div> -->
 
-  <el-button type="danger" @click="batchDelete">批量删除</el-button>
+  <el-button type="type" @click="addParent" size="small">新增</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
@@ -142,20 +142,48 @@ const isDraggable  = ref(true)
 
 const isCheckboxDisabled = ref(false)
 
-const batchDelete = () => {
-  console.log(treeRef.value.getCheckedKeys())
+const addParent = () => {
+  isEnd.value = null
+  isNative.value = true
+  isNormal.value = true
+  isDraggable.value = false
+    // 生成一个新的唯一 ID
+    const newId = Date.now(); // 您可以根据实际情况使用其他方法生成唯一 ID
+
+// 创建一个新的父分类对象
+const newParent = {
+  id: newId,
+  pid: -1, // 顶级分类的 pid 通常为 -1
+  name: '', // 新增的父分类名称
+  children: [] // 初始化子节点为空数组
+};
+
+// 将新的父分类对象添加到 cateData 中
+cateData.value.push(newParent);
+
+// 可选：展开新添加的父分类节点
+nextTick(() => {
+  // 假设您有一个方法来展开节点，这里需要根据实际情况实现
+  // expandNode(newId);
+});
+
 }
 
 
-// 用户选择大的复选框(父节点)，该函数会被调用多次，只要选择子节点才会触发1次
-const handleChecked = (checkedNode,checked,) => {
+// if的语句选择大的复选框(父节点)，该函数会被调用多次，只要选择子节点才会触发1次
+// if之外的语句取消选择也会调用
+// checkedNode是个节点数组
+const handleChecked = (checkedNode,checked) => {
+  if(checked){
 
-
+  }
 }
 
 const checkedIds = ref(null)
 
 // 只要勾选了至少1个或者1个都没勾选，才会调用，且只调用1次
+// if的语句是勾选了触发，if之外是取消勾选和勾选都会触发
+// 第二个参数是个对象，这里用了对象解构
 const getCheck = (checkedNodes,{checkedKeys}) => { 
   isDraggable.value = checkedKeys.length === 0
   // 有没有选中
@@ -174,10 +202,6 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
   }else {
     allShow.value = true
   }
-
-
-
-
 }
 
 /* const handleRemove = (data) => {
@@ -249,6 +273,7 @@ let nativeData = []
 
 const render = async () => {
   const res = await listApi()
+  console.log(res.data)
   cateData.value = res.data
 /*   const originData = res.data
   cateData.value = modifyDisabled(originData,isCheckboxDisabled.value) */
@@ -398,7 +423,7 @@ const append = (node, data) => {
 
   // 全部节点，是个数组
   // console.log(node.parent.childNodes)
-  beforeCount = data.children.length
+  beforeCount = data.children && data.children.length > 0?data.children.length : 0
   // console.log('beforeCount',beforeCount)
 
   allShow.value = false
@@ -406,7 +431,6 @@ const append = (node, data) => {
   node.expanded = true
   const newId = Date.now()
 
-  // 这里出现问题了，不会执行
   // 向当前节点的 children 数组中添加一个新的子节点
   data.children.push({
     id: newId,
