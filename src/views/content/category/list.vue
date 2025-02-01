@@ -374,16 +374,20 @@ const handleDrop = async(
 
 
 const append = (node, data) => {
-  console.log(node,data)
+  console.log(node)
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
   isDraggable.value = false
-  const arr = disabledCheckboxes(node.data.children)
+  /* const arr = disabledCheckboxes(node.data.children)
   node.data.children = [...arr]
-  Object.assign(node.data,{...node.data,disabled:true})
+  Object.assign(node.data,{...node.data,disabled:true}) */
 
   console.log('append-----------------------') //可以打印
+  
+  // modifyNodes(node)
+
+
   
   // 全部节点，是个数组
   // console.log(node.parent.childNodes)
@@ -443,7 +447,28 @@ let filterArr = []
 // 一上来设置为false的原因是为了重置数据
 const isReturn = ref(false)
 
+/* if(item.data.disabled !== undefined){
+          // 如果存在disabled属性，则修改
+          item.data.disabled = isCheckboxDisabled.value
+        }else {
+          // 如果不存在则添加disabled属性
+          Object.assign(item.data,{...item.data,disabled:isCheckboxDisabled.value})
+  } */
 
+// 修改节点
+const modifyNodes = (node) => {
+    isCheckboxDisabled.value = true
+  node.parent.childNodes.forEach(item =>{
+      if(item.data.children && item.data.children.length > 0){
+        const arr = modifyDisabled(item.data.children,isCheckboxDisabled.value)
+        item.data.children = [...arr]
+        Object.assign(item.data,{...item.data,disabled:isCheckboxDisabled.value})
+      }else Object.assign(item.data,{...item.data,disabled:isCheckboxDisabled.value})
+  })
+}
+
+
+// 递归函数
 const modifyDisabled = (data,disabled) => {
   return data.map(item => {
     const newItem = { ...item, disabled };
@@ -489,6 +514,8 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
+        const arr = handleExpand(node)
+        expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
         allShow.value = true
@@ -525,6 +552,8 @@ const handleBlur = (node, data) => {
         allShow.value = true
         // t_reset：handleBlur初始化(新增模式)
         isDraggable.value = true
+        const arr = handleExpand(node)
+        expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
         
@@ -556,6 +585,8 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
+        const arr = handleExpand(node)
+        expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
         allShow.value = true
@@ -627,6 +658,8 @@ const handleBlur = (node, data) => {
         if (beforeCount === afterCount) {
           console.log('没有新增的元素')
             // t_reset：handleBlur初始化(新增模式)
+            const arr = handleExpand(node)
+            expandKey.value = [...arr]
           isDraggable.value = true
           // 启用复选框
           enabledCheckboxes()
@@ -739,9 +772,10 @@ const confirm = async (e,node,data) => {
 
 
 const handleEdit = (node, data) => {
-  console.log(data)
+  console.log(node)
   isDraggable.value = false
-  disabledCheckboxes()
+  // disabledCheckboxes()
+  modifyNodes(node)
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -993,6 +1027,8 @@ const handleRevert = (e,node, data) => {
     ElMessage.error('回到最原始的数据')
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
+    const arr = handleExpand(node)
+    expandKey.value = [...arr]
     // 启用复选框
     enabledCheckboxes()
     allShow.value = true
@@ -1080,7 +1116,7 @@ const batchAdd = (node, data) => {
   console.log(node)
   isDraggable.value = false
   //禁用复选框
-  disabledCheckboxes()
+  // disabledCheckboxes()
   isNormal.value = true
   isEnd.value = null 
   const newId = Date.now()
