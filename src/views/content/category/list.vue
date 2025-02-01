@@ -196,18 +196,25 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
 } */
 
 const batchRemove = async(node,data,isFlag) => {
+  const total = treeRef.value.getCheckedKeys().length
   if(isFlag){
     await removeApi(data.id) 
     ElMessage.success('删除成功')
   }else {
-    await ElMessageBox.confirm('你确认要进行批量删除么','温馨提示', {
+    try {
+      await ElMessageBox.confirm(total > 1?'你确认要批量删除么':'你确认要删除么','温馨提示', {
       type: 'warning',
       confirmButtonText: '确认',
       cancelButtonText: '取消'
     })
     const getCheckedKeys = treeRef.value.getCheckedKeys()
     await removeApi(getCheckedKeys)
-    ElMessage.success('批量删除成功')
+    ElMessage.success(total > 1?'批量删除成功':'删除成功')
+    } catch (error) {
+      render()
+      const arr = handleExpand(node)
+      expandKey.value = [...arr]
+    }
   }
   // t_question 这里写 allShow.value = true 为什么不会生效，在render函数里面写就有效
   // allShow.value = true
@@ -385,10 +392,10 @@ const append = (node, data) => {
 
   console.log('append-----------------------') //可以打印
   
-  // modifyNodes(node)
+  modifyNodes(node.parent.data)
 
 
-  
+
   // 全部节点，是个数组
   // console.log(node.parent.childNodes)
   beforeCount = data.children.length
@@ -458,12 +465,12 @@ const isReturn = ref(false)
 // 修改节点
 const modifyNodes = (node) => {
     isCheckboxDisabled.value = true
-  node.parent.childNodes.forEach(item =>{
-      if(item.data.children && item.data.children.length > 0){
-        const arr = modifyDisabled(item.data.children,isCheckboxDisabled.value)
-        item.data.children = [...arr]
-        Object.assign(item.data,{...item.data,disabled:isCheckboxDisabled.value})
-      }else Object.assign(item.data,{...item.data,disabled:isCheckboxDisabled.value})
+  node.forEach(item =>{
+      if(item.children && item.children.length > 0){
+        const arr = modifyDisabled(item.children,isCheckboxDisabled.value)
+        item.children = [...arr]
+        Object.assign(item,{...item,disabled:isCheckboxDisabled.value})
+      }else Object.assign(item,{...item,disabled:isCheckboxDisabled.value})
   })
 }
 
@@ -484,9 +491,10 @@ const enabledCheckboxes = ()  => {
     cateData.value = modifyDisabled(cateData.value,isCheckboxDisabled.value)
 }
 
-const disabledCheckboxes = (data) => {
+const disabledCheckboxes = () => {
   isCheckboxDisabled.value = true
-  return modifyDisabled(data,isCheckboxDisabled.value)
+  // return modifyDisabled(data,isCheckboxDisabled.value)
+  cateData.value = modifyDisabled(cateData.value,isCheckboxDisabled.value)
 }
 
 
@@ -514,13 +522,14 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
+        allShow.value = true
+        console.log('different为空了')
+        isEdit.value = false
+        handleDuplicate(data)
         const arr = handleExpand(node)
         expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
-        allShow.value = true
-        console.log('different为空了')
-        isEdit.value = false
       }else {
         differentArr.forEach((item,index) => {
           if(index === differentArr.length -1) {
@@ -529,14 +538,11 @@ const handleBlur = (node, data) => {
           }
         })
         isEdit.value = true
+        handleDuplicate(data)
+          // 禁用复选框
+        disabledCheckboxes()
       }
       ElMessage.error('请输入内容')
-      data.isSave = false
-      data.isEdit = false
-      data.flag = false
-      data.isCheck = false
-      data.isReset = false
-      delete category[data.id]
       isReturn.value = true
       return;
     } else {
@@ -556,7 +562,6 @@ const handleBlur = (node, data) => {
         expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
-        
       }
       isReturn.value = true
       return;
@@ -585,28 +590,26 @@ const handleBlur = (node, data) => {
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         isDraggable.value = true
-        const arr = handleExpand(node)
-        expandKey.value = [...arr]
-        // 启用复选框
-        enabledCheckboxes()
         allShow.value = true
         isEdit.value = false
-      }else {
-        differentArr.forEach((item,index) => {
-          if(index === differentArr.length -1) {
+        handleDuplicate(data)
+        const arr = handleExpand(node)
+        expandKey.value = [...arr]
+      // 启用复选框
+      enabledCheckboxes()
+      } else {
+        differentArr.forEach((item, index) => {
+          if (index === differentArr.length - 1) {
             isLast.value = item
-            console.log('最后一个元素到底是谁',item)
+            console.log('最后一个元素到底是谁', item)
           }
         })
         isEdit.value = true
+        handleDuplicate(data)
+        // 禁用复选框
+        disabledCheckboxes()
       }
       ElMessage.error('分类名不能重复')
-      data.isEdit = false
-      data.flag = false
-      data.isSave = false
-      data.isCheck = false
-      data.isReset = false
-      delete category[data.id]
       isReturn.value = true
       return;
     }
@@ -695,6 +698,16 @@ const handleBlur = (node, data) => {
     }, 200);
 }
 
+
+const handleDuplicate = (data) => {
+  data.isEdit = false
+  data.flag = false
+  data.isSave = false
+  data.isCheck = false
+  data.isReset = false
+  delete category[data.id]
+}
+
 const handleAdd = (node,data) => {
 
   if(isEnd.value) {
@@ -772,10 +785,8 @@ const confirm = async (e,node,data) => {
 
 
 const handleEdit = (node, data) => {
-  console.log(node)
   isDraggable.value = false
   // disabledCheckboxes()
-  modifyNodes(node)
   currentEditID.value = data.id
   // 重置：只要点击编辑，就禁用确定按钮
   isDisabled.value = true
@@ -795,6 +806,13 @@ const handleEdit = (node, data) => {
   // console.log(node, data)
   allShow.value = false
   category[data.id] = data.name
+  if(node.level < 2){
+    modifyNodes(node.parent.data)
+  }else {
+    modifyNodes(node.parent.parent.data)
+  }
+
+  console.log('data',data)
 }
 
 
@@ -1116,6 +1134,7 @@ const batchAdd = (node, data) => {
   console.log(node)
   isDraggable.value = false
   //禁用复选框
+  modifyNodes(node.parent.parent.data)
   // disabledCheckboxes()
   isNormal.value = true
   isEnd.value = null 
@@ -1133,7 +1152,8 @@ const batchAdd = (node, data) => {
     // 控制修改的切换
     isCheck: false,
     // 控制关闭的切换
-    isReset: false
+    isReset: false,
+    disabled:isCheckboxDisabled.value
   })
 
   subData.value.push({
