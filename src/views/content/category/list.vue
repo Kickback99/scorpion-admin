@@ -385,6 +385,8 @@ const append = (node, data) => {
 
   console.log('append-----------------------') //可以打印
   
+  // 全部节点，是个数组
+  // console.log(node.parent.childNodes)
   beforeCount = data.children.length
   // console.log('beforeCount',beforeCount)
 
