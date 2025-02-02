@@ -149,15 +149,20 @@ const isCheckboxDisabled = ref(false)
 
 
 const handleTest = (node,data) => {
-  console.log(node,data)
-  handleAdd(node,data)
-  console.log(isEnd.value === data.id)
-  // console.log(isLastAll(node,data))
-  // console.log('是否是最后一个节点',data)
+  let arr;
+  if(node.level < 2) {
+    arr = node.data.children
+  }else arr = node.parent.data.children
+  const item = arr.find(item  => item.id === isChildId.value)
+   const nodes = treeRef.value.getNode(item)
+   console.log(nodes)
+    nextTick(()=>{
+       nodes.expanded = true
+    })
 
 } 
 
-watch(treeList,() => {
+/* watch(treeList,() => {
   if(isParentChild.value && isChild.value){
      const children = treeList.value.find(item => item.pid != -1)
     //  找不到，说明没有子节点，就开启父节点的显示
@@ -167,7 +172,7 @@ watch(treeList,() => {
       isEnd.value = null
     }
   }
-},{deep:true})
+},{deep:true}) */
 
 
 const addParent = (node,data) => {
@@ -580,10 +585,13 @@ const handleParentBlur = (node,data) => {
       if(treeList.value.length === 0){
         console.log('有没有进入判断')
         allShow.value = true
-        // t_reset：handleBlur初始化(新增模式)
+        // t_reset：handleBlur初始化(新增父子模式)
         isDraggable.value = true
         const arr = handleExpand(node)
         expandKey.value = [...arr]
+        isParentChild.value = false
+        isChild.value = false
+        isChildId.value = null
         // 启用复选框
         // enabledCheckboxes()
       }
@@ -626,10 +634,13 @@ const handleParentBlur = (node,data) => {
         // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
         if (treeList.value.length === 0) {
           console.log('没有新增的元素')
-            // t_reset：handleBlur初始化(新增模式)
+            // t_reset：handleBlur初始化(新增父子模式)
             const arr = handleExpand(node)
             expandKey.value = [...arr]
-          isDraggable.value = true
+            isParentChild.value = false
+            isChild.value = false
+            isChildId.value = null
+            isDraggable.value = true
           // 启用复选框
           // enabledCheckboxes()
           allShow.value = true
@@ -737,6 +748,8 @@ const handleBlur = (node, data) => {
       return;
     }
   }
+
+
 
 
   // 非法判断2
@@ -883,13 +896,13 @@ const isParentChild = ref(false)
 
 const isChild = ref(false)
 
-let count = 0;
 
 const isChildId = ref(null)
 
 // 批量添加子类
 const batchAddParentChild = (node,data) => {
   isParentChild.value = true
+  node.expanded = true
   if(!isChild.value){
     isChild.value = true
   }
@@ -988,13 +1001,18 @@ const handleAdd = (node,data,isPublish) => {
 } */
 
 if(isParentChild.value && isEnd.value) {
-    if(data.isParent != undefined ){
+
+    if(!isEmpty.value){
+      return isChildId.value  === data.id
+    }else return isEnd.value === data.id
+
+    /* if(data.isParent != undefined ){
       console.log('表达式1.1执行...')
        return !isEdit.value && data.isSave && isChildId.value === data.id
     }else {
       console.log('表达式1.2执行...')
       return isEnd.value === data.id
-    }
+    } */
   //  return  isNative.value ?!isEdit.value && data.isSave && isLastParentChild(node, data) : isEnd.value === data.id
 }
 
@@ -1366,7 +1384,11 @@ const currentRevertId = ref(null)
 // 点击虚拟关闭按钮，确定按钮和批量添加按钮根据filterArr数组中的最后一个来显示
 const isEnd = ref(null)
 
+const isEmpty = ref(false)
+
 const handleParentRevert = (node,data) => {
+
+        // isChild.value = true
 
        // 移除filter数据(标记)
        console.log('删除按钮',data.id)
@@ -1390,10 +1412,13 @@ const handleParentRevert = (node,data) => {
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (treeList.value.length === 0) {
     ElMessage.error('回到最原始的数据')
-    // t_reset：handleRevert初始化(新增模式)
+    // t_reset：handleRevert初始化(新增父子模式)
     isDraggable.value = true
     const arr = handleExpand(node)
     expandKey.value = [...arr]
+    isParentChild.value = false
+    isChild.value = false
+    isChildId.value = null
     // 启用复选框
     // enabledCheckboxes()
     allShow.value = true
@@ -1511,16 +1536,25 @@ const  removeParentFilter  = (node,data) => {
      arr.push(node.data.id)
      console.log("arrarrarr",arr)
      filterArr = filterArr.filter(item => !arr.includes(item))
-     const childrenIds = findPrevSubCate()
-     isChildId.value = childrenIds[childrenIds.length-1]
-     console.log('最后的决战1',isChildId.value )
+   
   }else {
     filterArr = filterArr.filter(item => item != data.id)
-    console.log('pop',filterArr)
-    isEnd.value = filterArr[filterArr.length-1]
   }
 
+  const childrenIds = findPrevSubCate()
+  // 先判断有没有子节点，没有的话，就给isEnd赋值，否则有子节点，就给isChildId赋值
+     if(childrenIds.length === 0) {
+      console.log('子分类已经等于0了')
+      isEmpty.value = true
+      isEnd.value = filterArr[filterArr.length-1]
+  }else isChildId.value = childrenIds[childrenIds.length-1]
+    
+
+
 }
+
+
+
 
 
 
@@ -1531,9 +1565,7 @@ const findPrevSubCate = () => {
         children.push(item.subId) 
       }
   })
-  console.log('pid不等于-1的',children )
   const childIds = filterArr.filter(item => children.includes(item))
-  console.log('childIds',childIds)
   return childIds
 
 }
