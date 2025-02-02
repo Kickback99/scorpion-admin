@@ -2,7 +2,9 @@
  <!--  <div>
     <p>分类管理</p>
   </div> -->
-  <!-- <h4>{{ subData }}</h4> -->
+   <h4> isEnd.value: {{ isEnd }}</h4> 
+   <h4> isChildId: {{ isChildId }}</h4> 
+   <h4> isChild: {{ isChild }}</h4> 
   <el-button type="type" @click="addParent" size="small">新增</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
@@ -119,7 +121,7 @@
 <script setup>
 import { Plus, Delete, WarnTriangleFilled, Edit,Check,Close,Refresh } from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
-import { computed, nextTick, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 
 defineOptions({
@@ -132,7 +134,8 @@ const cateData = ref([])
 // 除了编辑按钮额外处理，其他按钮的显示隐藏都依赖这个数据
 const allShow = ref(true)
 
-const subData = ref([])
+//收集数据提交服务器
+const treeList = ref([])
 
 const inputRefs = ref({})
 
@@ -142,16 +145,28 @@ const isDraggable  = ref(true)
 
 const isCheckboxDisabled = ref(false)
 
-// 父元素id
-const parentId = ref(null)
+
 
 const handleTest = (node,data) => {
-  console.log(node)
+  console.log(node,data)
+  handleAdd()
+  console.log(isEnd.value === data.id)
   // console.log(isLastAll(node,data))
   // console.log('是否是最后一个节点',data)
 
 } 
 
+watch(treeList,() => {
+  if(isParentChild.value && isChild.value){
+     const children = treeList.value.find(item => item.pid != -1)
+    //  找不到，说明没有子节点，就开启父节点的显示
+    if(!children){
+      console.log('treeList没有子节点了...')
+      isChild.value = false
+      isEnd.value = null
+    }
+  }
+},{deep:true})
 
 
 const addParent = (node,data) => {
@@ -177,7 +192,7 @@ const newParent = {
   isParent:true
 };
 
-subData.value.push({
+treeList.value.push({
     subId: newId,
     name: '',
     pid: -1
@@ -194,7 +209,6 @@ cateData.value.push(newParent);
 
   /* beforeCount = nativeData.length
   console.log(beforeCount) */
-  parentId.value = newId
 }
 
 
@@ -471,7 +485,7 @@ const append = (node, data) => {
     disabled:true
   })
 
-  subData.value.push({
+  treeList.value.push({
     subId: newId,
     name: '',
     pid: data.id
@@ -500,6 +514,7 @@ const differentArr = []
 // 过滤满足不为空和不重名的数组
 // 注意，filter后会返回一个新数组，所以这里只能用let声明
 let filterArr = []
+// let filterSubArr = []
 
 // isReturn用来控制键盘事件执行blur事件之后是否执行后续代码(提交服务器)
 // 在 handleBlur 函数，如果空值还有重复 isReturn 的值则为true，键盘事件将不在执行后续代码
@@ -550,8 +565,6 @@ const disabledCheckboxes = () => {
 }
 
 const handleParentBlur = (node,data) => {
-    console.log('到底是什么')
-    console.log(node)
 
     
     if (category[data.id]?.trim() === '') {
@@ -563,7 +576,7 @@ const handleParentBlur = (node,data) => {
       }
       // 移除新增的子节点
       removeParentElement(node,data)
-      if(subData.value.length === 0){
+      if(treeList.value.length === 0){
         console.log('有没有进入判断')
         allShow.value = true
         // t_reset：handleBlur初始化(新增模式)
@@ -600,12 +613,17 @@ const handleParentBlur = (node,data) => {
     }else {
       // 代码走到这里，说明非空并且不重复
       filterArr.push(data.id)
-      console.log(filterArr,'filterArr')
+      if(node.level > 1){
+        isChildId.value = filterArr[filterArr.length-1]
+        // filterSubArr.push(data.id)
+      }
+      console.log('push',filterArr)
+      // console.log("isChildId.value",isChildId.value)
     }
 
       // console.log(data)
         // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
-        if (subData.value.length === 0) {
+        if (treeList.value.length === 0) {
           console.log('没有新增的元素')
             // t_reset：handleBlur初始化(新增模式)
             const arr = handleExpand(node)
@@ -621,9 +639,9 @@ const handleParentBlur = (node,data) => {
         console.log('是不是最后一个子节点',isLastChild(node,data))
 
 
-  // 更新子分类名称(针对新增模式，往 subData 数据赋值，提交服务器)
+  // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
   data.name = category[data.id]
-  const subItem = subData.value.find(item => item.subId === data.id)
+  const subItem = treeList.value.find(item => item.subId === data.id)
   if (subItem) {
     subItem.name = data.name
   }
@@ -647,7 +665,7 @@ const handleParentBlur = (node,data) => {
 const handleBlur = (node, data) => {
   isReturn.value = false
 
-  if(data.isParent || isParentChild.value){
+  if(isParentChild.value){
     handleParentBlur(node,data)
     return;
   }
@@ -827,9 +845,9 @@ const handleBlur = (node, data) => {
   }
 
 
-  // 更新子分类名称(针对新增模式，往 subData 数据赋值，提交服务器)
+  // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
   data.name = category[data.id]
-  const subItem = subData.value.find(item => item.subId === data.id)
+  const subItem = treeList.value.find(item => item.subId === data.id)
   if (subItem) {
     subItem.name = data.name
   }
@@ -871,13 +889,12 @@ const isChildId = ref(null)
 // 批量添加子类
 const batchAddParentChild = (node,data) => {
   isParentChild.value = true
-  count++
-  if(count <= 1){
+  if(!isChild.value){
     isChild.value = true
   }
   const arr = node.level < 2  ?node.data.children : node.parent.data.children
+  const parentId = node.level < 2 ? node.data.id :node.parent.data.id
 
-  console.log('node',node)
   isDraggable.value = false
   //禁用复选框
   // modifyNodes(node.parent.data)
@@ -904,18 +921,14 @@ const batchAddParentChild = (node,data) => {
     disabled:isCheckboxDisabled.value
   })
 
-  if(parentId.value === node.data.id){
-      subData.value.push({
+  // console.log('parentId',parentId)
+  treeList.value.push({
       subId: newId,
       name: '',
-      pid: parentId.value
+      pid: parentId
     })
-  }
-  isChildId.value = newId
 
-
-  // node.parent.data.id
-
+ 
   nextTick(()=>{
     focusInput(newId)
   })
@@ -954,7 +967,7 @@ const batchAdd = (node, data) => {
     disabled:isCheckboxDisabled.value
   })
 
-  subData.value.push({
+  treeList.value.push({
     subId: newId,
     name: '',
     pid: node.parent.data.id
@@ -968,39 +981,66 @@ const batchAdd = (node, data) => {
 }
 
 const handleAdd = (node,data,isPublish) => {
-
-  if(isEnd.value) {
-   return  isNative.value ?!isEdit.value && data.isSave && isLastChild(node, data) : isEnd.value === data.id
+  if(isParentChild.value && isEnd.value) {
+    if(data.isParent){
+      console.log('表达式1.1执行...')
+       return !isEdit.value && data.isSave && isChildId.value === data.id
+    }else {
+      console.log('表达式1.2执行...')
+      return isEnd.value === data.id
+    }
+  //  return  isNative.value ?!isEdit.value && data.isSave && isLastParentChild(node, data) : isEnd.value === data.id
 }
+
+   
 
 
   if(isParentChild.value && !isPublish){
-
-    /*   if(isNormal.value) {
-        return (!isEdit.value && data.isSave && isLastAll(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node) && !nativeData.find(item => item.id == data.id))
-      }else return !isEdit.value && data.isSave && currentEditID.value === data.id */
-      
       // 批量添加按钮(完成)
       if(isNormal.value) {
+        console.log('表达式2.1执行...')
         return (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node,isPublish) && nativeData.find(item => item.id != data.id))
-      }else return !isEdit.value && data.isSave && currentEditID.value === data.id
+      }else {
+        console.log('表达式2.2执行...')
+        return (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node,isPublish) && nativeData.find(item => item.id != data.id))
+      }
   }
 
   if(isParentChild.value && isPublish){
       // 提交服务器按钮
       if(isNormal.value) {
         if(isChild.value){
+          console.log('表达式3.1执行...')
+          // 一旦添加了子分类，会走这个表达式
           return !isEdit.value && data.isSave  && node.level > 1 && isChildId.value === data.id
-        }else return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish)
+        }else {
+          console.log('表达式3.2执行...')
+          // watch 监视到了没有子节点，会走这个表达式
+          // 添加父分类(没有添加子分类)的时候也会走这个表达
+          return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish)
+        }
         
-      }else return !isEdit.value && data.isSave && currentEditID.value === data.id
+      }else {
+        console.log('表达式3.3执行...')
+        return !isEdit.value && data.isSave && currentEditID.value === data.id
+      }
   }
 
 
+ // 针对添加子分类
+  if(!isParentChild.value && isEnd.value) {
+      console.log('表达式1执行...')
+    return  isNative.value ?!isEdit.value && data.isSave && isLastChild(node, data) : isEnd.value === data.id
+  }
+
 
   if(isNormal.value){
+    console.log('表达式4.1执行...')
     return !isEdit.value && data.isSave && isLastChild(node, data)
-  }else return !isEdit.value && data.isSave && currentEditID.value === data.id
+  }else {
+    console.log('表达式4.2执行...')
+    return !isEdit.value && data.isSave && currentEditID.value === data.id
+  }
 }
 
 const handleInclude = (id) => {
@@ -1029,19 +1069,19 @@ const removeElement = (node,data,specific=false) => {
   if(index > -1){
     // 删除为空和重复的非法元素
     afterCount = childList.length-1
-    !specific?subData.value.pop():removeSpecificElement(data)
+    !specific?treeList.value.pop():removeSpecificElement(data)
     childList.splice(index,1)
     delete category[data.id]
     return afterCount
   }
 }
 
-// 删除 subData 指定的元素，针对handleRevert
+// 删除 treeList 指定的元素，针对handleRevert
 const removeSpecificElement = (data) => {
-  const subCate = subData.value.find(item => item.subId === data.id)
-  const index = subData.value.indexOf(subCate)
+  const subCate = treeList.value.find(item => item.subId === data.id)
+  const index = treeList.value.indexOf(subCate)
   if(index > -1){
-    subData.value.splice(index,1)
+    treeList.value.splice(index,1)
   }
 }
 
@@ -1051,14 +1091,16 @@ const removeParentRevert = (node,data) =>{
     const childrenId = node.data.children.map(item => item.id)
      arr = [...childrenId]
      arr.push(node.data.id)
+     console.log('arr',arr)
      arr.forEach(item => delete category[item])
-     subData.value = subData.value.filter(item => !arr.includes(item.subId))
-     console.log('subData.value',subData.value)
+     treeList.value = treeList.value.filter(item => !arr.includes(item.subId))
+     console.log('treeList.value',treeList.value)
    }else {
-     const cateItem = subData.value.find(item => item.id === data.id)
-     const index = subData.value.indexOf(cateItem)
+     const cateItem = treeList.value.find(item => item.subId === data.id)
+     console.log('cateItem',cateItem)
+     const index = treeList.value.indexOf(cateItem)
      if(index > -1){
-      subData.value.splice(index,1)
+      treeList.value.splice(index,1)
       delete category[data.id]
     }
    }
@@ -1088,7 +1130,7 @@ const removeParentElement = (node,data) => {
   if(index > -1){
     // 删除为空和重复的非法元素
     // afterCount = childList.length-1
-    subData.value.pop()
+    treeList.value.pop()
     childList.splice(index,1)
     delete category[data.id]
     console.log("删除为空和重复的非法元素")
@@ -1097,12 +1139,12 @@ const removeParentElement = (node,data) => {
   }
 }
 
-// 删除 subData 指定的元素，针对handleRevert 新增模式
+// 删除 treeList 指定的元素，针对handleRevert 新增模式
 /* const removeParentSpecificElement = (data) => {
-  const subCate = subData.value.find(item => item.subId === data.id)
-  const index = subData.value.indexOf(subCate)
+  const subCate = treeList.value.find(item => item.subId === data.id)
+  const index = treeList.value.indexOf(subCate)
   if(index > -1){
-    subData.value.splice(index,1)
+    treeList.value.splice(index,1)
   }
 } */
 
@@ -1180,7 +1222,7 @@ const handleEdit = (node, data) => {
 const handleSave = async (e, node, data) => {
   data.isSave = false
   e.stopPropagation()
-  /* const newSubData = subData.value.map(item =>{
+  /* const newtreeList = treeList.value.map(item =>{
       delete item.subId
       return {...item}
   }) */
@@ -1217,10 +1259,10 @@ const handleSave = async (e, node, data) => {
 
   } //新增事件的提交
   else {
-    if (subData.value.length > 0) {
-      await addApi(subData.value)
+    if (treeList.value.length > 0) {
+      await addApi(treeList.value)
       ElMessage.success('添加成功')
-      subData.value = []
+      treeList.value = []
     } else ElMessage.error('添加失败')
   }
   allShow.value = true
@@ -1318,25 +1360,28 @@ const currentRevertId = ref(null)
 const isEnd = ref(null)
 
 const handleParentRevert = (node,data) => {
-     // 移除filter数据(标记)
-     console.log('删除按钮',data.id)
-    removeParentFilter(node,data)
+
+       // 移除filter数据(标记)
+       console.log('删除按钮',data.id)
+      removeParentFilter(node,data)
+
+
+   // 移除treeList数据(服务器)
+   removeParentRevert(node,data)
+
 
     if(isNative.value){
       console.log('正常模式的删除')
     }else console.log('特殊模式的删除')
 
   console.log('filter-pop后',filterArr)
-
-  // 移除subData数据(服务器)
-  removeParentRevert(node,data)
   
   // 移除新增的子节点(视图上)
   removeTreeNode(node,data)
   
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
-  if (subData.value.length === 0) {
+  if (treeList.value.length === 0) {
     ElMessage.error('回到最原始的数据')
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
@@ -1453,17 +1498,38 @@ const handleRevert = (e,node, data) => {
 
 const  removeParentFilter  = (node,data) => {
   let arr = []
-  if(node.level < 2){
+  if( node.level < 2 && node.data.children.length > 1){
     const childrenId = node.data.children.map(item => item.id)
      arr = [...childrenId]
      arr.push(node.data.id)
-     console.log(arr)
+     console.log("arrarrarr",arr)
      filterArr = filterArr.filter(item => !arr.includes(item))
-  }else filterArr = filterArr.filter(item => item != data.id)
-
-  isEnd.value = filterArr[filterArr.length-1]
+     isChildId.value = findPrevSubCate()
+     console.log('最后的决战1',isChildId.value )
+  }else {
+    filterArr = filterArr.filter(item => item != data.id)
+    console.log('pop',filterArr)
+    isEnd.value = filterArr[filterArr.length-1]
+  }
 
 }
+
+
+
+const findPrevSubCate = () => {
+  const children = []
+  treeList.value.forEach((item) => {
+      if(item.pid != -1){
+        children.push(item.subId) 
+      }
+  })
+  console.log('pid不等于-1的',children )
+  const childIds = filterArr.filter(item => children.includes(item))
+  console.log('childIds',childIds)
+  return childIds[childIds.length-1]
+
+}
+
 
 const removeFilter = (id) => {
 filterArr = filterArr.filter(item => item != id)
@@ -1591,7 +1657,7 @@ const handleComment = () => {
      return Object.keys(category).length < 2 ? '按回车修改' : '按回车批量修改'
   }else {
   // 新增模式
-    if(subData.value.length >1){
+    if(treeList.value.length >1){
     return '按回车批量保存'
   }else return '按回车保存'
 
