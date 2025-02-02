@@ -5,6 +5,7 @@
    <h4> isEnd.value: {{ isEnd }}</h4> 
    <h4> isChildId: {{ isChildId }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
+   <h4> isParentChild: {{ isParentChild }}</h4> 
   <el-button type="type" @click="addParent" size="small">新增</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
@@ -149,7 +150,7 @@ const isCheckboxDisabled = ref(false)
 
 const handleTest = (node,data) => {
   console.log(node,data)
-  handleAdd()
+  handleAdd(node,data)
   console.log(isEnd.value === data.id)
   // console.log(isLastAll(node,data))
   // console.log('是否是最后一个节点',data)
@@ -161,7 +162,7 @@ watch(treeList,() => {
      const children = treeList.value.find(item => item.pid != -1)
     //  找不到，说明没有子节点，就开启父节点的显示
     if(!children){
-      console.log('treeList没有子节点了...')
+      console.log('treeList没有子节点了------------------------------------------------------------------')
       isChild.value = false
       isEnd.value = null
     }
@@ -981,8 +982,13 @@ const batchAdd = (node, data) => {
 }
 
 const handleAdd = (node,data,isPublish) => {
-  if(isParentChild.value && isEnd.value) {
-    if(data.isParent){
+  /* if(isParentChild.value && isEnd.value) {
+      console.log('表达式1.1执行...')
+       return !isEdit.value  && isEnd.value === data.id
+} */
+
+if(isParentChild.value && isEnd.value) {
+    if(data.isParent != undefined ){
       console.log('表达式1.1执行...')
        return !isEdit.value && data.isSave && isChildId.value === data.id
     }else {
@@ -991,6 +997,7 @@ const handleAdd = (node,data,isPublish) => {
     }
   //  return  isNative.value ?!isEdit.value && data.isSave && isLastParentChild(node, data) : isEnd.value === data.id
 }
+
 
    
 
@@ -1504,7 +1511,8 @@ const  removeParentFilter  = (node,data) => {
      arr.push(node.data.id)
      console.log("arrarrarr",arr)
      filterArr = filterArr.filter(item => !arr.includes(item))
-     isChildId.value = findPrevSubCate()
+     const childrenIds = findPrevSubCate()
+     isChildId.value = childrenIds[childrenIds.length-1]
      console.log('最后的决战1',isChildId.value )
   }else {
     filterArr = filterArr.filter(item => item != data.id)
@@ -1526,7 +1534,7 @@ const findPrevSubCate = () => {
   console.log('pid不等于-1的',children )
   const childIds = filterArr.filter(item => children.includes(item))
   console.log('childIds',childIds)
-  return childIds[childIds.length-1]
+  return childIds
 
 }
 
