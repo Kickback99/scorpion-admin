@@ -2,7 +2,7 @@
  <!--  <div>
     <p>分类管理</p>
   </div> -->
-
+  <!-- <h4>{{ subData }}</h4> -->
   <el-button type="type" @click="addParent" size="small">新增</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
@@ -35,7 +35,7 @@
               确定按钮显示
               最后一个子节点
            -->
-        <el-button v-if="handleAdd(node,data)" 
+        <el-button v-if="handleAdd(node,data,false)" 
           style="margin-left: 8px"
         :icon="Plus"
         type="primary" circle plain size="small"
@@ -54,7 +54,7 @@
            -->
         <el-button 
         style="margin-left: 8px"
-        v-if="!isEdit ? handleAdd(node,data) : 
+        v-if="!isEdit ? handleAdd(node,data,true) : 
         (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
         :disabled="!isEdit?false:handleDisabled(data)"
         :icon="Check"
@@ -109,7 +109,7 @@
                     <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete"  circle plain/>
                 </template>
             </el-popconfirm> -->
-
+          <el-button @click="handleTest(node,data)">test</el-button>
       </span>
     </template>
   </el-tree>
@@ -142,12 +142,26 @@ const isDraggable  = ref(true)
 
 const isCheckboxDisabled = ref(false)
 
-const addParent = () => {
+// 父元素id
+const parentId = ref(null)
+
+const handleTest = (node,data) => {
+  console.log(node)
+  // console.log(isLastAll(node,data))
+  // console.log('是否是最后一个节点',data)
+
+} 
+
+
+
+const addParent = (node,data) => {
+  isParentChild.value = true
+  allShow.value = false
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
   isDraggable.value = false
-    // 生成一个新的唯一 ID
+  // 生成一个新的唯一 ID
     const newId = Date.now(); // 您可以根据实际情况使用其他方法生成唯一 ID
 
 // 创建一个新的父分类对象
@@ -155,18 +169,32 @@ const newParent = {
   id: newId,
   pid: -1, // 顶级分类的 pid 通常为 -1
   name: '', // 新增的父分类名称
-  children: [] // 初始化子节点为空数组
+  children: [], // 初始化子节点为空数组
+  flag: true,
+  isSave: false,
+  isCheck: false,
+  isReset: false,
+  isParent:true
 };
+
+subData.value.push({
+    subId: newId,
+    name: '',
+    pid: -1
+  })
+
+  nextTick(()=>{
+    focusInput(newId)
+  })
 
 // 将新的父分类对象添加到 cateData 中
 cateData.value.push(newParent);
 
-// 可选：展开新添加的父分类节点
-nextTick(() => {
-  // 假设您有一个方法来展开节点，这里需要根据实际情况实现
-  // expandNode(newId);
-});
+  category[newId] = ""
 
+  /* beforeCount = nativeData.length
+  console.log(beforeCount) */
+  parentId.value = newId
 }
 
 
@@ -435,7 +463,7 @@ const append = (node, data) => {
   data.children.push({
     id: newId,
     name: '',
-    children: null,
+    children: [],
     flag: true,
     isSave: false,
     isCheck: false,
@@ -452,7 +480,7 @@ const append = (node, data) => {
   nextTick(()=>{
     focusInput(newId)
   })
-
+  // 避免为undefined
   category[newId] = ""
 }
 // 当前编辑行
@@ -521,9 +549,108 @@ const disabledCheckboxes = () => {
   cateData.value = modifyDisabled(cateData.value,isCheckboxDisabled.value)
 }
 
+const handleParentBlur = (node,data) => {
+    console.log('到底是什么')
+    console.log(node)
+
+    
+    if (category[data.id]?.trim() === '') {
+   // 新增事件的空值处理
+      console.log('输入为空')
+      ElMessage.error('请输入内容')
+      if(!isNormal.value){
+        removeFilter(data.id)
+      }
+      // 移除新增的子节点
+      removeParentElement(node,data)
+      if(subData.value.length === 0){
+        console.log('有没有进入判断')
+        allShow.value = true
+        // t_reset：handleBlur初始化(新增模式)
+        isDraggable.value = true
+        const arr = handleExpand(node)
+        expandKey.value = [...arr]
+        // 启用复选框
+        // enabledCheckboxes()
+      }
+      isReturn.value = true
+      return;
+    }
+
+    const childrenList = handleAllNodes(node)
+
+    // 排除名字相同的子分类
+    const isDuplicate = childrenList.find(item => {
+      // 把自己排除
+      if (data.id != item.id) {
+        return item.name === category[data.id]
+      }
+
+    })
+
+    if (isDuplicate) {
+        if(!isNormal.value){
+          removeFilter(data.id)
+        }
+        console.log('filter-pop后',filterArr)
+        removeParentElement(node,data)
+        ElMessage.error('分类名不能重复')
+        isReturn.value = true
+        // isNormal.value = true
+    }else {
+      // 代码走到这里，说明非空并且不重复
+      filterArr.push(data.id)
+      console.log(filterArr,'filterArr')
+    }
+
+      // console.log(data)
+        // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
+        if (subData.value.length === 0) {
+          console.log('没有新增的元素')
+            // t_reset：handleBlur初始化(新增模式)
+            const arr = handleExpand(node)
+            expandKey.value = [...arr]
+          isDraggable.value = true
+          // 启用复选框
+          // enabledCheckboxes()
+          allShow.value = true
+          return;
+        }
+
+
+        console.log('是不是最后一个子节点',isLastChild(node,data))
+
+
+  // 更新子分类名称(针对新增模式，往 subData 数据赋值，提交服务器)
+  data.name = category[data.id]
+  const subItem = subData.value.find(item => item.subId === data.id)
+  if (subItem) {
+    subItem.name = data.name
+  }
+
+
+    setTimeout(() => {
+      // 隐藏输入框
+      data.flag = false
+      // 显示确定按钮
+      data.isSave = true
+      console.log('handleBlur',data)
+      // 显示虚拟修改按钮
+      data.isCheck = true
+      // 显示虚拟恢复按钮
+      data.isReset = true
+    }, 200);
+
+}
+
 
 const handleBlur = (node, data) => {
   isReturn.value = false
+
+  if(data.isParent || isParentChild.value){
+    handleParentBlur(node,data)
+    return;
+  }
   // console.log(node, data)
   // currentEditID.value = data.id
 
@@ -653,7 +780,8 @@ const handleBlur = (node, data) => {
     // console.log('push',sameArr)
 
   } else {
-    console.log(node.parent.data.children)
+    console.log('到底是什么')
+    console.log(node)
     // 排除名字相同的子分类
     const isDuplicate = node.parent.data.children.find(item => {
       // 把自己排除
@@ -731,12 +859,144 @@ const handleDuplicate = (data) => {
   data.isReset = false
   delete category[data.id]
 }
+// (data.isParent区分是父分类，isParentChild是父分类和子分类共有的)
+const isParentChild = ref(false)
 
-const handleAdd = (node,data) => {
+const isChild = ref(false)
+
+let count = 0;
+
+const isChildId = ref(null)
+
+// 批量添加子类
+const batchAddParentChild = (node,data) => {
+  isParentChild.value = true
+  count++
+  if(count <= 1){
+    isChild.value = true
+  }
+  const arr = node.level < 2  ?node.data.children : node.parent.data.children
+
+  console.log('node',node)
+  isDraggable.value = false
+  //禁用复选框
+  // modifyNodes(node.parent.data)
+  // disabledCheckboxes()
+  isNormal.value = true
+  isEnd.value = null 
+  const newId = Date.now()
+
+ 
+
+  // 向父节点的 children 数组中添加一个新的子节点
+    arr.push({
+    id: newId,
+    name: '',
+    children: null,
+    // 控制span和输入框的切换
+    flag: true,
+    // 控制确定按钮的切换
+    isSave: false,
+    // 控制修改的切换
+    isCheck: false,
+    // 控制关闭的切换
+    isReset: false,
+    disabled:isCheckboxDisabled.value
+  })
+
+  if(parentId.value === node.data.id){
+      subData.value.push({
+      subId: newId,
+      name: '',
+      pid: parentId.value
+    })
+  }
+  isChildId.value = newId
+
+
+  // node.parent.data.id
+
+  nextTick(()=>{
+    focusInput(newId)
+  })
+
+  category[newId] = ""
+}
+
+// 批量添加
+const batchAdd = (node, data) => {
+  if(isParentChild.value){
+    batchAddParentChild(node,data)
+    return;
+  }
+  console.log(node)
+  isDraggable.value = false
+  //禁用复选框
+  modifyNodes(node.parent.parent.data)
+  // disabledCheckboxes()
+  isNormal.value = true
+  isEnd.value = null 
+  const newId = Date.now()
+
+  // 向父节点的 children 数组中添加一个新的子节点
+  node.parent.data.children.push({
+    id: newId,
+    name: '',
+    children: null,
+    // 控制span和输入框的切换
+    flag: true,
+    // 控制确定按钮的切换
+    isSave: false,
+    // 控制修改的切换
+    isCheck: false,
+    // 控制关闭的切换
+    isReset: false,
+    disabled:isCheckboxDisabled.value
+  })
+
+  subData.value.push({
+    subId: newId,
+    name: '',
+    pid: node.parent.data.id
+  })
+
+  nextTick(()=>{
+    focusInput(newId)
+  })
+
+  category[newId] = ""
+}
+
+const handleAdd = (node,data,isPublish) => {
 
   if(isEnd.value) {
    return  isNative.value ?!isEdit.value && data.isSave && isLastChild(node, data) : isEnd.value === data.id
 }
+
+
+  if(isParentChild.value && !isPublish){
+
+    /*   if(isNormal.value) {
+        return (!isEdit.value && data.isSave && isLastAll(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node) && !nativeData.find(item => item.id == data.id))
+      }else return !isEdit.value && data.isSave && currentEditID.value === data.id */
+      
+      // 批量添加按钮(完成)
+      if(isNormal.value) {
+        return (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node,isPublish) && nativeData.find(item => item.id != data.id))
+      }else return !isEdit.value && data.isSave && currentEditID.value === data.id
+  }
+
+  if(isParentChild.value && isPublish){
+      // 提交服务器按钮
+      if(isNormal.value) {
+        if(isChild.value){
+          return !isEdit.value && data.isSave  && node.level > 1 && isChildId.value === data.id
+        }else return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish)
+        
+      }else return !isEdit.value && data.isSave && currentEditID.value === data.id
+  }
+
+
 
   if(isNormal.value){
     return !isEdit.value && data.isSave && isLastChild(node, data)
@@ -745,6 +1005,21 @@ const handleAdd = (node,data) => {
 
 const handleInclude = (id) => {
   return differentArr.some(item => item=== id)
+}
+
+const handleAllNodes = (node) => {
+  const arr = []
+  const children = node.level < 2?node.parent.data:node.parent.parent.data
+  children.forEach(item => {
+    arr.push(item)
+    if(item.children && item.children.length > 0){
+       item.children.forEach(item => {
+        arr.push(item)
+       })
+    }
+  })
+
+  return arr
 }
 
 const removeElement = (node,data,specific=false) => {
@@ -769,6 +1044,67 @@ const removeSpecificElement = (data) => {
     subData.value.splice(index,1)
   }
 }
+
+const removeParentRevert = (node,data) =>{
+    let arr = []
+   if(node.level < 2) {
+    const childrenId = node.data.children.map(item => item.id)
+     arr = [...childrenId]
+     arr.push(node.data.id)
+     arr.forEach(item => delete category[item])
+     subData.value = subData.value.filter(item => !arr.includes(item.subId))
+     console.log('subData.value',subData.value)
+   }else {
+     const cateItem = subData.value.find(item => item.id === data.id)
+     const index = subData.value.indexOf(cateItem)
+     if(index > -1){
+      subData.value.splice(index,1)
+      delete category[data.id]
+    }
+   }
+
+}
+
+const removeTreeNode = (node,data) => {
+    const arr = node.level < 2  ? node.parent.data :node.parent.data.children
+    let index;
+    if(node.level < 2) {
+      // 删除父节点，子节点会自动删除
+      index = arr.indexOf(data)
+    }else {
+      index = arr.indexOf(data)
+    }
+    arr.splice(index,1)
+}
+
+
+// 针对校验的父子分类删除
+const removeParentElement = (node,data) => {
+  // let afterCount
+  console.log(node.parent.data)
+  const childList = node.level < 2 ? node.parent.data:node.parent.data.children
+  console.log('childList',childList)
+  const index = childList.indexOf(data)
+  if(index > -1){
+    // 删除为空和重复的非法元素
+    // afterCount = childList.length-1
+    subData.value.pop()
+    childList.splice(index,1)
+    delete category[data.id]
+    console.log("删除为空和重复的非法元素")
+    // console.log(afterCount,'afterCount')
+    // return afterCount
+  }
+}
+
+// 删除 subData 指定的元素，针对handleRevert 新增模式
+/* const removeParentSpecificElement = (data) => {
+  const subCate = subData.value.find(item => item.subId === data.id)
+  const index = subData.value.indexOf(subCate)
+  if(index > -1){
+    subData.value.splice(index,1)
+  }
+} */
 
 
 
@@ -981,6 +1317,37 @@ const currentRevertId = ref(null)
 // 点击虚拟关闭按钮，确定按钮和批量添加按钮根据filterArr数组中的最后一个来显示
 const isEnd = ref(null)
 
+const handleParentRevert = (node,data) => {
+     // 移除filter数据(标记)
+     console.log('删除按钮',data.id)
+    removeParentFilter(node,data)
+
+    if(isNative.value){
+      console.log('正常模式的删除')
+    }else console.log('特殊模式的删除')
+
+  console.log('filter-pop后',filterArr)
+
+  // 移除subData数据(服务器)
+  removeParentRevert(node,data)
+  
+  // 移除新增的子节点(视图上)
+  removeTreeNode(node,data)
+  
+
+  // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
+  if (subData.value.length === 0) {
+    ElMessage.error('回到最原始的数据')
+    // t_reset：handleRevert初始化(新增模式)
+    isDraggable.value = true
+    const arr = handleExpand(node)
+    expandKey.value = [...arr]
+    // 启用复选框
+    // enabledCheckboxes()
+    allShow.value = true
+  }
+}
+
 const handleRevert = (e,node, data) => {
   e.stopPropagation()
   // 编辑还原数据的事件
@@ -1046,6 +1413,13 @@ const handleRevert = (e,node, data) => {
     return;
   }
 
+
+  if(isParentChild.value){
+    handleParentRevert(node,data)
+    return;
+  }
+  
+
     // 移除filter数据
     console.log('删除按钮',data.id)
     removeFilter(data.id)
@@ -1072,13 +1446,26 @@ const handleRevert = (e,node, data) => {
     const arr = handleExpand(node)
     expandKey.value = [...arr]
     // 启用复选框
-    enabledCheckboxes()
+    // enabledCheckboxes()
     allShow.value = true
   }
 }
 
+const  removeParentFilter  = (node,data) => {
+  let arr = []
+  if(node.level < 2){
+    const childrenId = node.data.children.map(item => item.id)
+     arr = [...childrenId]
+     arr.push(node.data.id)
+     console.log(arr)
+     filterArr = filterArr.filter(item => !arr.includes(item))
+  }else filterArr = filterArr.filter(item => item != data.id)
+
+  isEnd.value = filterArr[filterArr.length-1]
+
+}
+
 const removeFilter = (id) => {
-  console.log('走filter')
 filterArr = filterArr.filter(item => item != id)
 
   filterArr.forEach((item,index) => {
@@ -1144,54 +1531,58 @@ const handleInput = (node,data) => {
 
 }
 
+
 // 判断当前节点是否为最后一个子节点
 const isLastChild = (node, data) => {
   if (!node.parent) return false
   const children = node.parent.data.children
+  console.log('children',children)
   if (!children) return false
   return children.indexOf(data) === children.length - 1
 }
 
-
-// 批量添加
-const batchAdd = (node, data) => {
-  console.log(node)
-  isDraggable.value = false
-  //禁用复选框
-  modifyNodes(node.parent.parent.data)
-  // disabledCheckboxes()
-  isNormal.value = true
-  isEnd.value = null 
-  const newId = Date.now()
-
-  // 向父节点的 children 数组中添加一个新的子节点
-  node.parent.data.children.push({
-    id: newId,
-    name: '',
-    children: null,
-    // 控制span和输入框的切换
-    flag: true,
-    // 控制确定按钮的切换
-    isSave: false,
-    // 控制修改的切换
-    isCheck: false,
-    // 控制关闭的切换
-    isReset: false,
-    disabled:isCheckboxDisabled.value
-  })
-
-  subData.value.push({
-    subId: newId,
-    name: '',
-    pid: node.parent.data.id
-  })
-
-  nextTick(()=>{
-    focusInput(newId)
-  })
-
-  category[newId] = ""
+// 判断子节点或父节点在当前节点是否都为最后一个
+const isLastParentChild = (node, data) => {
+  if (!node.parent) return false
+  const children = data.isParent?node.parent.data:node.parent.data.children
+  console.log('children',children)
+  if (!children) return false
+  return children.indexOf(data) === children.length - 1
 }
+
+// 判断有没有children
+const isHasChildren = (node,isPublish) => {
+  if(node.level < 2){
+    // 以下两种方式都可以
+    //方式一：
+    // return node.data.children.length === 0
+    //方式二： 该节点是否为叶子节点，也就是没有子节点的节点
+    return node.isLeaf
+  }
+
+  return isPublish?true:false
+}
+
+// 判断子节点或者父节点在所有节点是否都为最后一个
+const isLastAll = (node, data) => {
+  if(node.level < 2) {
+    const children = node.parent.data
+    return children.indexOf(data) === children.length-1
+  }else {
+    const children =  node.parent.parent.data
+    let arr = [];
+    children.forEach(item => {
+      if(item.children && item.children.length > 0 ){
+        item.children.forEach(item => {
+          arr.push(item)
+        })
+      }
+    })
+    return arr.indexOf(data) === arr.length-1
+  }
+}
+
+
 
 const handleComment = () => {
 
