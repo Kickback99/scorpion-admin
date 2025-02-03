@@ -173,6 +173,7 @@ const handleTest = (node,data) => {
 const addParent = (node,data) => {
   isParentChild.value = true
   allShow.value = false
+  isHasChild.value = false
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
@@ -911,9 +912,10 @@ const isChildId = ref(null)
 const batchAddParentChild = (node,data) => {
   console.log("data.id",data.id)
   isParentChild.value = true
-
+  isHasChild.value = false
   isChildId.value = null
-
+  isNormal.value = true
+  isEnd.value = null 
   node.expanded = true
   /* if(isChild.value){
     isChild.value = false
@@ -928,8 +930,7 @@ const batchAddParentChild = (node,data) => {
   //禁用复选框
   // modifyNodes(node.parent.data)
   // disabledCheckboxes()
-  isNormal.value = true
-  isEnd.value = null 
+
   const newId = Date.now()
 
  
@@ -1016,20 +1017,15 @@ const handleAdd = (node,data,isPublish) => {
 } */
 // 针对添加父子分类：
 if(isParentChild.value && isEnd.value || isHasChild.value) {
-    
-    if(isNormal.value){
-        if(isHasChild.value){
-        return isChildId.value  === data.id
-      }else return isEnd.value === data.id
-    }else {
-      if(isPublish) {
-        if(isHasChild.value){
-         return isChildId.value  === data.id
-        }else return isEnd.value === data.id
-      }else {
-        (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node,isPublish) && nativeData.find(item => item.id != data.id))
-      }
-    }
+
+
+  if (isPublish) {
+    if (isHasChild.value) {
+      return isChildId.value === data.id
+    } else return isEnd.value === data.id
+  } else {
+    (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node, data)) || (!isEdit.value && data.isSave && isHasChildren(node, isPublish) && nativeData.find(item => item.id != data.id))
+  }
 
     /* if(data.isParent != undefined ){
       console.log('表达式1.1执行...')
@@ -1417,7 +1413,6 @@ const isEnd = ref(null)
 const isHasChild = ref(false)
 
 const handleParentRevert = (node,data) => {
-
         // isChild.value = true
 
        // 移除filter数据(标记)
