@@ -195,7 +195,7 @@ const newParent = {
 };
 
 treeList.value.push({
-    subId: newId,
+    cate_id: newId,
     name: '',
     pid: -1
   })
@@ -488,7 +488,7 @@ const append = (node, data) => {
   })
 
   treeList.value.push({
-    subId: newId,
+    cate_id: newId,
     name: '',
     pid: data.id
   })
@@ -662,7 +662,7 @@ const handleParentBlur = (node,data) => {
 
   // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
   data.name = category[data.id]
-  const subItem = treeList.value.find(item => item.subId === data.id)
+  const subItem = treeList.value.find(item => item.cate_id === data.id)
   if (subItem) {
     subItem.name = data.name
   }
@@ -869,7 +869,7 @@ const handleBlur = (node, data) => {
 
   // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
   data.name = category[data.id]
-  const subItem = treeList.value.find(item => item.subId === data.id)
+  const subItem = treeList.value.find(item => item.cate_id === data.id)
   if (subItem) {
     subItem.name = data.name
   }
@@ -953,7 +953,7 @@ const batchAddParentChild = (node,data) => {
 
   // console.log('parentId',parentId)
   treeList.value.push({
-      subId: newId,
+      cate_id: newId,
       name: '',
       pid: parentId
     })
@@ -998,7 +998,7 @@ const batchAdd = (node, data) => {
   })
 
   treeList.value.push({
-    subId: newId,
+    cate_id: newId,
     name: '',
     pid: node.parent.data.id
   })
@@ -1083,7 +1083,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
   }
 
 
-  if(isNormal.value){
+  if(!isParentChild.value && isNormal.value){
     // console.log('表达式4.1执行...')
     return !isEdit.value && data.isSave && isLastChild(node, data)
   }else {
@@ -1127,7 +1127,7 @@ const removeElement = (node,data,specific=false) => {
 
 // 删除 treeList 指定的元素，针对handleRevert
 const removeSpecificElement = (data) => {
-  const subCate = treeList.value.find(item => item.subId === data.id)
+  const subCate = treeList.value.find(item => item.cate_id === data.id)
   const index = treeList.value.indexOf(subCate)
   if(index > -1){
     treeList.value.splice(index,1)
@@ -1142,10 +1142,10 @@ const removeParentRevert = (node,data) =>{
      arr.push(node.data.id)
      console.log('arr',arr)
      arr.forEach(item => delete category[item])
-     treeList.value = treeList.value.filter(item => !arr.includes(item.subId))
+     treeList.value = treeList.value.filter(item => !arr.includes(item.cate_id))
      console.log('treeList.value',treeList.value)
    }else {
-     const cateItem = treeList.value.find(item => item.subId === data.id)
+     const cateItem = treeList.value.find(item => item.cate_id === data.id)
      console.log('cateItem',cateItem)
      const index = treeList.value.indexOf(cateItem)
      if(index > -1){
@@ -1190,7 +1190,7 @@ const removeParentElement = (node,data) => {
 
 // 删除 treeList 指定的元素，针对handleRevert 新增模式
 /* const removeParentSpecificElement = (data) => {
-  const subCate = treeList.value.find(item => item.subId === data.id)
+  const subCate = treeList.value.find(item => item.cate_id === data.id)
   const index = treeList.value.indexOf(subCate)
   if(index > -1){
     treeList.value.splice(index,1)
@@ -1266,15 +1266,70 @@ const handleEdit = (node, data) => {
   console.log('data',data)
 }
 
+const handleBatchSave = async() => {
+  try {
+      
+  const parentList = treeList.value.filter(item => item.pid === -1 )
+  const childList = treeList.value.filter(item => item.pid != -1)
+  const newParents = parentList.map((item,index) => ({
+    ...item,
+    cateId:item.cate_id + ''
+  }))
+
+  // 提交添加父分类请求
+  await addApi(newParents)
+
+  if(findPrevSubCate().length === 0 ) {
+    console.log('没有子节点了？')
+    ElMessage.success('添加成功')
+    return;
+  }
+
+  // 提交查询父分类请求
+  const cateIds = newParents.map(item => item.cateId)
+  const res = await listApi(cateIds+'') //要把它转成json串数组
+  // const res = await listApi(cateIds) //这样传会报错
+  console.log(res.data)
+
+  const parentMap = res.reduce((cate,item) => {
+    cate[item.cate_id] = item.id
+    return cate
+  },{})
+
+  console.log("parentMap",parentMap)
+
+   const updateChildren = childList.map( item=> ({
+    name:item.name,
+    pid: parentMap[item.pid],
+  }))
+
+  console.log("updateChildren",updateChildren)
+   
+  // 提交添加子分类请求
+  /* await addApi(updateChildren)
+  ElMessage.success('添加成功')
+  allShow.value = true
+  render() */
+  } catch (error) {
+    ElMessage.error(error)
+    // 根据需要处理错误，例如显示错误消息或回滚操作
+  }
+
+}
 
 
 const handleSave = async (e, node, data) => {
   data.isSave = false
   e.stopPropagation()
   /* const newtreeList = treeList.value.map(item =>{
-      delete item.subId
+      delete item.cate_id
       return {...item}
   }) */
+  if(isParentChild.value){
+    handleBatchSave(node,data)
+    return;
+  }
+  
 
   //编辑事件的提交
   if (isEdit.value) {
@@ -1637,7 +1692,7 @@ const findPrevSubCate = () => {
   const children = []
   treeList.value.forEach((item) => {
       if(item.pid != -1){
-        children.push(item.subId) 
+        children.push(item.cate_id) 
       }
   })
   const childIds = filterArr.filter(item => children.includes(item))
