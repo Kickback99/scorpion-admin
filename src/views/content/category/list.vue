@@ -153,7 +153,7 @@ const isCheckboxDisabled = ref(false)
 
 
 const handleTest = (node,data) => {
-  console.log(node)
+  console.log(handleAdd(node,data))
 
 } 
 
@@ -587,6 +587,7 @@ const handleParentBlur = (node,data) => {
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
         isDraggable.value = true
+        isHasChild.value = false
         const arr = handleExpand(node)
         expandKey.value = [...arr]
         isParentChild.value = false
@@ -653,6 +654,7 @@ const handleParentBlur = (node,data) => {
             isChild.value = false
             isChildId.value = null
             isDraggable.value = true
+            isHasChild.value = false
           // 启用复选框
           // enabledCheckboxes()
           allShow.value = true
@@ -1017,11 +1019,21 @@ const handleAdd = (node,data,isPublish) => {
        return !isEdit.value  && isEnd.value === data.id
 } */
 // 针对添加父子分类：
-if(isParentChild.value && isEnd.value) {
-
-    if(isHasChild.value){
-      return isChildId.value  === data.id
-    }else return isEnd.value === data.id
+if(isParentChild.value && isEnd.value || isHasChild.value) {
+    
+    if(isNormal.value){
+        if(isHasChild.value){
+        return isChildId.value  === data.id
+      }else return isEnd.value === data.id
+    }else {
+      if(isPublish) {
+        if(isHasChild.value){
+         return isChildId.value  === data.id
+        }else return isEnd.value === data.id
+      }else {
+        (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)) || (!isEdit.value && data.isSave && isHasChildren(node,isPublish) && nativeData.find(item => item.id != data.id))
+      }
+    }
 
     /* if(data.isParent != undefined ){
       console.log('表达式1.1执行...')
@@ -1052,11 +1064,13 @@ if(isParentChild.value && isEnd.value) {
   if(isParentChild.value && isPublish){
       // 提交服务器按钮
       if(isNormal.value) {
+        // 控制子节点
         if(isChild.value){
           // console.log('表达式3.1执行...')
           // 一旦添加了子分类(非空且不重复)，会走这个表达式
           return !isEdit.value && data.isSave  && node.level > 1 && isChildId.value === data.id
         }else {
+          // 控制父节点
           // console.log('表达式3.2执行...')
           // watch 监视到了没有子节点，会走这个表达式
           // 添加父分类(没有添加子分类)的时候也会走这个表达
@@ -1379,6 +1393,8 @@ const handleCheck = (data) => {
     data.isSave = false
     isNormal.value = false
     isNative.value = false
+    // 针对父子分类模式
+    isHasChild.value = false
     
   }
   data.isCheck = false
