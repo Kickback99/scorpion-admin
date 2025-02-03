@@ -4,6 +4,7 @@
   </div> -->
    <h4> isEnd.value: {{ isEnd }}</h4> 
    <h4> isChildId: {{ isChildId }}</h4> 
+   <h4> currentEditID {{ currentEditID }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
    <h4> isParentChild: {{ isParentChild }}</h4> 
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
@@ -576,7 +577,7 @@ const handleParentBlur = (node,data) => {
           // 说明没有子节点
           isChild.value = false
           isTryChild.value = false
-        }
+        }else isChildId.value = filterArr[filterArr.length-1]
       if(!isNormal.value){
         removeParentFilter(node,data)
       }
@@ -615,7 +616,7 @@ const handleParentBlur = (node,data) => {
           // 说明没有子节点
           isChild.value = false
           isTryChild.value = false
-        }
+        }else isChildId.value = filterArr[filterArr.length-1]
         if(!isNormal.value){
           removeParentFilter(node,data)
         }
@@ -913,15 +914,15 @@ const batchAddParentChild = (node,data) => {
   console.log("data.id",data.id)
   isParentChild.value = true
 
-  isTryChild.value = true
+  isChildId.value = null
 
   node.expanded = true
-  if(isChild.value){
+  /* if(isChild.value){
     isChild.value = false
-  }
-/*   if(!isChild.value){
-    isChild.value = true
   } */
+  if(!isChild.value){
+    isChild.value = true
+  }
   const arr = node.level < 2  ?node.data.children : node.parent.data.children
   const parentId = node.level < 2 ? node.data.id :node.parent.data.id
 
@@ -1059,7 +1060,7 @@ if(isParentChild.value && isEnd.value) {
           // console.log('表达式3.2执行...')
           // watch 监视到了没有子节点，会走这个表达式
           // 添加父分类(没有添加子分类)的时候也会走这个表达
-          return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish) 
+          return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish) && !isTryChild.value
         }
         
       }else {
