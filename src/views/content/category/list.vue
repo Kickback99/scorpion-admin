@@ -576,7 +576,6 @@ const handleParentBlur = (node,data) => {
         console.log("输入为空，没有子节点",findPrevSubCate())
           // 说明没有子节点
           isChild.value = false
-          isTryChild.value = false
         }else isChildId.value = filterArr[filterArr.length-1]
       if(!isNormal.value){
         removeParentFilter(node,data)
@@ -616,7 +615,6 @@ const handleParentBlur = (node,data) => {
           console.log("输入重复，没有子节点",findPrevSubCate())
           // 说明没有子节点
           isChild.value = false
-          isTryChild.value = false
         }else isChildId.value = filterArr[filterArr.length-1]
         if(!isNormal.value){
           removeParentFilter(node,data)
@@ -637,7 +635,6 @@ const handleParentBlur = (node,data) => {
           // 说明有子节点
           console.log("有子节点",findPrevSubCate())
           isChild.value = true
-          isTryChild.value = true
         }
       console.log('push',filterArr)
       // console.log("isChildId.value",isChildId.value)
@@ -909,7 +906,6 @@ const isChild = ref(false)
 
 const isChildId = ref(null)
 
-const isTryChild = ref(false)
 
 // 批量添加子类
 const batchAddParentChild = (node,data) => {
@@ -1074,7 +1070,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
           // console.log('表达式3.2执行...')
           // watch 监视到了没有子节点，会走这个表达式
           // 添加父分类(没有添加子分类)的时候也会走这个表达
-          return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish) && !isTryChild.value
+          return !isEdit.value && data.isSave && isLastAll(node,data) && isHasChildren(node,isPublish) 
         }
         
       }else {
