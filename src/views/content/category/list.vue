@@ -6,7 +6,7 @@
    <h4> isChildId: {{ isChildId }}</h4> 
    <h4> currentEditID {{ currentEditID }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
-   <h4> isSameParent: {{ isSameParent }}</h4> 
+   <h4> isBig: {{ isBig }}</h4> 
    <h4> isParentChild: {{ isParentChild }}</h4> 
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
@@ -154,10 +154,7 @@ const isCheckboxDisabled = ref(false)
 
 
 const handleTest = (node,data) => {
-  console.log(isChildId.value)
-  console.log(node.parent.data.children)
-  const flag = node.parent.data.children.some(item => item.id == isChildId.value)
-  console.log(flag)
+  console.log(filterArr)
 } 
 
 /* watch(treeList,() => {
@@ -969,10 +966,6 @@ const batchAddParentChild = (node,data) => {
   category[newId] = ""
 }
 
-const showBatchAdd = () => {
-
-}
-
 // 批量添加
 const batchAdd = (node, data) => {
   if(isParentChild.value){
@@ -1028,7 +1021,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
 
   if (isPublish) {
     if (isHasChild.value) {
-      return isChildId.value === data.id
+      return showParent(node,data)
     } else return isEnd.value === data.id
   } else {
     return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node, isPublish) && nativeData.find(item => item.id != data.id))
@@ -1188,7 +1181,7 @@ const removeParentElement = (node,data) => {
   if(index > -1){
     // 删除为空和重复的非法元素
     // afterCount = childList.length-1
-    treeList.value.pop()
+    treeList.value.splice(index,1)
     childList.splice(index,1)
     delete category[data.id]
     console.log("删除为空和重复的非法元素")
@@ -1437,8 +1430,7 @@ const findParentId = (id) => {
 };
 
 
-const lastParentId = ref(null)
-
+const isBig = ref(false)
 
 const handleCheck = (node,data) => {
   data.flag = true
@@ -1453,6 +1445,10 @@ const handleCheck = (node,data) => {
     isNative.value = false    
     data.isCheck = false
     data.isReset = false
+
+    if(node.level < 2){
+      isBig.value = true
+    }else isBig.value = false
 
     nextTick(() => {
       focusInput(data.id)
@@ -1512,6 +1508,12 @@ const handleChildToggle = (node,data) => {
   if(isHasChild.value) {
     const flag = node.parent.data.children.some(item => item.id == isChildId.value)
     return flag?isChildId.value === data.id : isLastParentChild(node,data)
+  }
+
+  if(isBig.value) {
+    if(node.parent.data.id === currentEditID.value){
+        return currentEditID.value === data.id
+    }
   }
 
     if(isChild.value){
@@ -1708,7 +1710,7 @@ const  removeParentFilter  = (node,data) => {
       filterArr = filterArr.filter(item => !arr.includes(item))
     }
   }
-
+  console.log("最终filterArr",filterArr)
   const childrenIds = findPrevSubCate()
   // 先判断有没有子节点，没有的话，就给isEnd赋值，否则有子节点，就给isChildId赋值
   if (childrenIds.length === 0) {
