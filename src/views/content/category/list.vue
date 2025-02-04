@@ -1057,7 +1057,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         // console.log('表达式2.2执行...')
         // 特殊模式(虚拟修改)
         
-        return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node,isPublish) && nativeData.find(item => item.id != data.id))
+        return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleIsNormalParent(node,isPublish) && nativeData.find(item => item.id != data.id))
         // return (!isEdit.value && data.isSave && !data.isParent && handleToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node,isPublish) && nativeData.find(item => item.id != data.id))
       }
   }
@@ -1439,7 +1439,6 @@ const findParentId = (id) => {
 
 const lastParentId = ref(null)
 
-const isSameParent = ref(false)
 
 const handleCheck = (node,data) => {
   data.flag = true
@@ -1458,32 +1457,6 @@ const handleCheck = (node,data) => {
     nextTick(() => {
       focusInput(data.id)
     })
-    isSameParent.value = true
-    if(node.level > 1 && isChild.value){
-    const currentParentId = findParentId()
-    console.log("currentParentId",currentParentId)
-
-    // 如果是第一次操作，记录父分类 ID 并返回 true
-    if (lastParentId.value === null) {
-      lastParentId.value = currentParentId;
-      console.log('第一次lastParentId.value',lastParentId.value )
-      return;
-      // lastAppendId.value = appendId.value;
-    }
-
-    // 比较当前父分类 ID 与上一次操作的父分类 ID
-    if (lastParentId.value === currentParentId) {
-      // 属于同一个父分类，更新 lastAppendId 并返回 true
-      // lastAppendId.value = appendId.value;
-      console.log('第二次lastParentId.value',lastParentId.value )
-      console.log('currentParentId',currentParentId)
-      isSameParent.value = true
-    } else {
-      // 不属于同一个父分类，返回 false
-      isSameParent.value = false
-      lastParentId.value = currentParentId
-    }
-    }
 
     }
 
@@ -1529,6 +1502,7 @@ const handleParentToggle = (node,isPublish) => {
       return node.expanded?false:true
     }
   }
+
   return isPublish?true:false
 
 }
@@ -1550,6 +1524,15 @@ const handleChildToggle = (node,data) => {
     
 }
 
+const handleIsNormalParent = (node,data) => {
+   if(node.isLeaf && node.level < 2){
+      return true
+   }
+
+   if(node.level < 2){
+      return currentEditID.value === data.id
+   }
+}
 
 // 聚焦输入框的函数
 const focusInput = (id) => {
