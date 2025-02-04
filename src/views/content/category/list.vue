@@ -1024,7 +1024,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
       return isChildId.value === data.id
     } else return isEnd.value === data.id
   } else {
-    (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node, data)) || (!isEdit.value && data.isSave && isHasChildren(node, isPublish) && nativeData.find(item => item.id != data.id))
+    return (!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node, data)) || (!isEdit.value && data.isSave && isHasChildren(node, isPublish) && nativeData.find(item => item.id != data.id))
   }
 
     /* if(data.isParent != undefined ){
