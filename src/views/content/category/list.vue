@@ -1057,7 +1057,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         // console.log('表达式2.2执行...')
         // 特殊模式(虚拟修改)
         
-        return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleIsNormalParent(node,isPublish) && nativeData.find(item => item.id != data.id))
+        return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleIsNormalParent(node,data) && nativeData.find(item => item.id != data.id))
         // return (!isEdit.value && data.isSave && !data.isParent && handleToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node,isPublish) && nativeData.find(item => item.id != data.id))
       }
   }
