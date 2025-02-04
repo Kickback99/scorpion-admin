@@ -1544,7 +1544,6 @@ const focusInput = (id) => {
 }
 
 
-const currentRevertId = ref(null)
 
 // 点击虚拟关闭按钮，确定按钮和批量添加按钮根据filterArr数组中的最后一个来显示
 const isEnd = ref(null)
