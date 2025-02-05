@@ -1073,7 +1073,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         
       }else {
         // console.log('表达式3.3执行...')
-        return !isEdit.value && data.isSave && currentEditID.value === data.id
+        return !isEdit.value && data.isSave && handleParent(node,data)
       }
   }
 
@@ -1481,6 +1481,18 @@ const handleCheck = (node,data) => {
   })
 }
 
+const handleParent = (node,data) => {
+  
+   if(node.level < 2 && !node.isLeaf){
+
+    const flag = node.data.children.some(item => item.id === currentEditID.value)
+
+    if(flag || data.id === currentEditID.value){
+      return node.expanded?currentEditID.value === data.id:true
+    }
+
+   }else return currentEditID.value === data.id
+}
 
 // 判断有没有children
 const handleParentToggle = (node,isPublish) => {
