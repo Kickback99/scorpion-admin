@@ -1543,8 +1543,8 @@ const handleIsNormalParent = (node,data) => {
       return true
    }
 
-   if(node.level < 2){
-      return currentEditID.value === data.id
+   if(node.level < 2 && !node.isLeaf){
+      return node.expanded?currentEditID.value === data.id:true
    }
 }
 
