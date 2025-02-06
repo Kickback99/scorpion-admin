@@ -1481,6 +1481,7 @@ const handleCheck = (node,data) => {
   })
 }
 
+// 处理确定按钮的折叠
 const handleParent = (node,data) => {
   
    if(node.level < 2 && !node.isLeaf){
@@ -1538,6 +1539,7 @@ const handleChildToggle = (node,data) => {
     
 }
 
+// 处理添加按钮的折叠
 const handleIsNormalParent = (node,data) => {
    if(node.isLeaf && node.level < 2){
       return true
@@ -1882,7 +1884,7 @@ const isLastParentChild = (node, data) => {
 }
 
 
-
+//处理确定按钮的折叠
 const showParent = (node,data) => {
   if(node.level < 2 ){
     const result = node.data.children.some(item => item.id === isChildId.value)
