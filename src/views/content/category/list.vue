@@ -155,8 +155,10 @@ const isCheckboxDisabled = ref(false)
 
 
 const handleTest = (node,data) => {
-  const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
-  console.log(flag)
+  /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
+  console.log(flag) */
+
+  console.log(handleIsEndLeafParent(node,data))
 } 
 
 /* watch(treeList,() => {
@@ -176,7 +178,10 @@ const addParent = (node,data) => {
   isParentChild.value = true
   allShow.value = false
   isHasChild.value = false
+  currentEditID.value = null
+  isChildId.value = null 
   isEnd.value = null
+  isEndParent.value = true
   // isNative.value = true
   isNormal.value = true
   isDraggable.value = false
@@ -581,6 +586,9 @@ const handleParentBlur = (node,data) => {
           // 说明没有子节点
           isChild.value = false
         }else isChildId.value = children[children.length - 1]
+      if(node.level > 1 && findPrevSubCate().length === 0){
+        isEndParent.value = true
+      }
       if(!isNormal.value){
         removeParentFilter(node,data)
       }
@@ -620,6 +628,9 @@ const handleParentBlur = (node,data) => {
           // 说明没有子节点
           isChild.value = false
         }else isChildId.value = children[children.length - 1]
+        if(node.level > 1 && findPrevSubCate().length === 0){
+        isEndParent.value = true
+        }
         if(!isNormal.value){
           removeParentFilter(node,data)
         }
@@ -638,6 +649,9 @@ const handleParentBlur = (node,data) => {
           // 说明有子节点
           console.log("有子节点",findPrevSubCate())
           isChild.value = true
+        }
+        if(findPrevSubCate().length > 0 && node.level > 1){
+          isEndParent.value = false
         }
       console.log('push',filterArr)
       // console.log("isChildId.value",isChildId.value)
@@ -909,6 +923,8 @@ const isChild = ref(false)
 
 const isChildId = ref(null)
 
+const isEndParent = ref(true)
+
 
 // 批量添加子类
 const batchAddParentChild = (node,data) => {
@@ -916,6 +932,7 @@ const batchAddParentChild = (node,data) => {
   isParentChild.value = true
   isHasChild.value = false
   isChildId.value = null
+  isEndParent.value = false
   isNormal.value = true
   isNative.value = true
   isEnd.value = null 
@@ -1065,7 +1082,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         if(isChild.value){
           // console.log('表达式3.1执行...')
           // 一旦添加了子分类(非空且不重复)，会走这个表达式
-          return !isEdit.value && data.isSave  && showParent(node,data)
+          return (!isEdit.value && data.isSave  && showParent(node,data)) || (data.isSave && handleLastParent(node,data))
         }else {
           // 控制父节点
           // console.log('表达式3.2执行...')
@@ -1076,7 +1093,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         
       }else {
         // console.log('表达式3.3执行...')
-        return !isEdit.value && data.isSave && handleParent(node,data)
+        return (!isEdit.value && data.isSave && handleParent(node,data)) || (data.isSave && handleLastParent(node,data))
       }
   }
 
@@ -1751,7 +1768,19 @@ const  removeParentFilter  = (node,data) => {
     isHasChild.value = true
     isChildId.value = childrenIds[childrenIds.length - 1]
   }
-    
+  
+  /* const isEndLeafParent = handleIsEndLeafParent(node,data)
+  if(isEndLeafParent && isHasChild.value){
+    isChildId.value = null
+    isEndParent.value = true
+  }else {
+    isEndParent.value = false
+    if(childrenIds.length && childrenIds.length > 0) {
+      isChildId.value = childrenIds[childrenIds.length - 1]
+    }
+  } */
+  
+
   // 处理菜单展开
   handleCollapse(node,isChildId.value)
 
@@ -1798,7 +1827,15 @@ const handleCollapse = (node,id) => {
 
 
 
-
+const  handleIsEndLeafParent = (node,dta) => {
+  const arr = node.level < 2 ?node.parent.data : node.parent.parent.data
+ for (let i = 0; i < arr.length; i++) {
+  if(i === arr.length -1){
+      return arr[i].children && arr[i].children.length > 1 ? false : true
+    }
+ }
+  
+}
 
 
 
@@ -1990,6 +2027,13 @@ const isLastAll = (node, data) => {
   }
 }
 
+
+const handleLastParent = (node,data) => {
+  if(node.level < 2 && isEndParent.value){
+    const  parents = node.parent.data
+    return parents.indexOf(data) === parents.length - 1 && node.isLeaf
+  }
+}
 
 
 const handleComment = () => {
