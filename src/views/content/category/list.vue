@@ -1027,7 +1027,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
       return showParent(node,data)
     } else return isEnd.value === data.id
   } else {
-    return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node, isPublish) && nativeData.find(item => item.id != data.id))
+    return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node, data) && nativeData.find(item => item.id != data.id))
   }
 
     /* if(data.isParent != undefined ){
@@ -1510,7 +1510,13 @@ const handleParentToggle = (node,data) => {
     if(!isNative.value) {
       if(node.isLeaf){
         return true
-      }else return currentEditID.value === data.id
+      }else {
+        if(node.expanded) {
+          return isHasChild.value?isChildId.value === data.id:currentEditID.value === data.id
+        }
+        return true
+      
+      }
 
     }else {
 
@@ -1927,11 +1933,28 @@ const isActive = (node,data) => {
 const showParent = (node,data) => {
 
   if(!isNative.value){
-    if(node.level < 2){
-      return currentEditID.value === data.id
+    if(isHasChild.value){
+      if(node.level < 2) {
+        const result = node.data.children.some(item => item.id === isChildId.value)
+        if(result){
+          return node.expanded?isChildId.value === data.id:true
+        }
+      }else {
+        return isChildId.value === data.id
+      }
+
+
     }else {
-      const flag = node.parent.data.children.some(item => item.id === currentEditID.value)
-      if(flag) return currentEditID.value === data.id
+
+      if(node.level < 2){
+        const result = node.data.children.some(item => item.id === currentEditID.value)
+        if(result || currentEditID.value === data.id){
+          return node.expanded?currentEditID.value === data.id:true
+        }
+      }else {
+        return currentEditID.value === data.id 
+      }
+
     }
   }else {
     if(node.level < 2 ){
