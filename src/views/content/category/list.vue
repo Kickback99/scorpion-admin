@@ -158,7 +158,7 @@ const handleTest = (node,data) => {
   /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
   console.log(flag) */
 
-  console.log(handleIsEndLeafParent(node,data))
+  console.log(node)
 } 
 
 /* watch(treeList,() => {
