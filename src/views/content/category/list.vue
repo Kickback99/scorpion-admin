@@ -2,7 +2,7 @@
  <!--  <div>
     <p>分类管理</p>
   </div> -->
-   <h4> isEnd.value: {{ isEnd }}</h4> 
+ <!--   <h4> isEnd.value: {{ isEnd }}</h4> 
    <h4> isChildId: {{ isChildId }}</h4> 
    <h4> currentEditID {{ currentEditID }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
@@ -10,8 +10,9 @@
    <h4> isParentChild: {{ isParentChild }}</h4> 
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
-   <h4> isNative(原生): {{ isNative }}</h4> 
+   <h4> isNative(原生): {{ isNative }}</h4>  -->
   <el-button type="type" @click="addParent" size="small">新增</el-button>
+  <el-button type="type" @click="handleReset" size="small">重置</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
@@ -174,7 +175,7 @@ const handleTest = (node,data) => {
 },{deep:true}) */
 
 
-const addParent = (node,data) => {
+const addParent = () => {
   isParentChild.value = true
   allShow.value = false
   isHasChild.value = false
@@ -207,14 +208,28 @@ treeList.value.push({
     pid: -1
   })
 
-  nextTick(()=>{
-    focusInput(newId)
-  })
+
 
 // 将新的父分类对象添加到 cateData 中
 cateData.value.push(newParent);
 
   category[newId] = ""
+
+
+  nextTick(() => {
+    focusInput(newId)
+    if (!category[newId].trim()) {
+      const node = treeRef.value.getNode(newId)
+      console.log('开始添加', node)
+      if (node) {
+        modifyNodes(node.parent.data)
+      }
+    }
+  })
+
+  
+
+
 
   /* beforeCount = nativeData.length
   console.log(beforeCount) */
@@ -605,7 +620,7 @@ const handleParentBlur = (node,data) => {
         isChild.value = false
         isChildId.value = null
         // 启用复选框
-        // enabledCheckboxes()
+        enabledCheckboxes()
       }
       isReturn.value = true
       return;
@@ -670,7 +685,7 @@ const handleParentBlur = (node,data) => {
             isDraggable.value = true
             isHasChild.value = false
           // 启用复选框
-          // enabledCheckboxes()
+          enabledCheckboxes()
           allShow.value = true
           return;
         }
@@ -1192,7 +1207,7 @@ const removeTreeNode = (node,data) => {
 
 
 // 针对校验的父子分类删除
-const removeParentElement = (node,data) => {
+/* const removeParentElement = (node,data) => {
   // let afterCount
   console.log(node.parent.data)
   const childList = node.level < 2 ? node.parent.data:node.parent.data.children
@@ -1207,6 +1222,29 @@ const removeParentElement = (node,data) => {
     console.log("删除为空和重复的非法元素")
     // console.log(afterCount,'afterCount')
     // return afterCount
+  }
+} */
+
+
+const removeParentElement = (node,data) => {
+  // let afterCount
+  console.log(node.parent.data)
+  const childList = node.level < 2 ? node.parent.data:node.parent.data.children
+  console.log('childList',childList)
+  const index = childList.indexOf(data)
+  if(index > -1){
+    // 删除为空和重复的非法元素
+    // afterCount = childList.length-1
+    childList.splice(index,1)
+    delete category[data.id]
+    console.log("删除为空和重复的非法元素")
+    // console.log(afterCount,'afterCount')
+    // return afterCount
+  }
+
+  const index1 = treeList.value.findIndex(item => item.cate_id === data.id)
+  if(index1 !== -1){
+    treeList.value.splice(index1,1)
   }
 }
 
@@ -1442,12 +1480,12 @@ const isNormal = ref(true)
 const isNative = ref(true)
 
 
-const findParentId = (id) => {
+/* const findParentId = (id) => {
     for (const item of treeList.value) {
       if(item.cate_id === id)
       return item.pid
     }
-};
+}; */
 
 
 const isBig = ref(false)
@@ -1631,7 +1669,7 @@ const handleParentRevert = (node,data) => {
     isChild.value = false
     isChildId.value = null
     // 启用复选框
-    // enabledCheckboxes()
+    enabledCheckboxes()
     allShow.value = true
   }
 }
@@ -2035,6 +2073,27 @@ const handleLastParent = (node,data) => {
   }
 }
 
+const handleReset = () => {
+  render()
+  isDraggable.value = true
+  allShow.value = true
+  isCheckboxDisabled.value = false
+  isParentChild.value = false
+  isChild.value = false
+  isEndParent.value = true
+  isHasChild.value = false
+  isEnd.value = null
+  isLast.value = null
+  isBig.value = false
+  isChildId.value = null
+  currentEditID.value = null
+  isNormal.value = true
+  isNative.value = true
+  isReturn.value = false
+  treeList.value = []
+  differentArr.splice(0)
+  filterArr.splice(0)
+}
 
 const handleComment = () => {
 
