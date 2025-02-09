@@ -2,7 +2,7 @@
  <!--  <div>
     <p>分类管理</p>
   </div> -->
- <!--   <h4> isEnd.value: {{ isEnd }}</h4> 
+   <h4> isEnd.value: {{ isEnd }}</h4> 
    <h4> isChildId: {{ isChildId }}</h4> 
    <h4> currentEditID {{ currentEditID }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
@@ -10,7 +10,7 @@
    <h4> isParentChild: {{ isParentChild }}</h4> 
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
-   <h4> isNative(原生): {{ isNative }}</h4>  -->
+   <h4> isNative(原生): {{ isNative }}</h4> 
   <el-button type="type" @click="addParent" size="small">新增</el-button>
   <el-button type="type" @click="handleReset" size="small">重置</el-button>
   <!-- table树形展示 -->
@@ -159,7 +159,7 @@ const handleTest = (node,data) => {
   /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
   console.log(flag) */
 
-  console.log(node)
+  console.log(handleIsEndLeafParent(node))
 } 
 
 /* watch(treeList,() => {
@@ -596,19 +596,33 @@ const handleParentBlur = (node,data) => {
       console.log("输入为空，findPrevSubCate()",findPrevSubCate())
    // 新增事件的空值处理
       ElMessage.error('请输入内容')
-      if(isNormal.value && findPrevSubCate().length === 0 ){
+      /* if(isNormal.value && findPrevSubCate().length === 0 ){
+        console.log("输入为空，没有子节点",findPrevSubCate())
+          // 说明没有子节点
+          isChild.value = false
+        }else isChildId.value = children[children.length - 1] */
+        if(isNormal.value && findPrevSubCate().length === 0 ){
         console.log("输入为空，没有子节点",findPrevSubCate())
           // 说明没有子节点
           isChild.value = false
         }else isChildId.value = children[children.length - 1]
       if(node.level > 1 && findPrevSubCate().length === 0){
         isEndParent.value = true
+      }else {
+        isEndParent.value = false
       }
       if(!isNormal.value){
         removeParentFilter(node,data)
       }
       // 移除新增的子节点
       removeParentElement(node,data)
+      if ( handleIsEndLeafParent(node)) {
+        isChild.value = false
+        isEndParent.value = true
+      } else {
+        isChild.value = true
+        isEndParent.value = false
+      }
       if(treeList.value.length === 0){
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
@@ -645,7 +659,17 @@ const handleParentBlur = (node,data) => {
         }else isChildId.value = children[children.length - 1]
         if(node.level > 1 && findPrevSubCate().length === 0){
         isEndParent.value = true
-        }
+        }else {
+         isEndParent.value = false
+      }
+      if (node.level < 2 && handleIsEndLeafParent(node)) {
+        isChild.value = false
+        isEndParent.value = true
+      } else {
+        isChild.value = true
+        console.log('这句话没生效吗',isChild.value)
+        isEndParent.value = false
+      }
         if(!isNormal.value){
           removeParentFilter(node,data)
         }
@@ -1867,9 +1891,15 @@ const handleCollapse = (node,id) => {
 
 const  handleIsEndLeafParent = (node,dta) => {
   const arr = node.level < 2 ?node.parent.data : node.parent.parent.data
+  console.log('arr',node.data)
  for (let i = 0; i < arr.length; i++) {
   if(i === arr.length -1){
-      return arr[i].children && arr[i].children.length > 1 ? false : true
+      if(arr[i].children && arr[i].children.length > 0){
+        console.log('返回false')
+      }else {
+        console.log('返回true')
+      }
+      return arr[i].children && arr[i].children.length > 0 ? false : true
     }
  }
   
@@ -2021,13 +2051,22 @@ const showParent = (node,data) => {
 
     }else {
 
-      if(node.level < 2){
+      /* if(node.level < 2){
         const result = node.data.children.some(item => item.id === currentEditID.value)
         if(result || currentEditID.value === data.id){
           return node.expanded?currentEditID.value === data.id:true
         }
       }else {
         return currentEditID.value === data.id 
+      } */
+
+      if(node.level < 2){
+        const result = node.data.children.some(item => item.id === isChildId.value)
+        if(result || isChildId.value === data.id){
+          return node.expanded?isChildId.value === data.id:true
+        }
+      }else {
+        return isChildId.value === data.id 
       }
 
     }
@@ -2067,7 +2106,7 @@ const isLastAll = (node, data) => {
 
 
 const handleLastParent = (node,data) => {
-  if(node.level < 2 && isEndParent.value){
+  if(node.level < 2 && isEndParent.value && isNormal.value){
     const  parents = node.parent.data
     return parents.indexOf(data) === parents.length - 1 && node.isLeaf
   }
