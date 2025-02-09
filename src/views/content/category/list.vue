@@ -611,11 +611,18 @@ const handleParentBlur = (node,data) => {
       }else {
         isEndParent.value = false
       }
-      if(!isNormal.value){
-        removeParentFilter(node,data)
-      }
       // 移除新增的子节点
       removeParentElement(node,data)
+      if(!isNormal.value){
+        if(handleIsEndLeafParent(node)){
+          console.log('没有进入表达式1吗？')
+          isChild.value = false
+          isEndParent.value = true
+        }else {
+          console.log('没有进入表达式2吗？')
+          removeParentFilter(node,data)
+        }
+      }
       if ( handleIsEndLeafParent(node)) {
         isChild.value = false
         isEndParent.value = true
@@ -662,7 +669,17 @@ const handleParentBlur = (node,data) => {
         }else {
          isEndParent.value = false
       }
-      if (node.level < 2 && handleIsEndLeafParent(node)) {
+      removeParentElement(node,data)
+      if (!isNormal.value) {
+        if (handleIsEndLeafParent(node)) {
+          isChild.value = false
+          isEndParent.value = true
+        } else {
+          removeParentFilter(node, data)
+        }
+      }
+        console.log('filter-pop后',filterArr)
+        if (handleIsEndLeafParent(node)) {
         isChild.value = false
         isEndParent.value = true
       } else {
@@ -670,11 +687,6 @@ const handleParentBlur = (node,data) => {
         console.log('这句话没生效吗',isChild.value)
         isEndParent.value = false
       }
-        if(!isNormal.value){
-          removeParentFilter(node,data)
-        }
-        console.log('filter-pop后',filterArr)
-        removeParentElement(node,data)
         ElMessage.error('分类名不能重复')
         isReturn.value = true
         // isNormal.value = true
@@ -1527,6 +1539,7 @@ const handleCheck = (node,data) => {
     isNative.value = false    
     data.isCheck = false
     data.isReset = false
+    isEndParent.value = false
 
     if(node.level < 2){
       isBig.value = true
@@ -1809,6 +1822,7 @@ const  removeParentFilter  = (node,data) => {
 
     // 如果删除的父节点没有子节点
     if (node.level < 2 && node.isLeaf) {
+      console.log('删除的父节点没有子节点')
       filterArr = filterArr.filter(item => item != data.id)
     } else {
       console.log('删除的父节点有子节点')
@@ -1891,7 +1905,7 @@ const handleCollapse = (node,id) => {
 
 const  handleIsEndLeafParent = (node,dta) => {
   const arr = node.level < 2 ?node.parent.data : node.parent.parent.data
-  console.log('arr',node.data)
+  console.log('arr',arr)
  for (let i = 0; i < arr.length; i++) {
   if(i === arr.length -1){
       if(arr[i].children && arr[i].children.length > 0){
@@ -2106,7 +2120,7 @@ const isLastAll = (node, data) => {
 
 
 const handleLastParent = (node,data) => {
-  if(node.level < 2 && isEndParent.value && isNormal.value){
+  if(node.level < 2 && isEndParent.value){
     const  parents = node.parent.data
     return parents.indexOf(data) === parents.length - 1 && node.isLeaf
   }
