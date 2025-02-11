@@ -595,7 +595,6 @@ const handleParentBlur = (node,data) => {
     if (category[data.id]?.trim() === '') {
       console.log("输入为空，findPrevSubCate()",findPrevSubCate())
    // 新增事件的空值处理
-      ElMessage.error('请输入内容')
       /* if(isNormal.value && findPrevSubCate().length === 0 ){
         console.log("输入为空，没有子节点",findPrevSubCate())
           // 说明没有子节点
@@ -614,21 +613,24 @@ const handleParentBlur = (node,data) => {
       // 移除新增的子节点
       removeParentElement(node,data)
       if(!isNormal.value){
+        removeParentFilter(node,data)
         if(handleIsEndLeafParent(node)){
           console.log('没有进入表达式1吗？')
           isChild.value = false
           isEndParent.value = true
         }else {
           console.log('没有进入表达式2吗？')
-          removeParentFilter(node,data)
+          handleHasChild();
         }
-      }
-      if ( handleIsEndLeafParent(node)) {
-        isChild.value = false
-        isEndParent.value = true
       } else {
-        isChild.value = true
-        isEndParent.value = false
+        if (handleIsEndLeafParent(node)) {
+          isChild.value = false
+          isEndParent.value = true
+        } else {
+          isChild.value = true
+          isEndParent.value = false
+        }
+        ElMessage.error('请输入内容')
       }
       if(treeList.value.length === 0){
         allShow.value = true
@@ -671,23 +673,26 @@ const handleParentBlur = (node,data) => {
       }
       removeParentElement(node,data)
       if (!isNormal.value) {
+        removeParentFilter(node, data)
         if (handleIsEndLeafParent(node)) {
           isChild.value = false
           isEndParent.value = true
         } else {
-          removeParentFilter(node, data)
+          handleHasChild();
         }
-      }
-        console.log('filter-pop后',filterArr)
-        if (handleIsEndLeafParent(node)) {
-        isChild.value = false
-        isEndParent.value = true
       } else {
-        isChild.value = true
-        console.log('这句话没生效吗',isChild.value)
-        isEndParent.value = false
-      }
+        console.log('filter-pop后', filterArr)
+        if (handleIsEndLeafParent(node)) {
+          isChild.value = false
+          isEndParent.value = true
+        } else {
+          isChild.value = true
+          console.log('这句话没生效吗', isChild.value)
+          isEndParent.value = false
+        }
         ElMessage.error('分类名不能重复')
+
+      }
         isReturn.value = true
         // isNormal.value = true
     }else {
@@ -1679,6 +1684,7 @@ const handleParentRevert = (node,data) => {
        // 移除filter数据(标记)
        console.log('删除按钮',data.id)
       removeParentFilter(node,data)
+      handleHasChild()
 
 
    // 移除treeList数据(服务器)
@@ -1833,6 +1839,11 @@ const  removeParentFilter  = (node,data) => {
       filterArr = filterArr.filter(item => !arr.includes(item))
     }
   }
+
+}
+
+const handleHasChild = () => {
+  
   console.log("最终filterArr",filterArr)
   const childrenIds = findPrevSubCate()
   // 先判断有没有子节点，没有的话，就给isEnd赋值，否则有子节点，就给isChildId赋值
@@ -1859,7 +1870,6 @@ const  removeParentFilter  = (node,data) => {
 
   // 处理菜单展开
   handleCollapse(node,isChildId.value)
-
 }
 
 
@@ -1930,7 +1940,6 @@ const findPrevSubCate = () => {
   })
   const childIds = filterArr.filter(item => children.includes(item))
   return childIds
-
 }
 
 
