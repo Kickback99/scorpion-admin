@@ -183,7 +183,6 @@ const addParent = () => {
   isChildId.value = null 
   isEnd.value = null
   isEndParent.value = true
-  // isNative.value = true
   isNormal.value = true
   isDraggable.value = false
   // 生成一个新的唯一 ID
@@ -990,7 +989,6 @@ const batchAddParentChild = (node,data) => {
   isChildId.value = null
   isEndParent.value = false
   isNormal.value = true
-  isNative.value = true
   isEnd.value = null 
   node.expanded = true
   /* if(isChild.value){
@@ -1121,7 +1119,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
         // 正常模式：
         // 控制子节点：!isEdit.value && data.isSave && !data.isParent && isLastParentChild(node,data)
         // 控制父节点：!isEdit.value && data.isSave && handleParentToggle(node,isPublish) && nativeData.find(item => item.id != data.id)
-        return (!isEdit.value && data.isSave && !data.isParent && isActive(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node,data) && nativeData.find(item => item.id != data.id))
+        return (!isEdit.value && data.isSave && !data.isParent && isLastChild(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node,data) && nativeData.find(item => item.id != data.id))
       }else {
         // console.log('表达式2.2执行...')
         // 特殊模式(虚拟修改)
@@ -1541,7 +1539,6 @@ const handleCheck = (node,data) => {
     isHasChild.value = false
     isEnd.value = null
     isNormal.value = false
-    isNative.value = false    
     data.isCheck = false
     data.isReset = false
     isEndParent.value = false
@@ -1604,26 +1601,11 @@ const handleParentToggle = (node,data) => {
     // return node.data.children.length === 0
     //方式二： 该节点是否为叶子节点，也就是没有子节点的节点
     // return node.isLeaf
-    if(!isNative.value) {
-      if(node.isLeaf){
-        return true
-      }else {
-        if(node.expanded) {
-          return isHasChild.value?isChildId.value === data.id:currentEditID.value === data.id
-        }
-        return true
-      
-      }
-
-    }else {
-
-        if(node.isLeaf){
+    if(node.isLeaf){
         return true
       }else {
         return node.expanded?false:true
       }
-    }
-
   }
 
   // return isPublish?true:false
@@ -2028,72 +2010,9 @@ const isLastParentChild = (node, data) => {
   return children.indexOf(data) === children.length - 1
 }
 
-
-const isActive = (node,data) => {
-  if(!isNative.value) {
-
-    if(isBig.value) {
-    if(node.parent.data.id === currentEditID.value){
-        return currentEditID.value === data.id
-    }
-  }
-
-    const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
-    if(flag ){
-      return currentEditID.value === data.id
-    } else {
-      if (!node.parent) return false
-  const children = data.isParent?node.parent.data:node.parent.data.children
-  console.log('children',children)
-  if (!children) return false
-  return children.indexOf(data) === children.length - 1
-    }
-  }else {
-    if (!node.parent) return false
-  const children = data.isParent?node.parent.data:node.parent.data.children
-  console.log('children',children)
-  if (!children) return false
-  return children.indexOf(data) === children.length - 1
-  }
-}
-
 //处理确定按钮的折叠
 const showParent = (node,data) => {
 
-  if(!isNative.value){
-    if(isHasChild.value){
-      if(node.level < 2) {
-        const result = node.data.children.some(item => item.id === isChildId.value)
-        if(result){
-          return node.expanded?isChildId.value === data.id:true
-        }
-      }else {
-        return isChildId.value === data.id
-      }
-
-
-    }else {
-
-      /* if(node.level < 2){
-        const result = node.data.children.some(item => item.id === currentEditID.value)
-        if(result || currentEditID.value === data.id){
-          return node.expanded?currentEditID.value === data.id:true
-        }
-      }else {
-        return currentEditID.value === data.id 
-      } */
-
-      if(node.level < 2){
-        const result = node.data.children.some(item => item.id === isChildId.value)
-        if(result || isChildId.value === data.id){
-          return node.expanded?isChildId.value === data.id:true
-        }
-      }else {
-        return isChildId.value === data.id 
-      }
-
-    }
-  }else {
     if(node.level < 2 ){
     const result = node.data.children.some(item => item.id === isChildId.value)
 
@@ -2104,7 +2023,6 @@ const showParent = (node,data) => {
   }else {
       const parentNode = treeRef.value.getNode(node.parent.data)
       return parentNode.expanded?isChildId.value === data.id:false
-  }
   }
 }
 
