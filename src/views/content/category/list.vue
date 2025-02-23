@@ -619,7 +619,7 @@ const handleParentBlur = (node,data) => {
           isEndParent.value = true
         }else {
           console.log('没有进入表达式2吗？')
-          handleHasChild();
+          handleHasChild(node);
         }
       } else {
         if (handleIsEndLeafParent(node)) {
@@ -677,7 +677,7 @@ const handleParentBlur = (node,data) => {
           isChild.value = false
           isEndParent.value = true
         } else {
-          handleHasChild();
+          handleHasChild(node);
         }
       } else {
         console.log('filter-pop后', filterArr)
