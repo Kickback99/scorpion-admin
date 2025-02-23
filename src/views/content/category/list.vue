@@ -159,7 +159,7 @@ const handleTest = (node,data) => {
   /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
   console.log(flag) */
 
-  console.log(handleIsEndLeafParent(node))
+  console.log(node)
 } 
 
 /* watch(treeList,() => {
@@ -969,6 +969,9 @@ const handleDuplicate = (data) => {
   data.isReset = false
   delete category[data.id]
 }
+
+
+
 // (data.isParent区分是父分类，isParentChild是父分类和子分类共有的)
 const isParentChild = ref(false)
 
@@ -1364,7 +1367,34 @@ const handleEdit = (node, data) => {
   console.log('data',data)
 }
 
-const handleBatchSave = async() => {
+const handleParentDuplicate = (node,res) => {
+  allShow.value = true
+  isParentChild.value = false
+  isChild.value = false
+  isChildId.value = null
+  isHasChild.value = false
+  isEnd.value = null
+  isNormal.value = false
+  isEndParent.value = false
+  render()
+  const arr = handleExpand(node)
+  // 改变内部数组元素为id
+  if(res){
+    res.data.forEach(parentItem => {
+    arr.forEach((item,index) => {
+      if(item == parentItem.cateId){
+         arr[index] = parentItem.id
+      }
+    })
+  })
+  expandKey.value = [...arr]
+  }
+  ElMessage.success('添加成功')
+  // console.log("node.store.nodesMap",node.store.nodesMap)
+  // console.log("arr",arr)
+}
+
+const handleBatchSave = async(node) => {
   try {
       
   const parentList = treeList.value.filter(item => item.pid === -1 )
@@ -1379,7 +1409,7 @@ const handleBatchSave = async() => {
 
   if(findPrevSubCate().length === 0 ) {
     console.log('没有子节点了？')
-    ElMessage.success('添加成功')
+    handleParentDuplicate(node)
     return;
   }
 
@@ -1387,10 +1417,10 @@ const handleBatchSave = async() => {
   const cateIds = newParents.map(item => item.cateId)
   const res = await listApi(cateIds+'') //要把它转成json串数组
   // const res = await listApi(cateIds) //这样传会报错
-  console.log(res.data)
+  console.log('res.data',res.data)
 
-  const parentMap = res.reduce((cate,item) => {
-    cate[item.cate_id] = item.id
+  const parentMap = res.data.reduce((cate,item) => {
+    cate[item.cateId] = item.id
     return cate
   },{})
 
@@ -1402,13 +1432,12 @@ const handleBatchSave = async() => {
   }))
 
   console.log("updateChildren",updateChildren)
-   
   // 提交添加子分类请求
-  /* await addApi(updateChildren)
-  ElMessage.success('添加成功')
-  allShow.value = true
-  render() */
+  await addApi(updateChildren)
+  handleParentDuplicate(node,res)
+
   } catch (error) {
+    console.log('错误了...',error)
     ElMessage.error(error)
     // 根据需要处理错误，例如显示错误消息或回滚操作
   }
@@ -1474,6 +1503,8 @@ const handleSave = async (e, node, data) => {
   enabledCheckboxes()
   render()
   const arr = handleExpand(node)
+  // console.log("node.store.nodesMap",node.store.nodesMap)
+  // console.log("arr",arr)
   expandKey.value = [...arr]
 
 
@@ -2065,6 +2096,8 @@ const handleLastParent = (node,data) => {
     return parents.indexOf(data) === parents.length - 1 && node.isLeaf
   }
 }
+
+
 
 const handleReset = () => {
   render()
