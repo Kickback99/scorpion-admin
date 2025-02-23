@@ -615,7 +615,7 @@ const handleParentBlur = (node,data) => {
         removeParentFilter(node,data)
         if(handleIsEndLeafParent(node)){
           console.log('没有进入表达式1吗？')
-          isChild.value = false
+          // isChild.value = false
           isEndParent.value = true
         }else {
           console.log('没有进入表达式2吗？')
