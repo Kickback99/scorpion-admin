@@ -629,8 +629,8 @@ const handleParentBlur = (node,data) => {
           isChild.value = true
           isEndParent.value = false
         }
-        ElMessage.error('请输入内容')
       }
+      ElMessage.error('请输入内容')
       if(treeList.value.length === 0){
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
@@ -674,7 +674,7 @@ const handleParentBlur = (node,data) => {
       if (!isNormal.value) {
         removeParentFilter(node, data)
         if (handleIsEndLeafParent(node)) {
-          isChild.value = false
+          // isChild.value = false
           isEndParent.value = true
         } else {
           handleHasChild(node);
@@ -689,9 +689,8 @@ const handleParentBlur = (node,data) => {
           console.log('这句话没生效吗', isChild.value)
           isEndParent.value = false
         }
-        ElMessage.error('分类名不能重复')
-
       }
+        ElMessage.error('分类名不能重复')
         isReturn.value = true
         // isNormal.value = true
     }else {
