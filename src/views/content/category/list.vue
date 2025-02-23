@@ -1095,7 +1095,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
 
   if (isPublish) {
     if (isHasChild.value) {
-      return showParent(node,data)
+      return showParent(node,data) || handleLastParent(node,data)
     } else return isEnd.value === data.id
   } else {
     return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node, data) && nativeData.find(item => item.id != data.id))
@@ -1666,11 +1666,26 @@ const handleParentRevert = (node,data) => {
        // 移除filter数据(标记)
        console.log('删除按钮',data.id)
       removeParentFilter(node,data)
-      handleHasChild(node)
+
+        // 移除新增的子节点(视图上)
+      removeTreeNode(node,data)
+
+      if(handleIsEndLeafParent(node)){
+        console.log('最后一个没有子节点')
+        isChild.value = false
+        isEndParent.value = true
+      }else{
+        console.log('最后一个有子节点')
+        isChild.value = true
+        isEndParent.value = false
+        handleHasChild(node)
+      }
+
+     
 
 
-   // 移除treeList数据(服务器)
-   removeParentRevert(node,data)
+      // 移除treeList数据(服务器)
+      removeParentRevert(node,data)
 
 
     if(isNative.value){
@@ -1679,8 +1694,7 @@ const handleParentRevert = (node,data) => {
 
   console.log('filter-pop后',filterArr)
   
-  // 移除新增的子节点(视图上)
-  removeTreeNode(node,data)
+
   
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
