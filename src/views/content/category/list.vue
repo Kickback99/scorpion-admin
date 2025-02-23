@@ -158,7 +158,7 @@ const isCheckboxDisabled = ref(false)
 const handleTest = (node,data) => {
   /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
   console.log(flag) */
-
+  console.log(handleComment())
   console.log(node)
 } 
 
@@ -1410,6 +1410,7 @@ const handleBatchSave = async(node) => {
   if(findPrevSubCate().length === 0 ) {
     console.log('没有子节点了？')
     handleParentDuplicate(node)
+    treeList.value = []
     return;
   }
 
@@ -1435,7 +1436,7 @@ const handleBatchSave = async(node) => {
   // 提交添加子分类请求
   await addApi(updateChildren)
   handleParentDuplicate(node,res)
-
+  treeList.value = []
   } catch (error) {
     console.log('错误了...',error)
     ElMessage.error(error)
@@ -2002,6 +2003,10 @@ let debounceTimer = null
 
 const handleInput = (node,data) => {
 
+    if(isParentChild.value){
+      return
+    }
+
      // 每次输入时，清除之前的定时器
      if (debounceTimer !== null) {
       clearTimeout(debounceTimer)
@@ -2122,6 +2127,13 @@ const handleReset = () => {
 }
 
 const handleComment = () => {
+
+  if(isParentChild.value){
+    const arr = treeList.value.filter(item => item.pid === -1)
+    if(arr.length > 1){
+      return '按回车批量保存'
+    }else return '按回车保存'
+  }
 
   // 编辑模式
   if(isEdit.value){
