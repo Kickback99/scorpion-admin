@@ -1666,7 +1666,7 @@ const handleParentRevert = (node,data) => {
        // 移除filter数据(标记)
        console.log('删除按钮',data.id)
       removeParentFilter(node,data)
-      handleHasChild()
+      handleHasChild(node)
 
 
    // 移除treeList数据(服务器)
@@ -1824,7 +1824,7 @@ const  removeParentFilter  = (node,data) => {
 
 }
 
-const handleHasChild = () => {
+const handleHasChild = (node) => {
   
   console.log("最终filterArr",filterArr)
   const childrenIds = findPrevSubCate()
