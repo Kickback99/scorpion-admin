@@ -11,7 +11,7 @@
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
    <h4> isNative(原生): {{ isNative }}</h4> 
-  <el-button type="type" @click="addParent" size="small">新增</el-button>
+  <el-button type="type" @click="addParent" size="small" :disabled="disabledAddParent">新增</el-button>
   <el-button type="type" @click="handleReset" size="small">重置</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
@@ -153,6 +153,8 @@ const isDraggable  = ref(true)
 
 const isCheckboxDisabled = ref(false)
 
+const disabledAddParent = ref(false)
+
 
 
 const handleTest = (node,data) => {
@@ -177,6 +179,7 @@ const handleTest = (node,data) => {
 
 const addParent = () => {
   isParentChild.value = true
+  disabledAddParent.value = false
   allShow.value = false
   isHasChild.value = false
   currentEditID.value = null
@@ -255,17 +258,21 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
   if(checkedKeys.length > 0){
     console.log(checkedKeys)
     allShow.value = false
+    disabledAddParent.value = true
      const isDuplicate = cateData.value.find(item => item.id === checkedKeys[0])
     if(isDuplicate){
       // 选择了大的复选框，就选择最前面的id
       checkedIds.value = checkedKeys[0]
+      console.log('选择了大复选框')
     }else {
       // 选择的是子节点的父选框，那就选择最后1个id
       checkedIds.value = checkedKeys[checkedKeys.length-1]
     }
     // 没有选中
   }else {
+    checkedIds.value = null
     allShow.value = true
+    disabledAddParent.value = false
   }
 }
 
@@ -338,7 +345,7 @@ let nativeData = []
 
 const render = async () => {
   const res = await listApi()
-  console.log(res.data)
+  // console.log(res.data)
   cateData.value = res.data
 /*   const originData = res.data
   cateData.value = modifyDisabled(originData,isCheckboxDisabled.value) */
@@ -349,7 +356,7 @@ const render = async () => {
 
   // 不同的地址
   nativeData = JSON.parse(JSON.stringify(res.data))
-  console.log(nativeData)
+  // console.log(nativeData)
 
   // 结束编辑
   isEdit.value = false
@@ -394,20 +401,20 @@ const allowDrop = (draggingNode, dropNode, type) => {
       return true;
     }
     // 当1级节点没有子节点时，允许将其拖拽到其他1级节点内部
-    if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
+    /* if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
       return true;
-    }
+    } */
     // 其他情况不允许拖拽
-    return false;
+    // return false;
   } else if (type === 'prev' || type === 'next') {
     // 允许2级节点拖拽到1级节点的前后
-    if (draggingLevel === 2 && droppingLevel === 1) {
+    /* if (draggingLevel === 2 && droppingLevel === 1) {
       return true;
-    }
+    } */
     // 当1级节点没有子节点时，允许将其拖拽到其他1级节点的前后
-    if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
+    /* if (draggingLevel === 1 && droppingLevel === 1 && !hasDraggingChildren) {
       return true;
-    }
+    } */
     // 允许1级节点之间互相拖拽（无论是否有子节点）
     if (draggingLevel === 1 && droppingLevel === 1) {
       return true;
@@ -417,7 +424,7 @@ const allowDrop = (draggingNode, dropNode, type) => {
       return true;
     }
     // 其他情况不允许拖拽
-    return false;
+    // return false;
   }
   // 其他情况不允许拖拽
   return false;
@@ -472,6 +479,7 @@ const handleDrop = async(
 
 const append = (node, data) => {
   console.log(node)
+  disabledAddParent.value = true
   isEnd.value = null
   isNative.value = true
   isNormal.value = true
@@ -632,6 +640,7 @@ const handleParentBlur = (node,data) => {
       }
       ElMessage.error('请输入内容')
       if(treeList.value.length === 0){
+        disabledAddParent.value = false
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
         isDraggable.value = true
@@ -716,6 +725,7 @@ const handleParentBlur = (node,data) => {
         if (treeList.value.length === 0) {
           console.log('没有新增的元素')
             // t_reset：handleBlur初始化(新增父子模式)
+            disabledAddParent.value = false
             const arr = handleExpand(node)
             expandKey.value = [...arr]
             isParentChild.value = false
@@ -780,6 +790,7 @@ const handleBlur = (node, data) => {
       category[data.id] = nativeName
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
+        disabledAddParent.value = false
         isDraggable.value = true
         allShow.value = true
         console.log('different为空了')
@@ -816,6 +827,7 @@ const handleBlur = (node, data) => {
       if(beforeCount === afterCount){
         allShow.value = true
         // t_reset：handleBlur初始化(新增模式)
+        disabledAddParent.value = false
         isDraggable.value = true
         const arr = handleExpand(node)
         expandKey.value = [...arr]
@@ -850,6 +862,7 @@ const handleBlur = (node, data) => {
       // 重复的逻辑
       if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
+        disabledAddParent.value = false
         isDraggable.value = true
         allShow.value = true
         isEdit.value = false
@@ -923,6 +936,7 @@ const handleBlur = (node, data) => {
         if (beforeCount === afterCount) {
           console.log('没有新增的元素')
             // t_reset：handleBlur初始化(新增模式)
+            disabledAddParent.value = false
             const arr = handleExpand(node)
             expandKey.value = [...arr]
           isDraggable.value = true
@@ -985,6 +999,7 @@ const isEndParent = ref(true)
 
 // 批量添加子类
 const batchAddParentChild = (node,data) => {
+  disabledAddParent.value = false
   console.log("data.id",data.id)
   isParentChild.value = true
   isHasChild.value = false
@@ -1048,6 +1063,7 @@ const batchAdd = (node, data) => {
     batchAddParentChild(node,data)
     return;
   }
+  disabledAddParent.value = true
   console.log(node)
   isDraggable.value = false
   //禁用复选框
@@ -1318,7 +1334,6 @@ const revertData = (level, data) => {
 }
 
 
-// t_handle: 键盘事件
 const confirm = async (e,node,data) => {
   if(inputRefs.value[data.id]){
     inputRefs.value[data.id].blur()
@@ -1337,6 +1352,7 @@ const confirm = async (e,node,data) => {
 
 
 const handleEdit = (node, data) => {
+  disabledAddParent.value = true
   isDraggable.value = false
   // disabledCheckboxes()
   currentEditID.value = data.id
@@ -1499,6 +1515,7 @@ const handleSave = async (e, node, data) => {
   }
   allShow.value = true
   // t_reset：handleSave初始化(新增编辑模式)
+  disabledAddParent.value = false
   isDraggable.value = true
   // 启用复选框
   enabledCheckboxes()
@@ -1524,6 +1541,19 @@ const handleExpand = (node) => {
     arr.push({})
   }
   return arr
+}
+
+const handleResetExpand = () => {
+  // const parentNode = treeRef.value.getNode(1)
+  const parentNodes = []
+  cateData.value.forEach(item => {
+    parentNodes.push(treeRef.value.getNode(item.id))
+  })
+  // console.log("parentNodes",parentNodes)
+  if(parentNodes.length > 0){
+      const parentIds = parentNodes.filter(item => item.expanded === true).map(item => item.data.id)
+      return parentIds
+  }
 }
 
 // 正常模式和特殊模式以及排序模式切换(针对新增模式，会影响确定按钮和批量添加按钮的显示)
@@ -1731,6 +1761,7 @@ const handleParentRevert = (node,data) => {
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (treeList.value.length === 0) {
     ElMessage.error('回到最原始的数据')
+    disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增父子模式)
     isDraggable.value = true
     const arr = handleExpand(node)
@@ -1837,6 +1868,7 @@ const handleRevert = (e,node, data) => {
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (beforeCount === afterCount) {
     ElMessage.error('回到最原始的数据')
+    disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
     const arr = handleExpand(node)
@@ -2103,9 +2135,11 @@ const handleLastParent = (node,data) => {
 }
 
 
-
+// t_handle：重置数据这样太麻烦，解决：kwq-inspiration-mount
 const handleReset = () => {
   render()
+  checkedIds.value = null
+  disabledAddParent.value = false
   isDraggable.value = true
   allShow.value = true
   isCheckboxDisabled.value = false
@@ -2124,6 +2158,11 @@ const handleReset = () => {
   treeList.value = []
   differentArr.splice(0)
   filterArr.splice(0)
+  // handleResetExpand()
+  const arr = handleResetExpand()
+  // console.log("arr",arr)
+  expandKey.value = arr?[...arr]:[]
+  ElMessage.success('重置成功')
 }
 
 const handleComment = () => {
