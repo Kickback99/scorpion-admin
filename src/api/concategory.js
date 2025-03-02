@@ -1,4 +1,7 @@
 import http from '@/utils/request'
+
+// t_category_api：分类管理
+
 const API = {
     CATEGORY_URL : '/admin/content/category',
 }

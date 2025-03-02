@@ -291,6 +291,7 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
 
 } */
 
+//t_category_request:分类删除请求
 const batchRemove = async(node,data,isFlag) => {
   const total = treeRef.value.getCheckedKeys().length
   if(isFlag){
@@ -343,6 +344,7 @@ const defaultProps = {
 
 let nativeData = []
 
+// t_category_request:分类列表请求
 const render = async () => {
   const res = await listApi()
   // console.log(res.data)
@@ -387,6 +389,7 @@ const category = reactive({
 
 let beforeCount = 0
 
+//t_category_request:分类修改请求(拖拽)
 // 拖拽节点规则
 const allowDrop = (draggingNode, dropNode, type) => {
   const draggingLevel = draggingNode.level;
@@ -1410,6 +1413,8 @@ const handleParentDuplicate = (node,res) => {
   // console.log("arr",arr)
 }
 
+// t_category_request:分类列表请求(一级分类)
+// t_category_request:分类新增请求(一级分类)
 const handleBatchSave = async(node) => {
   try {
       
@@ -1462,6 +1467,8 @@ const handleBatchSave = async(node) => {
 }
 
 
+//t_category_request:分类新增请求
+//t_category_request:分类修改请求
 const handleSave = async (e, node, data) => {
   data.isSave = false
   e.stopPropagation()
