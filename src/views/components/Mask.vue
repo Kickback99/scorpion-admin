@@ -7,7 +7,7 @@
             <slot></slot>
         </div>
         <div class="footer">
-            <el-row justify="center">
+            <el-row justify="center" align="middle">
                 <el-button type="danger" @click="emit('closeMask')">返回</el-button>
                 <el-button type="primary" @click="emit('openDialog')">确定</el-button>
             </el-row>
@@ -43,7 +43,7 @@ const close = () => {
     height: calc(100vh - 70px);
     // min-height: 100%;
     z-index: 3;
-    background-color: red;
+    background-color: #fff;
 }
 
 .header {
@@ -64,10 +64,11 @@ const close = () => {
 }
 
 .footer {
-    height: 50px;
-
+    // height: 50px;
+    // background: coral;
+    // line-height: 50px;
     .el-row {
-        margin-top: 5px;
+        margin-top: 35px;
     }
 
     // background-color: deeppink;

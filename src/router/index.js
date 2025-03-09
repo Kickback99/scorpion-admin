@@ -20,6 +20,7 @@ const route = useRoute() */
 const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
+    {path:'/test',component:() => import('@/views/Test.vue')},
     { path:'/',redirect:'/index',meta:{
         hidden:true
     },
