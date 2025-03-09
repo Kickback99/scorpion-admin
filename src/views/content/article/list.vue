@@ -19,7 +19,7 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button type="success" :icon="Plus"  plain @click="addArticle({})">新增</el-button>
+            <el-button type="success" :icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
@@ -30,9 +30,9 @@
         <el-table-column prop="status" label="状态" />
         <el-table-column prop="createTime" label="创建日期" />
         <el-table-column label="操作">
-            <template #default>
-                <el-button type="primary" :icon="Edit"   circle plain ></el-button>
-                <el-button type="danger" :icon="Delete" circle plain ></el-button>
+            <template #default="{row}">
+                <el-button @click="handleEdit(row)" type="primary" :icon="Edit"   circle plain ></el-button>
+                <el-button @click="handleDelete(row.id)" type="danger" :icon="Delete" circle plain ></el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -48,12 +48,12 @@
         @current-change="onCurrentChange"
     />
 
-    <ArticleEdit ref="maskRef"></ArticleEdit>
+    <ArticleEdit ref="maskRef" @reRender="render"></ArticleEdit>
    
 </template>
 
 <script setup>
-import { listApi } from '@/api/conarticle';
+import { listApi, removeApi } from '@/api/conarticle';
 import CateSelect from '@/views/components/CateSelect.vue';
 import { ref } from 'vue';
 import {Search,Refresh,Plus,Edit,Delete} from '@element-plus/icons-vue'
@@ -114,9 +114,23 @@ const onReset = () => {
 
 const maskRef = ref()
 
-const addArticle = () => {
+const handleAdd = (param) => {
     console.log('hello')
     maskRef.value.openMask()
+    maskRef.value.handleToggle(param)
+}
+
+const handleEdit = (param) => {
+    maskRef.value.openMask()
+    maskRef.value.handleToggle(param)
+}
+
+// t_article_request：文章删除请求
+const handleDelete = async(id) => {
+    console.log(id)
+    await removeApi(id)
+    ElMessage.success('删除成功')
+    render()
 }
 
 </script>
