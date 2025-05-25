@@ -25,7 +25,22 @@
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
             <el-form ref="formRef" :model="formModel" label-width="auto"> 
                 <el-form-item label="文章描述" prop="description">
-                    <el-input v-model="formModel.description" placeholder="请输入" />
+                    <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
+                        <el-radio :label="'auto'">自动生成</el-radio>
+                        <el-radio :label="'empty'">留空</el-radio>
+                        <el-radio :label="'custom'">自定义</el-radio>
+                </el-radio-group>
+                </el-form-item>
+                <!-- 自定义摘要输入框（条件渲染） -->
+                <el-form-item v-if="formModel.descriptionType === 'custom'" prop="customDescription">
+                    <el-input
+                    v-model="formModel.customDescription"
+                    type="textarea"
+                    :rows="4"
+                    placeholder="请输入自定义摘要"
+                    maxlength="150"
+                    show-word-limit
+                    />
                 </el-form-item>
                 <el-form-item label="分类选择" prop="categoryId">
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
@@ -51,8 +66,17 @@ import { addApi, findApi, modifyApi } from '@/api/conarticle';
 
 let mdHeight = window.innerHeight - 30 - 70 - 200
 
-const blogData = ref({})
-const formModel = ref({})
+const blogData = ref({
+    title: '',
+    content: ''
+})
+const formModel = reactive({
+  categoryId: null,
+  status:null,
+  descriptionType: 'auto', // 默认自动生成
+  customDescription: '',   // 自定义摘要内容
+  description: null       // 实际提交给后端的值
+})
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 
@@ -78,13 +102,32 @@ const handleToggle = async(param) => {
     // 添加重置
     dialogTitle.value = '新增文章'
     blogData.value = {}
-    formModel.value = {}
+    // 重置数据
+    Object.assign(formModel,{
+        id:null,
+        categoryId: null,
+        status:null,
+        descriptionType: 'auto', // 默认自动生成
+        customDescription: '',   // 自定义摘要内容
+        description: null       // 实际提交给后端的值
+    })
    }else {
     // 回显
       dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
-    blogData.value = res.data
-    formModel.value = res.data
+    console.log("回显res.data",res.data)
+    const {title,content,...rest} = res.data
+    blogData.value = {title,content}  
+    Object.assign(formModel,rest)
+    if(res.data.isAutoDescription === 0){
+          formModel.descriptionType = 'auto'
+    }else if(res.data.description === ''){
+          formModel.descriptionType = 'empty'
+    } else {
+          formModel.descriptionType = 'custom'
+          formModel.customDescription = res.data.description
+    }
+
    }
 }
 
@@ -94,17 +137,42 @@ defineExpose({
 
 const emit = defineEmits(['reRender'])
 
+// 监听描述类型变化
+const handleDescriptionTypeChange = (type) => {
+  switch(type) {
+    case 'auto':
+      formModel.description = null // 传null表示自动生成
+      break
+    case 'empty':
+      formModel.description = ''   // 传空字符串表示刻意留空
+      break
+    case 'custom':
+      formModel.description = formModel.customDescription // 使用自定义内容
+      break
+  }
+}
+
 
 const handlePublish = async(status) => {
 
-    formModel.value.status = status
+    formModel.status = status
+
+    // 最后一次确认description值
+  if (formModel.descriptionType === 'custom') {
+    formModel.description = formModel.customDescription
+    // formModel.isAutoDescription = null; // 明确设置为null
+  }
 
     const data = {
         ...blogData.value,
-        ...formModel.value
+        ...formModel
     }
 
-    if(!formModel.value.id){
+    // 移除临时字段
+  delete data.descriptionType
+  delete data.customDescription
+
+    if(!formModel.id){
         // t_article_request：文章新增请求
         await addApi(data)
         ElMessage.success('添加成功')
