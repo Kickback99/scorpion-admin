@@ -13,7 +13,7 @@ export const removeApi = (aId) => http.delete(`${API.ARTICLE_URL}/${aId}`)
 
 export const modifyApi = (params) => http.put(`${API.ARTICLE_URL}`,params)
 
-export const findApi = (articleId) => http.get(`${API.ARTICLEBYID_URL}`,{params:{articleId}})
+export const findApi = (articleId) => http.get(`${API.ARTICLEBYID_URL}/${articleId}`)
 
 export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData})
 
