@@ -121,7 +121,7 @@ const handleToggle = async(param) => {
     Object.assign(formModel,rest)
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
-    }else if(res.data.description === ''){
+    }else if(res.data.isAutoDescription === 1){
           formModel.descriptionType = 'empty'
     } else {
           formModel.descriptionType = 'custom'
