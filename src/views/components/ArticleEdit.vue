@@ -29,7 +29,7 @@
                         <el-radio :label="'auto'">自动生成</el-radio>
                         <el-radio :label="'empty'">留空</el-radio>
                         <el-radio :label="'custom'">自定义</el-radio>
-                </el-radio-group>
+                    </el-radio-group>
                 </el-form-item>
                 <!-- 自定义摘要输入框（条件渲染） -->
                 <el-form-item v-if="formModel.descriptionType === 'custom'" prop="customDescription">
