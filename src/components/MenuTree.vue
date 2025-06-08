@@ -28,7 +28,19 @@ const handleMenuVisible = (menu) => {
 
 const handleChildren = (menu) => {
     // 根据 type 来决定添加哪个前缀
-    const prefix = menu.type === 'system'?'system':'content'
+    // const prefix = menu.type === 'system'?'system':'content'
+    let prefix;
+    switch(menu.type){
+        case 'system':
+            prefix = 'system'
+            break
+        case 'content':
+            prefix = 'content'
+            break
+        case 'msg':
+            prefix = 'msg'
+            break
+    }
     if(menu.level) {
         // 如果路径中包含 log，则添加 log 父路径
         return `/${prefix}/${menu.parentPath}/${menu.path}`
