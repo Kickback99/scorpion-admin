@@ -45,6 +45,7 @@ const routes = [
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
 const conModules = import.meta.glob('../views/content/**/*.vue')
+const msgModules = import.meta.glob('../views/msg/**/*.vue')
 
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
@@ -63,7 +64,21 @@ function routesHandler(router,parentType=null){
         // 如果是子路由，继承父路由的type属性
             route.type = parentType
             // 根据父路由的type来决定使用哪个模块导入
-            const modules = parentType === 'system'?sysModules:conModules;
+            // const modules = parentType === 'system'?sysModules:conModules;
+            let modules;
+            switch(parentType){
+                case 'system':
+                    modules = sysModules
+                    break
+                case 'content':
+                    modules = conModules
+                    break
+                case 'msg':
+                    modules = msgModules
+                    break
+            }
+
+
 
             // 处理二级子菜单：为这些孩子构建新的属性(parentPath，level)便于menu来添加父级路径
             if(route.children != null && route.component == 'ParentView'){
