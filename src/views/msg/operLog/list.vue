@@ -96,8 +96,8 @@
 		@current-change="onCurrentChange"
 		/>
 
-        <el-dialog v-model="dialogVisible" title="查看详情" width="30%">
-            <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm"
+        <el-dialog v-model="dialogVisible" title="查看日志详情" width="50%">
+          <!--   <el-form  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm"
                 :size="formSize" status-icon>
                 <el-form-item label="IP地址" >
                     <el-input  v-model="formModel.ipaddr" />
@@ -118,13 +118,39 @@
                 <el-form-item label="响应数据" >
                     <el-input  v-model="formModel.resData" />
                 </el-form-item>
-            </el-form>
+            </el-form> -->
+
+              <el-tabs type="border-card">
+                <!-- 基础信息 -->
+                <el-tab-pane label="基础信息">
+                <el-descriptions :column="1" border>
+                    <el-descriptions-item label="IP地址">{{ formModel.ipaddr }}</el-descriptions-item>
+                    <el-descriptions-item label="请求路径">{{ formModel.reqUrl }}</el-descriptions-item>
+                    <el-descriptions-item label="方法名称">{{ formModel.method }}</el-descriptions-item>
+                </el-descriptions>
+                </el-tab-pane>
+
+                <!-- 请求参数 -->
+                <el-tab-pane label="请求参数">
+                <v-md-editor 
+                    :model-value="formatJson(formModel.reqParam)" 
+                    mode="preview"
+                    height="400px"
+                />
+                </el-tab-pane>
+
+                <!-- 响应数据 -->
+                <el-tab-pane label="响应数据">
+                <v-md-editor 
+                    :model-value="formatJson(formModel.resData)" 
+                    mode="preview"
+                    height="400px"
+                />
+                </el-tab-pane>
+            </el-tabs>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false">确认</el-button>
-                    <el-button type="primary" @click="dialogVisible = false">
-                        取消
-                    </el-button>
+                    <el-button @click="dialogVisible = false">关闭</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -210,8 +236,32 @@ const onDetail = (row) => {
     Object.assign(formModel,{...row})
 }
 
+// JSON格式化（添加Markdown代码块语法）
+const formatJson = (str) => {
+  try {
+    const parsed = JSON.parse(str)
+    return '```json\n' + JSON.stringify(parsed, null, 2) + '\n```'
+  } catch {
+    return str // 非JSON数据保持原样
+  }
+}
+
 </script>
 
 <style scoped lang="scss">
+/* 调整编辑器内边距 */
+.v-md-editor-preview {
+  padding: 0 16px;
+}
 
+/* 标签页高度控制 */
+.el-tabs {
+  max-height: 50vh;
+  overflow: auto;
+}
+
+/* 基础信息描述列表样式 */
+.el-descriptions {
+  margin-top: 10px;
+}
 </style>
