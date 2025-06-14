@@ -22,12 +22,19 @@ import '@kangc/v-md-editor/lib/style/base-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 import '@kangc/v-md-editor/lib/theme/style/github.css';
 
+// 代码行号
+import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
+
+// 复制代码块
+import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
+import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
+
 // highlightjs
 import hljs from 'highlight.js';
 
 VMdEditor.use(githubTheme, {
   Hljs: hljs,
-});
+}).use(createLineNumbertPlugin()).use(createCopyCodePlugin());
 
 // 完整导入
 /* import ElementPlus from 'element-plus'
