@@ -72,7 +72,7 @@
         <el-table-column prop="createTime" label="操作日期"  />
         <el-table-column  label="操作" width="150">
             <template #default="{row}">
-                <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
+                <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" :icon="WarnTriangleFilled">
                 <template #reference>
                     <el-button type="danger" :icon="Delete"  circle plain/>
                 </template>
@@ -99,7 +99,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import {Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
-import { listApi,removeApi } from '@/api/msglog';
+import { loginLogListApi,loginLogRemoveApi } from '@/api/msglog';
 import { ElMessage } from 'element-plus';
 
 const searchData = reactive({})
@@ -116,7 +116,7 @@ const total = ref(null)
 
 // t_log_request：日志列表请求
 const render = async() => {
-    const res = await listApi(params.value.pageNum,params.value.pageSize,searchData)
+    const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
     tableData.value = res.data.items
     total.value = res.data.total
 }
@@ -157,8 +157,8 @@ const onReset = () => {
 const multipleSelection = ref([])
 
 // t_log_request：日志删除请求
-const removeRole = async(id) => {
-    await removeApi(id)
+const removeRow = async(id) => {
+    await loginLogRemoveApi(id)
     ElMessage.success('删除成功')
     render()
 }
@@ -177,7 +177,7 @@ const deleteSelectRows = async() => {
       confirmButtonText: '确认',
       cancelButtonText: '取消'
     })
-   await removeRole(rowIds)
+   await removeRow(rowIds)
 }
 
 const removeMultiple = (raw) =>{
