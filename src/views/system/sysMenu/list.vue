@@ -1,7 +1,7 @@
 <template>
          <div class="toolbar">
             <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" :icon="Plus" type="success" plain>新增</el-button>
-            <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button>
+            <!-- <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" :icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button> -->
          </div>
         
 
@@ -12,10 +12,8 @@
         row-key="id"
         :tree-props="treeProps"
         ref="multipleTableRef"
-        @selection-change="removeMultiple"
         border stripe
         >
-        <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column prop="name" label="菜单名称" width="160"/>
         <el-table-column label="图标">
           <template #default="{row}">
@@ -177,26 +175,25 @@ const removeMenu = async(id) =>{
 }
 
 // 批量删除相关
-const multipleTableRef = ref()
-const multipleSelection = ref([])
+// const multipleSelection = ref([])
 
 const treeProps = reactive({
   checkStrictly: false,
 })
 
-const removeMultiple = (raw) =>{
+/* const removeMultiple = (raw) =>{
     console.log(raw)
     multipleSelection.value = raw
     // console.log(multipleSelection.value)
-}
+} */
 
-const selectable = (row) => {
+/* const selectable = (row) => {
       return !row.children.length > 0
-}
+} */
 
 // 批量删除
-//t_question：批量删除菜单问题
-const deleteSelectRows = () => {
+//批量删除菜单问题
+/* const deleteSelectRows = () => {
     if(multipleSelection.value.length === 0){
         ElMessage.error('请先勾选要删除的行')
         return
@@ -204,7 +201,7 @@ const deleteSelectRows = () => {
     const rowIds = multipleSelection.value.map(row => row.id)
     removeMenu(rowIds)
 
-}
+} */
 
 //  t_menu_request：更改菜单状态请求
 /* const modifySwitch = async(row) =>{

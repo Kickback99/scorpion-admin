@@ -156,27 +156,27 @@ const onReset = () => {
 
 const multipleSelection = ref([])
 
-// t_log_request：日志删除请求
+// t_log_request：登录日志删除请求
 const removeRow = async(id) => {
     await loginLogRemoveApi(id)
     ElMessage.success('删除成功')
     render()
 }
 
-// t_log_request：日志批量删除请求
+// t_log_request：登录日志批量删除请求
 const deleteSelectRows = async() => {
     console.log(multipleSelection.value.length)
     if(multipleSelection.value.length === 0){
         ElMessage.error('请先勾选要删除的行')
         return
     }
-    const rowIds = multipleSelection.value.map(row => row.id)
     
-   await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
-      type: 'warning',
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
+    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+        type: 'warning',
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
     })
+   const rowIds = multipleSelection.value.map(row => row.id)
    await removeRow(rowIds)
 }
 

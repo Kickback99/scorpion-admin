@@ -20,10 +20,18 @@
                 :key="item.value"
                 :label="displayMode === 'label' ? item.label : item.value"
                 :value="item.value"
+                :disabled="disabledTypes.includes(item.value)"
                 />
                 </el-select>
             </el-form-item>
-                        <el-form-item>
+            <el-form-item>
+                <el-select v-model="searchData.reqMode" placeholder="请选择请求方式">
+                    <el-option value="POST">POST</el-option>
+                    <el-option value="PUT">PUT</el-option>
+                    <el-option value="DELETE">DELETE</el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-date-picker
                     v-model="searchData.createTimeBegin"
                     type="date"
@@ -54,7 +62,8 @@
             </el-form-item>
             </el-form-item>
         </el-form>
-        <el-table :data="tableData" :style="{ width: '100%' }" >
+        <el-table :data="tableData" :style="{ width: '100%' }" @selection-change="removeMultiple">
+            <el-table-column type="selection" :selectable="selectable" width="55" />
             <el-table-column type="index" label="序号"  width="60"/>
             <el-table-column prop="username" label="操作用户"  />
             <el-table-column  label="操作模块">
@@ -64,11 +73,16 @@
             </el-table-column>
             <el-table-column label="操作类型">
                 <template #default="{row}">
-                    {{ displayMode === 'label' ? row.typeLabel : row.type  }}
+                    <el-tag :type="getTagType(row.type)">
+                         {{ displayMode === 'label' ? row.typeLabel : row.type  }}
+                    </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="reqMode" label="请求方式" />
-            <el-table-column prop="ipaddr" label="请求地址" />
+            <el-table-column  label="请求方式">
+                <template #default="{row}">
+                       <el-tag :type="getTagType(row.reqMode)">{{ row.reqMode }}</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column prop="createTime" label="操作时间" />
             <el-table-column width="150">
                 <template #default="{row}">
@@ -91,7 +105,7 @@
 		:disabled="false"
 		:background="false"
 		layout="jumper, total, sizes, prev, pager, next"
-		:total="总页数"
+		:total="total"
 		@size-change="onSizeChange"
 		@current-change="onCurrentChange"
 		/>
@@ -159,9 +173,9 @@
 </template>
 
 <script setup>
-import { operlogEnumsListApi, operlogListApi } from '@/api/msglog';
+import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/msglog';
 import {MoreFilled,Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
-import { reactive, ref } from 'vue';
+import { reactive, ref,computed,watch } from 'vue';
 
 const tableData = ref([])
 
@@ -226,7 +240,7 @@ const onSearch = () => {
 
 const onReset = () => {
     params.pageNum = 1
-    Object.assign(searchData,{username:'',module:'',type:'',createTimeBegin:'',createTimeEnd:''})
+    Object.assign(searchData,{username:'',module:'',type:'',reqMode:'',createTimeBegin:'',createTimeEnd:''})
     render()
 }
 
@@ -248,7 +262,89 @@ const formatJson = (str) => {
   }
 }
 
+const getTagType = (type) => {
 
+// 如果类型以 BATCH_ 开头，返回 'danger'
+  if (type?.startsWith('BATCH_')) {
+    return 'danger';
+  }
+
+  if(type?.endsWith('_AUTH')){
+    return 'success'
+  }
+
+  const typeMap = {
+    INSERT: 'primary',
+    UPDATE: 'warning',
+    DELETE: 'danger',
+    POST:'primary',
+    PUT: 'warning'
+
+  }
+  return typeMap[type] || 'info'
+}
+
+const multipleSelection = ref([])
+
+// t_log_request：操作日志删除请求
+const removeRow = async(id) => {
+    await operLogRemoveApi(id)
+    ElMessage.success('删除成功')
+    render()
+}
+
+const removeMultiple = (raw) =>{
+    console.log(raw)
+    multipleSelection.value = raw
+    // console.log(multipleSelection.value)
+}
+
+// t_log_request：操作日志批量删除请求
+const deleteSelectRows = async() => {
+    if(multipleSelection.value.length === 0){
+        ElMessage.error('请先勾选要删除的行')
+        return
+    }
+	await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+        type: 'warning',
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+    })
+    const rowIds = multipleSelection.value.map(row => row.id)
+   await removeRow(rowIds)
+
+}
+
+// 操作类型禁用
+const disabledTypes = computed(() => {
+  const { module } = searchData;
+
+  // 未选择模块时，不禁用任何选项
+  if (!module) {
+    return [];
+  }
+  
+  // 默认禁用项（适用于所有模块）
+  const defaultDisabled = ['BATCH_INSERT', 'BATCH_UPDATE', 'USER_AUTH', 'ROLE_AUTH'];
+  
+  // 按模块动态调整
+  switch (module) {
+    case 'CATE': // 分类管理
+      return ['USER_AUTH', 'ROLE_AUTH'];
+    case 'USER': // 用户管理
+      return ['ROLE_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE'];
+    case 'ROLE': // 角色管理
+      return ['USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE'];
+    default: // 其他模块
+      return defaultDisabled;
+  }
+});
+
+watch(() => searchData.module, (newModule) => {
+  searchData.type = ''; // 清空已选类型
+});
+
+// 处理用户选择复制回调
 const handleCopySuccess = () => {
   const copyButtons = document.querySelectorAll('.v-md-copy-code-btn')
   
