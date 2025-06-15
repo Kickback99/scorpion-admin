@@ -250,28 +250,28 @@ const formatJson = (str) => {
 
 
 const handleCopySuccess = () => {
-  // 获取所有复制按钮
   const copyButtons = document.querySelectorAll('.v-md-copy-code-btn')
   
   copyButtons.forEach(btn => {
-    // 保存原始SVG
-    const originalSvg = btn.innerHTML
+    // 添加copied类
+    btn.classList.add('copied')
     
-    // 替换为成功图标
-    btn.innerHTML = `
-      <i>
-        <svg viewBox="0 0 1024 1024" width="1em" height="1em" fill="#67c23a">
-          <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 0 0-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z"/>
-        </svg>
-      </i>
-    `
-    
-    // 1.5秒后恢复
+    // 1.5秒后移除
     setTimeout(() => {
-      btn.innerHTML = originalSvg
+      btn.classList.remove('copied')
     }, 1500)
   })
 }
+
+// 确保预览组件渲染完成后监听
+onMounted(() => {
+  const preview = document.querySelector('.v-md-editor-preview')
+  if (preview) {
+    new MutationObserver(() => {
+      // 重新绑定事件监听器
+    }).observe(preview, { childList: true, subtree: true })
+  }
+})
 
 </script>
 
@@ -290,5 +290,19 @@ const handleCopySuccess = () => {
 /* 基础信息描述列表样式 */
 .el-descriptions {
   margin-top: 10px;
+}
+
+:deep(.v-md-copy-code-btn.copied svg) {
+  display: none;
+}
+
+:deep(.v-md-copy-code-btn.copied::after) {
+  content: "✓";
+  color: #67c23a;
+  font-size: 16px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
