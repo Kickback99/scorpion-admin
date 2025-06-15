@@ -147,7 +147,6 @@
                     mode="preview"
                     height="400px"
                     @copy-code-success="handleCopySuccess"
-                    :class="{ 'copy-success': isCopied }"
                 />
                 </el-tab-pane>
             </el-tabs>
