@@ -35,6 +35,11 @@
                         <el-color-picker :show-clear="false" v-model="logoTitleColor" popper-class="colorPic" show-alpha
                             :predefine="predefineColors" @change="setLogoTitleColor" @active-change="currentLogoTitleColor" :teleported=false />
                     </el-form-item>
+                    <el-form-item label="保持同步">
+                        <el-tooltip content="菜单标题和菜单高亮同步更改" placement="top">
+                         <el-checkbox v-model="isSyncColor"/>
+                        </el-tooltip>
+                    </el-form-item>
                     <el-divider border-style="dashed" />
                     <el-form-item>
                         <el-select v-model="colorModule" ref="selectRef" placeholder="请选择主题色" @change="changeColor" size="small" :teleported=false>
@@ -138,7 +143,7 @@ import { useColorStore } from '@/store/color'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { clearUserInfo } from '@/utils/remove';
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { darkMenu,menuThemeArr } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
 
@@ -223,15 +228,34 @@ const predefineColors = ref([
     '#c7158577',
 ])
 
+// 关联高亮和标题颜色
+const isSyncColor = ref(false)
+
+// 同步颜色的方法
+const syncColors = (source, target, sourceRef, targetRef) => {
+  if (!isSyncColor.value) return;
+  colorStore[target] = source;
+  targetRef.value = source; // 直接更新响应式变量
+};
+
 // 菜单标题颜色
 const logoTitleColor = ref(colorStore.logoTitleColor)
 // 点击确定后的颜色
 const setLogoTitleColor = () => {
     colorStore.setLogoTitleColor(logoTitleColor.value)
+    if (isSyncColor.value) {
+    colorStore.setMenuActive(logoTitleColor.value);
+    active.value = logoTitleColor.value; // 同步UI
+  }
+    initColorModule()
 }
 
-const currentLogoTitleColor = () =>{
-    colorStore.setLogoTitleColor(logoTitleColor.value)
+const currentLogoTitleColor = (color) =>{
+    if (isSyncColor.value) {
+    colorStore.setMenuActive(color);
+    active.value = color; // 同步UI
+  }
+    colorStore.setLogoTitleColor(color)
 }
 
 
@@ -253,6 +277,7 @@ const color = ref(colorStore.menuTextColor)
 const setColor = () => {
     console.log('change事件触发了...')
     colorStore.setMenuTextColor(color.value)
+    initColorModule()
 }
 
 // 当前激活的颜色
@@ -266,10 +291,19 @@ const active = ref(colorStore.menuActive)
 // 点击确定后的颜色
 const setActive = () => {
     colorStore.setMenuActive(active.value)
+    if (isSyncColor.value) {
+    colorStore.setLogoTitleColor(active.value);
+    logoTitleColor.value = active.value; // 同步UI
+  }
+    initColorModule()
 }
 
 const currentActive = (color) => {
     colorStore.setMenuActive(color)
+    if (isSyncColor.value) {
+    colorStore.setLogoTitleColor(color);
+    logoTitleColor.value = color; // 同步UI
+  }
 }
 
 /* let cacheColor = {
@@ -282,7 +316,6 @@ const currentActive = (color) => {
 const dark = ref(false)
 let cacheColorModule = ''
 
-const collectColor = {}
 const toggleDark = () => {
     // 获取html根节点
     const html = document.documentElement
@@ -304,10 +337,12 @@ const toggleDark = () => {
         colorStore.setMenuBg(colorStore.storageColors.menuBg),
         colorStore.setMenuTextColor(colorStore.storageColors.menuTextColor),
         colorStore.setMenuActive(colorStore.storageColors.menuActive)
+        colorStore.setLogoTitleColor(colorStore.storageColors.logoTitleColor)
     }
         bg.value = colorStore.menuBg
         color.value = colorStore.menuTextColor
         active.value = colorStore.menuActive
+        logoTitleColor.value = colorStore.logoTitleColor
 }
 
 // 主题颜色
@@ -325,14 +360,16 @@ onMounted(()=>{
 
 // 初始化下拉列表的选中项
 const  initColorModule = () => {
-    if(!dark.value){
-        const currentTheme = colorStore.themes.find(item => item.bg === colorStore.menuBg)
-        if(currentTheme) {
-            colorModule.value = currentTheme.value
-        }else {
-            colorModule.value = ''
-        }
-    }
+  if (dark.value) return;
+  
+  const { menuBg, menuTextColor, menuActive, logoTitleColor, themes } = colorStore;
+  
+  colorModule.value = themes.find(({ bg, textColor, active, title }) => 
+    bg === menuBg &&
+    textColor === menuTextColor &&
+    active === menuActive &&
+    title === logoTitleColor
+  )?.value || '';
 }
 
 const changeColor = () => {
@@ -349,8 +386,8 @@ const changeColor = () => {
     bg.value = selected.bg
     color.value = selected.textColor
     active.value = selected.active
+    logoTitleColor.value = selected.title
     batchSetMenu(selected)
-
 }
 
 const dialogVisible = ref(false)
@@ -380,7 +417,8 @@ const onConfirm = async() => {
         value:formData.value.themeCode,
         bg:colorStore.menuBg,
         textColor:colorStore.menuTextColor,
-        active:colorStore.menuActive
+        active:colorStore.menuActive,
+        title:colorStore.logoTitleColor
     }
     colorStore.addThemes(themeObj)
     colorModule.value = themeObj.value
@@ -440,6 +478,7 @@ const rules = {
     colorStore.setMenuBg(data.bg)
     colorStore.setMenuTextColor(data.textColor)
     colorStore.setMenuActive(data.active)
+    colorStore.setLogoTitleColor(data.title)
  }
 
  const selectRef = ref(null) // 引用 select 元素
@@ -461,7 +500,6 @@ const rules = {
      selectRef.value.$emit('change');
     }
   };
-
 </script>
 
 <style scoped lang="scss">
