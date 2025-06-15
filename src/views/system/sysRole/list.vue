@@ -16,10 +16,11 @@
 
         <el-form-item>
         <el-button :icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-        <el-button :icon="Refresh" size="mini" @click="onReset" type="warning" plain >重置</el-button>
+        <el-button :icon="Refresh"  @click="onReset" type="warning" plain >重置</el-button>
         </el-form-item>
         </el-form>
         <div class="right">
+            <el-button  :icon="Search" plain color="#626aef" :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
             <el-button :disabled="$hasPerm('bnt.sysRole.add')" @click="addDialog" :icon="Plus" type="success" plain>新增</el-button>
         </div>
     </div>
@@ -29,7 +30,9 @@
     v-loading="loading"
     :data="tableData" 
     style="width: 100%" 
+    @selection-change="removeMultiple"
     border stripe>
+        <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
@@ -156,6 +159,30 @@ const removeRole = async(id) =>{
     ElMessage.success('删除成功')
     //重新渲染
     render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
+
+}
+
+const multipleSelection = ref([])
+
+const removeMultiple = (raw) =>{
+    console.log(raw)
+    multipleSelection.value = raw
+    // console.log(multipleSelection.value)
+}
+
+// 批量删除
+const deleteSelectRows = async() => {
+    if(multipleSelection.value.length === 0){
+        ElMessage.error('请先勾选要删除的行')
+        return
+    }
+    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    const rowIds = multipleSelection.value.map(row => row.id)
+   removeRole(rowIds)
 
 }
 
