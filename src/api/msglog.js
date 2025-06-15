@@ -17,5 +17,6 @@ export const loginLogRemoveApi = (params) => http.delete(`${API.LOGIN_LOG_URL}/$
 // 操作日志
 export const operlogListApi = (pageNum,pageSize,searchData) => http.get(`${API.OPER_LOG_URL}/${pageNum}/${pageSize}`,{params:searchData})
 
+export const operLogRemoveApi = (params) => http.delete(`${API.OPER_LOG_URL}/${params}`)
 export const operlogEnumsListApi = () => http.get(API.OPER_LOG_ENUMS_URL)
 
