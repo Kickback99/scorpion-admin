@@ -12,9 +12,18 @@
             </el-form-item>
             <el-form-item>
                 <el-select v-model="searchData.status" placeholder="请选择登录状态">
-                    <el-option label="登录" value="0" />
-                    <el-option label="注册" value="1" />
-                    <el-option label="退出" value="2" />
+                    <!-- 遍历所有状态选项 -->
+                    <el-option
+                    v-for="item in [
+                        { label: '登录', value: '0' },
+                        { label: '注册', value: '1' },
+                        { label: '退出', value: '2' }
+                    ]"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                    :disabled="disabledStatusOptions.includes(item.value)"
+                    />
                 </el-select>
             </el-form-item>
 <!--             <el-form-item label="时间范围">
@@ -97,7 +106,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref,computed,watch } from 'vue';
 import {Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { loginLogListApi,loginLogRemoveApi } from '@/api/msglog';
 import { ElMessage } from 'element-plus';
@@ -185,6 +194,25 @@ const removeMultiple = (raw) =>{
     multipleSelection.value = raw
     // console.log(multipleSelection.value)
 }
+
+// 计算属性：返回需要禁用的选项值
+const disabledStatusOptions = computed(() => {
+  if (searchData.type === undefined || searchData.type === null) {
+    return [];
+  }
+  if (searchData.type === '1') {
+    return [];
+  }
+  if (searchData.type === '0') {
+    return ['1']; // 禁用注册选项（value="1"）
+  }
+  return [];
+});
+
+watch(() => searchData.type, (newType) => {
+  searchData.status = null; // 清空已选类型
+});
+
 
 </script>
 
