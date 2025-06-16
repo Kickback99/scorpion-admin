@@ -28,7 +28,7 @@
         <el-table-column label="状态" width="80">
             <template #default="{row}">
                 <!-- <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/> -->
-                 <el-button v-if="row.status ===1" type="success" plain size="small">启用</el-button>
+                 <el-button v-if="row.status === 0" type="success" plain size="small">启用</el-button>
                  <el-button v-else type="danger" plain size="small">禁用</el-button>
             </template>
         </el-table-column>
@@ -113,8 +113,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="type">
             <el-radio-group v-model="formModel.status">
-              <el-radio :label="1">正常</el-radio>
-              <el-radio :label="0">停用</el-radio>
+              <el-radio :label="0">正常</el-radio>
+              <el-radio :label="1">停用</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -226,7 +226,7 @@ const defaultForm = {
     perms: '',
     icon: '',
     sortValue: 1,
-    status: 1
+    status: 0
   }
 
 
