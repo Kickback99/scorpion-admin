@@ -47,12 +47,12 @@
         <el-table-column prop="phone" label="手机" align="center" />
         <el-table-column label="类型" align="center ">
             <template #default="{row}">
-                {{ row.type === 1 ? '后台用户':'前台用户' }}
+                {{ row.type === 0 ? '后台用户':'前台用户' }}
             </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center">
             <template #default="{row}">
-                <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/>
+                <el-switch v-model="row.status"  :active-value="0" :inactive-value="1" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
@@ -284,7 +284,7 @@ const removeUsers = async(ids) =>{
 //  t_user_request：更改用户状态请求
 const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
-    row.status === 1 ? ElMessage.success('用户已激活'):ElMessage.error('用户已禁用')
+    row.status === 0 ? ElMessage.success('用户已激活'):ElMessage.error('用户已禁用')
     render()
 }
 
@@ -297,7 +297,7 @@ const defaultData = {
     nickname:'',
     phone:'',
     email:'',
-    type:"1"
+    type:"0"
 }
 
 const formData = ref({
