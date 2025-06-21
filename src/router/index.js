@@ -216,8 +216,9 @@ router.beforeEach((to, from, next) => {
         console.log('跳转到404 count次')
         settings.isManualTo404 = false
         console.log('settings.isManualTo404',settings.isManualTo404)
-        next()
+        return next()
     }
+
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
