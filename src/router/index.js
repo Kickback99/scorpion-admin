@@ -207,6 +207,7 @@ router.beforeEach((to, from, next) => {
     const tokenStore = useTokenStore()
 
     if(to.path === '/404' && count === 3){
+        console.log('跳转到404 count次')
         next()
     }
 
