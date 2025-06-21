@@ -47,7 +47,7 @@ const loading = ref(false)
   const rules = {
       username : [    
         { required: true, message: '请输入用户名', trigger: 'blur' },
-        { min: 4, max: 20, message: '用户名必须是 5-10位 的字符', trigger: 'blur' },
+        { min: 4, max: 10, message: '用户名必须是 4-10位 的字符', trigger: 'blur' },
     ],
       password : [
         { required: true, message: '请输入密码', trigger: 'blur' },
