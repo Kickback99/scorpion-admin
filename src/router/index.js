@@ -8,6 +8,7 @@ import { ElMessage } from 'element-plus'
 import nprogress from 'nprogress'
 // 引入进度条样式
 import "nprogress/nprogress.css"
+import { useSettingStore } from '@/setting'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -16,6 +17,9 @@ const router = useRouter()
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
 const route = useRoute() */
+
+
+
 // 路由规则
 const routes = [
     //{path:"",component :}
@@ -197,8 +201,10 @@ const getToken = () => {
 let count = 1;
 
 const whiteList = ['/login','/register','/401']
+
 router.beforeEach((to, from, next) => {
     nprogress.start()
+    const settings =  useSettingStore()
     ++count;
     console.log(to)
     console.log('路由前置守卫执行')
@@ -206,11 +212,12 @@ router.beforeEach((to, from, next) => {
 
     const tokenStore = useTokenStore()
 
-    if(to.path === '/404' && count === 3){
+    if(to.path === '/404' && settings.isManualTo404){
         console.log('跳转到404 count次')
+        settings.isManualTo404 = false
+        console.log('settings.isManualTo404',settings.isManualTo404)
         next()
     }
-
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
@@ -256,6 +263,7 @@ router.beforeEach((to, from, next) => {
                 next()
             }else {
                 console.log('开始重定向')
+                settings.isManualTo404 = true
                 next('/404')
             }
         }
