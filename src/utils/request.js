@@ -64,11 +64,11 @@ instance.interceptors.response.use(
 
             }else ElMessage.error(res.data.message)
 
-            return Promise.reject(res.data)
+            return Promise.reject(res.data.message)
        }
 
-        ElMessage.error(res.data.message || '业务失败')
-        return Promise.reject(res.data)
+        // ElMessage.error(res.data.message || '业务失败')
+        return Promise.reject(res.data.message)
     },
     err=>{
         alert('服务异常');

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import {userInfoApi} from '@/api/admin'
 
 export const useUserStore = defineStore({
     id:'user',
@@ -6,9 +7,34 @@ export const useUserStore = defineStore({
         userMenu:[],
         userPerm:[],
         userInfo:{},
-        roleNames:[]
+        roleNames:[],
+        hasUserInfo: false // 新增标志位
     }),
     actions:{
+        async getUserInfo(){
+
+            // 如果已有用户信息，直接返回
+            if (this.hasUserInfo) {
+                return {
+                    data: {
+                        userInfo: this.userInfo,
+                        roleNames: this.roleNames,
+                        routers: this.userMenu,
+                        permissions: this.userPerm
+                    }
+                }
+            }
+            
+
+            // t_user_request：获取用户权限请求
+            const res = await userInfoApi()
+            this.userInfo = res.data.userInfo
+            this.roleNames = res.data.roleNames
+            this.userMenu = res.data.routers
+            this.userPerm = res.data.permissions
+            this.hasUserInfo = true // 设置标志位
+            return res
+        },
         setUserMenu(menuData){
             this.userMenu = menuData
         },
@@ -28,6 +54,7 @@ export const useUserStore = defineStore({
         setRemoveUserInfo(){
             this.userInfo = {},
             this.roleNames = []
+            this.hasUserInfo = false
         }
     }
 })
