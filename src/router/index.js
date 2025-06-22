@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {userInfoApi} from '@/api/admin'
 import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
@@ -9,6 +8,7 @@ import nprogress from 'nprogress'
 // 引入进度条样式
 import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
+import { clearRoute, clearUserInfo } from '@/utils/remove'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -125,13 +125,35 @@ function routesHandler(router,parentType=null){
 export const loadMenu = async(loadUserInfo = true) => {
     const userStore = useUserStore()
     console.log('请求菜单')
-    // t_user_request：获取用户权限请求
-    const res = await userInfoApi()
-    if(loadUserInfo){
+
+    /* if(loadUserInfo){
         userStore.setUserInfo(res.data.userInfo)
         userStore.setRoleNames(res.data.roleNames)
-    }
-    if(res.data.routers.length > 0){
+    } */
+   
+    try {
+
+        // 只在需要时获取用户信息
+        let res
+        if (!userStore.hasUserInfo) {
+            res = await userStore.getUserInfo()
+        } else {
+            // 复用已有用户信息
+            res = {
+                data: {
+                    routers: userStore.userMenu,
+                    permissions: userStore.userPerm,
+                    userInfo: userStore.userInfo,
+                    roleNames: userStore.roleNames
+                }
+            }
+        }
+        // 情况1：前台用户（假设 type !== 0 是前台用户）
+        if (userStore.userInfo.type !== 0) {
+            return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
+        }
+        // 情况2：有菜单权限的后台用户
+        if(res.data.routers.length > 0){
         //保存菜单，避免路由鉴权重复执行
         userStore.setUserMenu(res.data.routers)
         // 把用户按钮权限存进store
@@ -146,17 +168,20 @@ export const loadMenu = async(loadUserInfo = true) => {
         asyncRoutes.forEach(r => {
             router.addRoute(r)
         })
+
     }else {
+        // 情况3：无菜单权限的后台用户
         router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
         router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
-        return Promise.reject('该用户无菜单权限...')
+            return Promise.reject({ noMenuPermission: true, message: '该用户无菜单权限' });
     }
-
     router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
-
-
     console.log(router.getRoutes())
+    } catch (error) {
+    // 情况4：请求失败（如网络错误或API错误）
+    return Promise.reject(error);
+    }
 
 }
 
@@ -209,8 +234,8 @@ router.beforeEach((to, from, next) => {
     console.log(to)
     console.log('路由前置守卫执行')
     const userStore = useUserStore()
-
     const tokenStore = useTokenStore()
+    console.log('userStore.userMenu.length',userStore.userMenu.length )
 
     if(to.path === '/404' && settings.isManualTo404){
         console.log('跳转到404 count次')
@@ -258,15 +283,31 @@ router.beforeEach((to, from, next) => {
     // 已登录，无菜单 => 加载菜单
     loadMenu().then(
         ()=>{next({...to,replace:true})
-    }).catch(
-        ()=>{
-            if(to.path === '/index'){
-                next()
+    }).catch((error) =>
+        {
+            // 情况1：前台用户 -> 提示错误，并跳转login
+            if (error.isFrontendUser && to.path !== '/login') {
+                      ElMessage.error(error.message)
+                      router.replace('/login')
+                      tokenStore.removeToken()
+                      clearUserInfo()
+                      clearRoute(userStore.userMenu)
+                      userStore.removeUserAuth()
+                      
+            } 
+            // 情况3：无菜单权限的后台用户 -> 跳转404
+            else if (error.noMenuPermission) {
+                if(to.path === '/index'){
+                     next()
+                }else {
+                    settings.isManualTo404 = true;
+                    next('/404');
+                }
             }else {
-                console.log('开始重定向')
-                settings.isManualTo404 = true
-                next('/404')
+                ElMessage.error(error.message || '加载菜单失败');
+                next(false); // 阻止导航
             }
+                 
         }
     )
 

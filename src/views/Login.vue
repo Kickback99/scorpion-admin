@@ -29,8 +29,11 @@ import { ElMessage } from 'element-plus'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
 import {useTokenStore} from '@/store/token'
+import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
+const userStore = useUserStore()
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
+
 const router = useRouter()
 const route = useRoute()
 
@@ -47,7 +50,7 @@ const loading = ref(false)
   const rules = {
       username : [    
         { required: true, message: '请输入用户名', trigger: 'blur' },
-        { min: 4, max: 10, message: '用户名必须是 4-10位 的字符', trigger: 'blur' },
+        { min: 4, max: 20, message: '用户名必须是 4-20位 的字符', trigger: 'blur' },
     ],
       password : [
         { required: true, message: '请输入密码', trigger: 'blur' },
@@ -63,8 +66,11 @@ const handleLogin = async() => {
     const res = await adminLoginApi(formModel.value)
     console.log(res.data)
     tokenStore.setToken(res.data)
-    ElMessage.success('登录成功')
     loading.value = false
+    await userStore.getUserInfo()
+    if(userStore.userInfo.type === 0){
+        ElMessage.success('登录成功')
+    }
     // 从本地存储中获取原始路由的查询参数
     const originalRouteQuery = JSON.parse(localStorage.getItem('originalRouteQuery'));
      // 如果存在保存的路由信息，则重定向到该路由
