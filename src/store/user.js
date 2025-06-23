@@ -67,6 +67,7 @@ export const useUserStore = defineStore({
             this.roleNames = []
             this.hasUserInfo = false
         },
+        // 清除当前用户所有数据
         clearUserStore(){
             this.$reset()
         }
