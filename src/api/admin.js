@@ -27,7 +27,7 @@ export const adminLoginApi = (params) =>{
 
 // 获取用户信息
 export const userInfoApi = () => {
-    return http.get('/admin/userDetailInfo')
+    return http.get('/admin/userDetailInfo123')
 }
 
 // 用户退出登录

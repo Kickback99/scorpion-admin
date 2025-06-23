@@ -135,16 +135,16 @@ export const loadMenu = async(loadUserInfo = true) => {
 
         // 只在需要时获取用户信息
         let res
-        if (!userStore.hasUserInfo) {
+        if (!userStore.hasUserInfo && loadUserInfo) {
             res = await userStore.getUserInfo()
         } else {
             // 复用已有用户信息
             res = {
                 data: {
-                    routers: userStore.userMenu,
-                    permissions: userStore.userPerm,
                     userInfo: userStore.userInfo,
-                    roleNames: userStore.roleNames
+                    roleNames: userStore.roleNames,
+                    routers: userStore.menuData.routers,
+                    permissions: userStore.menuData.permissions,
                 }
             }
         }
@@ -153,16 +153,16 @@ export const loadMenu = async(loadUserInfo = true) => {
             return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
         }
         // 情况2：有菜单权限的后台用户
-        if(res.data.routers.length > 0){
+        if(userStore.menuData.routers.length > 0){
         //保存菜单，避免路由鉴权重复执行
-        userStore.setUserMenu(res.data.routers)
+        userStore.setUserMenu(userStore.menuData.routers)
         // 把用户按钮权限存进store
-        userStore.setUserPerm(res.data.permissions)
-        const asyncRoutes = routesHandler(res.data.routers)
+        userStore.setUserPerm(userStore.menuData.permissions)
+        const asyncRoutes = routesHandler(userStore.menuData.routers)
 
-        console.log('后端返回',res.data.routers)
+        console.log('后端返回',userStore.menuData.routers)
 
-        console.log('路由数据',asyncRoutes)
+        console.log('路由数据',asyncRoutes) 
 
         // 添加路由
         asyncRoutes.forEach(r => {
@@ -239,7 +239,7 @@ router.beforeEach((to, from, next) => {
 
     if(to.path === '/404' && settings.isManualTo404){
         console.log('跳转到404 count次')
-        settings.isManualTo404 = false
+        // settings.isManualTo404 = false
         console.log('settings.isManualTo404',settings.isManualTo404)
         return next()
     }
@@ -290,9 +290,10 @@ router.beforeEach((to, from, next) => {
                       ElMessage.error(error.message)
                       router.replace('/login')
                       tokenStore.removeToken()
-                      clearUserInfo()
+                    //   clearUserInfo()
                       clearRoute(userStore.userMenu)
-                      userStore.removeUserAuth()
+                      userStore.clearUserStore( )
+                    //   userStore.removeUserAuth()
                       
             } 
             // 情况3：无菜单权限的后台用户 -> 跳转404
@@ -304,7 +305,7 @@ router.beforeEach((to, from, next) => {
                     next('/404');
                 }
             }else {
-                ElMessage.error(error.message || '加载菜单失败');
+                ElMessage.error(error|| '加载菜单失败');
                 next(false); // 阻止导航
             }
                  

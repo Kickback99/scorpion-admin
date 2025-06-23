@@ -8,6 +8,10 @@ export const useUserStore = defineStore({
         userPerm:[],
         userInfo:{},
         roleNames:[],
+        menuData:{
+            routers:[],
+            permissions:[]
+        },
         hasUserInfo: false // 新增标志位
     }),
     actions:{
@@ -30,8 +34,10 @@ export const useUserStore = defineStore({
             const res = await userInfoApi()
             this.userInfo = res.data.userInfo
             this.roleNames = res.data.roleNames
-            this.userMenu = res.data.routers
-            this.userPerm = res.data.permissions
+            this.menuData = {
+                routers:res.data.routers,
+                permissions:res.data.permissions
+            }
             this.hasUserInfo = true // 设置标志位
             return res
         },
@@ -55,6 +61,9 @@ export const useUserStore = defineStore({
             this.userInfo = {},
             this.roleNames = []
             this.hasUserInfo = false
+        },
+        clearUserStore(){
+            this.$reset()
         }
     }
 })

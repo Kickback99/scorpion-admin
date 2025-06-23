@@ -193,14 +193,16 @@ const handleCommand = async (key) => {
         tokenStore.removeToken()
         console.log('清空前', router.getRoutes())
         // 清空用户信息
-        clearUserInfo()
+        // clearUserInfo()
         // 清空动态路由数据
         clearRoute(userStore.userMenu)
         console.log('清空后', router.getRoutes())
+        // 清空用户信息和菜单
+        userStore.clearUserStore()
         // 清空菜单
-        userStore.removeUserAuth()
+        // userStore.removeUserAuth()
         // 清空用户名
-        userStore.username = ''
+        // userStore.username = ''
         // 提示信息
         ElMessage.success(res.message)
         // 跳转到登录页
