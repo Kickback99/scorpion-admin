@@ -92,7 +92,10 @@ const handleLogin = async() => {
         router.push({path: redirect || '/'});
       }
     } catch (error) {
-      loading.value = false
+        console.log('访问错误',error)
+        loading.value = false
+        throw(error)
+
     }
 }
 
