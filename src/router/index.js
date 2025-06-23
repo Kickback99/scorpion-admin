@@ -179,6 +179,7 @@ export const loadMenu = async(loadUserInfo = true) => {
     router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
     console.log(router.getRoutes())
     } catch (error) {
+        console.log('error,',error)
     // 情况4：请求失败（如网络错误或API错误）
     return Promise.reject(error);
     }
@@ -239,7 +240,7 @@ router.beforeEach((to, from, next) => {
 
     if(to.path === '/404' && settings.isManualTo404){
         console.log('跳转到404 count次')
-        // settings.isManualTo404 = false
+        settings.isManualTo404 = false
         console.log('settings.isManualTo404',settings.isManualTo404)
         return next()
     }

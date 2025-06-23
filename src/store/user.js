@@ -31,6 +31,7 @@ export const useUserStore = defineStore({
             
 
             // t_user_request：获取用户权限请求
+            try{
             const res = await userInfoApi()
             this.userInfo = res.data.userInfo
             this.roleNames = res.data.roleNames
@@ -40,6 +41,10 @@ export const useUserStore = defineStore({
             }
             this.hasUserInfo = true // 设置标志位
             return res
+        }catch(error){
+            error = '访问用户信息失败'
+            return Promise.reject(error)
+        }
         },
         setUserMenu(menuData){
             this.userMenu = menuData
