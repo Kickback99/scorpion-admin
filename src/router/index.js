@@ -301,7 +301,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 按需加载菜单
-    loadMenu(userStore.hasUserInfo).then(
+    loadMenu().then(
         ()=>{next({...to,replace:true})
     }).catch((error) =>
         {
