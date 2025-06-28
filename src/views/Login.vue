@@ -67,7 +67,8 @@ const handleLogin = async() => {
     console.log(res.data)
     tokenStore.setToken(res.data)
     loading.value = false
-    await userStore.getUserInfo()
+    // 强制刷新用户信息
+    await userStore.getUserInfo(true)
     if(userStore.userInfo.type === 0){
         ElMessage.success('登录成功')
     }

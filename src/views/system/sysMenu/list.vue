@@ -316,6 +316,7 @@ const addMenu = async() => {
     await addApi(formModel.value)
     dialogVisible.value = false
     ElMessage.success('添加成功')
+    loadMenu(false)
     render()
 }
 
@@ -327,7 +328,7 @@ const modifyMenu = async() => {
     ElMessage.success('修改成功')
     render()
     // 清空路由
-    clearRoute(userStore.userMenu)
+    // clearRoute(userStore.userMenu)
     // 重新加载路由配置文件和pinia数据
     loadMenu(false)
 }

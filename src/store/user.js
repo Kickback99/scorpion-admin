@@ -15,10 +15,10 @@ export const useUserStore = defineStore({
         hasUserInfo: false // 新增标志位
     }),
     actions:{
-        async getUserInfo(){
+        async getUserInfo(forceRefreshMenu = false){
 
             // 如果已有用户信息，直接返回
-            if (this.hasUserInfo) {
+            /* if (this.hasUserInfo) {
                 return {
                     data: {
                         userInfo: this.userInfo,
@@ -27,9 +27,14 @@ export const useUserStore = defineStore({
                         permissions: this.userPerm
                     }
                 }
+            } */
+
+            // 已有基础信息且不强制刷新 → 仅返回菜单数据
+            if (this.hasUserInfo && !forceRefreshMenu) {
+                return {data: this.menuData}
             }
             
-
+            // 否则全量请求
             // t_user_request：获取用户权限请求
             try{
             const res = await userInfoApi()
@@ -45,6 +50,11 @@ export const useUserStore = defineStore({
             error = '访问用户信息失败'
             return Promise.reject(error)
         }
+        },
+        // 仅刷新菜单数据
+        async refreshMenuOnly() {
+            const res = await userInfoApi();
+            return res.data;
         },
         setUserMenu(menuData){
             this.userMenu = menuData
