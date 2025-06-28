@@ -195,7 +195,7 @@ const handleCommand = async (key) => {
         // 清空用户信息
         // clearUserInfo()
         // 清空动态路由数据
-        clearRoute(userStore.userMenu)
+        // clearRoute(userStore.userMenu)
         console.log('清空后', router.getRoutes())
         // 清空用户信息和菜单
         userStore.clearUserStore()
