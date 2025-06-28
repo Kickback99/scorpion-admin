@@ -9,6 +9,7 @@ import nprogress from 'nprogress'
 import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
 import { clearRoute, clearUserInfo } from '@/utils/remove'
+import { add404Routes } from '@/utils/404route'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -132,52 +133,70 @@ export const loadMenu = async(loadUserInfo = true) => {
     } */
    
     try {
-
-        // 只在需要时获取用户信息
-        let res
-        if (!userStore.hasUserInfo && loadUserInfo) {
-            res = await userStore.getUserInfo()
+        // ================= 1. 数据获取阶段 =================
+        let menuData
+        if(loadUserInfo){
+            // 场景1：完整获取用户信息+菜单
+            const res = await userStore.getUserInfo();
+            menuData = {
+                    routers: res.data.routers,
+                    permissions: res.data.permissions
+            };
         } else {
-            // 复用已有用户信息
-            res = {
-                data: {
-                    userInfo: userStore.userInfo,
-                    roleNames: userStore.roleNames,
-                    routers: userStore.menuData.routers,
-                    permissions: userStore.menuData.permissions,
-                }
-            }
+            // 场景2：仅刷新菜单(修改菜单后调用)
+            const res = await userStore.refreshMenuOnly();
+            menuData = {
+                routers: res.routers,
+                permissions: res.permissions
+            };
         }
-        // 情况1：前台用户（假设 type !== 0 是前台用户）
+    // ================= 2. 权限校验阶段 =================
+        // 情况1：前台用户拦截
         if (userStore.userInfo.type !== 0) {
+            console.log('情况1拦截')
             return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
         }
-        // 情况2：有菜单权限的后台用户
-        if(res.data.roleNames.length > 0){
-        //保存菜单，避免路由鉴权重复执行
-        userStore.setUserMenu(res.data.routers)
-        // 把用户按钮权限存进store
-        userStore.setUserPerm(res.data.permissions)
-        const asyncRoutes = routesHandler(res.data.routers)
 
-        console.log('后端返回',userStore.menuData.routers)
 
-        console.log('路由数据',asyncRoutes) 
+        // 情况2：无菜单权限拦截
+        if (menuData.routers.length === 0) {
+            console.log('情况2拦截')
+        add404Routes(router); // 确保404路由存在
+        return Promise.reject({ 
+            noMenuPermission: true, 
+            message: '该用户无菜单权限' 
+        });
+        }
 
-        // 添加路由
-        asyncRoutes.forEach(r => {
-            router.addRoute(r)
-        })
+            console.log('情况3拦截')
+    // ================= 3. 路由处理阶段 =================
+    // 3.1 清除旧路由
+    userStore.userMenu.forEach(route => {
+      router.removeRoute(route.name);
+    });
 
-    }else {
-        // 情况3：无菜单权限的后台用户
-        router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
-        router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
-            return Promise.reject({ noMenuPermission: true, message: '该用户无菜单权限' });
-    }
-    router.addRoute( {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'})
-    router.addRoute( {path:'/404',name:'404',component:()=>import('@/views/404/index.vue')})
-    console.log(router.getRoutes())
+    
+    // 3.2 处理新路由
+    const asyncRoutes = routesHandler(menuData.routers);
+    console.log('后端返回',menuData.routers)
+    console.log('路由数据',asyncRoutes) 
+    asyncRoutes.forEach(route => {
+      router.addRoute(route);
+    });
+
+    // 3.3 更新Store中的菜单引用
+    userStore.setUserMenu(menuData.routers);
+    userStore.setUserPerm(menuData.permissions);
+
+    // 3.4 确保404路由存在
+    add404Routes(router);
+
+    console.log('动态路由更新完成', {
+      routes: router.getRoutes(),
+      permissions: menuData.permissions
+    });
+
+    return true;
     } catch (error) {
         console.log('error,',error)
     // 情况4：请求失败（如网络错误或API错误）
@@ -281,8 +300,8 @@ router.beforeEach((to, from, next) => {
         return next()
     }
 
-    // 已登录，无菜单 => 加载菜单
-    loadMenu().then(
+    // 已登录，无菜单 => 按需加载菜单
+    loadMenu(userStore.hasUserInfo).then(
         ()=>{next({...to,replace:true})
     }).catch((error) =>
         {
