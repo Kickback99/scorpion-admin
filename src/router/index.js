@@ -153,12 +153,12 @@ export const loadMenu = async(loadUserInfo = true) => {
             return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
         }
         // 情况2：有菜单权限的后台用户
-        if(userStore.menuData.routers.length > 0){
+        if(res.data.roleNames.length > 0){
         //保存菜单，避免路由鉴权重复执行
-        userStore.setUserMenu(userStore.menuData.routers)
+        userStore.setUserMenu(res.data.routers)
         // 把用户按钮权限存进store
-        userStore.setUserPerm(userStore.menuData.permissions)
-        const asyncRoutes = routesHandler(userStore.menuData.routers)
+        userStore.setUserPerm(res.data.permissions)
+        const asyncRoutes = routesHandler(res.data.routers)
 
         console.log('后端返回',userStore.menuData.routers)
 
