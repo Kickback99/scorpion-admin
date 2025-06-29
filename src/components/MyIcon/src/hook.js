@@ -1,5 +1,5 @@
 import { h, defineComponent} from "vue";
-import { IconifyOnline, IconifyOffline, IconFont } from "../index";
+import { IconifyOnline, FullIconifyOffline, IconFont } from "../index";
 
 /**
  * 支持 `IconFont`、自定义 `svg` 以及 `iconify` 中所有的图标
@@ -38,7 +38,7 @@ export function useRenderIcon(icon,offline=true,attrs) {
     return defineComponent({
       name: "OfflineIcon",
       render() {
-        return h(IconifyOffline, {
+        return h(FullIconifyOffline, {
           icon: icon,
           ...attrs
         });
@@ -50,7 +50,7 @@ export function useRenderIcon(icon,offline=true,attrs) {
       name: "Icon",
       render() {
         const IconifyIcon =
-          icon && offline ?  IconifyOffline : IconifyOnline
+          icon && offline ?  FullIconifyOffline : IconifyOnline
         return h(IconifyIcon, {
           icon: icon,
           ...attrs

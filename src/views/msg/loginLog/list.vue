@@ -78,6 +78,32 @@
                 <el-tag type="danger" v-if="row.status === 2">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
+        <el-table-column label="token" >
+            <template #default="{row}">
+                <div style="display: flex; align-items: center; gap: 8px">
+                    <span style="overflow: hidden; text-overflow: ellipsis">
+                        {{ row.token ? `${row.token.substring(0, 6)}...${row.token.substring(row.token.length - 4)}` : '' }}
+                    </span>
+
+                    <!-- <el-icon 
+                        v-if="row.token"
+                        style="cursor: pointer" 
+                        @click="handleCopy(row.token, row.id)"
+                    >
+                        <component :is="copiedId === row.id ? CircleCheck : CopyDocument" />
+                    </el-icon> -->
+
+                    <el-icon 
+                        v-if="row.token"
+                        style="cursor: pointer; transition: all 0.3s" 
+                        @click="handleCopy(row.token, row.id)"
+                        :color="copiedId === row.id ? '#67c23a' : '#67c23a'"
+                    >
+                        <component :is="copiedId === row.id ? CircleCheck : CopyDocument" />
+                    </el-icon>
+                </div>
+            </template>
+        </el-table-column>
         <el-table-column prop="createTime" label="操作日期"  />
         <el-table-column  label="操作" width="150">
             <template #default="{row}">
@@ -107,7 +133,7 @@
 
 <script setup>
 import { reactive, ref,computed,watch } from 'vue';
-import {Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
+import {Delete,WarnTriangleFilled,CopyDocument,CircleCheck} from '@element-plus/icons-vue'
 import { loginLogListApi,loginLogRemoveApi } from '@/api/msglog';
 import { ElMessage } from 'element-plus';
 
@@ -212,6 +238,56 @@ const disabledStatusOptions = computed(() => {
 watch(() => searchData.type, (newType) => {
   searchData.status = null; // 清空已选类型
 });
+
+// 复制到剪贴板的方法
+/* const copyToClipboard = (text) => {
+  try {
+    navigator.clipboard.writeText(text)
+    ElMessage.success('复制成功')
+  } catch (err) {
+    // 兼容性处理
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    ElMessage.success('复制成功')
+  }
+} */
+
+const copiedId = ref(null) // 记录当前已复制的行ID
+
+const handleCopy = (text, id) => {
+  try {
+    navigator.clipboard.writeText(text)
+    copiedId.value = id // 设置当前复制的行ID
+
+    ElMessage.success('复制成功')
+    
+    // 3秒后恢复原图标
+    setTimeout(() => {
+      if (copiedId.value === id) {
+        copiedId.value = null
+      }
+    }, 3000)
+  } catch (err) {
+    // 兼容性处理
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    copiedId.value = id
+    
+    setTimeout(() => {
+      if (copiedId.value === id) {
+        copiedId.value = null
+      }
+    }, 3000)
+  }
+}
 
 
 </script>

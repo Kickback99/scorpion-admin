@@ -9,6 +9,10 @@ export default defineComponent({
     icon: {
       type: String,
       default: ""
+    },
+    type:{
+      type:String,
+      default:'ep'
     }
   },
   render() {
@@ -16,7 +20,7 @@ export default defineComponent({
     return h(
       IconifyIcon,
       {
-        icon: this.icon,
+        icon: `${this.type}:${this.icon}`,
         ...attrs
       },
       {
