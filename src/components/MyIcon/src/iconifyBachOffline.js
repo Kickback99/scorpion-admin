@@ -1,4 +1,5 @@
-import { addCollection,listIcons } from '@iconify/vue';
+import { listIcons } from '@iconify/vue';
+import { addCollection } from '@iconify/vue/dist/offline';
 import {prefix as epPrefix,icons as epIcons} from '@iconify-json/ep/icons.json'
 import {prefix as riPrefix,icons as rIIcons} from '@iconify-json/ri/icons.json'
 import {prefix as fasPrefix,icons as fasIcons} from '@iconify-json/fa-solid/icons.json'
