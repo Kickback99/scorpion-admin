@@ -7,6 +7,7 @@ import {prefix as fasPrefix,icons as fasIcons} from '@iconify-json/fa-solid/icon
 export const addSingleIcon = (icon) => {
     const [prefix, key] = icon.split(':');
     console.log(getIconData(prefix,key))
+    console.log('离线加载中')
     addIcon(icon,getIconData(prefix,key))
 }
 

@@ -36,7 +36,9 @@ export default defineComponent({
     // 如果传入的图标中包含":"，则调用函数来离线加载图标
     else if(this.icon?.includes(':')) {
       console.log('是字符串')
-      addSingleIcon(this.icon)
+       const data = getIcon(this.icon)
+      console.log('data',data)
+      data!= null ? addIcon(this.icon, {...data}):addSingleIcon(this.icon)
     }
     const attrs = this.$attrs;
     return h(
