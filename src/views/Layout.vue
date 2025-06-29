@@ -17,6 +17,27 @@
                    <el-icon> <IconifyOffline :icon="'ep:home-filled'"></IconifyOffline> </el-icon> <span>首页</span> 
           </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
+
+          			<!--多级菜单-->
+          <el-sub-menu index="/user">
+                <template #title>
+                    <el-icon><Aim /></el-icon> <span>个人中心</span>
+                </template>
+			   <!--展开的每一个菜单项-->
+                <el-menu-item index="/user/info">
+                    <el-icon><Aim /></el-icon> <span>基本资料</span>
+                </el-menu-item>
+                <el-menu-item index="/user/avatar">
+					          <el-icon><Aim /></el-icon> <span>用户头像</span>
+                </el-menu-item>
+                <el-menu-item index="/user/resetPassword">
+					          <el-icon><Aim /></el-icon> <span>重置密码</span>
+                </el-menu-item>
+            </el-sub-menu>
+
+            <el-menu-item index="/test">
+                   <el-icon> <IconifyOffline :icon="'ep:home-filled'"></IconifyOffline> </el-icon> <span>测试</span> 
+            </el-menu-item>
         </el-menu>
       </el-scrollbar>
       </el-aside>

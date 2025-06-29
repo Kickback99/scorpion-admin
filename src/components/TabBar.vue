@@ -79,7 +79,9 @@
             <span class="el-dropdown_box">
                 <el-avatar :src="userStore.userInfo.avatar || avatar" />
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
-                {{ displayName }}
+                <!-- {{ displayName }} -->
+
+                {{ userStore.userInfo.nickname || userStore.userInfo.username }}
                 <el-icon>
                     <arrow-down />
                 </el-icon>
@@ -155,8 +157,10 @@ const route = useRoute()
 const router = useRouter()
 
 const displayName = computed(() => {
-    if (userStore.roleNames && userStore.roleNames.length > 0) return userStore.roleNames[0]
+    /* if (userStore.roleNames && userStore.roleNames.length > 0) return userStore.roleNames[0]
     else if (userStore.userInfo.nickname) return userStore.userInfo.nickname
+    else return userStore.userInfo.username */
+    if(userStore.userInfo.nickname) return userStore.userInfo.nickname
     else return userStore.userInfo.username
 })
 
@@ -195,7 +199,7 @@ const handleCommand = async (key) => {
         // 清空用户信息
         // clearUserInfo()
         // 清空动态路由数据
-        // clearRoute(userStore.userMenu)
+        clearRoute(userStore.userMenu)
         console.log('清空后', router.getRoutes())
         // 清空用户信息和菜单
         userStore.clearUserStore()
