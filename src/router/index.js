@@ -25,7 +25,6 @@ const route = useRoute() */
 const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
-    {path:'/test',component:() => import('@/views/Test.vue')},
     { path:'/',redirect:'/index',meta:{
         hidden:true
     },
@@ -35,6 +34,10 @@ const routes = [
             meta:{
                title:'首页'     
         }},
+        {path:'/user/info',component:() =>import('@/views/user/userInfo.vue')},
+        {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
+        {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
+        {path:'/test',component:() => import('@/views/Test.vue')}
     ]}
 /*     {
     path:'/',
@@ -171,11 +174,7 @@ export const loadMenu = async(loadUserInfo = true) => {
             console.log('情况3拦截')
     // ================= 3. 路由处理阶段 =================
     // 3.1 清除旧路由
-    userStore.userMenu.forEach(route => {
-      router.removeRoute(route.name);
-    });
 
-    
     // 3.2 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
     console.log('后端返回',menuData.routers)

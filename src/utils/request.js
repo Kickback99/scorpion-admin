@@ -52,7 +52,7 @@ instance.interceptors.response.use(
                 // 清空用户信息
                 // clearUserInfo()
                 // 清空动态路由数据
-                // clearRoute(userStore.userMenu)    
+                clearRoute(userStore.userMenu)    
                 // 清空用户信息和菜单
                 userStore.clearUserStore()
                 // 清空菜单
