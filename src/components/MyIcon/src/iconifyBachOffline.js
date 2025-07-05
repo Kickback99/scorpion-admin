@@ -1,4 +1,4 @@
-import { listIcons } from '@iconify/vue';
+import { listIcons,getIcon } from '@iconify/vue';
 import { addCollection, addIcon } from '@iconify/vue/dist/offline';
 import { prefix as epPrefix, icons as epIcons } from '@iconify-json/ep/icons.json';
 import { prefix as riPrefix, icons as rIIcons } from '@iconify-json/ri/icons.json';
@@ -13,21 +13,27 @@ export function addBatchIconList(icons) {
     const existingIconsToAdd = []; // 需要单独添加的已存在图标
     
     // 第一步：分类处理所有图标
-    icons.forEach(fullName => {
+        icons.forEach(fullName => {
         const [prefix, name] = fullName.split(':');
-        const iconData = getIconData(prefix, name);
         
-        if (!iconData) {
-            console.warn(`无法获取图标数据: ${fullName}`);
-            return;
-        }
-        
-        // 判断是否已存在
+        // 先检查是否已存在
         if (existingIcons.includes(fullName)) {
-            // 已存在 -> 放入单独添加队列
-            existingIconsToAdd.push({ fullName, iconData });
+            // 已存在 -> 从getIcon获取数据
+            const iconData = getIcon(fullName);
+            if (iconData) {
+                existingIconsToAdd.push({ fullName, iconData });
+            } else {
+                console.warn(`图标 ${fullName} 已存在但获取失败`);
+            }
         } else {
-            // 新图标 -> 按前缀分组
+            // 新图标 -> 从本地JSON获取数据
+            const iconData = getIconData(prefix, name);
+            if (!iconData) {
+                console.warn(`无法获取图标数据: ${fullName}`);
+                return;
+            }
+            
+            // 按前缀分组
             if (!newIconsMap[prefix]) {
                 newIconsMap[prefix] = {
                     prefix,
@@ -52,7 +58,7 @@ export function addBatchIconList(icons) {
         addIcon(fullName, iconData);
     });
     
-    console.log('当前所有图标:', listIcons());
+    console.log('当前所有在线图标:', listIcons());
 }
 
 // 获取图标数据的函数保持不变
