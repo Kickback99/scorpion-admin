@@ -90,4 +90,18 @@ import { hasPermissions } from '@/utils/permissions'
 
 app.config.globalProperties.$hasPerm =  hasPermissions
 
+import { addBatchIconList } from './components/MyIcon/src/iconifyBachOffline'
+addBatchIconList([
+  'ep:download',
+  'ep:document',
+  'ep:stamp',
+  'ri:account-box-line',
+  'ri:aliens-line',
+  'ep:check',
+  'ep:folder',
+  'ep:chat-dot-round',
+  'ep:chrome-filled',
+  'ep:apple'
+  ])
+
 app.mount('#app')

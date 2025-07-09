@@ -5,6 +5,7 @@ import { getIcon } from '@iconify/vue';
 import Check from "@iconify-icons/ep/check";
 import Bell from "@iconify-icons/ep/bell";
 import { addSingleIcon } from "./iconifySingleOffilne";
+import { useIconStore } from "@/store/icon";
 addIcon("check", Check);
 addIcon("bell", Bell);
 
@@ -21,6 +22,25 @@ export default defineComponent({
   props: {
     icon: {
       default: null
+    },
+    isCollect:{
+      type: Boolean,
+      default: true
+    }
+  },
+    // t_store_icon：singleIcon.js(单个图标收集)
+    // 存入store
+  setup(props) {
+    if (props.isCollect && props.icon) {
+      const iconStore = useIconStore();
+      onMounted(() => {
+        console.log('避免输出多次...')
+        const uniqueIcons = new Set([
+          ...iconStore.singleIcons,
+          props.icon
+        ]);
+        iconStore.setSingleIcons([...uniqueIcons]);
+      });
     }
   },
   render() {
