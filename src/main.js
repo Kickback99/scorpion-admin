@@ -69,12 +69,12 @@ import 'virtual:svg-icons-register'
 
 // 全局注册@iconify/vue图标库
 import {
-  offlineIcon,
+  OfflineIcon,
   OnlineIcon,
   SingleIcon,
   IconFont
   } from "./components/MyIcon";
-  app.component("offlineIcon",offlineIcon)
+  app.component("OfflineIcon",OfflineIcon)
   app.component("OnlineIcon", OnlineIcon);
   app.component("SingleIcon", SingleIcon);
   app.component("IconFont", IconFont);

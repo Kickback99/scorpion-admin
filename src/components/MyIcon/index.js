@@ -1,4 +1,4 @@
-import offlineIcon from './src/offlineIcon'
+import OfflineIcon from './src/offlineIcon'
 
 // iconify本地图标(满的)
 import SingleIcon from "./src/singleIcon";
@@ -9,4 +9,4 @@ import IconFont from "./src/iconfont"
 // 图标选择器
 import IconSelect from "./src/Select.vue"
 
-export {offlineIcon,OnlineIcon,SingleIcon,IconFont,IconSelect}
+export {OfflineIcon,OnlineIcon,SingleIcon,IconFont,IconSelect}
