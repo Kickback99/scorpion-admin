@@ -36,7 +36,7 @@
             </el-sub-menu>
 
             <el-menu-item index="/test">
-                   <el-icon> <IconifyOffline :icon="'ep:home-filled'"></IconifyOffline> </el-icon> <span>测试</span> 
+                   <el-icon> <FullIconifyOffline :icon="'ep:home-filled'"></FullIconifyOffline> </el-icon> <span>测试</span> 
             </el-menu-item>
         </el-menu>
       </el-scrollbar>
