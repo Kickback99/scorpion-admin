@@ -14,7 +14,7 @@
           :collapse-transition="false"
         >
           <el-menu-item index="/index">
-                   <el-icon> <FullIconifyOffline :icon="'ep:home-filled'"></FullIconifyOffline> </el-icon> <span>首页</span> 
+                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>首页</span> 
           </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
 
@@ -36,7 +36,7 @@
             </el-sub-menu>
 
             <el-menu-item index="/test">
-                   <el-icon> <FullIconifyOffline :icon="'ep:home-filled'"></FullIconifyOffline> </el-icon> <span>测试</span> 
+                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>测试</span> 
             </el-menu-item>
         </el-menu>
       </el-scrollbar>

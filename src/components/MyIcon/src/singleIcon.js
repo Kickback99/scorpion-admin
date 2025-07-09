@@ -16,7 +16,7 @@ const renderIcon = (icon) => {
 
 // Iconify Icon在Vue里本地使用（用于内网环境）
 export default defineComponent({
-  name: "FullIconifyOffline",
+  name: "SingleIcon",
   components: { IconifyIcon },
   props: {
     icon: {

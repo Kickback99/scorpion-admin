@@ -3,23 +3,32 @@ import { defineStore } from "pinia";
 export const useIconStore = defineStore({
     id:'icon',
     state:()=>({
-        localIcons:[],
+        // 在线图标收集
+        onlineIcons:[],
+        // 批量收集
         batchIcons:[],
-        fullIcons:[],
-        objectIcons:[]
+        // 批量收集(已使用)
+        batchUsedIcons:[],
+        // 单个图标收集
+        singleIcons:[],
+        // 自定义图标收集
+        customIcons:[]
     }),
     actions:{
-        setLocalIcons(data){
-            this.localIcons = data
+        setOnlineIcons(data){
+            this.onlineIcons = data
         },
         setBatchIcons(data){
             this.batchIcons = data
         },
-        setFullIcons(data){
-            this.fullIcons = data
+        setBatchUsedIcons(data){
+            this.batchUsedIcons = data
         },
-        setObjectIcons(data){
-            this.objectIcons = data
+        setSingleIcons(data){
+            this.singleIcons = data
+        },
+        setCustomIcons(data){
+            this.customIcons = data
         },
         // 清除当前所有数据
         clearIconStore(){

@@ -9,7 +9,7 @@
             <el-breadcrumb-item v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden"
                 :to="item.path" class="breadcrumb">
                 <el-icon>
-                    <IconifyOffline :icon="item.meta.icon || Home"></IconifyOffline>
+                    <OfflineIcon :icon="item.meta.icon || Home"></OfflineIcon>
                 </el-icon>
                 <span>{{ item.meta.title }}</span>
                 <!-- <button @click="queryRouter(item)">查看当前路由</button> -->
