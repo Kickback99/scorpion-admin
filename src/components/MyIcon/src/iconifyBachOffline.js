@@ -3,9 +3,15 @@ import { addCollection, addIcon } from '@iconify/vue/dist/offline';
 import { prefix as epPrefix, icons as epIcons } from '@iconify-json/ep/icons.json';
 import { prefix as riPrefix, icons as rIIcons } from '@iconify-json/ri/icons.json';
 import { prefix as fasPrefix, icons as fasIcons } from '@iconify-json/fa-solid/icons.json';
+import { useIconStore } from '@/store/icon';
 
 export function addBatchIconList(icons) {
     console.log('批量加载调用了');
+
+    // t_store_icon：iconifyBachOffline.js(所有批量图标)
+    // 存入store
+    const iconStore = useIconStore()
+    iconStore.setBatchIcons([...icons])
     
     // 获取已存在的图标列表
     const existingIcons = listIcons();

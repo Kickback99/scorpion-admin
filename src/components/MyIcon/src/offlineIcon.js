@@ -4,6 +4,7 @@ import { getIcon } from '@iconify/vue';
 
 import Check from "@iconify-icons/ep/check";
 import Bell from "@iconify-icons/ep/bell";
+import { useIconStore } from "@/store/icon";
 addIcon("check", Check);
 addIcon("bell", Bell);
 addIcon("ep:aim",{
@@ -28,8 +29,27 @@ export default defineComponent({
   props: {
     icon: {
       default: null
+    },
+    isCollect:{
+      type:Boolean,
+      default:true
     }
   },
+      // t_store_icon：offlineIcon.js(离线图标收集)
+      // 存入store
+    setup(props) {
+      if (props.isCollect && props.icon) {
+        const iconStore = useIconStore();
+        onMounted(() => {
+          console.log('避免输出多次...')
+          const uniqueIcons = new Set([
+            ...iconStore.batchUsedIcons,
+            props.icon
+          ]);
+          iconStore.setBatchUsedIcons([...uniqueIcons]);
+        });
+      }
+    },
   render() {
     if (typeof this.icon === "object") addIcon(this.icon, this.icon);
     const attrs = this.$attrs;
