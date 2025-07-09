@@ -17,7 +17,6 @@
 </template>
 
 <script setup>
-import {useRenderIcon} from '@/components/MyIcon/src/hook'
 defineProps(['listData'])
 
 const handleMenuVisible = (menu) => {
@@ -40,7 +39,10 @@ const handleChildren = (menu) => {
         case 'msg':
             prefix = 'msg'
             break
-    }
+        case 'resource':
+            prefix = 'resource'
+            break
+    }       
     if(menu.level) {
         // 如果路径中包含 log，则添加 log 父路径
         return `/${prefix}/${menu.parentPath}/${menu.path}`
