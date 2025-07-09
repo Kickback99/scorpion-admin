@@ -207,9 +207,9 @@ watch(
               class="w-[40px] h-[32px] cursor-pointer flex justify-center items-center"
             >
             <!-- 如果icon数据属性不存在，则显示一个离线图标 -->
-              <FullIconifyOffline v-if="!icon" :icon=search />
+              <SingleIcon v-if="!icon" :icon=search />
             <!-- 如果icon数据属性存在，则显示一个在线图标 -->
-              <IconifyOnline v-else :icon="inputValue" />
+              <OnlineIcon v-else :icon="inputValue" />
             </div>
           </template>
 
@@ -238,7 +238,7 @@ watch(
                     :style="iconItemStyle(item)"
                     @click="onChangeIcon(item)"
                   >
-                    <IconifyOnline
+                    <OnlineIcon
                       :icon="currentActiveType + item"
                       width="20px"
                       height="20px"

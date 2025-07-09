@@ -69,14 +69,14 @@ import 'virtual:svg-icons-register'
 
 // 全局注册@iconify/vue图标库
 import {
-  IconifyOffline,
-  IconifyOnline,
-  FullIconifyOffline,
+  offlineIcon,
+  OnlineIcon,
+  SingleIcon,
   IconFont
   } from "./components/MyIcon";
-  app.component("IconifyOffline",IconifyOffline)
-  app.component("IconifyOnline", IconifyOnline);
-  app.component("FullIconifyOffline", FullIconifyOffline);
+  app.component("offlineIcon",offlineIcon)
+  app.component("OnlineIcon", OnlineIcon);
+  app.component("SingleIcon", SingleIcon);
   app.component("IconFont", IconFont);
 
 // 使用自定义指定来控制按钮权限的移除
