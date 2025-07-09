@@ -14,7 +14,7 @@
           :collapse-transition="false"
         >
           <el-menu-item index="/index">
-                   <el-icon> <IconifyOffline :icon="'ep:home-filled'"></IconifyOffline> </el-icon> <span>首页</span> 
+                   <el-icon> <FullIconifyOffline :icon="'ep:home-filled'"></FullIconifyOffline> </el-icon> <span>首页</span> 
           </el-menu-item>
           <menu-tree :listData="listData"></menu-tree>
 
