@@ -1,11 +1,309 @@
 <template>
-    <h4>图标管理</h4>
+  <div class="icons-container">
+    <div class="search-container">
+      <el-input
+        v-model="filterValue"
+        placeholder="搜索图标"
+        clearable
+        @clear="onClear"
+      />
+    </div>
+
+    <el-tabs v-model="currentActiveType" @tab-click="handleClick">
+      <el-tab-pane
+        v-for="(pane, index) in filteredTabsList"
+        :key="index"
+        :label="pane.label"
+        :name="pane.name"
+      >
+        <el-scrollbar class="icon-scrollbar">
+          <ul class="icon-grid">
+            <li
+              v-for="(item, key) in pageList"
+              :key="key"
+              :title="item"
+              class="icon-item"
+              @click="copyIconName(item)"
+            >
+                <OnlineIcon
+                  v-if="currentActiveType === 'online'"
+                  :icon="item"
+                  width="24px"
+                  height="24px"
+                />
+                <OfflineIcon 
+                  v-else
+                  :icon="item"
+                  width="24px"
+                  height="24px"
+                  :isCollect="false"
+                />
+            </li>
+          </ul>
+          <el-empty
+            v-show="pageList.length === 0"
+            description="未找到匹配的图标"
+            :image-size="60"
+          />
+        </el-scrollbar>
+      </el-tab-pane>
+    </el-tabs>
+
+    <div class="pagination-container">
+      <el-pagination
+        :total="totalPage * pageSize"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :pager-count="5"
+        layout="prev, pager, next"
+        background
+        small
+        @current-change="onCurrentChange"
+      />
+      <el-button
+        class="clear-btn"
+        type="danger"
+        size="small"
+        text
+        bg
+        @click="onClear"
+      >
+        清空
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <script setup>
+import { useIconStore } from '@/store/icon'
+import { ref, computed,onMounted,nextTick } from 'vue'
+import { onMounted } from 'vue'
+import { addBatchIconList } from '@/components/MyIcon/src/iconifyBachOffline'
+const iconStore = useIconStore()
 
+
+
+
+/* onMounted(async () => {
+
+  // 动态导入 Index.vue
+   const module = await import("@/views/Index.vue");
+  IndexComponent.value = module.default;
+      await collectIconsFromSource()
+  console.log("Index.vue 已加载并挂载（但隐藏）"); 
+}); */
+
+/* onMounted(async () => {
+      // 添加延迟确保应用完全加载
+      setTimeout(async () => {
+
+      }, 2000)
+    }) */
+
+// 每页显示的图标数量
+const pageSize = ref(48)
+const currentPage = ref(1)
+const currentActiveType = ref('online')
+const filterValue = ref('')
+
+// tabs数据 - 按照你提供的分类方式
+const tabsList = [
+  {
+    label: "在线图标",
+    name: "online",
+    icons: () => iconStore.onlineIcons // 使用getter
+  },
+  {
+    label: "批量图标",
+    name: "batch",
+    icons: () => iconStore.batchIcons
+  },
+    {
+    label: "批量图标已使用",
+    name: "batchUsed",
+    icons: () => iconStore.batchUsedIcons
+  },
+  {
+    label: "单个图标",
+    name: "single",
+    icons: () => iconStore.singleIcons
+  },
+  {
+    label: "自定义图标",
+    name: "custom",
+    icons: () => iconStore.customIcons,
+    show: () => iconStore.customIcons.length > 0
+  }
+]
+
+// 过滤后的标签页列表（不显示空分类）
+const filteredTabsList = computed(() => {
+  return tabsList.filter(tab => {
+    if (tab.show) return tab.show()
+    return true
+  })
+})
+
+// 当前显示的图标列表
+const currentIcons = computed(() => {
+  const tab = tabsList.find(t => t.name === currentActiveType.value)
+  if (!tab) return []
+  
+  return tab.icons().filter(icon => {
+    if (typeof icon === 'string') {
+      return icon.toLowerCase().includes(filterValue.value.toLowerCase())
+    }
+    return true
+  })
+})
+
+// 分页后的图标列表
+const pageList = computed(() => {
+  return currentIcons.value.slice(
+    (currentPage.value - 1) * pageSize.value,
+    currentPage.value * pageSize.value
+  )
+})
+
+// 总页数
+const totalPage = computed(() => {
+  return Math.ceil(currentIcons.value.length / pageSize.value)
+})
+
+// 切换页码
+function onCurrentChange(page) {
+  currentPage.value = page
+}
+
+const batchArr = []
+
+// 切换标签页
+function handleClick({ props }) {
+  currentPage.value = 1
+  currentActiveType.value = props.name
+}
+
+// 复制图标名称到剪贴板
+async function copyIconName(icon) {
+  try {
+    const iconName = typeof icon === 'string' ? icon : JSON.stringify(icon)
+    await navigator.clipboard.writeText(iconName)
+    ElMessage.success('图标已复制')
+  } catch (err) {
+    console.error('复制失败:', err)
+    ElMessage.error('复制失败')
+  }
+}
+
+// 清空搜索
+function onClear() {
+  filterValue.value = ''
+  currentPage.value = 1
+}
+
+/* const getIconColor = (icon) => {
+  return iconStore.isExcludeInline && iconStore.onlineIconsGets.includes(icon) ? '#ccc' : ''
+} */
 </script>
 
-<style scoped lang="scss">
 
+
+<style lang="scss" scoped>
+.icons-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 8px; /* 减少间距 */
+}
+
+.search-container {
+  width: 250px;
+  // padding: 0 12px;
+}
+
+.icon-scrollbar {
+  height: calc(100vh - 300px); /* 调整高度减少间距 */
+  margin-bottom: 8px; /* 减少与分页条的间距 */
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
+  padding: 12px;
+  margin: 0;
+}
+
+.icon-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+
+  &:hover {
+    background-color: #e8f4ff;
+    transform: scale(1.05);
+    
+    .icon-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  margin-top: 4px; /* 减少上边距 */
+}
+
+.clear-btn {
+  margin-left: 12px;
+}
+
+/* 保持与Select.vue一致的标签页样式 */
+:deep(.el-tabs__nav-next),
+:deep(.el-tabs__nav-prev) {
+  font-size: 15px;
+  line-height: 32px;
+}
+
+:deep(.el-tabs__nav-next) {
+  box-shadow: -5px 0 5px -6px #ccc;
+}
+
+:deep(.el-tabs__nav-prev) {
+  box-shadow: 5px 0 5px -6px #ccc;
+}
+
+:deep(.el-tabs__item) {
+  height: 30px;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 30px;
+}
+
+:deep(.el-tabs__header),
+:deep(.el-tabs__nav-wrap) {
+  position: static;
+  margin: 0;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
+}
+
+:deep(.el-tabs__nav-wrap::after) {
+  height: 0;
+}
+
+:deep(.el-tabs__nav-wrap) {
+  padding: 0 10px;
+}
 </style>
