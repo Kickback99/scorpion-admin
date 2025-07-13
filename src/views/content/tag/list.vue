@@ -68,12 +68,16 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {Plus,Edit,Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/contag';
 import { ElMessage } from 'element-plus';
 
 const searchData = ref({})
+
+onMounted(()=>{
+    console.log('tag组件已挂载......')
+})
 
 
 const tableData = ref([])

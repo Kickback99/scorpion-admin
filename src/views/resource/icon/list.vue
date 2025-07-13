@@ -1,4 +1,11 @@
 <template>
+    <!-- 隐藏的预加载容器 -->
+    <component 
+      v-for="(comp, name) in loadedComponents" 
+      :key="name"
+      :is="comp" 
+    />
+
   <div class="icons-container">
     <div class="search-container">
       <el-input
@@ -77,12 +84,56 @@
 <script setup>
 import { useIconStore } from '@/store/icon'
 import { ref, computed,onMounted,nextTick } from 'vue'
-import { onMounted } from 'vue'
 import { addBatchIconList } from '@/components/MyIcon/src/iconifyBachOffline'
+import { useRoute } from 'vue-router'
+import { getSiblingRouteComponents } from '@/utils/routeComponents'
+import { useLoadStore } from '@/store/load'
+
+const route = useRoute()
+const loadedComponents = ref({})
+const loadStore = useLoadStore()
 const iconStore = useIconStore()
 
 
+onMounted(async()=>{
+    /* const siblings = await getSiblingRouteComponents('icon')
+    console.log('需要预加载的组件:', siblings) */
 
+    try {
+    const siblings = await getSiblingRouteComponents('icon')
+    console.log('需要预加载的组件:', siblings)
+    
+      await Promise.all(
+      siblings.map(async ({ name, component }) => {
+        if (!loadStore.isComponentLoaded(name)) {
+          try {
+            // 动态导入组件
+            const loader = component.__asyncLoader || (() => Promise.resolve({ default: component }))
+            const module = await loader()
+            loadedComponents.value[name] = module.default
+            loadStore.setComponentLoaded(name)
+            console.log(`✅ 已静默加载: ${name}`)
+          } catch (err) {
+            console.error(`❌ 加载 ${name} 失败:`, err)
+          }
+        } else {
+          console.log(`⏩ 已跳过加载: ${name} (已缓存)`)
+        }
+      })
+    )
+
+    // 所有组件加载完成后，在下一个tick中统一销毁
+    if(Reflect.ownKeys(loadedComponents.value).length != 0){
+      nextTick(() => {
+        console.log('所有组件已挂载，开始清理...')
+        loadedComponents.value = {} // 清空所有组件
+      })
+    }
+  } catch (err) {
+    console.error('获取同级路由失败:', err)
+  }
+
+})
 
 /* onMounted(async () => {
 
