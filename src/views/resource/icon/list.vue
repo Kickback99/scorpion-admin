@@ -107,9 +107,11 @@ onMounted(async()=>{
       siblings.map(async ({ name, component }) => {
         if (!loadStore.isComponentLoaded(name)) {
           try {
-            // 动态导入组件
-            const loader = component.__asyncLoader || (() => Promise.resolve({ default: component }))
-            const module = await loader()
+              // 判断组件是否已经是对象
+            const module = component.__name ? 
+              { default: component } : // 已经是组件对象
+              await (component.__asyncLoader || (() => Promise.resolve({ default: component })))()
+            
             loadedComponents.value[name] = module.default
             loadStore.setComponentLoaded(name)
             console.log(`✅ 已静默加载: ${name}`)
