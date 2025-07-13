@@ -25,7 +25,7 @@ export const getSiblingRouteComponents = async (currentRouteName) => {
   const components = {}
   
   // 递归处理路由项
-  const processRouteItem = async (item) => {
+  /* const processRouteItem = async (item) => {
     // 特性1: 处理Layout组件或component为undefined但有children的情况
     if (
       (item.component?.__name === 'Layout' || item.component === undefined) && 
@@ -47,7 +47,38 @@ export const getSiblingRouteComponents = async (currentRouteName) => {
         console.error(`Failed to load component for route ${item.name}:`, error)
       }
     }
+  } */
+
+    const processRouteItem = async (item) => {
+  // 特性1: 处理Layout组件或component为undefined但有children的情况
+  if (
+    (item.component?.__name === 'Layout' || item.component === undefined) && 
+    Array.isArray(item.children) && 
+    item.children.length > 0
+  ) {
+    // 遍历children并处理每个子路由
+    for (const child of item.children) {
+      await processRouteItem(child)
+    }
+  } 
+  // 特性2: 处理有component且没有children的路由
+  else if (item.component && !item.children) {
+    try {
+      // 检查component是否是函数（动态导入）
+      if (typeof item.component === 'function') {
+        // 执行动态导入函数获取组件
+        const component = await item.component()
+        components[item.name] = component.default || component
+      } 
+      // 如果已经是组件对象，直接使用
+      else if (item.component.__name || item.component.__hmrId) {
+        components[item.name] = item.component
+      }
+    } catch (error) {
+      console.error(`Failed to load component for route ${item.name}:`, error)
+    }
   }
+}
   
   // 从根开始处理整个路由树
   for (const route of menuData) {
