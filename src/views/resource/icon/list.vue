@@ -1,10 +1,12 @@
 <template>
     <!-- 隐藏的预加载容器 -->
-    <component 
-      v-for="(item, index) in preloadedComponents" 
-      :key="index"
-      :is="item.component" 
-    />
+    <div style="display: none;">
+      <component 
+        v-for="(item, index) in preloadedComponents" 
+        :key="index"
+        :is="item.component" 
+      />
+    </div>
 
   <div class="icons-container">
     <div class="search-container">
