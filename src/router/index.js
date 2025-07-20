@@ -10,6 +10,7 @@ import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
 import { clearRoute, clearUserInfo } from '@/utils/remove'
 import { add404Routes } from '@/utils/404route'
+import { generateNameFromPath } from '@/utils/routeComponents'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -249,8 +250,8 @@ export function getLocalRouteComponents() {
     
     // 添加主路由组件（如果不是布局组件）
     if (route.component && route.path !== '/') {
-        console.log('本地route',route)
       components.push({
+        name: generateNameFromPath(route.path),
         path: route.path,
         component: route.component
       });
@@ -261,6 +262,7 @@ export function getLocalRouteComponents() {
       route.children.forEach(child => {
         if (child.component) {
           components.push({
+            name: generateNameFromPath(child.path),
             path: child.path,
             component: child.component
           });

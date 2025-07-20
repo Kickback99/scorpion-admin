@@ -1,9 +1,9 @@
 <template>
     <!-- 隐藏的预加载容器 -->
     <component 
-      v-for="(comp, name) in preloadedComponents" 
-      :key="name"
-      :is="comp" 
+      v-for="(item, index) in preloadedComponents" 
+      :key="index"
+      :is="item.component" 
     />
 
   <div class="icons-container">
@@ -86,12 +86,12 @@ import { useIconStore } from '@/store/icon'
 import { ref, computed,onMounted,nextTick } from 'vue'
 import { addBatchIconList } from '@/components/MyIcon/src/iconifyBachOffline'
 import { useRoute } from 'vue-router'
-import { getDynamicRouteComponents } from '@/utils/handleUserMenu'
+import { getDynamicRouteComponents } from '@/utils/routeComponents'
 import { getLocalRouteComponents } from '@/router'
 import { useLoadStore } from '@/store/load'
 
 const route = useRoute()
-const preloadedComponents = ref({})
+const preloadedComponents = ref([])
 const loadStore = useLoadStore()
 const iconStore = useIconStore()
 
@@ -100,7 +100,8 @@ onMounted(async () => {
   try {
     // 获取所有路由组件 (本地 + 动态)
     const localComponents = getLocalRouteComponents();
-    const dynamicComponents = getDynamicRouteComponents();
+    const excludes = ['icon']
+    const dynamicComponents = getDynamicRouteComponents(excludes);
     const allComponents = [...localComponents, ...dynamicComponents];
 
     console.log('All route components:', allComponents);
@@ -134,7 +135,7 @@ onMounted(async () => {
         console.error(`❌ 加载组件 ${route.name} 失败:`, error);
       }
     });
-    
+    console.log('preloadedComponents',preloadedComponents.value)
     await Promise.all(loadPromises);
     console.log("所有路由组件已静默预加载");
 
