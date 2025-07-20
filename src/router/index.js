@@ -242,6 +242,36 @@ const router = createRouter({
     routes
 })
 
+// 获取本地路由组件
+export function getLocalRouteComponents() {
+  return routes.flatMap(route => {
+    const components = [];
+    
+    // 添加主路由组件（如果不是布局组件）
+    if (route.component && route.path !== '/') {
+        console.log('本地route',route)
+      components.push({
+        path: route.path,
+        component: route.component
+      });
+    }
+    
+    // 添加子路由组件
+    if (route.children) {
+      route.children.forEach(child => {
+        if (child.component) {
+          components.push({
+            path: child.path,
+            component: child.component
+          });
+        }
+      });
+    }
+    
+    return components;
+  });
+}
+
 const getToken = () => {
     return localStorage.getItem('token')
 }
