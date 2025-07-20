@@ -102,8 +102,7 @@ onMounted(async () => {
   try {
     // 获取所有路由组件 (本地 + 动态)
     const localComponents = getLocalRouteComponents();
-    const excludes = ['icon']
-    const dynamicComponents = getDynamicRouteComponents(excludes);
+    const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
     const allComponents = [...localComponents, ...dynamicComponents];
 
     console.log('All route components:', allComponents);
