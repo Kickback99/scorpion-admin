@@ -1,7 +1,7 @@
 <template>
     <!-- 隐藏的预加载容器 -->
     <component 
-      v-for="(comp, name) in loadedComponents" 
+      v-for="(comp, name) in preloadedComponents" 
       :key="name"
       :is="comp" 
     />
@@ -86,55 +86,68 @@ import { useIconStore } from '@/store/icon'
 import { ref, computed,onMounted,nextTick } from 'vue'
 import { addBatchIconList } from '@/components/MyIcon/src/iconifyBachOffline'
 import { useRoute } from 'vue-router'
-import { getSiblingRouteComponents } from '@/utils/routeComponents'
+import { getDynamicRouteComponents } from '@/utils/handleUserMenu'
+import { getLocalRouteComponents } from '@/router'
 import { useLoadStore } from '@/store/load'
 
 const route = useRoute()
-const loadedComponents = ref({})
+const preloadedComponents = ref({})
 const loadStore = useLoadStore()
 const iconStore = useIconStore()
 
 
-onMounted(async()=>{
-    /* const siblings = await getSiblingRouteComponents('icon')
-    console.log('需要预加载的组件:', siblings) */
+onMounted(async () => {
+  try {
+    // 获取所有路由组件 (本地 + 动态)
+    const localComponents = getLocalRouteComponents();
+    const dynamicComponents = getDynamicRouteComponents();
+    const allComponents = [...localComponents, ...dynamicComponents];
 
-    try {
-    const siblings = await getSiblingRouteComponents('icon')
-    console.log('需要预加载的组件:', siblings)
+    console.log('All route components:', allComponents);
     
-      await Promise.all(
-      siblings.map(async ({ name, component }) => {
-        if (!loadStore.isComponentLoaded(name)) {
-          try {
-              // 判断组件是否已经是对象
-            const module = component.__name ? 
-              { default: component } : // 已经是组件对象
-              await (component.__asyncLoader || (() => Promise.resolve({ default: component })))()
-            
-            loadedComponents.value[name] = module.default
-            loadStore.setComponentLoaded(name)
-            console.log(`✅ 已静默加载: ${name}`)
-          } catch (err) {
-            console.error(`❌ 加载 ${name} 失败:`, err)
-          }
-        } else {
-          console.log(`⏩ 已跳过加载: ${name} (已缓存)`)
-        }
-      })
-    )
+    // 初始化预加载组件数组
+    preloadedComponents.value = allComponents.map(route => ({
+      path: route.path,
+      name: route.name,
+      component: null,
+      loaded: false
+    }));
+    
+    // 并行加载所有组件
+    const loadPromises = allComponents.map(async (route, index) => {
+      if (loadStore.isComponentLoaded(route.name)) {
+        console.log(`⏩ 已跳过加载: ${route.name} (已缓存)`)
+        return
+      }
+      
+      try {
+        // 如果是动态导入函数则执行，否则直接使用组件
+        const module = typeof route.component === 'function' 
+          ? await route.component() 
+          : route.component;
+          
+        preloadedComponents.value[index].component = module.default || module;
+        preloadedComponents.value[index].loaded = true;
+        loadStore.setComponentLoaded(route.name)
+        console.log(`✅ 已静默加载: ${route.name}`)
+      } catch (error) {
+        console.error(`❌ 加载组件 ${route.name} 失败:`, error);
+      }
+    });
+    
+    await Promise.all(loadPromises);
+    console.log("所有路由组件已静默预加载");
 
     // 所有组件加载完成后，在下一个tick中统一销毁
-    if(Reflect.ownKeys(loadedComponents.value).length != 0){
+    if (preloadedComponents.value.some(comp => comp.loaded)) {
       nextTick(() => {
         console.log('所有组件已挂载，开始清理...')
-        loadedComponents.value = {} // 清空所有组件
+        preloadedComponents.value = []
       })
     }
   } catch (err) {
-    console.error('获取同级路由失败:', err)
+    console.error('预加载组件失败:', err)
   }
-
 })
 
 /* onMounted(async () => {
