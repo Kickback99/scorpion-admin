@@ -1,101 +1,64 @@
-import { useUserStore } from '@/store/user'
+import { useUserStore } from "@/store/user"
 
-export const getSiblingRouteComponents = async (currentRouteName) => {
+// 获取动态路由组件 (重构后的版本)
+export function getDynamicRouteComponents(excludes = []) {
   const userStore = useUserStore()
   const menuData = userStore.userMenu
   
-  // 递归查找当前路由
-  const findRoute = (routes, name) => {
-    for (const route of routes) {
-      if (route.name === name) return route
-      if (route.children) {
-        const found = findRoute(route.children, name)
-        if (found) return found
-      }
-    }
-    return null
-  }
-  
-  // 找到当前路由
-  const currentRoute = findRoute(menuData, currentRouteName)
-  console.log('currentRoute',currentRoute)
-  if (!currentRoute) return {}
-  
-  // 收集所有需要加载的组件
-  const components = {}
-  
-  // 递归处理路由项
-  /* const processRouteItem = async (item) => {
-    // 特性1: 处理Layout组件或component为undefined但有children的情况
-    if (
-      (item.component?.__name === 'Layout' || item.component === undefined) && 
-      Array.isArray(item.children) && 
-      item.children.length > 0
-    ) {
-      // 遍历children并处理每个子路由
-      for (const child of item.children) {
-        await processRouteItem(child)
-      }
-    } 
-    // 特性2: 处理有component且没有children的路由
-    else if (item.component && !item.children) {
-      try {
-        // 执行动态导入函数获取组件
-        const component = await item.component?.()
-        components[item.name] = component.default || component
-      } catch (error) {
-        console.error(`Failed to load component for route ${item.name}:`, error)
-      }
-    }
-  } */
+  // 递归扁平化路由树
+  const flattenRoutes = (routes) => {
+    return routes.flatMap(route => {
+      const components = []
 
-    const processRouteItem = async (item) => {
-  // 特性1: 处理Layout组件或component为undefined但有children的情况
-  if (
-    (item.component?.__name === 'Layout' || item.component === undefined) && 
-    Array.isArray(item.children) && 
-    item.children.length > 0
-  ) {
-    // 遍历children并处理每个子路由
-    for (const child of item.children) {
-      await processRouteItem(child)
-    }
-  } 
-  // 特性2: 处理有component且没有children的路由
-  else if (item.component && !item.children) {
-    try {
-      // 检查component是否是函数（动态导入）
-      if (typeof item.component === 'function') {
-        // 执行动态导入函数获取组件
-        const component = await item.component()
-        components[item.name] = component.default || component
-      } 
-      // 如果已经是组件对象，直接使用
-      else if (item.component.__name || item.component.__hmrId) {
-        components[item.name] = item.component
+      // 检查是否在排除列表中
+      const shouldExclude = excludes.includes(route.name)
+      
+      // 添加当前路由组件 (排除Layout组件和指定名称的组件)
+      if (route.component && route.component.__name !== 'Layout' && !shouldExclude) {
+        components.push({
+          path: route.path,
+          name: route.name,
+          component: route.component
+        })
       }
-    } catch (error) {
-      console.error(`Failed to load component for route ${item.name}:`, error)
-    }
+      
+      // 递归处理子路由
+      if (route.children && !shouldExclude) {
+        components.push(...flattenRoutes(route.children))
+      }
+      
+      return components
+    })
   }
-}
   
-  // 从根开始处理整个路由树
-  for (const route of menuData) {
-    await processRouteItem(route)
-  }
+  // 获取扁平化后的路由组件
+  const flatComponents = flattenRoutes(menuData)
   
-  return convertToDesiredFormat(components)
+  // 转换为目标格式
+  return convertToDesiredFormat(flatComponents)
 }
 
+// 转换格式函数
+const convertToDesiredFormat = (components) => {
+  return components.map(item => ({
+    path: item.path,
+    name: item.name ? item.name.toLowerCase().replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-') : 'index',
+    component: item.component
+  }))
+}
 
+export function generateNameFromPath(path) {
+  // 去掉首尾斜杠
+  let cleanedPath = path.replace(/^\/|\/$/g, '')
+  
+  // 判断是否包含多个斜杠
+  if (path.split('/').length > 2) {
+    // 多个斜杠的情况：替换中间斜杠为短横线
+    return cleanedPath.replace(/\//g, '-')
+  }
+  
+  console.log('cleanedPath',cleanedPath)
 
-
-
-
-const convertToDesiredFormat = (data) => {
-  return Object.entries(data).map(([name, component]) => ({
-    name: name.toLowerCase().replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-') || 'index',
-    component
-  }));
-};
+  // 单个斜杠的情况：直接返回去掉首尾斜杠的结果
+  return cleanedPath
+}
