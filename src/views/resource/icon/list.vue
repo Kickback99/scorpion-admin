@@ -2,14 +2,14 @@
   <div class="icon-switcher">
     <el-radio-group 
       v-model="isSearch" 
-      size="large"
+      size="small"
       @change="toggleComponent"
     >
-      <el-radio-button :label="true" size="small">
+      <el-radio-button :label="true">
         <el-icon class="mr-1"><Search /></el-icon>
         图标搜索
       </el-radio-button>
-      <el-radio-button :label="false" size="small">
+      <el-radio-button :label="false">
         <el-icon class="mr-1"><Collection /></el-icon>
         图标收集
       </el-radio-button>
