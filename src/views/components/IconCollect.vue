@@ -167,7 +167,7 @@ onMounted(async () => {
     }) */
 
 // 每页显示的图标数量
-const pageSize = ref(35)
+const pageSize = ref(33)
 const currentPage = ref(1)
 const currentActiveType = ref('online')
 const filterValue = ref('')
@@ -278,7 +278,7 @@ function onClear() {
 .icons-container {
   height: 100%;
   width: 500px;
-  margin: 0 270px;
+  margin: auto;
   display: flex;
   flex-direction: column;
   gap: 8px; /* 减少间距 */
