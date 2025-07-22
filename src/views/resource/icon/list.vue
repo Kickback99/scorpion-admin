@@ -1,8 +1,7 @@
 <template>
     <!-- 切换按钮 -->
-  <el-button @click="toggleComponent">
-    {{ isSearch ? '切换到图标收集' : '切换到图标搜索' }}
-  </el-button>
+  <el-button @click="toggleComponent" :disabled="isSearch">图标搜索</el-button>
+  <el-button @click="toggleComponent" :disabled="!isSearch">图标收集</el-button>
 
 <IconSearch v-if="isSearch"></IconSearch>
 <IconCollect v-else></IconCollect>
