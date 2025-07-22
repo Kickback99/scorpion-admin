@@ -19,10 +19,10 @@
                   <li
                     v-for="(item, key) in pageList"
                     :key="key"
-                    :title="item"
+                    :title="currentActiveType+item"
                     class="icon-item p-2 cursor-pointer mr-1 mt-1 flex justify-center items-center border border-[#e5e7eb]"
                     :style="iconItemStyle(item)"
-                    @click="onChangeIcon(item)"
+                    @click="copyIconName(item)"
                   >
                     <OnlineIcon
                       :icon="currentActiveType + item"
@@ -95,7 +95,7 @@ const currentActiveType = ref("ep:");
 const copyIconList = cloneDeep(iconList.value);
 const totalPage = ref(0);
 // 每页显示35个图标
-const pageSize = ref(35);
+const pageSize = ref(33);
 const currentPage = ref(1);
 
 // 搜索条件
@@ -207,10 +207,17 @@ function handleClick({ props }) {
   currentActiveType.value = props.name;
 }
 
-// 点击icon触发事件
-function onChangeIcon(item) {
-  icon.value = item;
-  inputValue.value = currentActiveType.value + item;
+// 复制图标名称到剪贴板
+async function copyIconName(icon) {
+  try {
+    const iconName = typeof icon === 'string' ? icon : JSON.stringify(icon)
+    const finalIconName = currentActiveType.value + iconName
+    await navigator.clipboard.writeText(finalIconName)
+    ElMessage.success('图标已复制')
+  } catch (err) {
+    console.error('复制失败:', err)
+    ElMessage.error('复制失败')
+  }
 }
 
 // 页数变化事件
@@ -264,7 +271,7 @@ watch(
 <style lang="scss" scoped>
 .selector {
     width: 500px;
-    margin: 0 270px;
+    margin: auto;
     overflow: hidden !important;
     display: flex;
     flex-direction: column;
