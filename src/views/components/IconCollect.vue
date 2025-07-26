@@ -30,6 +30,7 @@
               :key="key"
               :title="item"
               class="icon-item p-2 cursor-pointer mr-1 mt-1 flex justify-center items-center border border-[#e5e7eb]"
+              style="width: 37.6px; height: 37.6px; min-width: 37.6px; min-height: 37.6px;"
               @click="copyIconName(item)"
             >
                 <OnlineIcon
@@ -289,8 +290,9 @@ function onClear() {
   // padding: 0 12px;
 }
 
+// tabs内容区的总高度
 .icon-scrollbar {
-    height: 200px;
+    height: 140px;
 }
 
 .icon-grid {
@@ -349,7 +351,7 @@ function onClear() {
 :deep(.el-tabs__nav-wrap) {
   position: static;
   margin: 0;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
+  // box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
 }
 
 :deep(.el-tabs__nav-wrap::after) {
