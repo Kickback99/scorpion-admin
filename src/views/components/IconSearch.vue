@@ -21,7 +21,6 @@
                     :key="key"
                     :title="currentActiveType+item"
                     class="icon-item p-2 cursor-pointer mr-1 mt-1 flex justify-center items-center border border-[#e5e7eb]"
-                    :style="iconItemStyle(item)"
                     @click="copyIconName(item)"
                   >
                     <OnlineIcon
@@ -145,62 +144,6 @@ const pageList = computed(() =>{
 }
 )
 
-// 选中的图标样式
-const iconItemStyle = computed(() => {
-  return item => {
-    if (inputValue.value === currentActiveType.value + item) {
-      return {
-        borderColor: "var(--el-color-primary)",
-        color: "var(--el-color-primary)"
-      };
-    }
-  };
-});
-
-
-const tabNames = tabsList.map(item => {
-  return item.name
-})
-
-// 把inputValue.value的值赋值给currentActiveType.value和icon.value
-function setVal() {
-  if(startsWithAnyPrefix(inputValue.value,tabNames)){
-    // 提取:号之前的字符串
-    currentActiveType.value = inputValue.value.substring(
-        0,
-        inputValue.value.indexOf(":") + 1
-      );
-        // 提取:号之后的字符串
-      icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
-      }
-}
-
-/**
- * 检查输入字符串是否以指定的前缀数组中的任何一个开始
- * @param {string} input - 用户输入的字符串
- * @param {string[]} prefixes - 前缀数组
- * @returns {boolean} 如果输入字符串以任何一个前缀开始，则返回 true，否则返回 false
- */
- function startsWithAnyPrefix(input, prefixes) {
-  return prefixes.some(prefix => input.startsWith(prefix));
-}
-
-// popover弹出层显示之前调用，回显图标所在的当前页
-function onBeforeEnter() {
-  if (isAllEmpty(icon.value)) return;
-  setVal();
-  // 寻找当前图标在第几页
-  const curIconIndex = copyIconList[currentActiveType.value].findIndex(
-    i => i === icon.value
-  );
-  currentPage.value = Math.ceil((curIconIndex + 1) / pageSize.value);
-}
-
-// popover弹出层隐藏之后调用，清除过滤条件
-function onAfterLeave() {
-  filterValue.value = "";
-}
-
 // 点击标签页触发事件
 function handleClick({ props }) {
   currentPage.value = 1;
@@ -225,21 +168,6 @@ function onCurrentChange(page) {
   currentPage.value = page;
 }
 
-function onClear() {
-  icon.value = "";
-  inputValue.value = "";
-}
-
-// 向外部暴露一个removeIcon，用于删除icon.value的值
-const removeIcon = () => {
-  console.log('删除icon中')
-  icon.value = ''
-}
-
-defineExpose({
-  removeIcon
-})
-
 
 
 // 当 pageList.value 发生变化时，重新计算 totalPage.value的值，totalPage.value的值根据过滤的元素决定
@@ -249,13 +177,6 @@ watch(
     (totalPage.value = copyIconList[currentActiveType.value].filter(i =>
       i.includes(filterValue.value)
     ).length),
-    // 在监听开始时立即执行一次回调
-  { immediate: true }
-);
-// 当 inputValue.value 发生变化时，如果新的值val为真，则调用setVal()函数
-watch(
-  () => inputValue.value,
-  val => val && setVal(),
     // 在监听开始时立即执行一次回调
   { immediate: true }
 );
