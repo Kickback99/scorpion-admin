@@ -1,4 +1,5 @@
 <template>
+  <el-button @click="actionStore.setIconEnabled()">关闭增强搜索</el-button>
     <!-- 隐藏的预加载容器 -->
     <div style="display: none;">
       <component 
@@ -18,7 +19,7 @@
       
       <div class="flex justify-between" v-if="actionStore.iconEnabled">
       <el-switch v-model="iconStore.isExcludeInline" @change="changeIconDisplay"/>
-      <el-switch v-model="value2" />
+      <el-switch v-model="iconStore.showBatchUsedIcons" @change="changeIconUsed" :disabled="currentActiveType != 'batch'"/>
       </div>
 
     <el-tabs v-model="currentActiveType" @tab-click="handleClick">
@@ -32,6 +33,7 @@
           <ul class="flex flex-wrap px-2 ml-2">
             <li
               v-for="(item, key) in pageList"
+              v-show="visibleInlineIcon(item)"
               :key="key"
               :title="item"
               class="icon-item p-2 cursor-pointer mr-1 mt-1 flex justify-center items-center border border-[#e5e7eb]"
@@ -285,8 +287,24 @@ const changeIconDisplay = (data) => {
   iconStore.setIsExcludeInline = data
 }
 
+
+const changeIconUsed = (data) => {
+  iconStore.setShowBatchUsedIcons = data
+}
+
 const setIconColor = (item) => {
   return iconStore.isExcludeInline && iconStore.onlineIcons.includes(item)? '#ccc':''
+}
+
+const visibleInlineIcon = (item) => {
+  if(currentActiveType.value === 'batch' && iconStore.showBatchUsedIcons){
+    const iconArr = iconStore.batchUsedIcons
+    console.log(iconArr)
+    if(iconArr.length > 0 && iconArr.includes(item)){
+      return true 
+    }else return false
+  }
+  return true
 }
 
 </script>

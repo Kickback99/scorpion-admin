@@ -15,6 +15,8 @@ export const useIconStore = defineStore({
         customIcons:[],
         // 是否排除在线图标
         isExcludeInline:false,
+        // 仅显示已使用的离线图标
+        showBatchUsedIcons:false
     }),
     actions:{
         setOnlineIcons(data){
@@ -34,6 +36,14 @@ export const useIconStore = defineStore({
         },
         setIsExcludeInline(data){
             this.isExcludeInline = data
+        },
+        setShowBatchUsedIcons(data){
+            this.showBatchUsedIcons = data
+        },
+         // 重置筛选条件
+        resetIconConditions(){
+            this.isExcludeInline = false
+            this.showBatchUsedIcons = false
         },
         // 清除当前所有数据
         clearIconStore(){

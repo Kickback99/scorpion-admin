@@ -1,6 +1,7 @@
 <template>
     {{ listIcons() }}
     <OfflineIcon icon="ep:download"></OfflineIcon>
+    <OnlineIcon icon="ep:download"></OnlineIcon>
 </template>
 
 <script setup>
