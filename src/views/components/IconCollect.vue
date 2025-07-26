@@ -17,10 +17,24 @@
         @clear="onClear"
       />
       
-      <div class="flex justify-between" v-if="actionStore.iconEnabled">
-      <el-switch v-model="iconStore.isExcludeInline" @change="changeIconDisplay"/>
-      <el-switch v-model="iconStore.showBatchUsedIcons" @change="changeIconUsed" :disabled="currentActiveType != 'batch'"/>
+    <div class="flex justify-between" v-if="actionStore.iconEnabled">
+      <div class="flex items-center">
+        <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
+        <el-switch 
+          v-model="iconStore.isExcludeInline" 
+          @change="changeIconDisplay"
+        />
       </div>
+      
+      <div class="flex items-center">
+        <span class="ml-2">批量图标显示</span>  <!-- 固定文本 -->
+        <el-switch 
+          v-model="iconStore.showBatchUsedIcons" 
+          @change="changeIconUsed" 
+          :disabled="currentActiveType != 'batch'"
+        />
+      </div>
+    </div>
 
     <el-tabs v-model="currentActiveType" @tab-click="handleClick">
       <el-tab-pane
@@ -312,6 +326,17 @@ const visibleInlineIcon = (item) => {
 
 
 <style lang="scss" scoped>
+.flex.items-center {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 控制间距 */
+  span {
+      font-size: 12px;
+      color:#aaa;
+  }
+}
+
+
 .icons-container {
   height: 100%;
   width: 500px;
