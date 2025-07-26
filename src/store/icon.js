@@ -12,7 +12,9 @@ export const useIconStore = defineStore({
         // 单个图标收集
         singleIcons:[],
         // 自定义图标收集
-        customIcons:[]
+        customIcons:[],
+        // 是否排除在线图标
+        isExcludeInline:false,
     }),
     actions:{
         setOnlineIcons(data){
@@ -29,6 +31,9 @@ export const useIconStore = defineStore({
         },
         setCustomIcons(data){
             this.customIcons = data
+        },
+        setIsExcludeInline(data){
+            this.isExcludeInline = data
         },
         // 清除当前所有数据
         clearIconStore(){

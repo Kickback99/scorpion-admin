@@ -15,6 +15,11 @@
         clearable
         @clear="onClear"
       />
+      
+      <div class="flex justify-between" v-if="actionStore.iconEnabled">
+      <el-switch v-model="iconStore.isExcludeInline" @change="changeIconDisplay"/>
+      <el-switch v-model="value2" />
+      </div>
 
     <el-tabs v-model="currentActiveType" @tab-click="handleClick">
       <el-tab-pane
@@ -38,6 +43,7 @@
                   :icon="item"
                   width="20px"
                   height="20px"
+                  :color="setIconColor(item)"
                 />
                 <OfflineIcon 
                   v-else
@@ -45,6 +51,7 @@
                   width="20px"
                   height="20px"
                   :isCollect="false"
+                  :color="setIconColor(item)"
                 />
             </li>
           </ul>
@@ -90,6 +97,8 @@ import { useRoute } from 'vue-router'
 import { getDynamicRouteComponents } from '@/utils/routeComponents'
 import { getLocalRouteComponents } from '@/router'
 import { useLoadStore } from '@/store/load'
+import { useActionStore } from '@/settings/action'
+const actionStore = useActionStore()
 
 const route = useRoute()
 const preloadedComponents = ref([])
@@ -271,6 +280,15 @@ function onClear() {
 /* const getIconColor = (icon) => {
   return iconStore.isExcludeInline && iconStore.onlineIconsGets.includes(icon) ? '#ccc' : ''
 } */
+
+const changeIconDisplay = (data) => {
+  iconStore.setIsExcludeInline = data
+}
+
+const setIconColor = (item) => {
+  return iconStore.isExcludeInline && iconStore.onlineIcons.includes(item)? '#ccc':''
+}
+
 </script>
 
 
