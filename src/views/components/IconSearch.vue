@@ -13,7 +13,7 @@
               :label="pane.label"
               :name="pane.name"
             >
-              <el-scrollbar height="220px">
+              <el-scrollbar class="icon-scrollbar">
                 <!-- t_question: li标签 tailwind-->
                 <ul class="flex flex-wrap px-2 ml-2">
                   <li
@@ -39,33 +39,19 @@
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
-
-          <div
-            class="w-full h-9 flex items-center overflow-auto border-t border-[#e5e7eb]"
-          >
           <!-- 分页 -->
+            <div class="pagination-container">
             <el-pagination
-              class="flex-auto ml-2 overflow-hidden"
               :total="totalPage"
               :current-page="currentPage"
               :page-size="pageSize"
               :pager-count="5"
-              layout="pager"
+              layout="prev, pager, next"
               background
-              size="small"
+              small
               @current-change="onCurrentChange"
             />
-            <el-button
-              class="justify-end mr-2 ml-2"
-              type="danger"
-              size="small"
-              text
-              bg
-              @click="onClear"
-            >
-              清空
-            </el-button>
-          </div>
+            </div>
   </div>
 </template>
 
@@ -198,6 +184,36 @@ watch(
     flex-direction: column;
     gap: 8px; /* 减少间距 */
 }
+
+// tabs内容区的总高度
+.icon-scrollbar {
+    height: 140px;
+}
+
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  margin-top: 4px; /* 减少上边距 */
+}
+
+/* 保持与Select.vue一致的标签页样式 */
+:deep(.el-tabs__nav-next),
+:deep(.el-tabs__nav-prev) {
+  font-size: 15px;
+  line-height: 32px;
+}
+
+:deep(.el-tabs__nav-next) {
+  box-shadow: -5px 0 5px -6px #ccc;
+}
+
+:deep(.el-tabs__nav-prev) {
+  box-shadow: 5px 0 5px -6px #ccc;
+}
+
 .icon-item {
   border: 1px #e5e7eb solid;
   &:hover {
@@ -235,7 +251,7 @@ watch(
 :deep(.el-tabs__nav-wrap) {
   position: static;
   margin: 0;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
+  // box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
 }
 
 :deep(.el-tabs__nav-wrap::after) {
@@ -246,7 +262,7 @@ watch(
   padding: 0 10px;
 }
 
-:deep(.el-tabs__content) {
+/* :deep(.el-tabs__content) {
   margin-top: 4px;
-}
+} */
 </style>
