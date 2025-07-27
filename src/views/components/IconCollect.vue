@@ -1,5 +1,5 @@
 <template>
-  <el-button @click="actionStore.setIconEnabled()">关闭增强搜索</el-button>
+  <el-button @click="actionSetStore.setIconEnabled()">关闭增强搜索</el-button>
     <!-- 隐藏的预加载容器 -->
     <div style="display: none;">
       <component 
@@ -17,7 +17,7 @@
         @clear="onClear"
       />
       
-    <div class="flex justify-between" v-if="actionStore.iconEnabled">
+    <div class="flex justify-between" v-if="actionSetStore.iconEnabled">
       <div class="flex items-center">
         <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
         <el-switch 
@@ -113,8 +113,8 @@ import { useRoute } from 'vue-router'
 import { getDynamicRouteComponents } from '@/utils/routeComponents'
 import { getLocalRouteComponents } from '@/router'
 import { useLoadStore } from '@/store/load'
-import { useActionStore } from '@/settings/action'
-const actionStore = useActionStore()
+import { useActionSetStore } from '@/settings/actionSet'
+const actionSetStore = useActionSetStore()
 
 const route = useRoute()
 const preloadedComponents = ref([])
