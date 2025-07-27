@@ -1,7 +1,7 @@
 
 import { useIconStore } from "@/store/icon"
 import { defineStore } from "pinia"
-export const useActionStore = defineStore({
+export const useActionSetStore = defineStore({
   id: 'action',
   state: () => ({
     // t_setting：收集图标时关闭搜索筛选
