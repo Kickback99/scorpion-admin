@@ -308,6 +308,7 @@ const batchRemove = async(node,data,isFlag) => {
     await removeApi(getCheckedKeys)
     ElMessage.success(total > 1?'批量删除成功':'删除成功')
     } catch (error) {
+      disabledAddParent.value = false
       render()
       const arr = handleExpand(node)
       expandKey.value = [...arr]
@@ -317,6 +318,7 @@ const batchRemove = async(node,data,isFlag) => {
   // allShow.value = true
   // treeRef.value.getCheckedKeys().splice(0)
   // console.log(treeRef.value.getCheckedKeys())
+  disabledAddParent.value = false
   render()
   const arr = handleExpand(node)
   expandKey.value = [...arr]
