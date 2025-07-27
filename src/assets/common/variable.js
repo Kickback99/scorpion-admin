@@ -2,7 +2,10 @@
 export const darkMenu = {
     bg:'rgba(0,0,0,1)',
     textColor:'rgba(255,255,255,1)',
-    active:'rgba(255,215,0,1)'
+    active:'rgba(255,215,0,1)',
+    get title(){
+        return this.active;
+    }
 }
 
 
