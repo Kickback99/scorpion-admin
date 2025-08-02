@@ -8,9 +8,24 @@ export const darkMenu = {
     }
 }
 
+export const darkMenuThemes = [
+    {
+        label:'土黄色',
+        value:'yellow',
+        bg:'rgba(0,0,0,1)',
+        textColor:'rgba(255,255,255,1)',
+        active:'rgba(255,215,0,1)',
+        get title(){
+            return this.active;
+        }
+    }
+]
+
+
+
 
 // 菜单主题
-export const menuThemeArr = [
+export const lightMenuThemes = [
     {
         label:'紫色篮',
         value:'people',

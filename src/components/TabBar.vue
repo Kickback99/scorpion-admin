@@ -46,7 +46,7 @@
                             <el-option v-for="(item,index) in colorStore.themes" :key="index" :value="item.value" :label="item.label">
                                 <span style="display: flex; align-items: center;">
                                     {{ item.label }}
-                                    <el-button type="text" v-if="index >= menuThemeArr.length" :icon="Delete" @click.stop="removeOption(item)"
+                                    <el-button type="text" v-if="index >= lightMenuThemes.length" :icon="Delete" @click.stop="removeOption(item)"
                                         style="margin-left: 8px;"></el-button>
                                 </span>
                             </el-option>
@@ -146,7 +146,7 @@ import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { clearUserInfo } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { darkMenu,menuThemeArr } from '@/assets/common/variable'
+import { darkMenuThemes,lightMenuThemes } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
 
 const userStore = useUserStore()
@@ -319,31 +319,31 @@ const currentActive = (color) => {
 } */
 
 // 暗黑模式切换
-const dark = ref(false)
+const dark = ref(colorStore.isDark)
 let cacheColorModule = ''
 
 const toggleDark = () => {
     // 获取html根节点
     const html = document.documentElement
     // 如果dark为真，给html标签添加dark类
+    colorStore.setDark()
     dark.value ? html.className = 'dark' : html.className = ''
+    // 先存储颜色状态
+    colorStore.storageColors(colorModule.value)
     if (dark.value) {
-        colorStore.storageColors()
+        console.log(123456789)
       /*   colorStore.setMenuBg(darkMenu.bg)
         colorStore.setMenuTextColor(darkMenu.textColor)
         colorStore.setMenuActive(darkMenu.active) */
-        batchSetMenu(darkMenu)
-        console.log(colorStore.menuBg)
-        cacheColorModule = colorModule.value
-        colorModule.value = ''
-    } else {
-        if(cacheColorModule != ''){
-            colorModule.value = cacheColorModule
+        batchSetMenuStore(colorStore.storageLightColors)
+        if(colorStore.storageDarkColors.colorModel != ''){
+            colorModule.value = colorStore.storageDarkColors.colorModel
         }
-        colorStore.setMenuBg(colorStore.storageColors.menuBg),
-        colorStore.setMenuTextColor(colorStore.storageColors.menuTextColor),
-        colorStore.setMenuActive(colorStore.storageColors.menuActive)
-        colorStore.setLogoTitleColor(colorStore.storageColors.logoTitleColor)
+    } else {
+        batchSetMenuStore(colorStore.storageDarkColors)
+        if(colorStore.storageLightColors.colorModel != ''){
+            colorModule.value = colorStore.storageLightColors.colorModel
+        }
     }
         bg.value = colorStore.menuBg
         color.value = colorStore.menuTextColor
@@ -355,7 +355,7 @@ const toggleDark = () => {
 const colorModule = ref('')
 
 /* onMounted(()=>{
-    menuThemeArr.forEach(item => {
+    lightMenuThemes.forEach(item => {
         colorStore.addThemes(item)
     })
 }) */
@@ -366,9 +366,12 @@ onMounted(()=>{
 
 // 初始化下拉列表的选中项
 const  initColorModule = () => {
-  if (dark.value) return;
+//   if (dark.value) return;
+    const html = document.documentElement
+    dark.value ? html.className = 'dark' : html.className = ''
   
   const { menuBg, menuTextColor, menuActive, logoTitleColor, themes } = colorStore;
+  console.log('themes',themes)
   
   colorModule.value = themes.find(({ bg, textColor, active, title }) => 
     bg === menuBg &&
@@ -379,9 +382,9 @@ const  initColorModule = () => {
 }
 
 const changeColor = () => {
-    if(dark.value){
+    /* if(dark.value){
         dark.value = false
-    }
+    } */
     // 获取html根节点
     const html = document.documentElement
     // 如果dark为真，给html标签添加dark类
@@ -458,7 +461,7 @@ const rules = {
     }else {
         console.log('仓库主题没有包含当前的主题')
     } */
-   if(colorStore.themes.length === menuThemeArr.length){
+   if(colorStore.themes.length === lightMenuThemes.length){
         ElMessage.error('你没有定义任何的主题，赶快添加吧')
         return;
    }
@@ -470,8 +473,8 @@ const rules = {
     })
     colorStore.resetThemes()
     if(!dark.value && colorStore.themes.length > 0){
-        batchSetMenu(menuThemeArr[0])
-        colorModule.value = menuThemeArr[0].value                  
+        batchSetMenu(lightMenuThemes[0])
+        colorModule.value = lightMenuThemes[0].value                  
     }else {
         colorModule.value = ''
     }
@@ -485,6 +488,13 @@ const rules = {
     colorStore.setMenuTextColor(data.textColor)
     colorStore.setMenuActive(data.active)
     colorStore.setLogoTitleColor(data.title)
+ }
+
+  const batchSetMenuStore = (data)=>{
+    colorStore.setMenuBg(data.menuBg)
+    colorStore.setMenuTextColor(data.menuTextColor)
+    colorStore.setMenuActive(data.MenuActive)
+    colorStore.setLogoTitleColor(data.logoTitleColor)
  }
 
  const selectRef = ref(null) // 引用 select 元素
@@ -502,7 +512,7 @@ const rules = {
       /* if (colorModule.value === item.value) {
         colorModule.value = '';
       } */
-     colorModule.value = menuThemeArr[0].value
+     colorModule.value = lightMenuThemes[0].value
      selectRef.value.$emit('change');
     }
   };

@@ -1,25 +1,39 @@
 import { defineStore } from "pinia";
-import { menuThemeArr } from '@/assets/common/variable'
+import { lightMenuThemes,darkMenuThemes } from '@/assets/common/variable'
 
 export const useColorStore = defineStore({
     id:'color',
     state:()=>{
-        const initTheme = menuThemeArr[0] || {}   
+        const initTheme = lightMenuThemes[0] || {}   
         return {
             menuBg:initTheme.bg,
             menuTextColor:initTheme.textColor,
             menuActive:initTheme.active,
             logoTitleColor:initTheme.title,
-            themes:[...menuThemeArr],
-            storageColors:{
+            isDark:false,
+            storageDarkColors:{
                 menuBg:'',
                 menuTextColor:'',
                 menuActive:'',
-                logoTitleColor:''
+                logoTitleColor:'',
+                colorModel:''
+            },
+            storageLightColors:{
+                menuBg:'',
+                menuTextColor:'',
+                menuActive:'',
+                logoTitleColor:'',
+                colorModel:''
             },
         }
     },
+    getters: {
+        themes: (state) => state.isDark ? [...darkMenuThemes] : [...lightMenuThemes],
+    },
     actions:{
+        setDark(){
+            this.isDark = !this.isDark;
+        },
         setMenuBg(data){
             this.menuBg = data
         },
@@ -32,17 +46,26 @@ export const useColorStore = defineStore({
         setLogoTitleColor(data){
             this.logoTitleColor = data
         },
-        storageColors(){
-            this.storageColors.menuBg = this.menuBg
-            this.storageColors.menuTextColor =  this.menuTextColor
-            this.storageColors.menuActive = this.menuActive
-            this.storageColors.logoTitleColor = this.logoTitleColor
+        storageColors(colorModel){
+            if(this.isDark){
+                this.storageDarkColors.menuBg = this.menuBg
+                this.storageDarkColors.menuTextColor =  this.menuTextColor
+                this.storageDarkColors.menuActive = this.menuActive
+                this.storageDarkColors.logoTitleColor = this.logoTitleColor
+                this.storageDarkColors.colorModel = colorModel
+            }else {
+                this.storageLightColors.menuBg = this.menuBg
+                this.storageLightColors.menuTextColor =  this.menuTextColor
+                this.storageLightColors.menuActive = this.menuActive
+                this.storageLightColors.logoTitleColor = this.logoTitleColor
+                this.storageLightColors.colorModel = colorModel
+            }
         },
         addThemes(data){
             this.themes.push(data)
         },
         resetThemes(){
-            this.themes = [...menuThemeArr]
+            this.themes = [...lightMenuThemes]
             this.logoTextColor = 'rgba(255,255,255,1)'
         }
         
