@@ -10,7 +10,10 @@ export const useColorStore = defineStore({
             menuTextColor:initTheme.textColor,
             menuActive:initTheme.active,
             logoTitleColor:initTheme.title,
+            // 黑暗模式颜色控制 
             isDark:false,
+            // 黑暗模式初始化的开关
+            darkStarted:true,
             customDarkThemes:[...darkMenuThemes],
             customLightThemes:[...lightMenuThemes],
             storageDarkColors:{
@@ -35,6 +38,9 @@ export const useColorStore = defineStore({
     actions:{
         setDark(){
             this.isDark = !this.isDark;
+        },
+        setDarkStarted(){
+            this.darkStarted = !this.darkStarted
         },
         setMenuBg(data){
             this.menuBg = data
@@ -73,8 +79,12 @@ export const useColorStore = defineStore({
         },
         resetThemes(){
             // this.themes = [...lightMenuThemes]
-            this.customLightThemes = [...lightMenuThemes];
-            this.customDarkThemes = [...darkMenuThemes];
+       
+            if (this.isDark) {
+                this.customDarkThemes = [...darkMenuThemes];
+            }else {
+                this.customLightThemes = [...lightMenuThemes]; 
+            }
         }
         
     },
