@@ -325,6 +325,8 @@ const currentActive = (color) => {
 // 暗黑模式切换
 const dark = ref(colorStore.isDark)
 
+const darkStarted = ref(true)
+
 let cacheColorModule = ''
 
 const toggleDark = () => {
@@ -336,19 +338,20 @@ const toggleDark = () => {
     if (dark.value) {
         // 先存储浅色主题状态
         colorStore.setStorageLightColors(colorModule.value)
-        console.log(123456789)
-      /*   colorStore.setMenuBg(darkMenu.bg)
-        colorStore.setMenuTextColor(darkMenu.textColor)
-        colorStore.setMenuActive(darkMenu.active) */
-        batchSetMenu(darkMenuThemes[0])
-        if(colorStore.storageDarkColors.colorModel != ''){
-            console.log('存储coloModule中...')
-            colorModule.value = colorStore.storageDarkColors.colorModel
-        }else colorModule.value = ''
-        // initColorModule()
-        if(colorStore.storageDarkColors.menuBg){
-            // 使用深色主题
-            batchSetMenuStore(colorStore.storageDarkColors)
+        if(darkStarted.value){
+            batchSetMenu(darkMenuThemes[0])
+            colorModule.value = darkMenuThemes[0].value
+            darkStarted.value = false
+        }else {
+            if(colorStore.storageDarkColors.colorModel != ''){
+                console.log('存储coloModule中...')
+                colorModule.value = colorStore.storageDarkColors.colorModel
+            }else colorModule.value = ''
+            // initColorModule()
+            if(colorStore.storageDarkColors.menuBg){
+                // 使用深色主题
+                batchSetMenuStore(colorStore.storageDarkColors)
+            }
         }
     } else {
         // 先存储深色主题状态
