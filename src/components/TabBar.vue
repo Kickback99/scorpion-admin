@@ -316,6 +316,12 @@ const currentActive = (color) => {
   }
 }
 
+watch(isSyncColor,()=>{
+    if(isSyncColor.value){
+        setLogoTitleColor()
+    }
+})
+
 /* let cacheColor = {
     menuBg:'',
     menuTextColor:'',
@@ -356,12 +362,10 @@ const toggleDark = () => {
         // 先存储深色主题状态
         colorStore.setStorageDarkColors(colorModule.value)
         // 使用浅色主题
-        console.log('colorStore.storageLightColors',colorStore.storageLightColors)
         if(colorStore.storageLightColors.menuActive){
             batchSetMenuStore(colorStore.storageLightColors)
         }
         if(colorStore.storageLightColors.colorModel != ''){
-            console.log('storageLightColors.colorModel不为空')
             colorModule.value = colorStore.storageLightColors.colorModel
         }else colorModule.value = ''
     }
@@ -438,7 +442,6 @@ const addColor = () =>{
 
 const onConfirm = async() => {
     await ruleFormRef.value.validate()
-    dark.value = false
     // if(colorStore.themes)
     const themeObj = {
         label:formData.value.themeName,
@@ -493,20 +496,28 @@ const rules = {
         ElMessage.error('你没有定义任何的主题，赶快添加吧')
         return;
    }
-    let text = withAnyBg(colorStore.menuBg,colorStore.themes)?'这将会删除你自定义的主题，你确定吗？':'当前主题未保存，你确定要重置吗'
+    let text = matchesTheme()?'这将会删除你自定义的主题，你确定吗？':'当前主题未保存，你确定要重置吗'
     await ElMessageBox.confirm(text,'温馨提示', {
       type: 'warning',
       confirmButtonText: '确认',
       cancelButtonText: '取消'
     })
     colorStore.resetThemes()
-    if(!dark.value && colorStore.themes.length > 0){
+    const firstThemes = colorStore.themes[0]
+    batchSetMenu(firstThemes)
+    colorModule.value = firstThemes.value
+
+    /* if(!dark.value && colorStore.themes.length > 0){
         batchSetMenu(lightMenuThemes[0])
         colorModule.value = lightMenuThemes[0].value                  
     }else {
         colorModule.value = ''
-    }
+    } */
 
+    bg.value = firstThemes.bg
+    color.value = firstThemes.textColor
+    active.value = firstThemes.active
+    logoTitleColor.value = firstThemes.title
     ElMessage.success('主题重置成功')
  }
 
