@@ -1,5 +1,4 @@
 <template>
-    <button @click="colorStore.menuActive = 'rgba(255,216,0,1)'">改变颜色</button>
     <div class="left">
         <!-- 折叠 -->
         <el-icon style="margin-right: 10px;" @click="stringStore.isCollapse = !stringStore.isCollapse">
@@ -331,9 +330,8 @@ watch(isSyncColor,()=>{
 // 暗黑模式切换
 const dark = ref(colorStore.isDark)
 
-const darkStarted = ref(true)
+const darkStarted = ref(colorStore.darkStarted)
 
-let cacheColorModule = ''
 
 const toggleDark = () => {
     // 获取html根节点
@@ -347,7 +345,7 @@ const toggleDark = () => {
         if(darkStarted.value){
             batchSetMenu(darkMenuThemes[0])
             colorModule.value = darkMenuThemes[0].value
-            darkStarted.value = false
+            colorStore.setDarkStarted()
         }else {
             if(colorStore.storageDarkColors.colorModel != ''){
                 colorModule.value = colorStore.storageDarkColors.colorModel
