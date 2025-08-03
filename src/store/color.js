@@ -11,6 +11,8 @@ export const useColorStore = defineStore({
             menuActive:initTheme.active,
             logoTitleColor:initTheme.title,
             isDark:false,
+            customDarkThemes:[...darkMenuThemes],
+            customLightThemes:[...lightMenuThemes],
             storageDarkColors:{
                 menuBg:'',
                 menuTextColor:'',
@@ -28,7 +30,7 @@ export const useColorStore = defineStore({
         }
     },
     getters: {
-        themes: (state) => state.isDark ? [...darkMenuThemes] : [...lightMenuThemes],
+        themes: (state) => state.isDark ? [...state.customDarkThemes] : [...state.customLightThemes],
     },
     actions:{
         setDark(){
@@ -55,12 +57,6 @@ export const useColorStore = defineStore({
 
         },
         setStorageLightColors(colorModel){
-                console.log('Storing Light Colors:', {
-                    menuBg: this.menuBg,
-                    menuTextColor: this.menuTextColor,
-                    menuActive: this.menuActive,  // 检查这里是不是 undefined
-                    logoTitleColor: this.logoTitleColor,
-                });
                 this.storageLightColors.menuBg = this.menuBg
                 this.storageLightColors.menuTextColor =  this.menuTextColor
                 this.storageLightColors.menuActive = this.menuActive
@@ -68,11 +64,17 @@ export const useColorStore = defineStore({
                 this.storageLightColors.colorModel = colorModel
         },        
         addThemes(data){
-            this.themes.push(data)
+            // this.themes.push(data)
+            if (this.isDark) {
+                this.customDarkThemes.push(data);
+            } else {
+                this.customLightThemes.push(data);
+            }
         },
         resetThemes(){
-            this.themes = [...lightMenuThemes]
-            this.logoTextColor = 'rgba(255,255,255,1)'
+            // this.themes = [...lightMenuThemes]
+            this.customLightThemes = [...lightMenuThemes];
+            this.customDarkThemes = [...darkMenuThemes];
         }
         
     },
