@@ -344,7 +344,6 @@ const toggleDark = () => {
             darkStarted.value = false
         }else {
             if(colorStore.storageDarkColors.colorModel != ''){
-                console.log('存储coloModule中...')
                 colorModule.value = colorStore.storageDarkColors.colorModel
             }else colorModule.value = ''
             // initColorModule()
@@ -425,7 +424,7 @@ const formData = ref({})
 
 const ruleFormRef = ref(null)
 const addColor = () =>{
-    if(withAnyBg(colorStore.menuBg,colorStore.themes)){
+    if(matchesTheme()){
         ElMessage.error('请重新设置主题颜色')
         return;
     }
@@ -460,6 +459,15 @@ function withAnyBg(bg,bgs){
  return bgs.some(item => bg===item.bg) || dark.value
 }
 
+function matchesTheme(){
+    const { menuBg, menuTextColor, menuActive, logoTitleColor, themes } = colorStore;
+    return themes.some(t => 
+        t.bg === menuBg &&
+        t.textColor === menuTextColor &&
+        t.active === menuActive &&
+        t.title === logoTitleColor
+    )
+}
 
 
 // 绑定表单校验规则
