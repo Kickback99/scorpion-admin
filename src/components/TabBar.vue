@@ -1,4 +1,5 @@
 <template>
+    <button @click="colorStore.menuActive = 'rgba(255,216,0,1)'">改变颜色</button>
     <div class="left">
         <!-- 折叠 -->
         <el-icon style="margin-right: 10px;" @click="stringStore.isCollapse = !stringStore.isCollapse">
@@ -214,6 +215,9 @@ const handleCommand = async (key) => {
     }
 }
 
+// 主题颜色
+const colorModule = ref('')
+
 // 颜色选择器
 const predefineColors = ref([
     '#333333',
@@ -320,6 +324,7 @@ const currentActive = (color) => {
 
 // 暗黑模式切换
 const dark = ref(colorStore.isDark)
+
 let cacheColorModule = ''
 
 const toggleDark = () => {
@@ -328,22 +333,35 @@ const toggleDark = () => {
     // 如果dark为真，给html标签添加dark类
     colorStore.setDark()
     dark.value ? html.className = 'dark' : html.className = ''
-    // 先存储颜色状态
-    colorStore.storageColors(colorModule.value)
     if (dark.value) {
+        // 先存储浅色主题状态
+        colorStore.setStorageLightColors(colorModule.value)
         console.log(123456789)
       /*   colorStore.setMenuBg(darkMenu.bg)
         colorStore.setMenuTextColor(darkMenu.textColor)
         colorStore.setMenuActive(darkMenu.active) */
-        batchSetMenuStore(colorStore.storageLightColors)
+        batchSetMenu(darkMenuThemes[0])
         if(colorStore.storageDarkColors.colorModel != ''){
+            console.log('存储coloModule中...')
             colorModule.value = colorStore.storageDarkColors.colorModel
+        }else colorModule.value = ''
+        // initColorModule()
+        if(colorStore.storageDarkColors.menuBg){
+            // 使用深色主题
+            batchSetMenuStore(colorStore.storageDarkColors)
         }
     } else {
-        batchSetMenuStore(colorStore.storageDarkColors)
-        if(colorStore.storageLightColors.colorModel != ''){
-            colorModule.value = colorStore.storageLightColors.colorModel
+        // 先存储深色主题状态
+        colorStore.setStorageDarkColors(colorModule.value)
+        // 使用浅色主题
+        console.log('colorStore.storageLightColors',colorStore.storageLightColors)
+        if(colorStore.storageLightColors.menuActive){
+            batchSetMenuStore(colorStore.storageLightColors)
         }
+        if(colorStore.storageLightColors.colorModel != ''){
+            console.log('storageLightColors.colorModel不为空')
+            colorModule.value = colorStore.storageLightColors.colorModel
+        }else colorModule.value = ''
     }
         bg.value = colorStore.menuBg
         color.value = colorStore.menuTextColor
@@ -351,8 +369,7 @@ const toggleDark = () => {
         logoTitleColor.value = colorStore.logoTitleColor
 }
 
-// 主题颜色
-const colorModule = ref('')
+
 
 /* onMounted(()=>{
     lightMenuThemes.forEach(item => {
@@ -491,9 +508,10 @@ const rules = {
  }
 
   const batchSetMenuStore = (data)=>{
+    console.log('data',data)
     colorStore.setMenuBg(data.menuBg)
     colorStore.setMenuTextColor(data.menuTextColor)
-    colorStore.setMenuActive(data.MenuActive)
+    colorStore.setMenuActive(data.menuActive)
     colorStore.setLogoTitleColor(data.logoTitleColor)
  }
 
