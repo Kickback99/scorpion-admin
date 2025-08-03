@@ -46,21 +46,27 @@ export const useColorStore = defineStore({
         setLogoTitleColor(data){
             this.logoTitleColor = data
         },
-        storageColors(colorModel){
-            if(this.isDark){
+        setStorageDarkColors(colorModel){
                 this.storageDarkColors.menuBg = this.menuBg
                 this.storageDarkColors.menuTextColor =  this.menuTextColor
                 this.storageDarkColors.menuActive = this.menuActive
                 this.storageDarkColors.logoTitleColor = this.logoTitleColor
                 this.storageDarkColors.colorModel = colorModel
-            }else {
+
+        },
+        setStorageLightColors(colorModel){
+                console.log('Storing Light Colors:', {
+                    menuBg: this.menuBg,
+                    menuTextColor: this.menuTextColor,
+                    menuActive: this.menuActive,  // 检查这里是不是 undefined
+                    logoTitleColor: this.logoTitleColor,
+                });
                 this.storageLightColors.menuBg = this.menuBg
                 this.storageLightColors.menuTextColor =  this.menuTextColor
                 this.storageLightColors.menuActive = this.menuActive
                 this.storageLightColors.logoTitleColor = this.logoTitleColor
                 this.storageLightColors.colorModel = colorModel
-            }
-        },
+        },        
         addThemes(data){
             this.themes.push(data)
         },

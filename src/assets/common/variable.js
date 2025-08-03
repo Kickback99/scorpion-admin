@@ -13,8 +13,18 @@ export const darkMenuThemes = [
         label:'土黄色',
         value:'yellow',
         bg:'rgba(0,0,0,1)',
-        textColor:'rgba(255,255,255,1)',
-        active:'rgba(255,215,0,1)',
+        textColor:'rgba(255, 255, 255, 1)',
+        active:'rgba(255, 215, 0, 1)',
+        get title(){
+            return this.active;
+        }
+    },
+        {
+        label:'湖绿色',
+        value:'cyan',
+        bg:'rgba(0,0,0,1)',
+        textColor:'rgba(255, 255, 255, 1)',
+        active:'rgba(0, 186, 189, 1)',
         get title(){
             return this.active;
         }
