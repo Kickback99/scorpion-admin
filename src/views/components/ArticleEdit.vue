@@ -45,12 +45,18 @@
                 <el-form-item label="分类选择" prop="categoryId">
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
                 </el-form-item>
-            </el-form>
-            <el-input-tag
-                        v-model="input"
-                        placeholder="Please input"
-                        aria-label="Please click the Enter key after input"
+
+                <!-- 将el-input-tag放在el-form-item中 -->
+              <el-form-item label="文章标签" prop="tagNames">
+                <el-input-tag
+                  v-model="formModel.tagNames"
+                  placeholder="请输入标签，按回车确认"
+                  style="width: 100%"
                 />
+              </el-form-item>
+
+            </el-form>
+
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="dialogVisible = false">取消</el-button>
@@ -80,7 +86,8 @@ const formModel = reactive({
   status:null,
   descriptionType: 'auto', // 默认自动生成
   customDescription: '',   // 自定义摘要内容
-  description: null       // 实际提交给后端的值
+  description: null,       // 实际提交给后端的值
+  tagNames:[]
 })
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -116,18 +123,17 @@ const handleToggle = async(param) => {
         status:null,
         descriptionType: 'auto', // 默认自动生成
         customDescription: '',   // 自定义摘要内容
-        description: null       // 实际提交给后端的值
+        description: null,       // 实际提交给后端的值
+        tagNames: [] // 重置标签
     })
    }else {
     // 回显
       dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
     console.log("回显res.data",res.data)
-    const {title,content,tagNames,...rest} = res.data
-    console.log('tagNames',tagNames)
+    const {title,content,...rest} = res.data
     blogData.value = {title,content}  
     Object.assign(formModel,rest)
-    input.value = tagNames || []
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
     }else if(res.data.isAutoDescription === 1){
@@ -177,12 +183,13 @@ const handlePublish = async(status) => {
         ...blogData.value,
         ...formModel
       },
-      tagNames: input.value
+      tagNames: formModel.tagNames
     }
 
-    // 移除临时字段
-  delete data.descriptionType
-  delete data.customDescription
+  // 移除临时字段
+  delete data.article.descriptionType
+  delete data.article.customDescription
+  delete data.article.tagNames // 移除tagNames字段，因为article表中没有这个字段
 
     if(!formModel.id){
         // t_article_request：文章新增请求
