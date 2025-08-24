@@ -8,10 +8,12 @@
                 <CateSelect v-model="searchData.categoryId"></CateSelect>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.status" placeholder="请选择状态">
-                    <el-option label="已发布" value="0" />
-                    <el-option label="草稿" value="1" />
-                </el-select>
+                <div style="width: 200px;">
+                    <el-select v-model="searchData.status" placeholder="请选择状态">
+                        <el-option label="已发布" value="0" />
+                        <el-option label="草稿" value="1" />
+                    </el-select>
+                </div>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" :icon="Search"  plain @click="onSearch">搜索</el-button>
