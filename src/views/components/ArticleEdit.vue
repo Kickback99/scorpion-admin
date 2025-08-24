@@ -46,6 +46,11 @@
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
                 </el-form-item>
             </el-form>
+            <el-input-tag
+                        v-model="input"
+                        placeholder="Please input"
+                        aria-label="Please click the Enter key after input"
+                />
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="dialogVisible = false">取消</el-button>
@@ -83,6 +88,8 @@ const dialogTitle = ref('')
 // mask弹窗
 const maskVisible = ref(false)
 
+const input = ref([])
+
 // 暴露打开方法
 
 
@@ -116,9 +123,11 @@ const handleToggle = async(param) => {
       dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
     console.log("回显res.data",res.data)
-    const {title,content,...rest} = res.data
+    const {title,content,tagNames,...rest} = res.data
+    console.log('tagNames',tagNames)
     blogData.value = {title,content}  
     Object.assign(formModel,rest)
+    input.value = tagNames || []
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
     }else if(res.data.isAutoDescription === 1){
@@ -164,8 +173,11 @@ const handlePublish = async(status) => {
   }
 
     const data = {
+      article:{
         ...blogData.value,
         ...formModel
+      },
+      tagNames: input.value
     }
 
     // 移除临时字段
