@@ -1,11 +1,11 @@
 <template>
-     <Mask :maskVisible="maskVisible" @closeMask="maskVisible=false" @openDialog="dialogVisible=true">
+     <Mask :maskVisible="maskVisible" @closeMask="maskVisible=false" @openDialog="handleOpen">
 
-        <el-form :model="blogData">
-            <el-form-item>
+        <el-form :model="blogData" ref="blogFormRef" :rules="rules">
+            <el-form-item prop="title">
                     <el-input placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="content">
          
                 <!-- attention -->
                 <!-- 老罗使用的是 -->
@@ -168,6 +168,28 @@ const handleDescriptionTypeChange = (type) => {
 }
 
 
+const blogFormRef = ref(null)
+
+const rules = {
+  title:[
+    { required: true, message: '请输入标题'},
+  ],
+  content:[
+    { required: true, message: '请输入内容'},
+  ],
+}
+
+
+const handleOpen = () => {
+  blogFormRef.value.validate((valid) => {
+    if (!valid) {
+      return
+    }
+    dialogVisible.value = true
+  }
+  )
+}
+
 const handlePublish = async(status) => {
 
     formModel.status = status
@@ -208,5 +230,9 @@ const handlePublish = async(status) => {
 </script>
 
 <style scoped lang="scss">
-
+  // 针对<el-input placeholder="请输入标题" v-model="blogData.title" />
+  // 不管校验是否生效，都保持原来的样式！
+ :deep(.el-form .el-form-item .el-form-item__content .el-input__wrapper){
+	box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
+}
 </style>
