@@ -5,13 +5,13 @@
                 <el-input v-model="searchData.username" placeholder="请输入用户名" />
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.type" placeholder="请选择用户类型">
+                <el-select style="width: 200px" v-model="searchData.type" placeholder="请选择用户类型">
                     <el-option label="前台" value="1" />
                     <el-option label="后台" value="0" />
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.status" placeholder="请选择登录状态">
+                <el-select style="width: 200px" v-model="searchData.status" placeholder="请选择登录状态">
                     <!-- 遍历所有状态选项 -->
                     <el-option
                     v-for="item in [

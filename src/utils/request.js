@@ -3,7 +3,7 @@
 //导入axios  npm install axios
 import axios from 'axios';
 //定义一个变量,记录公共的前缀  ,  baseURL
-const baseURL = '/api';
+const baseURL = import.meta.env.VITE_API;
 const instance = axios.create({baseURL,timeout:4000})
 import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
