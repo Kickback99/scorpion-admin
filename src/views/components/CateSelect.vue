@@ -6,7 +6,7 @@
       check-strictly
       :render-after-expand="false"
       placeholder="请选择分类"
-      style="width: 240px"
+      style="width: 200px"
     />
   </template>
 
