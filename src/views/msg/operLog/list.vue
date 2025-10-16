@@ -4,7 +4,7 @@
                 <el-input v-model="searchData.username" placeholder="请输入用户名" />
             </el-form-item>
             <el-form-item>
-            <el-select v-model="searchData.module" placeholder="请选择模块类型">
+            <el-select style="width: 200px" v-model="searchData.module" placeholder="请选择模块类型">
                 <el-option
                 v-for="item in enumOptions.modules"
                 :key="item.value"
@@ -14,7 +14,7 @@
             </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.type" placeholder="请选择操作类型">
+                <el-select style="width: 200px" v-model="searchData.type" placeholder="请选择操作类型">
                 <el-option
                 v-for="item in enumOptions.types"
                 :key="item.value"
@@ -25,7 +25,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.reqMode" placeholder="请选择请求方式">
+                <el-select style="width: 200px" v-model="searchData.reqMode" placeholder="请选择请求方式">
                     <el-option value="POST">POST</el-option>
                     <el-option value="PUT">PUT</el-option>
                     <el-option value="DELETE">DELETE</el-option>
