@@ -26,6 +26,11 @@
     <el-table :data="tableData" :style="{ width: '100%' }" >
         <el-table-column type="index" label="序号" width="60"></el-table-column>
         <el-table-column prop="title" label="标题" />
+        <el-table-column label="封面">
+            <template #default="{row}">
+                <el-image style="width: 100px" :src="row.cover" :fit="cover" />
+            </template>
+        </el-table-column>
         <el-table-column prop="categoryId" label="分类" />
         <el-table-column prop="status" label="状态" />
         <el-table-column prop="createTime" label="创建日期" />
