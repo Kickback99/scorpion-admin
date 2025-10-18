@@ -3,7 +3,7 @@
       <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
 
       <el-upload v-show="!isProgressVisible" class="avatar-uploader" 
-          action="/back/admin/upload/cover" 
+          :action="handleAction" 
           name="cover" 
           :headers="headers"
           :show-file-list="false"
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { useTokenStore } from '@/store/token';
@@ -31,6 +31,11 @@ const headers = computed(() => {
   return {
     authorization: tokenStore.token || ''
   }
+})
+
+// 处理上传文件地址
+const handleAction = computed(()=>{
+  return `${import.meta.env.VITE_API}/admin/upload/cover`
 })
 
 // 图片上传成功之后的回调
@@ -50,7 +55,6 @@ const  isProgressVisible = ref(false)
 
 // 准备上传的回调
 const beforeAvatarUpload = (rawFile) => {
-    isProgressVisible.value = true
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!allowedTypes.includes(rawFile.type)){
     ElMessage.error('必须为 jpg | png | jpeg 格式')
@@ -59,6 +63,7 @@ const beforeAvatarUpload = (rawFile) => {
     ElMessage.error('图片不能超过2MB')
     return false
   }
+   isProgressVisible.value = true
   return true
 }
 
