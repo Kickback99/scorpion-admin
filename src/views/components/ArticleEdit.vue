@@ -42,8 +42,12 @@
                     show-word-limit
                     />
                 </el-form-item>
-                <el-form-item label="分类选择" prop="categoryId">
+                <el-form-item label="文章分类" prop="categoryId">
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
+                </el-form-item>
+
+                <el-form-item label="文章封面" prop="cover">
+                    <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
                 </el-form-item>
 
                 <!-- 将el-input-tag放在el-form-item中 -->
@@ -74,6 +78,7 @@ import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
 import { addApi, findApi, modifyApi } from '@/api/conarticle';
+import SmartUpload from '@/views/components/SmartUpload.vue';
 
 let mdHeight = window.innerHeight - 30 - 70 - 200
 
@@ -179,15 +184,23 @@ const rules = {
   ],
 }
 
+const uploadRef = ref()
 
-const handleOpen = () => {
-  blogFormRef.value.validate((valid) => {
-    if (!valid) {
-      return
-    }
-    dialogVisible.value = true
+const handleOpen = async() => {
+  const valid = await blogFormRef.value.validate().catch(() => false)
+  if (!valid) return
+  
+  dialogVisible.value = true
+  
+  // 等待对话框打开和内容渲染
+  await nextTick()
+  
+  // 现在 SmartUpload 组件已经创建
+  if (uploadRef.value && uploadRef.value.handleImage) {
+    const imageUrl = !formModel.id ? '' : formModel.cover
+    console.log('对话框打开后调用 handleImage:', imageUrl)
+    uploadRef.value.handleImage(imageUrl)
   }
-  )
 }
 
 const handlePublish = async(status) => {
