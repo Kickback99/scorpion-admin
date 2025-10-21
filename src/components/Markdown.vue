@@ -7,6 +7,8 @@
 </template>
 
 <script setup>
+import { uploadApi } from '@/api/conarticle'
+
 // import { uploadImgService } from '@/api/article'
 
 defineProps({
@@ -28,10 +30,11 @@ const onChange = (markdownContent,htmlContent) =>{
 
 
 const handleUploadImage = async (event, insertImage, files) => {
-    /* const formData = new FormData()
-    formData.append('picture', files[0])
+    const formData = new FormData()
+    formData.append('content', files[0])
     try {
-        const res = await uploadImgService(formData)
+        // t_upload_request：内容图片请求
+        const res = await uploadApi(formData)
         insertImage({
             url: res.data,
             desc: '图片描述的信息',
@@ -40,6 +43,6 @@ const handleUploadImage = async (event, insertImage, files) => {
         });
     } catch (error) {
         console.error('上传失败', error)
-    } */
+    }
 }
 </script>
