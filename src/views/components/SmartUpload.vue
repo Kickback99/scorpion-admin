@@ -33,6 +33,7 @@ const headers = computed(() => {
   }
 })
 
+// t_upload_request：封面图片请求
 // 处理上传文件地址
 const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/admin/upload/cover`
