@@ -35,9 +35,8 @@ const routes = [
             meta:{
                title:'首页'     
         }},
-        {path:'/user/info',component:() =>import('@/views/user/userInfo.vue')},
-        {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
-        {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
+        {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue')},
+        {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue')},
         {path:'/test',component:() => import('@/views/Test.vue')}
     ]}
 /*     {
