@@ -31,25 +31,37 @@ export const useUserStore = defineStore({
 
             // 已有基础信息且不强制刷新 → 仅返回菜单数据
             if (this.hasUserInfo && !forceRefreshMenu) {
+                console.log('只刷新菜单。。。')
                 return {data: this.menuData}
             }
             
-            // 否则全量请求
-            // t_user_request：获取用户权限请求
-            try{
-            const res = await userInfoApi()
-            this.userInfo = res.data.userInfo
-            this.roleNames = res.data.roleNames
-            this.menuData = {
-                routers:res.data.routers,
-                permissions:res.data.permissions
+            if(forceRefreshMenu == false){
+                console.log('全量请求')
+                    // 否则全量请求
+                    // t_user_request：获取用户权限请求
+                try{
+                const res = await userInfoApi()
+                this.userInfo = res.data.userInfo
+                this.roleNames = res.data.roleNames
+                this.menuData = {
+                    routers:res.data.routers,
+                    permissions:res.data.permissions
+                }
+                    this.hasUserInfo = true // 设置标志位
+                    return res
+                }catch(error){
+                    error = '访问用户信息失败'
+                    return Promise.reject(error)
+                }
+            }else {
+                // 仅获取用户信息
+                console.log('仅获取用户信息')
+                const res = await userInfoApi()
+                this.userInfo = res.data.userInfo
+                this.roleNames = res.data.roleNames
+                return res.data.userInfo
             }
-            this.hasUserInfo = true // 设置标志位
-            return res
-        }catch(error){
-            error = '访问用户信息失败'
-            return Promise.reject(error)
-        }
+      
         },
         // 仅刷新菜单数据
         async refreshMenuOnly() {

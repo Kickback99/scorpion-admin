@@ -77,7 +77,9 @@
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
-                <el-avatar :src="userStore.userInfo.avatar || avatar" />
+                <!-- 添加key强制渲染？ -->
+                <!-- <el-avatar :src="handleUrl" :key="avatarKey"/> -->
+                <el-avatar :src="handleUrl"/>
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
                 <!-- {{ displayName }} -->
 
@@ -90,8 +92,8 @@
             <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item>
-                    <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item>
-                    <el-dropdown-item command="password" :icon="EditPen">重置密码</el-dropdown-item>
+                    <!-- <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item> -->
+                    <el-dropdown-item command="rePassword" :icon="EditPen">重置密码</el-dropdown-item>
                     <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
@@ -148,8 +150,38 @@ import { clearUserInfo } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { darkMenuThemes,lightMenuThemes } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
-
+// 导入全局事件总线对象
+import emitter from '@/utils/event-bus.js' // 引入事件总线
+const avatarUrlWithTimestamp = ref('') // 带时间戳的头像URL
+// const avatarKey = ref(Date.now()) // 初始key
 const userStore = useUserStore()
+const handleUrl = computed(()=>{
+    return avatarUrlWithTimestamp.value || userStore.userInfo.avatar || avatar
+})
+
+// 处理URL覆盖
+async function overwriteAvatarUrl() {
+    await userStore.getUserInfo(true)
+      if (userStore.userInfo.avatar) {
+    // 1. 添加时间戳
+    const timestamp = new Date().getTime()
+    avatarUrlWithTimestamp.value = `${userStore.userInfo.avatar}?_t=${timestamp}`
+    // console.log('添加时间戳:', avatarUrlWithTimestamp.value)
+    // 2. 更新key强制重新创建组件（只在这里改key）
+    // avatarKey.value = timestamp
+    // 1秒后去掉时间戳，恢复原始URL
+    setTimeout(() => {
+      avatarUrlWithTimestamp.value = ''
+    //   console.log('恢复原始URL')
+    }, 1000)
+  }
+}
+
+emitter.on('changeUrl',overwriteAvatarUrl)
+
+
+
+
 const tokenStore = useTokenStore()
 const colorStore = useColorStore()
 
@@ -211,6 +243,8 @@ const handleCommand = async (key) => {
         ElMessage.success(res.message)
         // 跳转到登录页
         router.push({ path: '/login', query: { redirect: route.path } })
+    }else {
+        router.push(`/user/${key}`)
     }
 }
 

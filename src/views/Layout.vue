@@ -24,13 +24,10 @@
                     <el-icon><Aim /></el-icon> <span>个人中心</span>
                 </template>
 			   <!--展开的每一个菜单项-->
-                <el-menu-item index="/user/info">
+                <el-menu-item index="/user/profile">
                     <el-icon><Aim /></el-icon> <span>基本资料</span>
                 </el-menu-item>
-                <el-menu-item index="/user/avatar">
-					          <el-icon><Aim /></el-icon> <span>用户头像</span>
-                </el-menu-item>
-                <el-menu-item index="/user/resetPassword">
+                <el-menu-item index="/user/rePassword">
 					          <el-icon><Aim /></el-icon> <span>重置密码</span>
                 </el-menu-item>
             </el-sub-menu>
