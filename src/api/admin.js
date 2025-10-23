@@ -30,6 +30,17 @@ export const userInfoApi = () => {
     return http.get('/admin/userDetailInfo')
 }
 
+// 修改用户信息
+export const userUpdateInfoApi = (params) => {
+    const formData = new FormData()
+    for(const k in params){
+        if(params[k] != null){
+        formData.append(k,params[k])
+        }
+    }
+    return http.put('/admin/updateUserDetailInfo',formData)
+}
+
 // 用户退出登录
 export const adminLogoutApi = () => {
     return http.get("/admin/logout")
