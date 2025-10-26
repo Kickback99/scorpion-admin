@@ -1,0 +1,359 @@
+<template>
+    <div class="toolbar">
+        <el-form label-width="auto" inline>
+            <el-form-item>
+                <el-input v-model="searchData.name" placeholder="请输入文件名称" />
+            </el-form-item>
+            <el-form-item>
+                <SmartSelector v-model="searchData.ext" :data="exts" style="width: 200px;" placeholder="请选择扩展名">
+                </SmartSelector>
+            </el-form-item>
+            <el-form-item>
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序">
+                </SmartSelector>
+            </el-form-item>
+            <el-form-item>
+                <el-button :icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
+                    @click="setSortOrder('ASC')" />
+                <el-button :icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
+                    @click="setSortOrder('DESC')" />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" :icon="Search" plain @click="onSearch">搜索</el-button>
+                <el-button type="warning" :icon="Refresh" plain @click="onReset">重置</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="bottom">
+            <el-upload class="file-operate" :action="handleAction" :headers="headers"
+                name="file" :show-file-list="false" :on-success="onSuccess">
+                <el-button color="#9BCD9B">
+                    <offlineIcon icon="ri:add-fill"></offlineIcon>文件上传
+                </el-button>
+            </el-upload>
+            <el-upload class="file-operate" :action="handleAction" :headers="headers" name="file"
+                :show-file-list="false" :on-success="onSuccess" multiple>
+                <el-button color="#F4A460" >
+                    <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
+                </el-button>
+            </el-upload>
+            <div class="file-operate">
+                <el-button color="#7B68EE"  @click="handleSyncDelete()">
+                    <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
+                </el-button>
+            </div>
+            <!-- color="#626aef" -->
+            <div class="file-operate">
+                <el-button color="#EEDD82" @click="deleteSelectRows()">
+                    <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
+                </el-button>
+            </div>
+
+            <div class="file-operate">
+                <el-button color="#8B4726" @click="handleUpdateRecords">
+                    <offlineIcon icon="fa-solid:database"></offlineIcon>更新数据库</el-button>
+            </div>
+           
+        </div>
+    </div>
+
+    <el-table :data="tableData" :style="{ width: '100%' }"   @selection-change="removeMultiple">
+        <el-table-column type="selection" :selectable="selectable" width="55" />
+        <el-table-column type="index" label="序号" width="60" />
+        <el-table-column prop="name" label="文件名称" />
+        <el-table-column prop="ext" label="扩展名" />
+        <el-table-column prop="size" label="文件大小" />
+        <!-- <el-table-column prop="url" label="文件链接" /> -->
+        <el-table-column prop="md5" label="文件md5" />
+        <el-table-column prop="status" label="文件状态"></el-table-column>
+        <el-table-column prop="createTime" label="创建日期"></el-table-column>
+        <el-table-column label="操作" width="150">
+            <template #default="{row}">
+                <el-button @click="handleEdit(row)" type="primary" :icon="Edit" circle plain></el-button>
+                <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"
+                    :icon="WarnTriangleFilled">
+                    <template #reference>
+                        <el-button type="danger" :icon="Delete" circle plain />
+                    </template>
+                </el-popconfirm>
+                <el-button @click="handleDownload(row)" circle plain type="success" :icon="Download"></el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[2,3,5,7]"
+        :small="false" :disabled="false" :background="false" layout="jumper, total, sizes, prev, pager, next"
+        :total="total" @size-change="onSizeChange" @current-change="onCurrentChange" />
+
+    <el-dialog v-model="dialogVisible" title="修改文件名" width="30%" :close-on-click-modal="false">
+        <el-form ref="ruleFormRef"  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm" :size="formSize"
+            status-icon>
+            <el-form-item label="文件名称" prop="name">
+                <el-input placeholder="请输入文件名称" v-model="formModel.name" />
+            </el-form-item>
+
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="handleConfirm">确认</el-button>
+                <el-button type="primary" @click="dialogVisible = false">
+                    取消
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+
+</template>
+
+<script setup>
+import { nextTick, onMounted, reactive, ref } from 'vue';
+import {Plus,Edit,Delete,Top,Bottom,Download,WarnTriangleFilled} from '@element-plus/icons-vue'
+import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/resfile';
+import { ElMessage } from 'element-plus';
+import SmartSelector from '@/views/components/SmartSelector.vue';
+import { useTokenStore } from '@/store/token';
+import offlineIcon from '@/components/MyIcon/src/offlineIcon';
+const tokenStore = useTokenStore()
+const searchData = reactive({
+})
+
+onMounted(()=>{
+    console.log('文件组件已挂载......')
+})
+
+
+
+const tableData = ref([])
+
+const params = reactive({
+    pageNum:1,
+    pageSize:10
+})
+
+const total = ref(null)
+
+const fields = ref([
+    {label:'文件名',value:'name'},
+    {label:'文件大小',value:'size'},
+    {label:'创建时间',value:'create_time'},
+])
+
+// 设置排序方向
+const setSortOrder = (order) => {
+  searchData.sortOrder = order
+}
+
+const exts = ref([])
+
+// t_file_request：文件列表请求
+const render = async() => {
+    const res = await listApi(params.pageNum,params.pageSize,searchData)
+    tableData.value = res.data.items
+    console.log(res.data.items)
+    total.value = res.data.total
+}
+
+render()
+
+const renderExts = async() => {
+    const res = await extsApi()
+    exts.value =res.data.map(item => ({
+        label:item,
+        value:item
+    }))
+}
+renderExts()
+
+//点击分页事件
+const onSizeChange = (size) => {
+    //console.log(`onSizeChange：每页显示${size}条`)
+    //每页条数发生变化时，重新从第一页渲染
+    params.pageNum = 1
+    //更新每页条数
+    params.pageSize = size
+    //重新渲染
+    render()
+}
+
+const onCurrentChange = (page) => {
+    //console.log(`onCurrentChange：当前第${page}页`)
+    //更新当前页
+    params.pageNum = page
+    //重新渲染
+    render()
+}
+
+const onSearch = () => {
+    if(Boolean(searchData.sortField) != Boolean(searchData.sortOrder)){
+        ElMessage.error(searchData.sortField?'请选择排序':'请选择排序字段')
+    }
+    params.pageNum = 1
+    render()
+}
+
+const onReset = () => {
+    params.pageNum = 1
+    Object.assign(searchData,{name:'',ext:'',sortField:'',sortOrder:''})
+    render()
+}
+
+// 手动设置请求头
+const headers = computed(() => {
+  return {
+    authorization: tokenStore.token || ''
+  }
+})
+
+// t_file_request：文件上传请求
+// 处理上传文件地址
+const handleAction = computed(()=>{
+  return `${import.meta.env.VITE_API}/resource/file/upload`
+})
+
+const handleDownload = async(row) => {
+    console.log(row.url)
+    // const url = row.url.substring(row.url.lastIndexOf('/')+1)
+    window.open(row.url)
+}
+
+const onSuccess = (res,file) => {
+    // 文件存在重复上传
+    if(res.code === 0){
+        ElMessage.error(res.message)
+        return;
+    }
+    // 文件上传超出大小限制异常
+    if(res.code === 201){
+        ElMessage.error(res.message)
+        return;
+    }
+
+    // 文件上传成功
+    ElMessage.success(res.message)
+    render()
+}
+
+const dialogVisible = ref(false)
+
+const formModel = reactive({})
+
+const handleSyncDelete = async() => {
+    const res = await syncDeleteApi()
+    /* ElMessage.success(res.message)
+    render() */
+
+    
+    if (res.code === 200) {
+        // 成功消息
+        ElMessage.success({
+            message: res.message.replace(/\n/g, '<br><br>'),
+            // duration: 6000, // 显示时间长一些，方便阅读
+            dangerouslyUseHTMLString: true,
+            customClass: 'pre-line-message' // 添加自定义样式类
+        })
+    }else{
+        // 错误消息
+        ElMessage.error({
+            message: res.message.replace(/\n/g, '<br><br>'),
+            // duration: 6000,
+            dangerouslyUseHTMLString: true,
+            customClass: 'pre-line-message'
+        })
+    }
+
+    render()
+}
+
+const ruleFormRef = ref()
+// 表单校验
+const rules = reactive({
+   name:[
+        {required:true,message:'请输入文件名',trigger:'blur'},
+        {pattern:/^\S{2,10}$/,message:'密码必须是 2-10位 的非空字符',trigger:'blur'}
+    ]
+})
+
+const handleEdit = async(row) => {
+  dialogVisible.value = true
+  // 等待对话框渲染完成
+  await nextTick()
+  // 重置表单校验状态
+  ruleFormRef.value?.resetFields()
+  // 设置回显数据
+  Object.assign(formModel, row)
+}
+
+const handleConfirm = async() => {
+    await ruleFormRef.value.validate()
+    modifyApi(formModel.id,formModel.name)
+    dialogVisible.value = false
+    ElMessage.success('修改成功')
+    render()
+}
+
+const multipleSelection = ref([])
+
+const removeMultiple = (raw) =>{
+    console.log(raw)
+    multipleSelection.value = raw
+    // console.log(multipleSelection.value)
+}
+
+const handleRemove = async(id) => {
+    const res = await removeApi(id)
+    ElMessage.success(res.message)
+    render()
+}
+
+// 批量删除
+const deleteSelectRows = async() => {
+    if(multipleSelection.value.length === 0){
+        ElMessage.error('请先勾选要删除的行')
+        return
+    }
+	await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+        type: 'warning',
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+    })
+    const rowIds = multipleSelection.value.map(row => row.id)
+    const res = await removeApi(rowIds)
+    ElMessage.success(res.message)
+    render()
+}
+
+const handleUpdateRecords = async() => {
+    const res = await updateRecordApi()
+    if (res.code === 200) {
+        // 成功消息
+        ElMessage.success({
+            message: res.message.replace(/\n/g, '<br><br>'),
+            // duration: 6000, // 显示时间长一些，方便阅读
+            dangerouslyUseHTMLString: true,
+            customClass: 'pre-line-message' // 添加自定义样式类
+        })
+    }else{
+        // 错误消息
+        ElMessage.error({
+            message: res.message.replace(/\n/g, '<br><br>'),
+            // duration: 6000,
+            dangerouslyUseHTMLString: true,
+            customClass: 'pre-line-message'
+        })
+    }
+
+    render()
+}
+
+</script>
+
+<style lang="scss" scoped>
+/* .toolbar {
+    @include flex(space-between,null,null)
+} */
+ .bottom {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+ }
+
+</style>

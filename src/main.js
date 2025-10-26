@@ -101,7 +101,12 @@ addBatchIconList([
   'ep:folder',
   'ep:chat-dot-round',
   'ep:chrome-filled',
-  'ep:apple'
+  'ep:apple',
+  'ri:delete-bin-fill',
+  'ri:file-add-line',
+  'ri:add-fill',
+  'ri:delete-bin-3-fill',
+  'fa-solid:database'
   ])
 
 app.mount('#app')
