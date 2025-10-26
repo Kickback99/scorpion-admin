@@ -238,6 +238,7 @@ function menusNameHandler(menus){
 // 创建路由对象
 
 const router = createRouter({
+    //t_env：router
     history:createWebHistory(import.meta.env.VITE_ROUTER_URL), //采用 html5 路由模式
     routes
 })

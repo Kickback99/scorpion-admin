@@ -204,11 +204,13 @@ const headers = computed(() => {
 })
 
 // t_file_request：文件上传请求
+// t_env：文件上传
 // 处理上传文件地址
 const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/resource/file/upload`
 })
 
+// t_file_request：文件下载请求
 const handleDownload = async(row) => {
     console.log(row.url)
     // const url = row.url.substring(row.url.lastIndexOf('/')+1)
@@ -236,6 +238,7 @@ const dialogVisible = ref(false)
 
 const formModel = reactive({})
 
+// t_file_request：文件同步删除请求
 const handleSyncDelete = async() => {
     const res = await syncDeleteApi()
     /* ElMessage.success(res.message)
@@ -282,6 +285,7 @@ const handleEdit = async(row) => {
   Object.assign(formModel, row)
 }
 
+// t_file_request：文件名字修改请求
 const handleConfirm = async() => {
     await ruleFormRef.value.validate()
     modifyApi(formModel.id,formModel.name)
@@ -298,13 +302,14 @@ const removeMultiple = (raw) =>{
     // console.log(multipleSelection.value)
 }
 
+// t_file_request：文件删除请求
 const handleRemove = async(id) => {
     const res = await removeApi(id)
     ElMessage.success(res.message)
     render()
 }
 
-// 批量删除
+// t_file_request：文件批量删除请求
 const deleteSelectRows = async() => {
     if(multipleSelection.value.length === 0){
         ElMessage.error('请先勾选要删除的行')
@@ -321,6 +326,7 @@ const deleteSelectRows = async() => {
     render()
 }
 
+// t_file_request：更新数据库请求
 const handleUpdateRecords = async() => {
     const res = await updateRecordApi()
     if (res.code === 200) {
