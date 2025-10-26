@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 
+// t_file_api：文件管理
 const API = {
     FILE_PAGE : '/resource/file/page',
     FILE_UPDATE:'/resource/file',
