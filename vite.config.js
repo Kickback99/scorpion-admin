@@ -8,6 +8,7 @@ export default defineConfig(({mode}) => {
   // 获取各种环境下的对应的变量
   let env = loadEnv(mode,process.cwd())
   return {
+    //t_env：base
     base: env.VITE_BASE_URL,
     resolve: {
       alias: {
