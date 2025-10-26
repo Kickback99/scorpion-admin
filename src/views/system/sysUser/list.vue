@@ -45,7 +45,7 @@
         <el-table-column prop="nickname" label="呢称" align="center" />
         <el-table-column label="头像" align="center">
             <template #default="{row}">
-                <el-image style="width: 50px; height: 50px" :src="row.avatar" :fit="fit" />
+                <el-image style="width: 50px; height: 50px" :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
         <el-table-column prop="roleNames" label="用户角色" align="center" show-overflow-tooltip/>
@@ -177,6 +177,14 @@ import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
 import { useRouter } from 'vue-router';
 
+const handleImage = (row) => {
+    if(row.id === userStore.userInfo.id){
+        return userStore.userInfo.avatar
+    }else {
+        return row.avatar
+    }
+}
+
 const params = ref({
     pageNum :1,
     pageSize : 10
@@ -214,7 +222,7 @@ const render = async(pager = 1) =>{
     loading.value = true
     params.value.pageNum =  pager
     const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    console.log('请求用户列表')
+    console.log('请求用户列表-------------------------------------------')
     console.log(res.data)
     tableData.value = res.data.items
     total.value = res.data.total

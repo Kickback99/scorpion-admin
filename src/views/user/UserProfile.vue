@@ -188,7 +188,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import avatar from '@/assets/images/avatar.png'
-import { userUpdateInfoApi } from '@/api/admin'
+import { userInfoApi, userUpdateInfoApi } from '@/api/admin'
 // 导入全局事件总线对象
 import emitter from '@/utils/event-bus.js' // 引入事件总线
 // 响应式数据
@@ -273,10 +273,10 @@ const handleSave = async () => {
     // Object.assign(originalUserInfo.value, { ...userInfo })
     // 发送请求
     await userUpdateInfoApi(userInfo)
-    emitter.emit('changeUrl')
-
-
- 
+    const res = await userInfoApi()
+      Object.assign(userStore.userInfo, res.data.userInfo, {
+      avatar: res.data.userInfo.avatar + `?_t=${Date.now()}`
+    }) 
     editMode.value = false
     loading.value = false
     ElMessage.success('个人信息更新成功')
