@@ -44,6 +44,7 @@
         </el-header>
         <el-main>
             <el-scrollbar>
+              <Tabs></Tabs>
             <router-view v-if="isDestroy"/>
           </el-scrollbar>
         </el-main>
@@ -63,6 +64,7 @@ import {useSettingStore} from '@/setting'
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
 import Logo from '@/components/logo/index.vue';
+import Tabs from '@/views/tabs/list.vue';
 
 // 方式一：使用css变量动态设置el-menu的text-color属性值
 // const textColor = ref('')
