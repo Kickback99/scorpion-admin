@@ -26,7 +26,7 @@ const route = useRoute() */
 const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
-    { path:'/',redirect:'/index',meta:{
+    { path:'/',redirect:'/index',name:'parentNode',meta:{
         hidden:true
     },
     component:Layout,
@@ -281,6 +281,29 @@ const getToken = () => {
 let count = 1;
 
 const whiteList = ['/login','/register','/401']
+
+function addDynamicRoutes(routerData){
+    routerData.forEach(r => {
+        //router.addRoute('/',r) //错误写法
+        router.addRoute('parentNode',r) //此处必须填写的父路由名字(name)
+    })
+}
+
+const modules = import.meta.glob('../views/temp/*.vue')
+
+const routerData = Object.entries(modules).map(([filePath, component]) => {
+    // 提取文件名（不含扩展名）
+    const fileName = filePath.split('/').pop().replace('.vue', '')
+    
+    return {
+        path: `/${fileName.toLowerCase()}`, // 路径，如：/temp1
+        name: fileName, // 路由名称，如：temp1
+        component: component, // 组件
+        meta: { title: `${fileName}页面` } // 可选的元信息
+    }
+})
+
+addDynamicRoutes(routerData)
 
 router.beforeEach((to, from, next) => {
     nprogress.start()
