@@ -16,6 +16,22 @@
           <el-menu-item index="/index">
                    <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>首页</span> 
           </el-menu-item>
+
+              <el-sub-menu index="/template">
+                <template #title>
+                  <el-icon><Document /></el-icon>
+                  <span>模板页面</span>
+                </template>
+                
+                <el-menu-item 
+                  v-for="item in tempMenuConfig" 
+                  :key="item.path"
+                  :index="item.path"
+                >
+                  {{ item.title }}
+                </el-menu-item>
+            </el-sub-menu>
+      
           <menu-tree :listData="listData"></menu-tree>
 
           			<!--多级菜单-->
@@ -65,6 +81,7 @@ import {useSettingStore} from '@/setting'
 import { useRoute } from 'vue-router'
 import Logo from '@/components/logo/index.vue';
 import Tabs from '@/views/tabs/list.vue';
+import { tempMenuConfig } from '@/config/menuConfig'
 
 // 方式一：使用css变量动态设置el-menu的text-color属性值
 // const textColor = ref('')

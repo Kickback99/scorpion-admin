@@ -1,137 +1,455 @@
 <template>
-  <el-tabs
-    v-model="activeTab"
-    type="card"
-    class="demo-tabs"
-    closable
-    @tab-remove="removeTab"
-    @tab-click="clickTab"
-  >
-    <el-tab-pane
-      v-for="item in tabs"
-      :key="item.path"
-      :label="item.title"
-      :name="item.path"
+  <div v-if="showTags" class="tags-view">
+    <!-- 左滚动按钮 -->
+    <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
+      <el-icon><ArrowLeft /></el-icon>
+    </span>
+    
+    <!-- 标签容器 -->
+    <div 
+      ref="scrollbarDom" 
+      class="scroll-container"
+      @wheel.prevent="handleWheel"
     >
-    </el-tab-pane>
-  </el-tabs>
+      <div 
+        ref="tabDom" 
+        class="tab select-none" 
+        :style="{ transform: `translateX(${translateX}px)` }"
+      >
+        <div
+          v-for="(item, index) in tabs"
+          :key="item.path"
+          :class="[
+            'scroll-item is-closable',
+            linkIsActive(item) && 'is-active'
+          ]"
+          @contextmenu.prevent="openMenu(item, $event)"
+          @click="tagOnClick(item)"
+        >
+          <span class="tag-title">
+            {{ item.title }}
+          </span>
+          <!-- 首页(index === 0)不显示关闭按钮 -->
+          <span
+            v-if="index !== 0"
+            class="el-icon-close"
+            @click.stop="removeTab(item.path)"
+          >
+            <el-icon><Close /></el-icon>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右滚动按钮 -->
+    <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)">
+      <el-icon><ArrowRight /></el-icon>
+    </span>
+    
+    <!-- 下拉菜单 -->
+    <el-dropdown trigger="click" @command="handleCommand">
+      <span class="arrow-down">
+        <el-icon><ArrowDown /></el-icon>
+      </span>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="refresh">
+            <el-icon><Refresh /></el-icon>
+            重新加载
+          </el-dropdown-item>
+          <el-dropdown-item command="closeCurrent" divided>
+            <el-icon><Close /></el-icon>
+            关闭当前标签页
+          </el-dropdown-item>
+          <el-dropdown-item command="closeRight">
+            <el-icon><Right /></el-icon>
+            关闭右侧标签页
+          </el-dropdown-item>
+          <el-dropdown-item command="closeOther">
+            <el-icon><CircleClose /></el-icon>
+            关闭其他标签页
+          </el-dropdown-item>
+          <el-dropdown-item command="closeAll">
+            <el-icon><Remove /></el-icon>
+            关闭全部标签
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+    
+    <!-- 右键菜单 -->
+    <ul
+      v-show="contextmenuVisible"
+      ref="contextmenuRef"
+      class="contextmenu"
+      :style="{
+        left: contextmenuLeft + 'px',
+        top: contextmenuTop + 'px'
+      }"
+    >
+      <li @click="handleContextMenu('refresh')">
+        <el-icon><Refresh /></el-icon>
+        重新加载
+      </li>
+      <li @click="handleContextMenu('closeCurrent')">
+        <el-icon><Close /></el-icon>
+        关闭当前标签页
+      </li>
+      <li @click="handleContextMenu('closeRight')">
+        <el-icon><Right /></el-icon>
+        关闭右侧标签页
+      </li>
+      <li @click="handleContextMenu('closeOther')">
+        <el-icon><CircleClose /></el-icon>
+        关闭其他标签页
+      </li>
+      <li @click="handleContextMenu('closeAll')">
+        <el-icon><Remove /></el-icon>
+        关闭全部标签
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script setup>
 import { useTabStore } from '@/store/tabs';
-import { ref,computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { onClickOutside } from '@vueuse/core';
+
+// 导入图标
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowDown,
+  Close,
+  Refresh,
+  Right,
+  CircleClose,
+  Remove
+} from '@element-plus/icons-vue';
+
 const route = useRoute()
 const router = useRouter()
 const tabStore = useTabStore()
 
 const activeTab = ref('')
+const showTags = ref(true)
+const translateX = ref(0)
+const isShowArrow = ref(false)
+const contextmenuVisible = ref(false)
+const contextmenuLeft = ref(0)
+const contextmenuTop = ref(0)
+const currentContextMenuTab = ref(null)
 
+const scrollbarDom = ref(null)
+const tabDom = ref(null)
+const contextmenuRef = ref(null)
 
 const tabs = computed(() => {
-   return  tabStore.getTabs
+  return tabStore.getTabs
 })
 
-const addTab = () => {
-    console.log('routerouterouteroute')
-    console.log(route)
-    const {path,meta:{title}} = route
-    /* console.log(route)
-    console.log(path)
-    console.log(title) */
-    const itemTab = {
-        path,
-        title
-    }
-    tabStore.addTabs(itemTab)
+// 检查标签是否激活
+const linkIsActive = (tab) => {
+  return route.path === tab.path
 }
 
-//监听路由
-watch(()=>route.path,()=>{
-    setActiveTab()
-    addTab()
-})
-
-
-// 点击选项卡
-const clickTab = (tab) => {
-    const {props} = tab
-    router.push(props.name)
+// 添加标签页
+const addTab = () => {
+  const { path, meta: { title } } = route
+  const itemTab = {
+    path,
+    title
+  }
+  tabStore.addTabs(itemTab)
+  nextTick(() => {
+    adjustScrollPosition()
+  })
 }
 
 // 设置激活的选项卡
 const setActiveTab = () => {
-    activeTab.value = route.path
+  activeTab.value = route.path
 }
 
-onMounted(()=>{
-    setActiveTab()
-    addTab()
+// 监听路由
+watch(() => route.path, () => {
+  setActiveTab()
+  addTab()
 })
 
-// 删除选项卡
+// 点击标签页
+const tagOnClick = (item) => {
+  router.push(item.path)
+}
+
+// 删除单个标签页
 const removeTab = (targetName) => {
-  // 获取当前所有的标签页列表
-  const currentTabs = tabs.value  // 从计算属性获取标签页数组
-  
-  // 获取当前激活的标签页路径
+  const currentTabs = tabs.value
   let activeName = activeTab.value
   
-  // 检查要删除的是否是当前激活的标签页
   if (activeName === targetName) {
-    // 如果是激活的标签页，需要找到下一个应该激活的标签页
     currentTabs.forEach((tab, index) => {
-      // 找到要删除的标签页在数组中的位置
       if (tab.path === targetName) {
-        // 优先找右边的标签页，如果没有就找左边的
         const nextTab = currentTabs[index + 1] || currentTabs[index - 1]
         if (nextTab) {
-          // 设置新的激活标签页为找到的标签页路径
           activeName = nextTab.path
+          router.push(nextTab.path)
         }
       }
     })
   }
   
-  // 更新激活的标签页状态
   activeTab.value = activeName
-  
-  // 从 store 中过滤掉被删除的标签页，更新标签页列表
   tabStore.tabList = currentTabs.filter((tab) => tab.path !== targetName)
+  
+  nextTick(() => {
+    adjustScrollPosition()
+  })
 }
 
+// 调整滚动位置 - 修复版本
+const adjustScrollPosition = () => {
+  if (!scrollbarDom.value || !tabDom.value) return
+  
+  const scrollbarWidth = scrollbarDom.value.offsetWidth
+  const tabWidth = tabDom.value.scrollWidth
+  
+  isShowArrow.value = tabWidth > scrollbarWidth
+  
+  // 确保当前激活的标签在可视区域内且完全显示
+  const activeIndex = tabs.value.findIndex(tab => tab.path === route.path)
+  if (activeIndex !== -1) {
+    moveActiveTabToView(activeIndex)
+  }
+}
+
+// 移动激活标签到可视区域 - 修复版本
+const moveActiveTabToView = (index) => {
+  if (!scrollbarDom.value || !tabDom.value) return
+  
+  const tabItemEl = tabDom.value.children[index]
+  if (!tabItemEl) return
+  
+  const tabItemLeft = tabItemEl.offsetLeft
+  const tabItemWidth = tabItemEl.offsetWidth
+  const scrollbarWidth = scrollbarDom.value.offsetWidth
+  const totalTabWidth = tabDom.value.scrollWidth
+  
+  // 如果总宽度不超过容器宽度，不需要滚动
+  if (totalTabWidth <= scrollbarWidth) {
+    translateX.value = 0
+    return
+  }
+  
+  // 计算标签的左右边界
+  const tabRight = tabItemLeft + tabItemWidth
+  const visibleLeft = -translateX.value
+  const visibleRight = visibleLeft + scrollbarWidth
+  
+  // 检查标签是否完全在可视区域内
+  const isFullyVisible = tabItemLeft >= visibleLeft && tabRight <= visibleRight
+  
+  if (!isFullyVisible) {
+    // 如果标签不在可视区域内或部分显示，调整位置
+    if (tabItemLeft < visibleLeft) {
+      // 标签在可视区域左侧，向左滚动让标签显示在左边
+      translateX.value = -tabItemLeft
+    } else if (tabRight > visibleRight) {
+      // 标签在可视区域右侧，向右滚动让标签显示在右边
+      translateX.value = -(tabRight - scrollbarWidth)
+    }
+  }
+  
+  // 确保不会滚动过度
+  const maxTranslate = scrollbarWidth - totalTabWidth
+  if (translateX.value > 0) {
+    translateX.value = 0
+  } else if (translateX.value < maxTranslate) {
+    translateX.value = maxTranslate
+  }
+}
+
+// 处理滚动
+const handleScroll = (offset) => {
+  const scrollbarWidth = scrollbarDom.value.offsetWidth
+  const tabWidth = tabDom.value.scrollWidth
+  
+  if (tabWidth <= scrollbarWidth) {
+    translateX.value = 0
+    return
+  }
+  
+  const newTranslate = translateX.value + offset
+  const maxTranslate = scrollbarWidth - tabWidth
+  
+  // 限制滚动范围
+  if (newTranslate > 0) {
+    translateX.value = 0
+  } else if (newTranslate < maxTranslate) {
+    translateX.value = maxTranslate
+  } else {
+    translateX.value = newTranslate
+  }
+}
+
+// 鼠标滚轮滚动
+const handleWheel = (event) => {
+  const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
+  const scrollAmount = 80
+  
+  if (delta > 0) {
+    // 向右滚动
+    handleScroll(scrollAmount)
+  } else {
+    // 向左滚动
+    handleScroll(-scrollAmount)
+  }
+}
+
+// 右键菜单 - 直接使用鼠标位置
+const openMenu = (tab, event) => {
+  event.preventDefault()
+  currentContextMenuTab.value = tab
+  
+  // 直接使用鼠标在容器内的相对位置
+  const tagsViewContainer = event.currentTarget.closest('.tags-view')
+  if (!tagsViewContainer) return
+  
+  const containerRect = tagsViewContainer.getBoundingClientRect()
+  
+  // 计算相对于容器的位置
+  const relativeLeft = event.clientX - containerRect.left
+  const relativeTop = event.clientY - containerRect.top
+  
+  // 设置菜单位置
+  contextmenuLeft.value = relativeLeft
+  contextmenuTop.value = relativeTop
+  
+  contextmenuVisible.value = true
+}
+
+
+// 处理右键菜单点击
+const handleContextMenu = (command) => {
+  if (!currentContextMenuTab.value) return
+  
+  switch (command) {
+    case 'refresh':
+      router.replace({
+        path: '/redirect' + route.fullPath
+      })
+      break
+    case 'closeCurrent':
+      removeTab(currentContextMenuTab.value.path)
+      break
+    case 'closeRight':
+      closeRightTabs(currentContextMenuTab.value)
+      break
+    case 'closeOther':
+      closeOtherTabs(currentContextMenuTab.value)
+      break
+    case 'closeAll':
+      closeAllTabs()
+      break
+  }
+  
+  contextmenuVisible.value = false
+}
+
+// 处理下拉菜单
+const handleCommand = (command) => {
+  switch (command) {
+    case 'refresh':
+      router.replace({
+        path: '/redirect' + route.fullPath
+      })
+      break
+    case 'closeCurrent':
+      removeTab(route.path)
+      break
+    case 'closeRight':
+      closeRightTabs({ path: route.path })
+      break
+    case 'closeOther':
+      closeOtherTabs({ path: route.path })
+      break
+    case 'closeAll':
+      closeAllTabs()
+      break
+  }
+}
+
+// 关闭右侧标签页
+const closeRightTabs = (currentTab) => {
+  const currentIndex = tabs.value.findIndex(tab => tab.path === currentTab.path)
+  if (currentIndex !== -1) {
+    const tabsToKeep = tabs.value.slice(0, currentIndex + 1)
+    tabStore.tabList = tabsToKeep
+    
+    // 如果当前激活的标签在关闭的右侧，跳转到当前标签
+    if (tabs.value.findIndex(tab => tab.path === route.path) > currentIndex) {
+      router.push(currentTab.path)
+    }
+    
+    nextTick(adjustScrollPosition)
+  }
+}
+
+// 关闭其他标签页
+const closeOtherTabs = (currentTab) => {
+  tabStore.tabList = tabs.value.filter(tab => 
+    tab.path === currentTab.path || tab.path === '/'
+  )
+  
+  if (route.path !== currentTab.path) {
+    router.push(currentTab.path)
+  }
+  
+  nextTick(adjustScrollPosition)
+}
+
+// 关闭全部标签页
+const closeAllTabs = () => {
+  // 保留首页
+  const homeTab = tabs.value.find(tab => tab.path === '/')
+  tabStore.tabList = homeTab ? [homeTab] : []
+  
+  if (route.path !== '/') {
+    router.push('/')
+  }
+  
+  nextTick(adjustScrollPosition)
+}
+
+// 点击外部关闭右键菜单
+onClickOutside(contextmenuRef, () => {
+  contextmenuVisible.value = false
+})
+
+onMounted(() => {
+  setActiveTab()
+  addTab()
+  
+  // 延迟执行，确保DOM完全渲染
+  setTimeout(() => {
+    adjustScrollPosition()
+  }, 100)
+  
+  // 监听窗口大小变化
+  window.addEventListener('resize', adjustScrollPosition)
+})
+
+// 添加路由变化后的延迟调整
+watch(() => route.path, () => {
+  // 路由变化后延迟调整滚动位置
+  setTimeout(() => {
+    adjustScrollPosition()
+  }, 150)
+})
 </script>
 
 <style scoped lang="scss">
-:deep(.el-tabs__header){
-    margin: Opx;
-}
-:deep(.el-tabs_item){
-    height:26px !important;
-    line-height:26px !important;
-    text-align:center !important;
-    border:1px solid #d8dce5 !important;
-    margin:Opx 3px !important;
-    color:#495060;
-    font-size:12px important;
-    padding:Opx 10px !important;
-}
-:deep(.el-tabs_nav){
-    border:none important;
-}
-:deep(.is-active){
-    border-bottom:1px solid transparent important;
-    border:1px solid #42b983 !important;
-    background-color:#42b983 !important;
-    color:#fff !important;
-}
-:deep(.el-tabs_item:hover){
-    color:#495060 important;
-}
-:deep(.is-active:hover){
-    color:#fff !important;
-}
-:deep(.el-tabs_nav-next){
-    line-height:26px important;
-}
+@import './tag-styles.scss';
 </style>

@@ -1,0 +1,225 @@
+@keyframes schedule-in-width {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes schedule-out-width {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0;
+  }
+}
+
+.tags-view {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 14px;
+  color: var(--el-text-color-primary);
+  background: #fff;
+  box-shadow: 0 0 1px #888;
+
+  .scroll-item {
+    position: relative;
+    display: inline-block;
+    height: 34px;
+    padding-left: 6px;
+    line-height: 34px;
+    cursor: pointer;
+    transition: all 0.4s;
+
+    &:not(:first-child) {
+      padding-right: 24px;
+    }
+
+    .el-icon-close {
+      position: absolute;
+      top: 50%;
+      right: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      color: var(--el-color-primary);
+      cursor: pointer;
+      border-radius: 4px;
+      transition:
+        background-color 0.12s,
+        color 0.12s;
+      transform: translate(0, -50%);
+      opacity: 0; // 默认隐藏
+
+      &:hover {
+        color: rgb(0 0 0 / 88%) !important;
+        background-color: rgb(0 0 0 / 6%);
+      }
+    }
+      // 鼠标移入时显示关闭按钮（首页不显示关闭按钮）
+      &:hover:not(:first-child) .el-icon-close {
+        opacity: 1;
+      }
+
+      // 激活状态的标签页也显示关闭按钮（首页除外）
+      &.is-active:not(:first-child) .el-icon-close {
+        opacity: 1;
+      }
+  }
+
+  .tag-title {
+    padding: 0 4px;
+    color: var(--el-text-color-primary);
+    text-decoration: none;
+  }
+
+  .scroll-container {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+
+    .tab {
+      position: relative;
+      float: left;
+      overflow: visible;
+      white-space: nowrap;
+      list-style: none;
+      transition: transform 0.3s ease;
+
+      .scroll-item {
+        transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+        &:nth-child(1) {
+          padding: 0 12px;
+        }
+      }
+    }
+  }
+
+  /* 右键菜单 */
+  .contextmenu {
+    position: absolute;
+    padding: 5px 0;
+    margin: 0;
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--el-text-color-primary);
+    white-space: nowrap;
+    list-style-type: none;
+    background: #fff;
+    border-radius: 4px;
+    outline: 0;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    z-index: 9999;
+
+    li {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 7px 12px;
+      margin: 0;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--el-color-primary);
+        background-color: #f5f7fa;
+      }
+
+      svg {
+        display: block;
+        margin-right: 0.5em;
+      }
+    }
+  }
+}
+
+.scroll-item.is-active {
+  position: relative;
+  color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-9);
+  box-shadow: 0 0 0.7px #888;
+
+  .tag-title {
+    color: var(--el-color-primary) !important;
+  }
+
+  .el-icon-close {
+    color: var(--el-color-primary);
+    &:hover {
+      background-color: var(--el-color-primary-light-5);
+    }
+  }
+}
+
+.arrow-left,
+.arrow-right,
+.arrow-down {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 34px;
+  color: var(--el-text-color-primary);
+  cursor: pointer;
+  background: #fff;
+
+  &:hover {
+    background-color: #f5f7fa;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.arrow-left {
+  box-shadow: 5px 0 5px -6px #ccc;
+}
+
+.arrow-right {
+  border-right: 0.5px solid #ccc;
+  box-shadow: -5px 0 5px -6px #ccc;
+}
+
+/* 灵动模式 */
+.schedule-active {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--el-color-primary);
+}
+
+/* 灵动模式下鼠标移入显示蓝色进度条 */
+.schedule-in {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--el-color-primary);
+  animation: schedule-in-width 200ms ease-in;
+}
+
+/* 灵动模式下鼠标移出隐藏蓝色进度条 */
+.schedule-out {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--el-color-primary);
+  animation: schedule-out-width 200ms ease-in;
+}
