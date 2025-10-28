@@ -24,24 +24,6 @@
             </el-form-item>
         </el-form>
         <div class="bottom">
-            <el-upload class="file-operate" :action="handleAction" :headers="headers"
-                name="file" :show-file-list="false" :on-success="onSuccess">
-                <el-button color="#9BCD9B">
-                    <offlineIcon icon="ri:add-fill"></offlineIcon>文件上传
-                </el-button>
-            </el-upload>
-            <el-upload class="file-operate" :action="handleAction" :headers="headers" name="file"
-                :show-file-list="false" :on-success="onSuccess" multiple>
-                <el-button color="#F4A460" >
-                    <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
-                </el-button>
-            </el-upload>
-            <div class="file-operate">
-                <el-button color="#7B68EE"  @click="handleSyncDelete()">
-                    <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
-                </el-button>
-            </div>
-            <!-- color="#626aef" -->
             <div class="file-operate">
                 <el-button color="#EEDD82" @click="deleteSelectRows()">
                     <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
@@ -49,9 +31,35 @@
             </div>
 
             <div class="file-operate">
-                <el-button color="#8B4726" @click="handleUpdateRecords">
-                    <offlineIcon icon="fa-solid:database"></offlineIcon>更新数据库</el-button>
+                <el-button color="#7B68EE"  @click="handleSyncDelete()">
+                    <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
+                </el-button>
             </div>
+
+            <div class="file-operate">
+                <el-button color="#8B4726" @click="handleUpdateRecords">
+                    <offlineIcon icon="ri:database-2-line"></offlineIcon>更新数据库</el-button>
+            </div>
+
+            <el-upload class="file-operate file-upload" :action="handleAction" :headers="headers"
+                name="file" :show-file-list="false" 
+                :on-success="onSuccess"
+                :before-upload="beforeUpload"
+                :on-error="onError">
+                <el-button color="#9BCD9B">
+                    <offlineIcon icon="ri:add-fill"></offlineIcon>文件上传
+                </el-button>
+            </el-upload>
+
+            <el-upload class="file-operate" :action="handleAction" :headers="headers" name="file"
+                :show-file-list="false" :on-success="onSuccess" 
+                :before-upload="beforeUpload"
+                :on-error="onError"
+                multiple>
+                <el-button color="#F4A460" >
+                    <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
+                </el-button>
+            </el-upload>
            
         </div>
     </div>
@@ -217,21 +225,42 @@ const handleDownload = async(row) => {
     window.open(row.url)
 }
 
+// 文件预检查
+const beforeUpload = (file) => {
+  const maxSize = 10 * 1024 * 1024 // 10MB
+  
+  // 检查文件大小
+  if (file.size > maxSize) {
+    ElMessage.error(`"${file.name}" 大小 ${(file.size / 1024 / 1024).toFixed(2)}MB，超过 10MB 限制`)
+    return false
+  }
+
+  return true
+}
+
 const onSuccess = (res,file) => {
-    // 文件存在重复上传
+    // 文件存在重复上传或者大小超出限制
     if(res.code === 0){
         ElMessage.error(res.message)
         return;
     }
-    // 文件上传超出大小限制异常
-    if(res.code === 201){
-        ElMessage.error(res.message)
-        return;
-    }
-
+    
     // 文件上传成功
     ElMessage.success(res.message)
     render()
+}
+
+const onError = (error, file, fileList) => {
+      console.error('上传错误:', error)
+  
+  // 处理大文件错误
+  if (error.status === 0 || 
+      error.message?.includes('CONNECTION') || 
+      error.message?.includes('Network Error')) {
+    ElMessage.error('文件太大，请上传 10MB 以内的文件')
+  } else {
+    ElMessage.error('上传失败，请重试')
+  }
 }
 
 const dialogVisible = ref(false)
@@ -360,6 +389,9 @@ const handleUpdateRecords = async() => {
     display: flex;
     align-items: center;
     gap: 15px;
+    .file-upload {
+        margin-left: auto;
+    }
  }
 
 </style>

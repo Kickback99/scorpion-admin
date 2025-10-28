@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showTags" class="tags-view">
+  <div v-if="showTags" class="tags-view" style="margin-bottom: 10px;">
     <!-- 左滚动按钮 -->
     <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
@@ -31,7 +31,7 @@
           </span>
           <!-- 首页(index === 0)不显示关闭按钮 -->
           <span
-            v-if="index !== 0"
+            v-if="item.path !== '/index'"
             class="el-icon-close"
             @click.stop="removeTab(item.path)"
           >
@@ -113,9 +113,11 @@
 
 <script setup>
 import { useTabStore } from '@/store/tabs';
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
+// 导入全局事件总线对象
+import { eventBus } from '@/utils/event-bus'; 
 
 // 导入图标
 import {
@@ -162,11 +164,18 @@ const addTab = () => {
     path,
     title
   }
+  // 如果是首页路径，确保标题正确
+  if (path === '/index') {
+    itemTab.title = '首页'
+  }
+  
   tabStore.addTabs(itemTab)
   nextTick(() => {
     adjustScrollPosition()
   })
 }
+
+
 
 // 设置激活的选项卡
 const setActiveTab = () => {
@@ -337,9 +346,10 @@ const handleContextMenu = (command) => {
   
   switch (command) {
     case 'refresh':
-      router.replace({
+      /* router.replace({
         path: '/redirect' + route.fullPath
-      })
+      }) */
+      window.location.reload()
       break
     case 'closeCurrent':
       removeTab(currentContextMenuTab.value.path)
@@ -362,9 +372,10 @@ const handleContextMenu = (command) => {
 const handleCommand = (command) => {
   switch (command) {
     case 'refresh':
-      router.replace({
+      /* router.replace({
         path: '/redirect' + route.fullPath
-      })
+      }) */
+      window.location.reload()
       break
     case 'closeCurrent':
       removeTab(route.path)
@@ -397,27 +408,62 @@ const closeRightTabs = (currentTab) => {
   }
 }
 
-// 关闭其他标签页
+// 关闭其他标签页 - 修复版本
 const closeOtherTabs = (currentTab) => {
-  tabStore.tabList = tabs.value.filter(tab => 
-    tab.path === currentTab.path || tab.path === '/'
-  )
+  // 获取首页标签（路径为 '/index'）
+  const homeTab = tabs.value.find(tab => tab.path === '/index')
   
-  if (route.path !== currentTab.path) {
+  // 确保保留首页和当前标签页
+  const tabsToKeep = []
+  
+  // 添加首页（如果存在）
+  if (homeTab) {
+    tabsToKeep.push(homeTab)
+  }
+  
+  // 添加当前标签页（如果不是首页）
+  if (currentTab.path !== '/index') {
+    tabsToKeep.push(currentTab)
+  }
+  
+  // 如果首页不存在，创建首页标签
+  if (!homeTab && currentTab.path !== '/index') {
+    tabsToKeep.unshift({
+      path: '/index',
+      title: '首页'
+    })
+  }
+  
+  // 更新标签页列表
+  tabStore.tabList = tabsToKeep
+  
+  // 路由跳转
+  if (route.path !== currentTab.path && currentTab.path !== '/index') {
     router.push(currentTab.path)
+  } else if (route.path !== '/index' && currentTab.path === '/index') {
+    router.push('/index')
   }
   
   nextTick(adjustScrollPosition)
 }
 
-// 关闭全部标签页
+// 关闭全部标签页 - 修复版本
 const closeAllTabs = () => {
-  // 保留首页
-  const homeTab = tabs.value.find(tab => tab.path === '/')
-  tabStore.tabList = homeTab ? [homeTab] : []
+  // 保留首页（路径为 '/index'）
+  const homeTab = tabs.value.find(tab => tab.path === '/index')
   
-  if (route.path !== '/') {
-    router.push('/')
+  // 如果首页存在，只保留首页；如果不存在，创建首页
+  if (homeTab) {
+    tabStore.tabList = [homeTab]
+  } else {
+    tabStore.tabList = [{
+      path: '/index',
+      title: '首页'
+    }]
+  }
+  
+  if (route.path !== '/index') {
+    router.push('/index')
   }
   
   nextTick(adjustScrollPosition)
@@ -433,9 +479,15 @@ onMounted(() => {
   addTab()
   
   // 延迟执行，确保DOM完全渲染
-  setTimeout(() => {
-    adjustScrollPosition()
-  }, 100)
+    setTimeout(() => {
+      adjustScrollPosition()
+    }, 100);
+
+    eventBus.on('adjustTabScroll', async() => {
+      // await nextTick()
+      // await nextTick()
+      adjustScrollPosition();
+    });
   
   // 监听窗口大小变化
   window.addEventListener('resize', adjustScrollPosition)
@@ -448,6 +500,13 @@ watch(() => route.path, () => {
     adjustScrollPosition()
   }, 150)
 })
+
+nextTick(()=>{
+  onUnmounted(()=>{
+      eventBus.off('adjustTabScroll')
+  })
+})
+
 </script>
 
 <style scoped lang="scss">
