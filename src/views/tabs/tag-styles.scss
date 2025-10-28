@@ -69,10 +69,11 @@
         opacity: 1;
       }
 
-      // 激活状态的标签页也显示关闭按钮（首页除外）
-      &.is-active:not(:first-child) .el-icon-close {
-        opacity: 1;
-      }
+        // 确保首页不显示关闭按钮（通过路径判断）
+        &[data-path="/index"] .el-icon-close,
+        &:first-child .el-icon-close {
+          display: none !important;
+        }
   }
 
   .tag-title {
@@ -154,8 +155,13 @@
 
   .el-icon-close {
     color: var(--el-color-primary);
+    opacity: 1 !important;
     &:hover {
       background-color: var(--el-color-primary-light-5);
+    }
+      // 首页不显示关闭按钮
+    &[data-path="/index"] {
+      display: none !important;
     }
   }
 }

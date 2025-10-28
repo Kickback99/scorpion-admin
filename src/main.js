@@ -106,7 +106,7 @@ addBatchIconList([
   'ri:file-add-line',
   'ri:add-fill',
   'ri:delete-bin-3-fill',
-  'fa-solid:database'
+  'ri:database-2-line'
   ])
 
 app.mount('#app')

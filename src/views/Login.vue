@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { ElMessage } from 'element-plus'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
@@ -33,6 +33,8 @@ import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
+// 导入全局事件总线对象
+import { eventBus } from '@/utils/event-bus'; 
 
 const router = useRouter()
 const route = useRoute()
@@ -92,6 +94,15 @@ const handleLogin = async() => {
         let redirect = route.query.redirect
         router.push({path: redirect || '/'});
       }
+
+      await nextTick()
+      eventBus.emit('adjustTabScroll');
+
+    // 在路由跳转后触发调整
+    /* setTimeout(() => {
+        eventBus.emit('adjustTabScroll');
+    }, 300); */
+
     } catch (error) {
         console.log(error)
         loading.value = false
