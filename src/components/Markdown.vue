@@ -1,13 +1,18 @@
 <template>
-    <v-md-editor :modelValue="modelValue"
-        :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
-        @change="onChange"
-        :config="{mode:'markdown'}"
-        @upload-image="handleUploadImage"></v-md-editor>
+    <div :class="{'dark-mode': colorStore.isDark}" style="width: 100%;">
+        <v-md-editor :modelValue="modelValue"
+            :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
+            @change="onChange"
+            :config="{mode:'markdown'}"
+            @upload-image="handleUploadImage">
+        </v-md-editor>
+    </div>
 </template>
 
 <script setup>
 import { uploadApi } from '@/api/conarticle'
+import { useColorStore } from '@/store/color'
+const colorStore = useColorStore()
 
 // import { uploadImgService } from '@/api/article'
 
@@ -46,3 +51,44 @@ const handleUploadImage = async (event, insertImage, files) => {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+
+:root {
+    --editor-bg: #fff;
+    --editor-text: #000;
+    --toolbar-bg: #f5f5f5;
+    --toolbar-text: #333;
+}
+
+.dark-mode {
+    --editor-bg: #000;
+    --editor-text: #fff;
+    --toolbar-bg: #000;
+    --toolbar-text: #ccc;
+}
+
+ /* v-md-editor-工具栏 */
+:deep(.v-md-editor__right-area .v-md-editor__toolbar){
+    background-color: var(--toolbar-bg) !important;
+    color: var(--toolbar-text);
+    .v-md-editor__toolbar-left-wrapper li{
+           color: var(--toolbar-text);
+    }
+    .v-md-editor__toolbar-left-wrapper .v-md-editor__toolbar-item:hover{
+           color: var(--editor-bg) !important;
+    }
+}
+
+ /* v-md-editor-左边的编辑器 */
+:deep(.v-md-editor__editor-wrapper textarea){
+    background-color: var(--editor-bg) !important;
+    color: var(--editor-text)
+}
+ /* v-md-editor-右边的预览区 */
+:deep(.v-md-editor__preview-wrapper .github-markdown-body) {
+    background-color: var(--editor-bg) !important;
+    color: var(--editor-text)
+}
+
+</style>

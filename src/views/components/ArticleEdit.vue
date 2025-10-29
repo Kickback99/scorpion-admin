@@ -3,7 +3,10 @@
 
         <el-form :model="blogData" ref="blogFormRef" :rules="rules">
             <el-form-item prop="title">
-                    <el-input placeholder="请输入标题" v-model="blogData.title" />
+                    <el-input 
+                    :style="{backgroundColor:colorStore.isDark?'#000':'#fff'}" 
+                    :class="{'dark-mode':colorStore.isDark}"
+                    placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
             <el-form-item prop="content">
          
@@ -79,7 +82,8 @@ import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
 import { addApi, findApi, modifyApi } from '@/api/conarticle';
 import SmartUpload from '@/views/components/SmartUpload.vue';
-
+import { useColorStore } from '@/store/color';
+const colorStore = useColorStore()
 let mdHeight = window.innerHeight - 30 - 70 - 200
 
 const blogData = ref({
@@ -245,7 +249,16 @@ const handlePublish = async(status) => {
 <style scoped lang="scss">
   // 针对<el-input placeholder="请输入标题" v-model="blogData.title" />
   // 不管校验是否生效，都保持原来的样式！
+
  :deep(.el-form .el-form-item .el-form-item__content .el-input__wrapper){
+
 	box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
+  .el-input__inner {
+    color: #000;
+  }
 }
+ :deep(.dark-mode .el-input__wrapper .el-input__inner){
+   color: #fff !important;
+ }
+
 </style>
