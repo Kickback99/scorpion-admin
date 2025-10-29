@@ -1,5 +1,7 @@
 <template>
-    <div class="window" v-if="maskVisible">
+    <div v-if="maskVisible" class="window" :style="{
+        backgroundColor:colorStore.isDark?'#222':'#fff',
+        }">
         <!-- <div class="header">
             <span class="iconfont icon-back" @click="close"></span>
         </div> -->
@@ -16,7 +18,8 @@
 </template>
 
 <script setup>
-
+import { useColorStore } from '@/store/color'
+const colorStore = useColorStore()
 const windowWidth = window.innerWidth - 260
 
 defineProps({
@@ -43,7 +46,6 @@ const close = () => {
     height: calc(100vh - 70px);
     // min-height: 100%;
     z-index: 3;
-    background-color: #fff;
 }
 
 .header {
