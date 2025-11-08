@@ -8,7 +8,7 @@
             <el-form-item prop="password">
                 <el-input v-model="formModel.password" :prefix-icon="Lock" size="large" auto-complete="off" placeholder="密码" @keyup.enter="handleLogin" show-password></el-input>
             </el-form-item>
-            <el-checkbox style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+            <el-checkbox v-model="formModel.checkPwd" style="margin:0px 0px 25px 0px;" @click="handleCheckbox">记住密码</el-checkbox>
             <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
                     <span>登 录</span>
@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { nextTick, ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
@@ -35,6 +35,7 @@ const userStore = useUserStore()
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
+import { async } from '@kangc/v-md-editor';
 
 const router = useRouter()
 const route = useRoute()
@@ -46,6 +47,7 @@ const loading = ref(false)
   const formModel = ref({
     username:'',
     password:'',
+    checkPwd:false
 })
 
   // 绑定表单校验规则
@@ -68,6 +70,15 @@ const handleLogin = async() => {
     const res = await adminLoginApi(formModel.value)
     console.log(res.data)
     tokenStore.setToken(res.data)
+
+    // 处理记住密码逻辑 - 简单判断是否勾选
+    if (formModel.value.checkPwd) {
+        // 用户勾选了记住密码，保存凭证
+        tokenStore.saveCredentials(formModel.value.username, formModel.value.password)
+    } else {
+            // 用户没有勾选记住密码，清除凭证
+            tokenStore.clearCredentials()
+    }
     loading.value = false
     // 强制刷新用户信息
     await userStore.getUserInfo()
@@ -110,7 +121,26 @@ const handleLogin = async() => {
     }
 }
 
+const handleCheckbox = async() => {
+        try {
+        // 先校验表单
+        await loginRef.value.validate()
+        // 如果校验通过，允许勾选状态改变（这里不需要额外操作，因为v-model会自动更新）
+        
+    } catch (error) {
+        // 校验失败时，阻止复选框状态改变
+        formModel.value.checkPwd = !formModel.value.checkPwd
+        ElMessage.warning('请先正确填写用户名和密码')
+    }
+}
 
+onMounted(()=>{
+    if (tokenStore.hasSavedCredentials()) {
+        formModel.value.username = tokenStore.savedUsername
+        formModel.value.password = tokenStore.getDecryptedPassword()
+        formModel.value.checkPwd = true
+    }
+})
 
 </script>
 <style lang="scss" scoped>
