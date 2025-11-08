@@ -16,7 +16,7 @@ import './assets/style/tailwind.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
 
-// 集成md编辑器
+/* // 集成md编辑器
 import VMdEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
@@ -34,7 +34,8 @@ import hljs from 'highlight.js';
 
 VMdEditor.use(githubTheme, {
   Hljs: hljs,
-}).use(createLineNumbertPlugin()).use(createCopyCodePlugin());
+}).use(createLineNumbertPlugin()).use(createCopyCodePlugin()); */
+
 
 // 完整导入
 /* import ElementPlus from 'element-plus'
@@ -43,7 +44,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs' */
 
 
 const app = createApp(App)
-app.use(VMdEditor)
+// app.use(VMdEditor)
 app.use(router)
 const pinia = createPinia() //创建Pinia实例
 app.use(pinia.use(persist)) //安装pinia插件
