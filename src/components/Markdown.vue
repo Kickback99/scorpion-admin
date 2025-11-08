@@ -1,18 +1,37 @@
 <template>
     <div :class="{'dark-mode': colorStore.isDark}" style="width: 100%;">
-        <v-md-editor :modelValue="modelValue"
+        <!-- <v-md-editor :modelValue="modelValue"
             :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
             @change="onChange"
             :config="{mode:'markdown'}"
             @upload-image="handleUploadImage">
-        </v-md-editor>
+        </v-md-editor> -->
+
+        <component 
+        :is="MarkdownPreview" 
+        :modelValue="modelValue"
+        :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
+        @change="onChange"
+        :config="{mode:'markdown'}"
+        @upload-image="handleUploadImage"
+        :key="colorStore.isDark"
+        />  
+
     </div>
 </template>
 
 <script setup>
 import { uploadApi } from '@/api/conarticle'
+import { computed } from 'vue'
 import { useColorStore } from '@/store/color'
 const colorStore = useColorStore()
+import { createMarkdownPreview } from '@/utils/markdown-config'
+
+// 使用 computed 每次重新创建组件
+const MarkdownPreview = computed(() => {
+  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
+  return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
+})
 
 // import { uploadImgService } from '@/api/article'
 
@@ -86,9 +105,31 @@ const handleUploadImage = async (event, insertImage, files) => {
     color: var(--editor-text)
 }
  /* v-md-editor-右边的预览区 */
-:deep(.v-md-editor__preview-wrapper .github-markdown-body) {
+/* :deep(.v-md-editor__preview-wrapper .github-markdown-body) {
     background-color: var(--editor-bg) !important;
     color: var(--editor-text)
+} */
+
+ /* vuepress主题下的v-md-editor-右边的预览区 */
+:deep(.v-md-editor__preview-wrapper .v-md-editor-preview .vuepress-markdown-body){
+  color: #fff;
+  background: black !important;
+}
+
+// 这样设置切换主题不会生效
+/* :deep(.v-md-editor__preview-wrapper){
+       background: black !important;
+} */
+
+
+ /* vuepress主题下的v-md-editor-右边的预览区 */
+:deep(.v-md-editor__preview-wrapper:has(.vuepress-markdown-body)){
+    background: black !important;
+}
+
+// vuepress主题下的v-md-editor-右边的预览区 代码块颜色
+:deep(.v-md-editor__preview-wrapper .vuepress-markdown-body code){
+    color: $code-color !important;
 }
 
 </style>

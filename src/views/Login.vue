@@ -191,4 +191,19 @@ a {
     height: 40px;
     padding-left: 12px;
 }
+
+:deep(.login-form .el-input){
+   background-color: #fff !important;
+}
+
+:deep(.el-input__wrapper){
+    box-shadow: none;
+    .el-input__inner {
+       color: #606266 !important; 
+   }
+}
+
+:deep(span.el-checkbox__label){
+       color: #606266 !important; 
+}
 </style>
