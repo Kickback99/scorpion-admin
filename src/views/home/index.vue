@@ -1,12 +1,17 @@
 <template>
+    <h4>用户名：{{tokenStore.savedUsername}}</h4>
+    <h4>密码：{{tokenStore.savedPassword}}</h4>
     <div class="wrap">
-        <div class="left"></div>
+        <div class="left">
+        </div>
         <div class="right"></div>
     </div>
 </template>
 
 <script setup>
+import { useTokenStore } from '@/store/token';
 
+const  tokenStore = useTokenStore()
 </script>
 
 <style scoped lang="scss">
