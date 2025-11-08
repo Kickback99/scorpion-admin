@@ -15,10 +15,15 @@ $login-bg:url("../assets/images/wallhaven-g75r7d.jpg");
     menuTextColor:$menu-color;
 } */
 
+// v-md-editor
+// 文章预览视图的code标签，如``，
+$code-color:#a0a4ec;
+
 // css变量
 :root{
     --text:#FFFFFF;
 }
+
 
 // flex函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {

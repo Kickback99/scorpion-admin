@@ -146,22 +146,38 @@
 
                 <!-- 请求参数 -->
                 <el-tab-pane label="请求参数">
-                <v-md-editor 
+                <!-- <v-md-editor 
                     :model-value="formatJson(formModel.reqParam)" 
                     mode="preview"
                     height="400px"
                     @copy-code-success="handleCopySuccess"
-                />
+                /> -->
+
+                    <component 
+                    :is="MarkdownPreview" 
+                    :model-value="formatJson(formModel.reqParam)"
+                     mode="preview"
+                    @copy-code-success="handleCopySuccess"
+                    :key="colorStore.isDark"
+                      />  
                 </el-tab-pane>
 
                 <!-- 响应数据 -->
                 <el-tab-pane label="响应数据">
-                <v-md-editor 
+                <!-- <v-md-editor 
                     :model-value="formatJson(formModel.resData)" 
                     mode="preview"
                     height="400px"
                     @copy-code-success="handleCopySuccess"
-                />
+                /> -->
+
+                    <component 
+                    :is="MarkdownPreview" 
+                    :model-value="formatJson(formModel.resData)"
+                     mode="preview"
+                    @copy-code-success="handleCopySuccess"
+                    :key="colorStore.isDark"
+                      /> 
                 </el-tab-pane>
             </el-tabs>
             <template #footer>
@@ -176,6 +192,14 @@
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/msglog';
 import {MoreFilled,Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { reactive, ref,computed,watch } from 'vue';
+import { useColorStore } from '@/store/color'
+import { createMarkdownPreview } from '@/utils/markdown-config'
+const colorStore = useColorStore()
+// 使用 computed 每次重新创建组件
+const MarkdownPreview = computed(() => {
+  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
+  return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
+})
 
 const tableData = ref([])
 
@@ -379,7 +403,7 @@ onMounted(() => {
 
 /* 标签页高度控制 */
 .el-tabs {
-  max-height: 50vh;
+  max-height: auto;
   overflow: auto;
 }
 
@@ -400,5 +424,9 @@ onMounted(() => {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+:deep(.v-md-editor-preview .vuepress-markdown-body){
+  background: black !important;
 }
 </style>
