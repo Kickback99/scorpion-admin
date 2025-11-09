@@ -9,8 +9,9 @@ import nprogress from 'nprogress'
 import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
 import { clearRoute, clearUserInfo } from '@/utils/remove'
-import { add404Routes } from '@/utils/404route'
+import { add403Routes } from '@/utils/403route'
 import { generateNameFromPath } from '@/utils/routeComponents'
+import { add404Routes } from '@/utils/404route'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -38,7 +39,7 @@ const routes = [
         {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue')},
         {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue')},
         {path:'/test',component:() => import('@/views/Test.vue')}
-    ]}
+    ]},
 /*     {
     path:'/',
     component:() => import('@/views/Layout.vue'),
@@ -49,6 +50,8 @@ const routes = [
         {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
         {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
     ]} */
+    {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'},
+    {path:'/404',name:'404',component:()=>import('@/views/error/404.vue')}
 ]
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
@@ -130,7 +133,7 @@ function routesHandler(router,parentType=null){
     })
 }
 
-export const loadMenu = async(loadUserInfo = true) => {
+export const loadMenu = async(loadUserInfo = true,to) => {
     const userStore = useUserStore()
     console.log('请求菜单')
 
@@ -166,18 +169,20 @@ export const loadMenu = async(loadUserInfo = true) => {
 
 
         // 情况2：无菜单权限拦截
-        if (menuData.routers.length === 0) {
+        if (menuData.routers.length === 0 ) {
             console.log('情况2拦截')
-        add404Routes(router); // 确保404路由存在
+        add403Routes(router); // 确保403路由存在
         return Promise.reject({ 
             noMenuPermission: true, 
             message: '该用户无菜单权限' 
         });
         }
 
-            console.log('情况3拦截')
     // ================= 3. 路由处理阶段 =================
     // 3.1 清除旧路由
+    // 3.1 移除现有的404路由，确保动态路由优先匹配
+    remove404Routes()
+        
 
     // 3.2 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
@@ -187,17 +192,27 @@ export const loadMenu = async(loadUserInfo = true) => {
       router.addRoute(route);
     });
 
+    add404Routes(router)
+
     // 3.3 更新Store中的菜单引用
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
-    // 3.4 确保404路由存在
-    add404Routes(router);
+    // 3.4 确保403路由存在
+    add403Routes(router);
 
     console.log('动态路由更新完成', {
       routes: router.getRoutes(),
       permissions: menuData.permissions
     });
+    
+    // 用户菜单权限不足校验
+    if(!hasRouteByPath(to.path)){
+        return Promise.reject({ 
+            noMenuAccess: true, 
+            message: '该用户无菜单权限' 
+        });
+    }
 
     return true;
     } catch (error) {
@@ -206,6 +221,21 @@ export const loadMenu = async(loadUserInfo = true) => {
     return Promise.reject(error);
     }
 
+}
+
+
+// 移除404路由的函数
+function remove404Routes() {
+    if (router.hasRoute('NotFound')) {
+        router.removeRoute('NotFound')
+    }
+    if (router.hasRoute('404')) {
+        router.removeRoute('404')
+    }
+}
+
+const hasRouteByPath = (path) => {
+    return router.getRoutes().some(route => route.path === path)
 }
 
 // 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
@@ -280,8 +310,6 @@ const getToken = () => {
 
 let count = 1;
 
-const whiteList = ['/login','/register','/401']
-
 function addDynamicRoutes(routerData){
     routerData.forEach(r => {
         //router.addRoute('/',r) //错误写法
@@ -305,20 +333,23 @@ const routerData = Object.entries(modules).map(([filePath, component]) => {
 
 addDynamicRoutes(routerData)
 
+const whiteList = ['/login','/register','/401','/404']
+
 router.beforeEach((to, from, next) => {
     nprogress.start()
     const settings =  useSettingStore()
     ++count;
-    console.log(to)
     console.log('路由前置守卫执行')
+    console.log(to.path)
+    console.log(to.fullPath)
     const userStore = useUserStore()
     const tokenStore = useTokenStore()
     console.log('userStore.userMenu.length',userStore.userMenu.length )
 
-    if(to.path === '/404' && settings.isManualTo404){
-        console.log('跳转到404 count次')
-        settings.isManualTo404 = false
-        console.log('settings.isManualTo404',settings.isManualTo404)
+    if(to.path === '/403' && settings.isManualTo403){
+        console.log('跳转到403 count次')
+        settings.isManualTo403 = false
+        console.log('settings.isManualTo403',settings.isManualTo403)
         return next()
     }
 
@@ -339,15 +370,13 @@ router.beforeEach((to, from, next) => {
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
         ElMessage.error('如果没有token跳转到登录页')
-        if(to.path != '/login' && to.path != '/index' && !localStorage.getItem('originalRouteQuery')){
-            // 保存原始路由的查询参数到本地存储
-            const path = to.path
-            const query =  to.query
-            localStorage.setItem('originalRouteQuery', JSON.stringify({path,query}));
+    // 重定向到登录页面，使用原始路径避免重复编码
+    return next({
+        path: '/login',
+        query: {
+            redirect: to.path + (to.query && Object.keys(to.query).length ? `?${new URLSearchParams(to.query).toString()}` : '')
         }
-        console.log('最终的',localStorage.getItem('originalRouteQuery'))
-        // 重定向到登录页面
-        return next('/login');
+    });
     }
 
 
@@ -359,7 +388,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 按需加载菜单
-    loadMenu().then(
+    loadMenu(true,to).then(
         ()=>{next({...to,replace:true})
     }).catch((error) =>
         {
@@ -374,14 +403,17 @@ router.beforeEach((to, from, next) => {
                     //   userStore.removeUserAuth()
                       
             } 
-            // 情况3：无菜单权限的后台用户 -> 跳转404
+            // 情况3：无菜单权限的后台用户 -> 跳转403
             else if (error.noMenuPermission) {
-                if(to.path === '/index'){
-                     next()
+                if(hasRouteByPath(to.path)){
+                    next()
                 }else {
-                    settings.isManualTo404 = true;
-                    next('/404');
+                settings.isManualTo403 = true;
+                next('/403');
                 }
+            }else if(error.noMenuAccess){
+                settings.isManualTo403 = true;
+                next('/403');   
             }else {
                 ElMessage.error(error|| '加载菜单失败');
                 next(false); // 阻止导航

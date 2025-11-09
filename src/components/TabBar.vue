@@ -152,6 +152,7 @@ import { darkMenuThemes,lightMenuThemes } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
 // 导入全局事件总线对象
 import emitter from '@/utils/event-bus.js' // 引入事件总线
+import { useTabStore } from "@/store/tabs";
 const avatarUrlWithTimestamp = ref('') // 带时间戳的头像URL
 // const avatarKey = ref(Date.now()) // 初始key
 const userStore = useUserStore()
@@ -184,6 +185,7 @@ emitter.on('changeUrl',overwriteAvatarUrl)
 
 const tokenStore = useTokenStore()
 const colorStore = useColorStore()
+const tabStore = useTabStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -223,6 +225,11 @@ const fullScreen = () => {
 const handleCommand = async (key) => {
     console.log('下拉事件执行了')
     if (key === 'logout') {
+        await ElMessageBox.confirm('你确认要退出登录吗', '温馨提示', {
+            type: 'warning',
+            confirmButtonText: '确认',
+            cancelButtonText: '取消'
+        })
         // 发送注销请求
         const res = await adminLogoutApi()
         // 清空token
@@ -235,6 +242,8 @@ const handleCommand = async (key) => {
         console.log('清空后', router.getRoutes())
         // 清空用户信息和菜单
         userStore.clearUserStore()
+        // 清空标签页
+        tabStore.clearTabs()
         // 清空菜单
         // userStore.removeUserAuth()
         // 清空用户名
@@ -242,7 +251,17 @@ const handleCommand = async (key) => {
         // 提示信息
         ElMessage.success(res.message)
         // 跳转到登录页
-        router.push({ path: '/login', query: { redirect: route.path } })
+        // router.push({ path: '/login', query: { redirect: route.path } })
+                // 构建完整的重定向URL，包含查询参数
+        const redirectUrl = route.path + (route.query && Object.keys(route.query).length ? `?${new URLSearchParams(route.query).toString()}` : '')
+        
+        // 跳转到登录页，携带完整的重定向信息
+        router.push({
+            path: '/login',
+            query: {
+                redirect: redirectUrl
+            }
+        })
     }else {
         router.push(`/user/${key}`)
     }

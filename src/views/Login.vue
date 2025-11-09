@@ -85,26 +85,23 @@ const handleLogin = async() => {
     if(userStore.userInfo.type === 0){
         ElMessage.success('登录成功')
     }
-    // 从本地存储中获取原始路由的查询参数
-    const originalRouteQuery = JSON.parse(localStorage.getItem('originalRouteQuery'));
-     // 如果存在保存的路由信息，则重定向到该路由
-      if (originalRouteQuery) {
-        // 使用带有查询参数的路径重定向用户
-        console.log('从本地跳转')
-        if(originalRouteQuery.path === '/404'){
-          router.push('/')
-          localStorage.removeItem('originalRouteQuery');
-          return;
+    // 处理重定向逻辑 - 解码重定向路径
+    let redirect = route.query.redirect
+    if (redirect) {
+        // 如果redirect是字符串且被编码过，进行解码
+        if (typeof redirect === 'string') {
+            // 尝试解码，如果已经是解码状态则不会报错
+            try {
+                redirect = decodeURIComponent(redirect)
+            } catch (e) {
+                // 如果解码失败，说明可能已经是解码状态，使用原值
+                console.log('Redirect path is already decoded or invalid')
+            }
         }
-        router.push({ path: originalRouteQuery.path, query: originalRouteQuery.query });
-        // 清除保存的路由信息
-        localStorage.removeItem('originalRouteQuery');
-      } else {
-        // 如果没有保存的路由信息，可以重定向到首页或其他默认页面
-        console.log('开始重定向')
-        let redirect = route.query.redirect
-        router.push({path: redirect || '/'});
-      }
+        router.push(redirect || '/')
+    } else {
+        router.push('/')
+    }
 
       await nextTick()
       eventBus.emit('adjustTabScroll');
