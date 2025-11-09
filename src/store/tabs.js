@@ -13,6 +13,10 @@ export const useTabStore = defineStore({
     addTabs(tab){
         if(this.tabList.some(item => item.path === tab.path)) return
         this.tabList.push(tab)
+    },
+    clearTabs(){
+      this.$reset()
+       localStorage.removeItem('tabs'); 
     }
   },
     persist: true,  // 开启当前仓库的持久化

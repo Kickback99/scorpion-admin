@@ -12,7 +12,7 @@ export const useSettingStore = defineStore({
         title:'蝎子博客管理',
         // 菜单默认是否折叠
         isCollapse:false,
-        isManualTo404:false,
+        isManualTo403:false,
     }),
     actions:{
         setMenuTextColor(data){

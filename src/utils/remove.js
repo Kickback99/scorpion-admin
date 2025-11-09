@@ -9,8 +9,8 @@ export const clearRoute = (res) => {
         }
     })
     // 删除404路由
-    router.removeRoute('NotFound')
-    router.removeRoute('404')
+    /* router.removeRoute('NotFound')
+    router.removeRoute('404') */
 }
 
 export const clearUserInfo = () => {

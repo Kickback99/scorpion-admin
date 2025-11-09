@@ -7,6 +7,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 import prismjs from 'vite-plugin-prismjs';
+import svgLoader from 'vite-svg-loader'  // svg加载器
 
 // pathSrc 是给自动导入图标库使用的
 const pathSrc = path.relative(__dirname,'src')
@@ -28,6 +29,7 @@ export function getPlugins(){
             ]
           }
         }),
+        svgLoader(),  // 添加 SVG 加载器
         prismjs({
           languages:['json','js','java','xml']
         }),
