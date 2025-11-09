@@ -56,6 +56,8 @@ instance.interceptors.response.use(
                 clearRoute(userStore.userMenu)    
                 // 清空用户信息和菜单
                 userStore.clearUserStore()
+                // 清空标签页
+                tabStore.clearTabs()
                 // 清空菜单
                 // userStore.removeUserAuth()
                 // 清空用户名
