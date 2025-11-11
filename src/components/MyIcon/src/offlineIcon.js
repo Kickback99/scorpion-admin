@@ -1,4 +1,4 @@
-import { h, defineComponent } from "vue";
+import { h, defineComponent,onMounted } from "vue";
 import { Icon as IconifyIcon, addIcon } from "@iconify/vue/dist/offline";
 import { getIcon } from '@iconify/vue';
 

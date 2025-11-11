@@ -6,7 +6,7 @@
           <span class="title">个人信息</span>
           <el-button 
             type="primary" 
-            :icon="Edit" 
+            icon="Edit" 
             @click="editMode = !editMode"
           >
             {{ editMode ? '取消编辑' : '编辑资料' }}
@@ -33,7 +33,7 @@
               :before-upload="beforeAvatarUpload"
               :onChange="handleSelectAvatar"
             >
-              <el-button type="primary" :icon="Upload" size="small">
+              <el-button type="primary" icon="Upload" size="small">
                 更换头像
               </el-button>
             </el-upload>
@@ -185,7 +185,6 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Edit, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import avatar from '@/assets/images/avatar.png'
 import { userInfoApi, userUpdateInfoApi } from '@/api/admin'

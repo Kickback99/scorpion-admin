@@ -16,9 +16,10 @@ export default defineComponent({
         "i",
         {
           class: "iconfont",
+          innerHTML: '&#x' + this.icon + ';', // 使用 innerHTML 并添加分号
           ...attrs
         },
-        this.icon
+        // '&#x' + this.icon
       );
     } else if (
       Object.keys(attrs).includes("svg") ||

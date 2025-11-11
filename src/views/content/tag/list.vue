@@ -5,12 +5,12 @@
                 <el-input v-model="searchData.tagName" placeholder="请输入标签名" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" :icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" :icon="Refresh" plain @click="onReset" >重置</el-button>
+                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
+                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button type="success" :icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
@@ -20,10 +20,10 @@
         <el-table-column prop="remark" label="备注" />
         <el-table-column  label="操作" width="150">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" :icon="Edit"   circle plain ></el-button>
-                <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
+                <el-button @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
+                <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button type="danger" :icon="Delete"  circle plain/>
+                    <el-button type="danger" icon="Delete"  circle plain/>
                 </template>
                 </el-popconfirm>
             </template>
@@ -69,7 +69,6 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import {Plus,Edit,Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/contag';
 import { ElMessage } from 'element-plus';
 

@@ -10,18 +10,18 @@
         status-icon
         >
         <el-form-item  prop="roleName">
-        <el-input :prefix-icon="User"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
+        <el-input prefix-icon="User"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
         </el-form-item>
 
 
         <el-form-item>
-        <el-button :icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-        <el-button :icon="Refresh"  @click="onReset" type="warning" plain >重置</el-button>
+        <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
+        <el-button icon="Refresh"  @click="onReset" type="warning" plain >重置</el-button>
         </el-form-item>
         </el-form>
         <div class="right">
-            <el-button  :icon="Search" plain color="#626aef" :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
-            <el-button :disabled="$hasPerm('bnt.sysRole.add')" @click="addDialog" :icon="Plus" type="success" plain>新增</el-button>
+            <el-button  icon="Search" plain color="#626aef" :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
+            <el-button :disabled="$hasPerm('bnt.sysRole.add')" @click="addDialog" icon="Plus" type="success" plain>新增</el-button>
         </div>
     </div>
 
@@ -39,13 +39,13 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column label="操作" width="150">
             <template #default="{row,$index}">
-            <el-button :disabled="$hasPerm('bnt.sysRole.update')" type="primary" :icon="Edit" @click="editDialog(row)" circle plain/>
-            <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
+            <el-button :disabled="$hasPerm('bnt.sysRole.update')" type="primary" icon="Edit" @click="editDialog(row)" circle plain/>
+            <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete"  circle plain/>
+                    <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" icon="Delete"  circle plain/>
                 </template>
             </el-popconfirm>
-            <el-button :disabled="$hasPerm('bnt.sysRole.assignAuth')" type="warning" :icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysRole.assignAuth')" type="warning" icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
             </template>
         </el-table-column>
     </el-table>
@@ -98,7 +98,6 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User,Search,Plus,Baseball,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { nextTick, ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
 import { ElMessage} from 'element-plus';

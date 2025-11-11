@@ -33,7 +33,7 @@
         <span v-else>{{ node.label }}</span>
         <!-- <span else>{{ node.label }}</span> -->
         <!-- 新增 -->
-        <el-button style="margin-left: 8px" v-if="node.level <= 1 && allShow" @click="append(node, data)" :icon="Plus"
+        <el-button style="margin-left: 8px" v-if="node.level <= 1 && allShow" @click="append(node, data)" icon="Plus"
           type="primary" circle plain size="small" />
 
 
@@ -46,7 +46,7 @@
            -->
         <el-button v-if="handleAdd(node,data,false)" 
           style="margin-left: 8px"
-        :icon="Plus"
+        icon="Plus"
         type="primary" circle plain size="small"
         @click="batchAdd(node, data)" />
 
@@ -66,7 +66,7 @@
         v-if="!isEdit ? handleAdd(node,data,true) : 
         (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
         :disabled="!isEdit?false:handleDisabled(data)"
-        :icon="Check"
+        icon="Check"
         type="success" circle plain size="small"
           @click="handleSave($event, node, data)" />
 
@@ -74,7 +74,7 @@
         <!-- 虚拟按钮：修改 -->
 
         <el-button v-if="data.isCheck" 
-        :icon="Edit"
+        icon="Edit"
         style="margin-left: 8px"
         type="warning" circle plain size="small"
         @click="handleCheck(node,data)" />
@@ -87,7 +87,7 @@
 
         <el-button 
         v-if="!isEdit?data.isReset:(data.isReset  && handleInclude(data.id))" 
-        :icon="!isEdit?Close:Refresh"
+        icon="!isEdit?'Close':'Refresh'"
         color="#626aef"
         circle plain size="small"
         @click="handleRevert($event,node, data)" />
@@ -101,21 +101,21 @@
                即点中哪个编辑项，哪个编辑项隐藏 
          -->
         <el-button v-if="!isEdit ? allShow : (isEdit && !data.isEdit)" style="margin-left: 8px"
-          @click="handleEdit(node, data)" :icon="Edit" type="primary" circle plain size="small" />
+          @click="handleEdit(node, data)" icon="Edit" type="primary" circle plain size="small" />
         <!-- 删除 -->
         <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow"
-          @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" :icon="WarnTriangleFilled">
+          @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" icon="WarnTriangleFilled">
           <template #reference>
-            <el-button style="margin-left: 8px" type="danger" circle plain size="small" :icon="Delete" />
+            <el-button style="margin-left: 8px" type="danger" circle plain size="small" icon="Delete" />
           </template>
         </el-popconfirm>
         <el-button v-if="checkedIds == data.id" @click="batchRemove(node,data,false)" 
-        type="danger" style="margin-left: 8px;"  circle plain size="small" :icon="Delete" />
+        type="danger" style="margin-left: 8px;"  circle plain size="small" icon="Delete" />
 
 
-        <!-- <el-popconfirm v-if="data.children === null || data.children.length === 0" :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" :icon="WarnTriangleFilled">
+        <!-- <el-popconfirm v-if="data.children === null || data.children.length === 0" :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" :icon="Delete"  circle plain/>
+                    <el-button :disabled="$hasPerm('bnt.sysRole.remove')" type="danger" icon="Delete"  circle plain/>
                 </template>
             </el-popconfirm> -->
           <el-button @click="handleTest(node,data)">test</el-button>
@@ -126,7 +126,6 @@
 </template>
 
 <script setup>
-import { Plus, Delete, WarnTriangleFilled, Edit,Check,Close,Refresh } from '@element-plus/icons-vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';

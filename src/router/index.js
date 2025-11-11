@@ -10,7 +10,6 @@ import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
 import { clearRoute, clearUserInfo } from '@/utils/remove'
 import { add403Routes } from '@/utils/403route'
-import { generateNameFromPath } from '@/utils/routeComponents'
 import { add404Routes } from '@/utils/404route'
 
 //路由器对象--跳转路径
@@ -24,7 +23,7 @@ const route = useRoute() */
 
 
 // 路由规则
-const routes = [
+export const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
     { path:'/',redirect:'/index',name:'parentNode',meta:{
@@ -36,8 +35,8 @@ const routes = [
             meta:{
                title:'首页'     
         }},
-        {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue')},
-        {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue')},
+        {path:'/user/profile',component:() =>import('@/views/user/profile.vue')},
+        {path:'/user/rePassword',component:() =>import('@/views/user/rePassword.vue')},
         {path:'/test',component:() => import('@/views/Test.vue')}
     ]},
 /*     {
@@ -50,8 +49,8 @@ const routes = [
         {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
         {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
     ]} */
-    {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'},
-    {path:'/404',name:'404',component:()=>import('@/views/error/404.vue')}
+    /* {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'},
+    {path:'/404',name:'404',component:()=>import('@/views/error/404.vue')} */
 ]
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
@@ -133,7 +132,7 @@ function routesHandler(router,parentType=null){
     })
 }
 
-export const loadMenu = async(loadUserInfo = true,to) => {
+export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     const userStore = useUserStore()
     console.log('请求菜单')
 
@@ -181,7 +180,7 @@ export const loadMenu = async(loadUserInfo = true,to) => {
     // ================= 3. 路由处理阶段 =================
     // 3.1 清除旧路由
     // 3.1 移除现有的404路由，确保动态路由优先匹配
-    remove404Routes()
+    // remove404Routes()
         
 
     // 3.2 处理新路由
@@ -192,13 +191,14 @@ export const loadMenu = async(loadUserInfo = true,to) => {
       router.addRoute(route);
     });
 
-    add404Routes(router)
+  
 
     // 3.3 更新Store中的菜单引用
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
     // 3.4 确保403路由存在
+    add404Routes(router)
     add403Routes(router);
 
     console.log('动态路由更新完成', {
@@ -206,14 +206,21 @@ export const loadMenu = async(loadUserInfo = true,to) => {
       permissions: menuData.permissions
     });
     
+    
     // 用户菜单权限不足校验
     if(!hasRouteByPath(to.path)){
+        if(from.path != '/login'){
+            return next('/404')
+        }
+        console.log('router.getRoutes()',router.getRoutes())
+        console.log('用户菜单权限不足')
         return Promise.reject({ 
             noMenuAccess: true, 
             message: '该用户无菜单权限' 
         });
     }
-
+   console.log('router.getRoutes()',router.getRoutes())
+   console.log('用户菜单权限充足')
     return true;
     } catch (error) {
         console.log('error,',error)
@@ -225,14 +232,14 @@ export const loadMenu = async(loadUserInfo = true,to) => {
 
 
 // 移除404路由的函数
-function remove404Routes() {
+/* function remove404Routes() {
     if (router.hasRoute('NotFound')) {
         router.removeRoute('NotFound')
     }
     if (router.hasRoute('404')) {
         router.removeRoute('404')
     }
-}
+} */
 
 const hasRouteByPath = (path) => {
     return router.getRoutes().some(route => route.path === path)
@@ -273,37 +280,6 @@ const router = createRouter({
     routes
 })
 
-// 获取本地路由组件
-export function getLocalRouteComponents() {
-  return routes.flatMap(route => {
-    const components = [];
-    
-    // 添加主路由组件（如果不是布局组件）
-    if (route.component && route.path !== '/') {
-      components.push({
-        name: generateNameFromPath(route.path),
-        path: route.path,
-        component: route.component
-      });
-    }
-    
-    // 添加子路由组件
-    if (route.children) {
-      route.children.forEach(child => {
-        if (child.component) {
-          components.push({
-            name: generateNameFromPath(child.path),
-            path: child.path,
-            component: child.component
-          });
-        }
-      });
-    }
-    
-    return components;
-  });
-}
-
 const getToken = () => {
     return localStorage.getItem('token')
 }
@@ -333,13 +309,14 @@ const routerData = Object.entries(modules).map(([filePath, component]) => {
 
 addDynamicRoutes(routerData)
 
-const whiteList = ['/login','/register','/401','/404']
+const whiteList = ['/login','/register','/401']
 
 router.beforeEach((to, from, next) => {
     nprogress.start()
     const settings =  useSettingStore()
     ++count;
     console.log('路由前置守卫执行')
+    console.log(from)
     console.log(to.path)
     console.log(to.fullPath)
     const userStore = useUserStore()
@@ -379,7 +356,6 @@ router.beforeEach((to, from, next) => {
     });
     }
 
-
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
@@ -388,7 +364,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 已登录，无菜单 => 按需加载菜单
-    loadMenu(true,to).then(
+    loadMenu(true,to,from,next).then(
         ()=>{next({...to,replace:true})
     }).catch((error) =>
         {
@@ -408,10 +384,12 @@ router.beforeEach((to, from, next) => {
                 if(hasRouteByPath(to.path)){
                     next()
                 }else {
+                    console.log('拦截2')
                 settings.isManualTo403 = true;
                 next('/403');
                 }
             }else if(error.noMenuAccess){
+                console.log('拦截1')
                 settings.isManualTo403 = true;
                 next('/403');   
             }else {
