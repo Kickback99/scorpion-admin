@@ -13,14 +13,14 @@
                 </SmartSelector>
             </el-form-item>
             <el-form-item>
-                <el-button :icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
+                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
                     @click="setSortOrder('ASC')" />
-                <el-button :icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
+                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
                     @click="setSortOrder('DESC')" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" :icon="Search" plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" :icon="Refresh" plain @click="onReset">重置</el-button>
+                <el-button type="primary" icon="Search" plain @click="onSearch">搜索</el-button>
+                <el-button type="warning" icon="Refresh" plain @click="onReset">重置</el-button>
             </el-form-item>
         </el-form>
         <div class="bottom">
@@ -76,14 +76,14 @@
         <el-table-column prop="createTime" label="创建日期"></el-table-column>
         <el-table-column label="操作" width="150">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" :icon="Edit" circle plain></el-button>
+                <el-button @click="handleEdit(row)" type="primary" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"
-                    :icon="WarnTriangleFilled">
+                    icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button type="danger" :icon="Delete" circle plain />
+                        <el-button type="danger" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
-                <el-button @click="handleDownload(row)" circle plain type="success" :icon="Download"></el-button>
+                <el-button @click="handleDownload(row)" circle plain type="success" icon="Download"></el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -114,7 +114,6 @@
 
 <script setup>
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import {Plus,Edit,Delete,Top,Bottom,Download,WarnTriangleFilled} from '@element-plus/icons-vue'
 import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/resfile';
 import { ElMessage } from 'element-plus';
 import SmartSelector from '@/views/components/SmartSelector.vue';

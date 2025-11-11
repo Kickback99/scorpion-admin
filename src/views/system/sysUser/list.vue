@@ -7,7 +7,7 @@
             status-icon
             >
             <el-form-item>
-            <el-input :prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
+            <el-input prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
             </el-form-item>
 
             <el-form-item>
@@ -15,13 +15,13 @@
             </el-form-item>
 
             <el-form-item>
-            <el-button :icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-            <el-button :icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
+            <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
+            <el-button icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('bnt.sysUser.remove')" :icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
-            <el-button @click="addDialog" :disabled="$hasPerm('bnt.sysUser.add')" :icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
+            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('bnt.sysUser.remove')" icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
+            <el-button @click="addDialog" :disabled="$hasPerm('bnt.sysUser.add')" icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
         </div>
     </div>
 
@@ -63,35 +63,35 @@
         <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
         <el-table-column label="操作" width="150" align="center" >
             <template #default="{row,$index}">
-            <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" :icon="Edit"  circle plain/>
-            <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" :icon="WarnTriangleFilled">
+            <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" icon="Edit"  circle plain/>
+            <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('bnt.sysUser.remove')" type="danger" :icon="Delete"   circle plain/>
+                    <el-button :disabled="$hasPerm('bnt.sysUser.remove')" type="danger" icon="Delete"   circle plain/>
                 </template>
             </el-popconfirm>
-            <el-button :disabled="$hasPerm('bnt.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" :icon="User"   circle plain/>
+            <el-button :disabled="$hasPerm('bnt.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" icon="User"   circle plain/>
             </template>
         </el-table-column>
     </el-table>
 
-    <!-- 文章新增和修改弹层 -->
+    <!-- 用户新增和修改弹层 -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
         <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
             :size="formSize" status-icon label-width="100px" style="padding-right: 35px;">
             <el-form-item label="用户名" prop="username">
-                <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
+                <el-input prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
             </el-form-item>
 
             <el-form-item label="呢称" prop="nickname">
-                <el-input :prefix-icon="User" placeholder="请输入呢称" v-model="formData.nickname" />
+                <el-input prefix-icon="User" placeholder="请输入呢称" v-model="formData.nickname" />
             </el-form-item>
 
             <el-form-item label="手机号" prop="phone">
-                <el-input :prefix-icon="User" placeholder="请输入手机号" v-model="formData.phone" />
+                <el-input prefix-icon="User" placeholder="请输入手机号" v-model="formData.phone" />
             </el-form-item>
 
             <el-form-item label="邮箱" prop="email">
-                <el-input :prefix-icon="User" placeholder="请输入邮箱" v-model="formData.email" />
+                <el-input prefix-icon="User" placeholder="请输入邮箱" v-model="formData.email" />
             </el-form-item>
 
             <el-form-item label="用户类型">
@@ -114,7 +114,7 @@
         <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
             :size="formSize" status-icon>
             <el-form-item label="用户名">
-                <el-input :prefix-icon="User" disabled v-model="formData.username" />
+                <el-input prefix-icon="User" disabled v-model="formData.username" />
             </el-form-item>
 
             <el-form-item label="角色列表">
@@ -163,7 +163,6 @@
 </template>
 
 <script setup>
-import {Edit,Delete,Refresh,User,Search,Plus,WarnTriangleFilled} from '@element-plus/icons-vue'
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';

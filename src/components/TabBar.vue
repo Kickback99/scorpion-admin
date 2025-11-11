@@ -2,10 +2,10 @@
     <div class="left">
         <!-- 折叠 -->
         <el-icon style="margin-right: 10px;" @click="stringStore.isCollapse = !stringStore.isCollapse">
-            <component :is="stringStore.isCollapse?Expand:Fold"></component>
+            <component :is="stringStore.isCollapse?'Expand':'Fold'"></component>
         </el-icon>
         <!-- 面包屑 -->
-        <el-breadcrumb :separator-icon="ArrowRight">
+        <el-breadcrumb separator-icon="ArrowRight">
             <el-breadcrumb-item v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden"
                 :to="item.path" class="breadcrumb">
                 <el-icon>
@@ -19,16 +19,16 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button circle :icon="Refresh" @click="modifyRefresh"></el-button>
-            <el-button circle :icon="FullScreen" @click="fullScreen"></el-button>
+            <el-button circle icon="Refresh" @click="modifyRefresh"></el-button>
+            <el-button circle icon="FullScreen" @click="fullScreen"></el-button>
             <el-popover placement="bottom" :width="150" trigger="hover">
                 <template #reference>
-                    <el-button circle :icon="Setting"></el-button>
+                    <el-button circle icon="Setting"></el-button>
                 </template>
                 <el-form>
                     <el-form-item label="暗黑模式">
-                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt :active-icon="Moon"
-                            :inactive-icon="Sunny" />
+                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
+                            inactive-icon="Sunny" />
                     </el-form-item>
                     <el-divider border-style="dashed" />
                     <el-form-item label="菜单标题">
@@ -46,7 +46,7 @@
                             <el-option v-for="(item,index) in colorStore.themes" :key="index" :value="item.value" :label="item.label">
                                 <span style="display: flex; align-items: center;">
                                     {{ item.label }}
-                                    <el-button type="text" v-if="index >= lightMenuThemes.length" :icon="Delete" @click.stop="removeOption(item)"
+                                    <el-button type="text" v-if="index >= lightMenuThemes.length" icon="Delete" @click.stop="removeOption(item)"
                                         style="margin-left: 8px;"></el-button>
                                 </span>
                             </el-option>
@@ -69,7 +69,7 @@
                             <el-tooltip content="保存当前主题设置" placement="top">
                                 <el-button type="primary" :icon="useRenderIcon('ri:save-3-fill')" size="small" @click="addColor" plain circle/>
                             </el-tooltip>
-                            <el-button type="primary" :icon="Refresh" size="small" @click="resetColor" plain circle/>
+                            <el-button type="primary" icon="Refresh" size="small" @click="resetColor" plain circle/>
                         </template>
                     </el-form-item>
                 </el-form>
@@ -85,16 +85,16 @@
 
                 {{ userStore.userInfo.nickname || userStore.userInfo.username }}
                 <el-icon>
-                    <arrow-down />
+                    <component is="ArrowDown"></component>
                 </el-icon>
             </span>
             <!-- 折叠的下拉部分 -->
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item>
+                    <el-dropdown-item command="profile" icon="User">基本资料</el-dropdown-item>
                     <!-- <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item> -->
-                    <el-dropdown-item command="rePassword" :icon="EditPen">重置密码</el-dropdown-item>
-                    <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
+                    <el-dropdown-item command="rePassword" icon="EditPen">重置密码</el-dropdown-item>
+                    <el-dropdown-item command="logout" icon="SwitchButton">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -126,18 +126,6 @@
 
 <script setup>
 import Home from "@iconify-icons/ep/home-filled";
-import {
-    Expand,
-    Fold,
-    Delete,
-    ArrowDown,
-    ArrowRight,
-    Refresh,
-    FullScreen,
-    Setting,
-    Moon,
-    Sunny,
-} from '@element-plus/icons-vue'
 import avatar from '@/assets/images/avatar.png'
 import { useUserStore } from '@/store/user'
 import { useSettingStore } from '@/setting'

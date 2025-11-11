@@ -1,6 +1,6 @@
 <template>
     <svg aria-hidden="true" :style="{width,height}">
-      <use :xlink:href="symbolId" :fill="color" />
+      <use :xlink:href="symbolId" :fill="fill" />
     </svg>
   </template>
   
@@ -11,11 +11,11 @@
         type: String,
         default: 'icon',
       },
-      icon: {
+      name: {
         type: String,
         required: true,
       },
-      color: {
+      fill: {
         type: String,
         default: '',
       },
@@ -28,6 +28,6 @@
         default: '18px'
       }
     })
-    const symbolId = computed(() => `#${props.prefix}-${props.icon}`)
+    const symbolId = computed(() => `#${props.prefix}-${props.name}`)
 
   </script>

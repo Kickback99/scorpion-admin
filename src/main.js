@@ -16,27 +16,6 @@ import './assets/style/tailwind.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
 
-/* // 集成md编辑器
-import VMdEditor from '@kangc/v-md-editor';
-import '@kangc/v-md-editor/lib/style/base-editor.css';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import '@kangc/v-md-editor/lib/theme/style/github.css';
-
-// 代码行号
-import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
-
-// 复制代码块
-import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
-import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
-
-// highlightjs
-import hljs from 'highlight.js';
-
-VMdEditor.use(githubTheme, {
-  Hljs: hljs,
-}).use(createLineNumbertPlugin()).use(createCopyCodePlugin()); */
-
-
 // 完整导入
 /* import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -44,7 +23,6 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs' */
 
 
 const app = createApp(App)
-// app.use(VMdEditor)
 app.use(router)
 const pinia = createPinia() //创建Pinia实例
 app.use(pinia.use(persist)) //安装pinia插件
@@ -84,6 +62,11 @@ import {
 // import {directiveList} from '@/directives'
 
 // directiveList(app)
+// import elementIcons from './data/elementIcons'
+// 注册图标组件
+// app.use(elementIcons)
+import { registerIcons } from '@/data/elementIcons'
+registerIcons(app)
 
 // 使用全局属性注入来控制按钮权限的禁用
 

@@ -13,8 +13,8 @@
         :props="defaultProps"
       />
       <div style="padding: 20px 20px;">
-        <el-button :loading="loading" type="primary" icon="el-icon-check" size="mini" @click="save">保存</el-button>
-        <el-button @click="$router.push('/system/sysRole')" size="mini" icon="el-icon-refresh-right">返回</el-button>
+        <el-button :loading="loading" type="primary"  size="mini" @click="save">保存</el-button>
+        <el-button @click="$router.push('/system/sysRole')" size="mini">返回</el-button>
       </div>
     </div>
   </template>
@@ -43,6 +43,9 @@ const defaultProps = {
 
 //t_role_request: 获取角色菜单数据请求
 const render = async () => {
+    if(Reflect.ownKeys(route.query).length === 0){
+      return 
+    }
     const roleId = route.query.id
     const result = await allocMenusApi(roleId);
     sysMenuList.value = result.data;

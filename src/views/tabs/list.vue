@@ -127,7 +127,7 @@ import { eventBus } from '@/utils/event-bus';
 import { useColorStore } from '@/store/color'
 const colorStore = useColorStore()
 // 导入图标
-import {
+/* import {
   ArrowLeft,
   ArrowRight,
   ArrowDown,
@@ -136,7 +136,7 @@ import {
   Right,
   CircleClose,
   Remove
-} from '@element-plus/icons-vue';
+} from '@element-plus/icons-vue'; */
 
 const route = useRoute()
 const router = useRouter()
