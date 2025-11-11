@@ -49,8 +49,8 @@
                 />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" :icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" :icon="Refresh" plain @click="onReset" >重置</el-button>
+                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
+                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
                 <el-button plain color="#626aef" :dark="isDark"  @click="deleteSelectRows()">批量删除</el-button>
             </el-form-item>
             <el-form-item>
@@ -86,10 +86,10 @@
             <el-table-column prop="createTime" label="操作时间" />
             <el-table-column width="150">
                 <template #default="{row}">
-                    <el-button @click="onDetail(row)" type="primary" :icon="MoreFilled"  circle plain/>
-                    <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" :icon="WarnTriangleFilled">
+                    <el-button @click="onDetail(row)" type="primary" icon="MoreFilled"  circle plain/>
+                    <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
-                    <el-button type="danger" :icon="Delete"  circle plain/>
+                    <el-button type="danger" icon="Delete"  circle plain/>
                         </template>
                     </el-popconfirm>
                 </template>
@@ -190,7 +190,6 @@
 
 <script setup>
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/msglog';
-import {MoreFilled,Delete,WarnTriangleFilled} from '@element-plus/icons-vue'
 import { reactive, ref,computed,watch } from 'vue';
 import { useColorStore } from '@/store/color'
 import { createMarkdownPreview } from '@/utils/markdown-config'

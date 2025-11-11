@@ -61,6 +61,16 @@
                   height="20px"
                   :color="setIconColor(item)"
                 />
+                <el-icon v-else-if="currentActiveType === 'element'">
+                   <component :is="item" />
+                </el-icon>
+                <SvgIcon v-else-if="currentActiveType === 'svg'" 
+                :name="item.name" :color="item.color?item.color:''" />
+                <template v-else-if="currentActiveType ===  'alibaba'">
+                  <IconFont v-if="item.type == 'iconfont'" :icon="item.icon" :style="{color:item.color?item.color:''}"/>
+                  <IconFont v-else-if="item.type == 'uni'" :icon="item.icon" :fill="item.color?item.color:''"  uni />
+                  <IconFont v-else  :icon="item.icon" :fill="item.color?item.color:''" />
+                </template>
                 <OfflineIcon 
                   v-else
                   :icon="item"
@@ -108,35 +118,39 @@
 <script setup>
 import { useIconStore } from '@/store/icon'
 import { ref, computed,onMounted,nextTick } from 'vue'
-import { addBatchIconList } from '@/components/MyIcon/src/iconifyBachOffline'
-import { useRoute } from 'vue-router'
-import { getDynamicRouteComponents } from '@/utils/routeComponents'
-import { getLocalRouteComponents } from '@/router'
+import { getDynamicRouteComponents,getLocalRouteComponents } from '@/utils/RouteHandler'
 import { useLoadStore } from '@/store/load'
 import { useActionSetStore } from '@/settings/actionSet'
+import { analyzeComponent, getComponentImportPath} from '@/utils/hasIconComponent'
+import { plainComData } from '@/data/plainComponent'
+import { IconFont } from '@/components/MyIcon'
+import SvgIcon from '@/components/MyIcon/src/SvgIcon.vue'
 const actionSetStore = useActionSetStore()
 
-const route = useRoute()
 const preloadedComponents = ref([])
 const loadStore = useLoadStore()
 const iconStore = useIconStore()
 
-
 onMounted(async () => {
   try {
     // 获取所有路由组件 (本地 + 动态)
-    const localComponents = getLocalRouteComponents();
+    const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
     const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
-    const allComponents = [...localComponents, ...dynamicComponents];
-
-    console.log('All route components:', allComponents);
+    
+    const allComponents = [...localComponents, ...dynamicComponents,...plainComData];
+    /* allComponents.forEach((item)=>{
+      console.log('打印每个元素的component',item.component)
+    }) */
+    // console.log('All route components:', allComponents);
     
     // 初始化预加载组件数组
     preloadedComponents.value = allComponents.map(route => ({
       path: route.path,
       name: route.name,
       component: null,
-      loaded: false
+      loaded: false,
+      hasIcon: false,
+      iconName: null
     }));
     
     // 并行加载所有组件
@@ -147,22 +161,54 @@ onMounted(async () => {
       }
       
       try {
-        // 如果是动态导入函数则执行，否则直接使用组件
-        const module = typeof route.component === 'function' 
-          ? await route.component() 
-          : route.component;
+        // ========== 静态分析阶段 ==========
+        let hasIcon = false;
           
-        preloadedComponents.value[index].component = module.default || module;
-        preloadedComponents.value[index].loaded = true;
-        loadStore.setComponentLoaded(route.name)
-        console.log(`✅ 已静默加载: ${route.name}`)
+        const importPath = getComponentImportPath(route.component);
+        if (importPath) {
+          console.log(`🔍 分析组件: ${importPath}`);
+          hasIcon = await analyzeComponent(importPath);
+        } else {
+          // console.warn(`⚠️ 无法分析组件 ${route.name}`);
+        }
+        
+        // ========== 组件加载阶段 ==========
+        // 只有包含图标的组件才进行实际加载
+        if (hasIcon) {
+          // 如果是动态导入函数则执行，否则直接使用组件
+          const module = typeof route.component === 'function' 
+            ? await route.component() 
+            : route.component;
+          
+          console.log('module',module)
+          preloadedComponents.value[index].component = module.default || module;
+          preloadedComponents.value[index].loaded = true;
+          preloadedComponents.value[index].hasIcon = true;
+          
+          loadStore.setComponentLoaded(route.name);
+          
+          console.log(`✅ 已加载包含图标的组件: ${route.name}`);
+        } else {
+          // 不包含图标的组件，只标记为已加载但不实际加载组件
+          preloadedComponents.value[index].loaded = true;
+          loadStore.setComponentLoaded(route.name);
+          console.log(`⏭️  跳过加载无图标组件: ${route.name}`);
+        }
       } catch (error) {
-        console.error(`❌ 加载组件 ${route.name} 失败:`, error);
+        console.error(`❌ 处理组件 ${route.name} 失败:`, error);
       }
     });
-    console.log('preloadedComponents',preloadedComponents.value)
+    
+    console.log('preloadedComponents', preloadedComponents.value);
     await Promise.all(loadPromises);
-    console.log("所有路由组件已静默预加载");
+    console.log("所有路由组件已处理完成");
+
+    // 输出包含图标的组件总结
+    const componentsWithIcons = preloadedComponents.value.filter(comp => comp.hasIcon);
+    console.log('🎯 包含图标的组件:', componentsWithIcons.map(comp => ({
+      name: comp.name,
+      icon: comp.iconName
+    })));
 
     // 所有组件加载完成后，在下一个tick中统一销毁
     if (preloadedComponents.value.some(comp => comp.loaded)) {
@@ -175,7 +221,6 @@ onMounted(async () => {
     console.error('预加载组件失败:', err)
   }
 })
-
 /* onMounted(async () => {
 
   // 动态导入 Index.vue
@@ -225,7 +270,23 @@ const tabsList = [
     name: "custom",
     icons: () => iconStore.customIcons,
     show: () => iconStore.customIcons.length > 0
-  }
+  },
+  {
+    label: "饿了么图标",
+    name: "element",
+    icons: () => iconStore.elementIcons,
+    show: () => iconStore.elementIcons.length > 0
+  },
+  {
+    label: "svg图标",
+    name: "svg",
+    icons: () => iconStore.svgIcons,
+  },
+  {
+    label: "阿里巴巴图标",
+    name: "alibaba",
+    icons: () => iconStore.alibabaIcons,
+  },
 ]
 
 // 过滤后的标签页列表（不显示空分类）
@@ -391,10 +452,13 @@ const visibleInlineIcon = (item) => {
 :deep(.el-tabs__nav-prev) {
   font-size: 15px;
   line-height: 32px;
+  box-shadow: 2px 0 3px -1px rgba(0, 0, 0, 0.1); /* 减弱阴影 */
 }
 
 :deep(.el-tabs__nav-next) {
+  margin-left: 30px;
   box-shadow: -5px 0 5px -6px #ccc;
+  
 }
 
 :deep(.el-tabs__nav-prev) {
@@ -410,7 +474,7 @@ const visibleInlineIcon = (item) => {
 
 :deep(.el-tabs__header),
 :deep(.el-tabs__nav-wrap) {
-  position: static;
+  position: relative;
   margin: 0;
   // box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
 }
@@ -420,6 +484,6 @@ const visibleInlineIcon = (item) => {
 }
 
 :deep(.el-tabs__nav-wrap) {
-  padding: 0 10px;
+  padding: 0 25px;
 }
 </style>

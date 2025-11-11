@@ -1,4 +1,4 @@
-import { h, defineComponent } from "vue";
+import { h, defineComponent,onMounted } from "vue";
 import { Icon as IconifyIcon } from "@iconify/vue";
 import { useIconStore } from "@/store/icon";
 

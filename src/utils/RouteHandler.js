@@ -1,3 +1,4 @@
+import { routes } from "@/router"
 import { useUserStore } from "@/store/user"
 
 // 获取动态路由组件 (重构后的版本)
@@ -46,6 +47,49 @@ const convertToDesiredFormat = (components) => {
     component: item.component
   }))
 }
+
+
+// 获取本地路由组件
+export function getLocalRouteComponents(excludes = []) {
+  return routes.flatMap(route => {
+    // 1. 主路由排除检查
+    if (excludes.includes(route.name)) {
+      return []; // 如果主路由被排除，直接返回空数组（包括它的所有子路由）
+    }
+    
+    const components = [];
+    
+    // 添加主路由组件
+    if (route.component && route.path !== '/') {
+      components.push({
+        name: generateNameFromPath(route.path),
+        path: route.path,
+        component: route.component,
+        isLocal: true
+      });
+    }
+    
+    // 添加子路由组件
+    if (route.children) {
+      route.children.forEach(child => {
+        // 2. 子路由排除检查
+        if (!excludes.includes(child.name) && child.component) {
+          components.push({
+            name: generateNameFromPath(child.path),
+            path: child.path,
+            component: child.component,
+            isLocal: true
+          });
+        }
+      });
+    }
+    
+    return components;
+  });
+}
+
+
+
 
 export function generateNameFromPath(path) {
   // 去掉首尾斜杠

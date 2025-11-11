@@ -14,12 +14,12 @@
                     </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" :icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" :icon="Refresh" plain @click="onReset" >重置</el-button>
+                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
+                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button type="success" :icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
@@ -36,8 +36,8 @@
         <el-table-column prop="createTime" label="创建日期" />
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" :icon="Edit"   circle plain ></el-button>
-                <el-button @click="handleDelete(row.id)" type="danger" :icon="Delete" circle plain ></el-button>
+                <el-button @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
+                <el-button @click="handleDelete(row.id)" type="danger" icon="Delete" circle plain ></el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -61,7 +61,6 @@
 import { listApi, removeApi } from '@/api/conarticle';
 import CateSelect from '@/views/components/CateSelect.vue';
 import { ref } from 'vue';
-import {Search,Refresh,Plus,Edit,Delete} from '@element-plus/icons-vue'
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
 
 //搜索相关
