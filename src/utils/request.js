@@ -12,6 +12,7 @@ import { useUserStore } from '@/store/user';
 import router from '@/router';
 import { clearRoute } from './remove';
 import { clearUserInfo } from './remove';
+import { useTabStore } from '@/store/tabs';
 
 
 
@@ -48,6 +49,7 @@ instance.interceptors.response.use(
                 // 处理token过期或者篡改
                 const tokenStore = useTokenStore()
                 const userStore = useUserStore()
+                const tabStore = useTabStore()
                 // 清空token
                 tokenStore.removeToken()
                 // 清空用户信息
@@ -63,7 +65,7 @@ instance.interceptors.response.use(
                 // 清空用户名
                 // userStore.username = ''
                 // 提示信息
-                ElMessage.success(res.data.message)
+                // ElMessage.success(res.data.message)
                 // 跳转到登录页
                 router.replace('/login')
 
