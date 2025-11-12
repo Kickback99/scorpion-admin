@@ -62,7 +62,7 @@
                   :color="setIconColor(item)"
                 />
                 <el-icon v-else-if="currentActiveType === 'element'">
-                   <component :is="item" />
+                   <component :is="item.icon" />
                 </el-icon>
                 <SvgIcon v-else-if="currentActiveType === 'svg'" 
                 :name="item.name" :color="item.color?item.color:''" />
@@ -137,7 +137,7 @@ onMounted(async () => {
     const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
     const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
     
-    const allComponents = [...plainComData];
+    const allComponents = [...plainComData,...localComponents,...dynamicComponents];
     /* allComponents.forEach((item)=>{
       console.log('打印每个元素的component',item.component)
     }) */

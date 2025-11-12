@@ -13,6 +13,7 @@
   <IconFont icon="demo-fenxiang"></IconFont>
   <IconFont icon="e602" uni style="color: yellow;"></IconFont>
   <IconFont icon="icon-xiangyou" svg fill="red"></IconFont>
+  <IconFont icon="icon-xiangxia" svg ></IconFont>
 
 </template>
 
