@@ -1,6 +1,6 @@
 import { useIconStore } from "@/store/icon";
 /**
- * 通用分析函数 - 检查组件是否有 icon 和 useRenderIcon 属性，收集 Element Plus 图标
+ * 通用分析函数
  */
 export async function analyzeComponent(importPath) {
   try {
@@ -21,6 +21,7 @@ export async function analyzeComponent(importPath) {
     let hasValidIcon = false;
     const svgIcons = [];
     const alibabaIcons = [];
+    const elementIcons = [];
     
     // 1. 检查是否有符合条件的 icon 属性或 useRenderIcon
     hasValidIcon = checkValidIconUsage(template);
@@ -30,14 +31,18 @@ export async function analyzeComponent(importPath) {
     
     // 3. 收集阿里巴巴图标
     collectAlibabaIcons(template, styleContent, alibabaIcons);
+
+    // 4. 收集 Element Plus 图标
+    collectElementPlusIcons(rawModule.default, elementIcons, importPath);
     
-    // 保存到 store
-    saveToStore(svgIcons, alibabaIcons);
+    // 5. 立即保存所有图标到 store
+    saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath);
     
     console.log(`🎯 ${importPath} 分析结果:`, { 
       hasValidIcon, 
       svgCount: svgIcons.length, 
-      alibabaCount: alibabaIcons.length 
+      alibabaCount: alibabaIcons.length,
+      elementCount: elementIcons.length
     });
     
     return hasValidIcon;
@@ -48,8 +53,118 @@ export async function analyzeComponent(importPath) {
   }
 }
 
+
+/**
+ * 收集 Element Plus 图标
+ */
+function collectElementPlusIcons(content, elementIcons, importPath) {
+  // 先移除注释内容
+  const cleanContent = removeComments(content);
+  const iconSet = new Set();
+  
+  // 使用确认能正常工作的正则表达式
+  const iconPatterns = [
+    // 1. 静态属性: icon="Edit", prefix-icon="Search"
+    /(?:icon|active-icon|inactive-icon|prefix-icon|suffix-icon)="([^"]+)"/gi,
+    
+    // 2. 动态属性: :icon="Edit", :icon="'Search'"
+    /(?:icon|active-icon|inactive-icon|prefix-icon|suffix-icon)=["']?([A-Z][A-Za-z0-9]*)["']?/g,
+    
+    // 3. el-icon 内的组件: <el-icon><Edit /></el-icon> 或 <el-icon><Edit></Edit></el-icon>
+    /<el-icon[^>]*>[\s\S]*?<([A-Z][A-Za-z0-9]*)(?:\s[^>]*)?(?:\s*\/>|>[\s\S]*?<\/\1>)[\s\S]*?<\/el-icon>/gi,
+    
+    // 4. 直接使用的图标组件: <Edit /> 或 <Edit></Edit>
+    /<([A-Z][A-Za-z0-9]+)(?:\s[^>]*)?(?:\s*\/>|>[\s\S]*?<\/\1>)/g,
+    
+    // 5. 动态组件: <component :is="Edit" />
+    /<component[^>]*:is=["']?([A-Z][A-Za-z0-9]*)["']?[^>]*\/>/gi,
+    
+    // 6. 动态组件: <component is="Expand" />
+    /<component[^>]*\sis=["']?([A-Z][A-Za-z0-9]*)["']?[^>]*>/gi,
+    
+    // 7. 三元表达式中的图标: :is="condition?'Top':'Bottom'"
+    /:is=["'][^"']*\?["']?([A-Z][A-Za-z0-9]*)["']?:["']?([A-Z][A-Za-z0-9]*)["']?/gi
+  ];
+
+  // 应用所有正则模式
+  iconPatterns.forEach(pattern => {
+    let match;
+    while ((match = pattern.exec(cleanContent)) !== null) {
+      // 处理多个捕获组的情况（如三元表达式）
+      for (let i = 1; i < match.length; i++) {
+        const iconName = match[i];
+        if (iconName && isValidElementIconName(iconName)) {
+          iconSet.add(iconName);
+        }
+      }
+    }
+  });
+
+  const foundIcons = Array.from(iconSet);
+  console.log(`🔍 ${importPath} 发现 Element Plus 图标:`, foundIcons);
+
+  // 添加到当前文件的图标数组
+  if (foundIcons.length > 0) {
+    foundIcons.forEach(icon => {
+      elementIcons.push({
+        icon,
+        files: [importPath]
+      });
+    });
+  }
+}
+
+
+import elIcons from '@/data/elIcons';
+
+/**
+ * 验证 Element Plus 图标名的辅助函数 - 使用导入的白名单
+ */
+function isValidElementIconName(name) {
+  if (!name) return false;
+  
+  // 使用导入的 Element Plus 图标白名单
+  const elementIconWhitelist = elIcons;
+  
+  // 基本格式验证
+  const isValidFormat = (
+    /^[A-Z][A-Za-z0-9]*$/.test(name) && // 首字母大写，只包含字母数字
+    name.length >= 3 && // 长度至少3个字符
+    name.length <= 20 // 长度不超过20个字符
+  );
+  
+  // 必须在白名单中
+  const isInWhitelist = elementIconWhitelist.includes(name);
+  
+  const isValid = isValidFormat && isInWhitelist;
+  
+  if (!isValid) {
+    if (isValidFormat) {
+      console.log(`❌ 图标不在白名单中: ${name}`);
+    } else {
+      console.log(`❌ 图标格式无效: ${name}`);
+    }
+  } else {
+    console.log(`✅ 验证通过: ${name}`);
+  }
+  
+  return isValid;
+}
+
+/**
+ * 移除注释的辅助函数
+ */
+function removeComments(content) {
+  return content
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
 /**
  * 检查是否有符合条件的 icon 属性或 useRenderIcon
+ * 如果标签不是 IconFont，且包含 icon 属性并且属性值首字符是小写，则返回 true
+ * 避免与 Element Plus 图标起冲突
  */
 function checkValidIconUsage(template) {
   // 1. 检查 useRenderIcon
@@ -64,8 +179,8 @@ function checkValidIconUsage(template) {
     const tagContent = match[1];
     const iconValue = match[3];
     
-    // 如果标签不是 IconFont，且包含 icon 属性，则返回 true
-    if (!tagContent.includes('IconFont') && iconValue) {
+    // 如果标签不是 IconFont，且包含 icon 属性并且属性值首字符是小写
+    if (!tagContent.includes('IconFont') && iconValue && /^[a-z]/.test(iconValue)) {
       return true;
     }
   }
@@ -153,11 +268,17 @@ function collectAlibabaIcons(template, styleContent, alibabaIcons) {
   }
 }
 
+
 /**
- * 保存数据到 store
+ * 保存所有图标到 store（立即保存，不依赖临时存储）
  */
-function saveToStore(svgIcons, alibabaIcons) {
+function saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath) {
   const iconStore = useIconStore();
+  
+  // 确保 store 已初始化
+  if (!iconStore.svgIcons) iconStore.svgIcons = [];
+  if (!iconStore.alibabaIcons) iconStore.alibabaIcons = [];
+  if (!iconStore.elementIcons) iconStore.elementIcons = [];
   
   // 保存 SVG 图标（去重）
   if (svgIcons.length > 0) {
@@ -186,7 +307,7 @@ function saveToStore(svgIcons, alibabaIcons) {
     });
     
     iconStore.svgIcons = finalSvgIcons;
-    console.log(`💾 保存 SVG 图标:`, finalSvgIcons);
+    console.log(`💾 保存 SVG 图标:`, finalSvgIcons.length);
   }
   
   // 保存阿里巴巴图标（去重）
@@ -216,7 +337,42 @@ function saveToStore(svgIcons, alibabaIcons) {
     });
     
     iconStore.alibabaIcons = finalAlibabaIcons;
-    console.log(`💾 保存阿里巴巴图标:`, finalAlibabaIcons);
+    console.log(`💾 保存阿里巴巴图标:`, finalAlibabaIcons.length);
+  }
+  
+  // 保存 Element Plus 图标（跨文件合并）
+  if (elementIcons.length > 0) {
+    console.log(`💾 合并 Element Plus 图标:`, elementIcons.length);
+    
+    // 创建临时 Map 来合并数据
+    const iconMap = new Map();
+    
+    // 先添加现有数据到 Map
+    iconStore.elementIcons.forEach(item => {
+      iconMap.set(item.icon, [...item.files]);
+    });
+    
+    // 合并新数据
+    elementIcons.forEach(item => {
+      if (iconMap.has(item.icon)) {
+        // 合并文件数组（去重）
+        const existingFiles = iconMap.get(item.icon);
+        const newFiles = [...new Set([...existingFiles, ...item.files])];
+        iconMap.set(item.icon, newFiles);
+      } else {
+        // 直接添加
+        iconMap.set(item.icon, [...item.files]);
+      }
+    });
+    
+    // 转换回数组并按字母排序
+    const mergedElementIcons = Array.from(iconMap, ([icon, files]) => ({
+      icon,
+      files: files.sort()
+    })).sort((a, b) => a.icon.localeCompare(b.icon));
+    
+    iconStore.elementIcons = mergedElementIcons;
+    console.log(`💾 最终 Element Plus 图标:`, mergedElementIcons.length);
   }
 }
 
@@ -225,21 +381,15 @@ function saveToStore(svgIcons, alibabaIcons) {
  */
 export function getComponentImportPath(component) {
   if (typeof component === 'function') {
-    // 动态导入函数：() => import('@/path/to/component.vue')
     const importPath = component.toString();
     const match = importPath.match(/import\("([^"]+)"\)/);
     if (match) {
-      // 将 @ 符号替换为 /src，并去掉时间戳参数
       let path = match[1].replace(/^@\//, '/src/');
-      // 去掉 ?t= 时间戳参数
       path = path.replace(/\?t=\d+$/, '');
       return path;
     }
   } else if (component && component.__file) {
-    // 直接导入的组件：从 __file 构建路径
-    // __file: "L:/project/src/test/Learn.vue" → '/src/test/Learn.vue'
     const fullPath = component.__file;
-    // 提取 src 及后面的部分
     const srcIndex = fullPath.indexOf('src');
     if (srcIndex !== -1) {
       const relativePath = fullPath.substring(srcIndex).replace(/\\/g, '/');

@@ -2,7 +2,7 @@
     <offlineIcon icon="ep:check"></offlineIcon>
     <onlineIcon icon="ep:filter"></onlineIcon>
   
-    <el-button>Default</el-button>
+    <!-- <el-button>Default</el-button> -->
     <el-button   type="primary" icon="Edit"  circle plain/>
     <el-button icon="Plus" type="primary">sds </el-button>
 

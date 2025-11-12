@@ -137,7 +137,7 @@ onMounted(async () => {
     const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
     const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
     
-    const allComponents = [...localComponents, ...dynamicComponents,...plainComData];
+    const allComponents = [...plainComData];
     /* allComponents.forEach((item)=>{
       console.log('打印每个元素的component',item.component)
     }) */
@@ -209,6 +209,7 @@ onMounted(async () => {
       name: comp.name,
       icon: comp.iconName
     })));
+
 
     // 所有组件加载完成后，在下一个tick中统一销毁
     if (preloadedComponents.value.some(comp => comp.loaded)) {
