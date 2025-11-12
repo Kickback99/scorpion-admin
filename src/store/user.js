@@ -50,7 +50,6 @@ export const useUserStore = defineStore({
                     this.hasUserInfo = true // 设置标志位
                     return res
                 }catch(error){
-                    error = '访问用户信息失败'
                     return Promise.reject(error)
                 }
             }else {
