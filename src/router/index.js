@@ -35,8 +35,12 @@ export const routes = [
             meta:{
                title:'首页'     
         }},
-        {path:'/user/profile',component:() =>import('@/views/user/profile.vue')},
-        {path:'/user/rePassword',component:() =>import('@/views/user/rePassword.vue')},
+        {path:'/user/profile',component:() =>import('@/views/user/profile.vue'),meta:{
+            title:'个人资料'
+        }},
+        {path:'/user/rePassword',component:() =>import('@/views/user/rePassword.vue'),meta:{
+            title:'重置密码'
+        }},
         {path:'/test',component:() => import('@/views/Test.vue')}
     ]},
 /*     {
