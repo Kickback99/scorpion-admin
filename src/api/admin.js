@@ -41,6 +41,11 @@ export const userUpdateInfoApi = (params) => {
     return http.put('/admin/updateUserDetailInfo',formData)
 }
 
+// 修改用户密码
+export const userUpdatePwdApi = (params) => {
+    return http.patch('/admin/updateUserPwd',params)
+}
+
 // 用户退出登录
 export const adminLogoutApi = () => {
     return http.get("/admin/logout")

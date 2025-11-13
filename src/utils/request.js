@@ -65,13 +65,15 @@ instance.interceptors.response.use(
                 // 清空用户名
                 // userStore.username = ''
                 // 提示信息
-                // ElMessage.success(res.data.message)
+                ElMessage.error(res.data.message)
                 // 跳转到登录页
                 router.replace('/login')
 
             }else ElMessage.error(res.data.message)
 
-            return Promise.reject(res.data.message)
+            // return Promise.reject(res.data.message)
+            // 关键：返回pending的Promise，阻止错误开始向上传递的后续执行
+             return new Promise(() => {})
        }
 
         ElMessage.error(res.data.message || '业务失败')
