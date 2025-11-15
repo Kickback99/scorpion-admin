@@ -102,7 +102,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Lock } from '@element-plus/icons-vue'
 import { userUpdatePwdApi } from '@/api/admin'
 import { useTokenStore } from '@/store/token'
+import { useRouter } from 'vue-router'
 const tokenStore = useTokenStore()
+// const router = useRouter()
 
 // 响应式数据
 const formRef = ref()

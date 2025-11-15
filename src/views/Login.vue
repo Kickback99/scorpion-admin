@@ -35,7 +35,6 @@ const userStore = useUserStore()
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
-import { async } from '@kangc/v-md-editor';
 
 const router = useRouter()
 const route = useRoute()

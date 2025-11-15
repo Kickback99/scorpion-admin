@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia'
 import { ref } from 'vue'
 import CryptoJS from 'crypto-js'
+import { useUserStore } from './user';
 
 // 定义store
 // defineStore('仓库的唯一标识',()=>{...})
@@ -10,6 +11,8 @@ const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
 export const useTokenStore = defineStore('token',{
     state:()=>({
         token:'',
+
+        // 记住密码凭证
         savedUsername:'',
         savedPassword:'',
         rememberMe:false

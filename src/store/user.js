@@ -12,7 +12,7 @@ export const useUserStore = defineStore({
             routers:[],
             permissions:[]
         },
-        hasUserInfo: false // 新增标志位
+        hasUserInfo: false, // 新增标志位
     }),
     actions:{
         async getUserInfo(forceRefreshMenu = false){
@@ -43,6 +43,7 @@ export const useUserStore = defineStore({
                 const res = await userInfoApi()
                 this.userInfo = res.data.userInfo
                 this.roleNames = res.data.roleNames
+                this.userId = res.data.userInfo.id
                 this.menuData = {
                     routers:res.data.routers,
                     permissions:res.data.permissions
