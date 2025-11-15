@@ -134,10 +134,15 @@ import { useTokenStore } from '@/store/token'
 import { useColorStore } from '@/store/color'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
-import { clearUserInfo } from '@/utils/remove';
+// import { clearUserInfo } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { darkMenuThemes,lightMenuThemes } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
+import {useWebSocket} from '@/server/useWebSocket'
+
+// 初始化 WebSocket
+const { initWebSocketListener, closeWebSocket } = useWebSocket()
+
 // 导入全局事件总线对象
 import emitter from '@/utils/event-bus.js' // 引入事件总线
 import { useTabStore } from "@/store/tabs";
@@ -220,6 +225,7 @@ const handleCommand = async (key) => {
         })
         // 发送注销请求
         const res = await adminLogoutApi()
+        closeWebSocket()
         // 清空token
         tokenStore.removeToken()
         console.log('清空前', router.getRoutes())
