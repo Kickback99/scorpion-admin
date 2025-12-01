@@ -167,6 +167,10 @@ const linkIsActive = (tab) => {
 // 添加标签页
 const addTab = () => {
   const { path, meta: { title } } = route
+
+    // 确保首页始终存在
+  ensureHomeTabExists()
+
   const itemTab = {
     path,
     title
@@ -180,6 +184,18 @@ const addTab = () => {
   nextTick(() => {
     adjustScrollPosition()
   })
+}
+
+// 确保首页标签存在
+const ensureHomeTabExists = () => {
+  const homeTab = tabs.value.find(tab => tab.path === '/index')
+  if (!homeTab) {
+    // 如果首页不存在，添加首页
+    tabStore.addTabs({
+      path: '/index',
+      title: '首页'
+    })
+  }
 }
 
 
