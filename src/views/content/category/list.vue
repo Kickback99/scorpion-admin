@@ -87,7 +87,7 @@
 
         <el-button 
         v-if="!isEdit?data.isReset:(data.isReset  && handleInclude(data.id))" 
-        icon="!isEdit?'Close':'Refresh'"
+        :icon="!isEdit?'Close':'Refresh'"
         color="#626aef"
         circle plain size="small"
         @click="handleRevert($event,node, data)" />
@@ -106,10 +106,10 @@
         <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow"
           @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" icon="WarnTriangleFilled">
           <template #reference>
-            <el-button style="margin-left: 8px" type="danger" circle plain size="small" icon="Delete" />
+            <el-button @click.stop style="margin-left: 8px" type="danger" circle plain size="small" icon="Delete" />
           </template>
         </el-popconfirm>
-        <el-button v-if="checkedIds == data.id" @click="batchRemove(node,data,false)" 
+        <el-button v-if="checkedIds == data.id" @click.stop="batchRemove(node,data,false)" 
         type="danger" style="margin-left: 8px;"  circle plain size="small" icon="Delete" />
 
 
@@ -129,7 +129,6 @@
 import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
-import data from '@iconify-icons/ep/check';
 
 defineOptions({
   name: 'Category'
@@ -644,6 +643,7 @@ const handleParentBlur = (node,data) => {
       }
       ElMessage.error('请输入内容')
       if(treeList.value.length === 0){
+        ElMessage.error('回到最原始的数据')
         disabledAddParent.value = false
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
@@ -1287,25 +1287,54 @@ const removeTreeNode = (node,data) => {
 } */
 
 
-const removeParentElement = (node,data) => {
-  // let afterCount
+const removeParentElement = (node, data) => {
   console.log(node.parent.data)
-  const childList = node.level < 2 ? node.parent.data:node.parent.data.children
-  console.log('childList',childList)
+  const childList = node.level < 2 ? node.parent.data : node.parent.data.children
+  console.log('childList', childList)
+  
   const index = childList.indexOf(data)
-  if(index > -1){
-    // 删除为空和重复的非法元素
-    // afterCount = childList.length-1
-    childList.splice(index,1)
-    delete category[data.id]
-    console.log("删除为空和重复的非法元素")
-    // console.log(afterCount,'afterCount')
-    // return afterCount
-  }
-
-  const index1 = treeList.value.findIndex(item => item.cate_id === data.id)
-  if(index1 !== -1){
-    treeList.value.splice(index1,1)
+  if (index > -1) {
+    // 检查是否是父节点且有子节点
+    const isParentNode = node.level < 2
+    const hasChildren = data.children && data.children.length > 0
+    const isNormalMode = !isNormal.value
+    
+    if (isParentNode && hasChildren && isNormalMode) {
+      // 非正常模式 + 父节点有子节点：删除所有相关数据
+      console.log('删除父节点及其所有子节点')
+      
+      // 1. 收集所有节点ID
+      const allNodeIds = [data.id]
+      if (data.children) {
+        data.children.forEach(child => {
+          allNodeIds.push(child.id)
+        })
+      }
+      
+      // 2. 删除DOM节点（父节点）
+      childList.splice(index, 1)
+      
+      // 3. 清理所有相关数据
+      allNodeIds.forEach(nodeId => {
+        delete category[nodeId]
+        
+        const treeIndex = treeList.value.findIndex(item => item.cate_id === nodeId)
+        if (treeIndex !== -1) {
+          treeList.value.splice(treeIndex, 1)
+        }
+      })
+      
+    } else {
+      // 其他情况：只删除当前节点
+      console.log("删除单个节点")
+      childList.splice(index, 1)
+      delete category[data.id]
+      
+      const index1 = treeList.value.findIndex(item => item.cate_id === data.id)
+      if (index1 !== -1) {
+        treeList.value.splice(index1, 1)
+      }
+    }
   }
 }
 
