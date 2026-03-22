@@ -10,6 +10,7 @@ class WebSocketManager {
     this.maxReconnectAttempts = 5
     this.reconnectInterval = 3000
     this.isConnecting = false
+    this.isManualClose = false  // 是否手动关闭
   }
 
   // 初始化 WebSocket 连接
@@ -19,10 +20,18 @@ class WebSocketManager {
       return
     }
 
+    
+    // 重置手动关闭标志
+    this.isManualClose = false
+
     // 如果正在连接或已连接，先关闭
-    /* if (this.isConnecting || this.socket) {
-      this.close()
-    } */
+    if (this.isConnecting || this.socket) {
+      if (this.socket) {
+        console.log('🔌 关闭现有连接，准备重新连接')
+        this.socket.close()
+        this.socket = null
+      }
+    }
 
     this.isConnecting = true
     
@@ -44,6 +53,11 @@ class WebSocketManager {
         console.log('🔌 WebSocket 连接关闭:', event.code, event.reason)
         this.isConnecting = false
         // this.handleReconnect(userId)
+
+        // 只在应该重连且不是手动关闭才重连
+        if (this.shouldReconnectOnClose(event.code) && !this.isManualClose) {
+            this.handleReconnect(userId)
+        }
       }
 
       this.socket.onerror = (error) => {
@@ -56,6 +70,21 @@ class WebSocketManager {
       console.error('❌ 创建 WebSocket 失败:', error)
       this.isConnecting = false
     }
+  }
+
+    // 判断是否应该重连
+  shouldReconnectOnClose(code) {
+    // 正常关闭，不重连
+    if (code === 1000) return false
+    
+    // 1001：页面关闭，不重连
+    if (code === 1001) return false
+    
+    // 1008：策略违规，可能是权限问题，不重连
+    if (code === 1008) return false
+    
+    // 其他错误码，尝试重连
+    return true
   }
 
   // 处理重连逻辑
@@ -150,9 +179,10 @@ class WebSocketManager {
 
   // 关闭 WebSocket 连接
   close() {
+    this.isManualClose = true  // 标记为手动关闭，防止重连
     if (this.socket) {
       console.log('🔌 手动关闭 WebSocket 连接')
-      this.socket.close()
+      this.socket.close(1000, 'Manual close')
       this.socket = null
     }
     this.isConnecting = false
