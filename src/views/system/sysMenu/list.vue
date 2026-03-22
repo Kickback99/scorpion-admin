@@ -1,7 +1,7 @@
 <template>
          <div class="toolbar">
-            <el-button :disabled="$hasPerm('bnt.sysMenu.add')" @click="addDir" icon="Plus" type="success" plain>新增</el-button>
-            <!-- <el-button :disabled="$hasPerm('bnt.sysMenu.remove')" @click="deleteSelectRows()" icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button> -->
+            <el-button :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" type="success" plain>新增</el-button>
+            <!-- <el-button :disabled="$hasPerm('btn.sysMenu.remove')" @click="deleteSelectRows()" icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button> -->
          </div>
         
 
@@ -35,8 +35,8 @@
         <el-table-column prop="createTime" label="创建时间" width="160"/>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{row}">
-            <el-button v-if="row.type !== 2" @click="addMenuButton(row)" :disabled="$hasPerm('bnt.sysMenu.add')"  type="success" circle plain  icon="Plus" size="mini"/>
-            <el-button  @click="editMenu(row)" :disabled="$hasPerm('bnt.sysMenu.update')"  type="primary" circle plain  icon="Edit" size="mini" />
+            <el-button v-if="row.type !== 2" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="success" circle plain  icon="Plus" size="mini"/>
+            <el-button  @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')"  type="primary" circle plain  icon="Edit" size="mini" />
             <el-button @click="removeMenu(row.id)" :disabled="row.children.length > 0"  type="danger"  circle plain icon="Delete" size="mini" title="删除" />
           </template>
         </el-table-column>
@@ -104,7 +104,7 @@
             <el-input v-model="formModel.perms" placeholder="请输入权限标识" maxlength="100"/>
             <template #label>
                 权限字符
-                  <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('bnt.sysRole.list'))" placement="top">
+                  <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('btn.sysUser.list'))" placement="top">
                   <el-icon>
                     <i-ep-questionFilled></i-ep-questionFilled>
                   </el-icon>

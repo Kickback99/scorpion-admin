@@ -10,7 +10,7 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button :disabled="$hasPerm('btn.tag.add')" type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
@@ -20,10 +20,10 @@
         <el-table-column prop="remark" label="备注" />
         <el-table-column  label="操作" width="150">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
+                <el-button :disabled="$hasPerm('btn.tag.update')" @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button type="danger" icon="Delete"  circle plain/>
+                    <el-button :disabled="$hasPerm('btn.tag.remove')" type="danger" icon="Delete"  circle plain/>
                 </template>
                 </el-popconfirm>
             </template>

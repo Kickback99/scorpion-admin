@@ -25,19 +25,19 @@
         </el-form>
         <div class="bottom">
             <div class="file-operate">
-                <el-button color="#EEDD82" @click="deleteSelectRows()">
+                <el-button :disabled="$hasPerm('btn.file.remove')" color="#EEDD82" @click="deleteSelectRows()">
                     <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
                 </el-button>
             </div>
 
             <div class="file-operate">
-                <el-button color="#7B68EE"  @click="handleSyncDelete()">
+                <el-button :disabled="$hasPerm('btn.file.remove')" color="#7B68EE"  @click="handleSyncDelete()">
                     <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
                 </el-button>
             </div>
 
             <div class="file-operate">
-                <el-button color="#8B4726" @click="handleUpdateRecords">
+                <el-button :disabled="$hasPerm('btn.file.update')" color="#8B4726" @click="handleUpdateRecords">
                     <offlineIcon icon="ri:database-2-line"></offlineIcon>更新数据库</el-button>
             </div>
 
@@ -46,7 +46,7 @@
                 :on-success="onSuccess"
                 :before-upload="beforeUpload"
                 :on-error="onError">
-                <el-button color="#9BCD9B">
+                <el-button :disabled="$hasPerm('btn.file.add')" color="#9BCD9B">
                     <offlineIcon icon="ri:add-fill"></offlineIcon>文件上传
                 </el-button>
             </el-upload>
@@ -56,7 +56,7 @@
                 :before-upload="beforeUpload"
                 :on-error="onError"
                 multiple>
-                <el-button color="#F4A460" >
+                <el-button :disabled="$hasPerm('btn.file.add')" color="#F4A460" >
                     <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
                 </el-button>
             </el-upload>
@@ -76,11 +76,11 @@
         <el-table-column prop="createTime" label="创建日期"></el-table-column>
         <el-table-column label="操作" width="150">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" icon="Edit" circle plain></el-button>
+                <el-button :disabled="$hasPerm('btn.file.update')" @click="handleEdit(row)" type="primary" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"
                     icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button type="danger" icon="Delete" circle plain />
+                        <el-button :disabled="$hasPerm('btn.file.remove')" type="danger" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
                 <el-button @click="handleDownload(row)" circle plain type="success" icon="Download"></el-button>

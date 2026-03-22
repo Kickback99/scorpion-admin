@@ -20,8 +20,8 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('bnt.sysUser.remove')" icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
-            <el-button @click="addDialog" :disabled="$hasPerm('bnt.sysUser.add')" icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
+            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
+            <el-button @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
         </div>
     </div>
 
@@ -63,13 +63,13 @@
         <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
         <el-table-column label="操作" width="150" align="center" >
             <template #default="{row,$index}">
-            <el-button  :disabled="$hasPerm('bnt.sysUser.update')" @click="editDialog(row)" type="primary" icon="Edit"  circle plain/>
+            <el-button  :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" type="primary" icon="Edit"  circle plain/>
             <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('bnt.sysUser.remove')" type="danger" icon="Delete"   circle plain/>
+                    <el-button :disabled="$hasPerm('btn.sysUser.remove')" type="danger" icon="Delete"   circle plain/>
                 </template>
             </el-popconfirm>
-            <el-button :disabled="$hasPerm('bnt.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" icon="User"   circle plain/>
+            <el-button :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" icon="User"   circle plain/>
             </template>
         </el-table-column>
     </el-table>
