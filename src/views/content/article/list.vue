@@ -19,7 +19,7 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button :disabled="$hasPerm('btn.article.add')" type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
@@ -36,8 +36,8 @@
         <el-table-column prop="createTime" label="创建日期" />
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
-                <el-button @click="handleDelete(row.id)" type="danger" icon="Delete" circle plain ></el-button>
+                <el-button :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
+                <el-button :disabled="$hasPerm('btn.article.remove')" @click="handleDelete(row.id)" type="danger" icon="Delete" circle plain ></el-button>
             </template>
         </el-table-column>
     </el-table>
