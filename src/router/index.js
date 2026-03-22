@@ -11,6 +11,7 @@ import { useSettingStore } from '@/setting'
 import { clearRoute, clearUserInfo } from '@/utils/remove'
 import { add403Routes } from '@/utils/403route'
 import { add404Routes } from '@/utils/404route'
+import { useWebSocket } from '@/server/useWebSocket'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -380,6 +381,8 @@ router.beforeEach((to, from, next) => {
                     //   clearUserInfo()
                       clearRoute(userStore.userMenu)
                       userStore.clearUserStore( )
+                      const { closeWebSocket } = useWebSocket()
+                      closeWebSocket()
                     //   userStore.removeUserAuth()
                       
             } 
