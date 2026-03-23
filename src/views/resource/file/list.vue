@@ -121,6 +121,8 @@ import { useTokenStore } from '@/store/token';
 import offlineIcon from '@/components/MyIcon/src/offlineIcon';
 const tokenStore = useTokenStore()
 const searchData = reactive({
+        sortField: 'create_time',  // 保留默认排序字段
+        sortOrder: 'DESC'           // 保留默认排序方向
 })
 
 onMounted(()=>{
@@ -139,6 +141,7 @@ const params = reactive({
 const total = ref(null)
 
 const fields = ref([
+    {label:'请选择排序',value:'',disabled: true},
     {label:'文件名',value:'name'},
     {label:'文件大小',value:'size'},
     {label:'创建时间',value:'create_time'},
@@ -190,16 +193,16 @@ const onCurrentChange = (page) => {
 }
 
 const onSearch = () => {
-    if(Boolean(searchData.sortField) != Boolean(searchData.sortOrder)){
+    /* if(Boolean(searchData.sortField) != Boolean(searchData.sortOrder)){
         ElMessage.error(searchData.sortField?'请选择排序':'请选择排序字段')
-    }
+    } */
     params.pageNum = 1
     render()
 }
 
 const onReset = () => {
     params.pageNum = 1
-    Object.assign(searchData,{name:'',ext:'',sortField:'',sortOrder:''})
+    Object.assign(searchData,{name:'',ext:'',sortField:'create_time',sortOrder:'DESC'})
     render()
 }
 
