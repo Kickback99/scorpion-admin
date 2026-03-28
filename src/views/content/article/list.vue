@@ -206,8 +206,15 @@ const handleDelete = async(id) => {
 
 //  t_article_request：更改文章状态请求
 const modifySwitch = async(row) =>{
-    await isTopApi(row.id,row.isTop)
-    row.isTop === "1" ? ElMessage.success('已置顶'):ElMessage.error('已取消置顶')
+    
+   const res = await isTopApi(row.id,row.isTop)
+    // row.isTop === "1" ? ElMessage.success('已置顶'):ElMessage.error('已取消置顶')
+    // 根据返回的 message 显示不同的提示
+    if (res.message && res.message.includes("自动取消")) {
+        ElMessage.warning(res.message)  // 警告提示
+    } else {
+        ElMessage.success(res.message)  // 成功提示
+    }
     render()
 }
 
