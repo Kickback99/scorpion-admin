@@ -98,7 +98,7 @@
                     </el-icon>
                   </el-tooltip>
                 </template>
-            <el-input v-model="formModel.component" placeholder="请输入组件路径" />
+            <el-input v-model="formModel.component" :disabled="isComponentDisabled " placeholder="请输入组件路径" />
           </el-form-item>
           <el-form-item v-if="formModel.type === 2">
             <el-input v-model="formModel.perms" placeholder="请输入权限标识" maxlength="100"/>
@@ -134,7 +134,7 @@ import { IconSelect } from "@/components/MyIcon";
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysmenu'
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
-import { nextTick,watch } from 'vue';
+import { computed, nextTick,ref,watch } from 'vue';
 const iconRef = ref()
 import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
@@ -234,6 +234,13 @@ const formModel = ref({
     ...defaultForm
 })
 
+
+const AuthFields = ['Layout','ParentView','list']
+
+const isComponentDisabled  = ref(false)
+
+
+
 // 在工具条点击的添加按钮的事件
 const addDir = () =>{
     // 添加为目录或菜单
@@ -257,6 +264,7 @@ const addDir = () =>{
 
     // 标记为工具条新增模式
     formModel.value._isToolbarAdd = true
+    isComponentDisabled.value = true
 }
 
 // 监听类型变化
@@ -267,6 +275,7 @@ watch(
         if (formModel.value._isToolbarAdd && !formModel.value.id && formModel.value.parentId === 0) {
             formModel.value.component = newType === 0 ? 'Layout' : 'list'
             formModel.value.type = newType ===0 ? 0 : 1
+            isComponentDisabled .value  = true
         }
     }
 )
@@ -281,6 +290,7 @@ const addMenuButton = (row) => {
     formModel.value.parentId = row.id
     dialogVisible.value = true
     title.value = '添加下级节点'
+    isComponentDisabled .value = false
     
     if(row.type === 0){
         // 在目录中点击的添加，可以添加目录或菜单
@@ -305,12 +315,15 @@ watch(() => formModel.value.type, (newType) => {
         if (newType === 0) {
             // 选择目录
             formModel.value.component = 'ParentView'
+            isComponentDisabled .value  = true
         } else if (newType === 1) {
             // 选择菜单
             formModel.value.component = ''
+            isComponentDisabled .value  = false
         } else if (newType === 2) {
             // 选择按钮
             formModel.value.component = ''
+            isComponentDisabled .value  = false
         }
     }
 })
@@ -318,6 +331,11 @@ watch(() => formModel.value.type, (newType) => {
 // let baseIcon;
 
 const editMenu = (row) =>{
+    if (row.type === 0 || AuthFields.includes(row.component)){
+      isComponentDisabled.value = true
+    }else {
+      isComponentDisabled.value = false
+    }
     title.value = '修改菜单'
     dialogVisible.value = true
     console.log(row.type)
@@ -338,6 +356,7 @@ const onCancel = () => {
   dialogVisible.value = false
   delete formModel.value._isToolbarAdd
   delete formModel.value._isChildAdd
+  isComponentDisabled.value = false  // 重置状态
   // formModel.value.icon = baseIcon
 }
 
@@ -345,6 +364,7 @@ const onCancel = () => {
 const addOrModify = () =>{
     delete formModel.value._isToolbarAdd
     delete formModel.value._isChildAdd
+    isComponentDisabled.value = false  // 重置状态
 
     if(formModel.value.type === 0 && formModel.value.parentId != 0){
         formModel.value.component = 'ParentView'
