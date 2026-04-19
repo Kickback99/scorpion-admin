@@ -35,7 +35,7 @@
         <el-table-column prop="createTime" label="创建时间" width="160"/>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{row}">
-            <el-button v-if="row.type !== 2" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="success" circle plain  icon="Plus" size="mini"/>
+            <el-button v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="success" circle plain  icon="Plus" size="mini"/>
             <el-button  @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')"  type="primary" circle plain  icon="Edit" size="mini" />
             <el-button @click="removeMenu(row.id)" :disabled="row.children.length > 0"  type="danger"  circle plain icon="Delete" size="mini" title="删除" />
           </template>
@@ -89,7 +89,7 @@
                 </template>
             <el-input v-model="formModel.path" placeholder="请输入路由地址" />
           </el-form-item>
-          <el-form-item prop="component" v-if="formModel.type !== 0">
+          <el-form-item prop="component" >
                 <template #label>
                 组件路径
                   <el-tooltip content="访问的组件路径，如：`system/user/index`，默认在`views`目录下" placement="top">
@@ -134,7 +134,7 @@ import { IconSelect } from "@/components/MyIcon";
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysmenu'
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
-import { nextTick } from 'vue';
+import { nextTick,watch } from 'vue';
 const iconRef = ref()
 import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
@@ -236,23 +236,44 @@ const formModel = ref({
 
 // 在工具条点击的添加按钮的事件
 const addDir = () =>{
-    // 添加为目录
-    title.value = '添加目录'
+    // 添加为目录或菜单
+    title.value = '添加目录/菜单'
     dialogVisible.value = true
-    typeDisabled.value = true
-
+    
     // 重置数据
     formModel.value = {...defaultForm}
-
-    formModel.value.component = 'Layout'
     formModel.value.parentId = 0
-    formModel.value.type = 0
     formModel.value.parentName = ''
+    
+    // 不禁用任何类型，让用户可以选择目录或菜单，只禁用按钮
+    typeDisabled.value = false
+    type0Disabled.value = false
+    type1Disabled.value = false
+    type2Disabled.value = true  // 禁用按钮选项
+    
+    // 默认选中目录类型
+    formModel.value.type = 0
+    formModel.value.component = 'Layout'  // 目录默认组件为Layout
+
+    // 标记为工具条新增模式
+    formModel.value._isToolbarAdd = true
 }
+
+// 监听类型变化
+watch(
+    () => formModel.value.type,
+    (newType) => {
+        // 仅在工具条新增模式且没有id（新增）且父级为0时执行
+        if (formModel.value._isToolbarAdd && !formModel.value.id && formModel.value.parentId === 0) {
+            formModel.value.component = newType === 0 ? 'Layout' : 'list'
+            formModel.value.type = newType ===0 ? 0 : 1
+        }
+    }
+)
 
 // 在表格中点击添加按钮的事件
 const addMenuButton = (row) => {
-    console.log(row.name)
+    console.log(row)
     // 重置数据
     formModel.value = {...defaultForm}
 
@@ -260,18 +281,40 @@ const addMenuButton = (row) => {
     formModel.value.parentId = row.id
     dialogVisible.value = true
     title.value = '添加下级节点'
+    
     if(row.type === 0){
-        // 在目录中点击的添加，则添加目录或菜单
-        type2Disabled.value = true
+        // 在目录中点击的添加，可以添加目录或菜单
+        type2Disabled.value = true  // 禁用按钮
+        typeDisabled.value = false   // 不禁用类型选择
+        
+        // 默认选中菜单类型
         formModel.value.type = 1
-        typeDisabled.value = false
-    }else {
-        // 在菜单中点击的添加，则添加按钮
+        formModel.value._isChildAdd = true  // 标记为子节点添加
+    } else {
+        // 在菜单中点击的添加，只能添加按钮
         typeDisabled.value = true
         formModel.value.type = 2
-        
+        formModel.value._isChildAdd = true // 标记为子节点添加
     }
 }
+
+// 添加监听处理子节点添加的类型变化
+watch(() => formModel.value.type, (newType) => {
+    // 子节点添加模式下的自动填充
+    if (formModel.value._isChildAdd && !formModel.value.id) {
+        if (newType === 0) {
+            // 选择目录
+            formModel.value.component = 'ParentView'
+        } else if (newType === 1) {
+            // 选择菜单
+            formModel.value.component = ''
+        } else if (newType === 2) {
+            // 选择按钮
+            formModel.value.component = ''
+        }
+    }
+})
+
 // let baseIcon;
 
 const editMenu = (row) =>{
@@ -293,11 +336,16 @@ const editMenu = (row) =>{
 // 弹层取消事件
 const onCancel = () => {
   dialogVisible.value = false
+  delete formModel.value._isToolbarAdd
+  delete formModel.value._isChildAdd
   // formModel.value.icon = baseIcon
 }
 
 // 弹层确认事件：添加或修改
 const addOrModify = () =>{
+    delete formModel.value._isToolbarAdd
+    delete formModel.value._isChildAdd
+
     if(formModel.value.type === 0 && formModel.value.parentId != 0){
         formModel.value.component = 'ParentView'
     }
