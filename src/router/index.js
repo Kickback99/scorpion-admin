@@ -62,6 +62,7 @@ const sysModules = import.meta.glob('../views/system/**/*.vue')
 const conModules = import.meta.glob('../views/content/**/*.vue')
 const msgModules = import.meta.glob('../views/msg/**/*.vue')
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
+const configModules = import.meta.glob('../views/config/*.vue')
 
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
@@ -76,7 +77,29 @@ function routesHandler(router,parentType=null){
               if(route.children && route.children.length > 0){
                   route.redirect = `${route.path}/${route.children[0].path}`
               }
-        }else {
+        }else if(route.component === 'list'){
+            // 标记为需要添加到 parentNode 的配置管理路由
+            route._addToParentNode = true
+            const newStr =  route.path.substring(1)
+            route.name = newStr
+            route.type = newStr
+            // 根据父路由的type来决定使用哪个模块导入
+            let modules;
+            switch(route.type){
+                case 'config':
+                    modules = configModules
+                    break
+                default:
+                    modules = null
+            }
+            
+            if(modules){
+                const compName = route.component
+                // 注意：这里 component 字段存储的是相对路径，如 'config/sysConfig/list'
+                const path = `../views/${route.name}/${compName}.vue`
+                console.log('加载配置管理组件:', path)
+                route.component = modules[path]
+            }}else {
         // 如果是子路由，继承父路由的type属性
             route.type = parentType
             // 根据父路由的type来决定使用哪个模块导入
@@ -193,7 +216,15 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     console.log('后端返回',menuData.routers)
     console.log('路由数据',asyncRoutes) 
     asyncRoutes.forEach(route => {
-      router.addRoute(route);
+        if (route._addToParentNode) {
+            // 配置管理类菜单添加到 parentNode 下
+            router.addRoute('parentNode', route);
+            console.log(`添加配置管理路由到 parentNode: ${route.path}`);
+        } else {
+            // Layout 顶层路由正常添加
+            router.addRoute(route);
+            console.log(`添加普通路由: ${route.path}`);
+        }
     });
 
   
