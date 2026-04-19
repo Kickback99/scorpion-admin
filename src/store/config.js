@@ -1,11 +1,13 @@
 
 import { useIconStore } from "@/store/icon"
 import { defineStore } from "pinia"
-export const useActionSetStore = defineStore({
-  id: 'action',
+export const useConfigSetStore = defineStore({
+  id: 'config',
   state: () => ({
     // t_setting：收集图标时关闭搜索筛选
-    iconEnabled:true
+    iconEnabled:true,
+    // 菜单默认是否折叠
+    isCollapse:false,
   }),
   actions: {
     executeInit(){
