@@ -10,8 +10,6 @@ export const useSettingStore = defineStore({
         logo:logoImage,
         // 项目标题
         title:'蝎子博客管理',
-        // 菜单默认是否折叠
-        isCollapse:false,
         isManualTo403:false,
     }),
     actions:{

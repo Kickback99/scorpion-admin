@@ -1,8 +1,8 @@
 <template>
     <div class="left">
         <!-- 折叠 -->
-        <el-icon style="margin-right: 10px;" @click="stringStore.isCollapse = !stringStore.isCollapse">
-            <component :is="stringStore.isCollapse?'Expand':'Fold'"></component>
+        <el-icon style="margin-right: 10px;" @click="configStore.isCollapse = !configStore.isCollapse">
+            <component :is="configStore.isCollapse?'Expand':'Fold'"></component>
         </el-icon>
         <!-- 面包屑 -->
         <el-breadcrumb separator-icon="ArrowRight">
@@ -146,6 +146,7 @@ const { initWebSocketListener, closeWebSocket } = useWebSocket()
 // 导入全局事件总线对象
 import emitter from '@/utils/event-bus.js' // 引入事件总线
 import { useTabStore } from "@/store/tabs";
+import { useConfigStore } from "@/store/config";
 const avatarUrlWithTimestamp = ref('') // 带时间戳的头像URL
 // const avatarKey = ref(Date.now()) // 初始key
 const userStore = useUserStore()
@@ -198,11 +199,10 @@ const displayName = computed(() => {
 // 处理菜单折叠
 const stringStore = useSettingStore()
 
-// 处理刷新业务
-const settingStore = useSettingStore()
+const configStore = useConfigStore()
 
 const modifyRefresh = () => {
-    settingStore.refresh = !settingStore.refresh
+    stringStore.refresh = !stringStore.refresh
 }
 
 // 处理全屏
