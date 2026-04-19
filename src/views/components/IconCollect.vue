@@ -1,5 +1,5 @@
 <template>
-  <el-button @click="actionSetStore.setIconEnabled()">关闭增强搜索</el-button>
+  <el-button @click="configStore.setIconEnabled()">关闭增强搜索</el-button>
     <!-- 隐藏的预加载容器 -->
     <div style="display: none;">
       <component 
@@ -24,7 +24,7 @@
           @clear="onClear"
         />
         
-      <div class="flex justify-between" v-if="actionSetStore.iconEnabled">
+      <div class="flex justify-between" v-if="configStore.iconEnabled">
         <div class="flex items-center">
           <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
           <el-switch 
@@ -128,13 +128,13 @@ import { useIconStore } from '@/store/icon'
 import { ref, computed,onMounted,nextTick } from 'vue'
 import { getDynamicRouteComponents,getLocalRouteComponents } from '@/utils/RouteHandler'
 import { useLoadStore } from '@/store/load'
-import { useActionSetStore } from '@/settings/actionSet'
 import { analyzeComponent, getComponentImportPath} from '@/utils/hasIconComponent'
 import { plainComData } from '@/data/plainComponent'
 import { IconFont } from '@/components/MyIcon'
 import SvgIcon from '@/components/MyIcon/src/SvgIcon.vue'
 import { useColorStore } from '@/store/color'
-const actionSetStore = useActionSetStore()
+import { useConfigStore } from '@/store/config'
+const configStore =  useConfigStore()
 
 const preloadedComponents = ref([])
 const loadStore = useLoadStore()
