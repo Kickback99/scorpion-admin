@@ -12,6 +12,7 @@ import { clearRoute, clearUserInfo } from '@/utils/remove'
 import { add403Routes } from '@/utils/403route'
 import { add404Routes } from '@/utils/404route'
 import { useWebSocket } from '@/server/useWebSocket'
+import { useConfigStore } from '@/store/config'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -162,6 +163,7 @@ function routesHandler(router,parentType=null){
 
 export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     const userStore = useUserStore()
+    const configStore = useConfigStore()
     console.log('请求菜单')
 
     /* if(loadUserInfo){
@@ -187,6 +189,11 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
                 permissions: res.permissions
             };
         }
+
+    // ================= 1.5 加载系统配置 =================
+    // 确保系统配置已加载（用于路由守卫中的菜单折叠等判断）
+    await configStore.loadConfig()
+
     // ================= 2. 权限校验阶段 =================
         // 情况1：前台用户拦截
         if (userStore.userInfo.type !== 0) {
