@@ -1,8 +1,8 @@
 <template>
     <div class="left">
         <!-- 折叠 -->
-        <el-icon style="margin-right: 10px;" @click="configStore.isCollapse = !configStore.isCollapse">
-            <component :is="configStore.isCollapse?'Expand':'Fold'"></component>
+        <el-icon style="margin-right: 10px;" @click="handleToggleCollapse">
+            <component :is="configStore.getIsCollapse()?'Expand':'Fold'"></component>
         </el-icon>
         <!-- 面包屑 -->
         <el-breadcrumb separator-icon="ArrowRight">
@@ -200,6 +200,18 @@ const displayName = computed(() => {
 const stringStore = useSettingStore()
 
 const configStore = useConfigStore()
+
+const handleToggleCollapse = async () => {
+    // 调用 configStore 的 toggleCollapse 方法
+    // 该方法会：
+    // 1. 切换本地 isCollapse 状态（0: 折叠, 1: 展开）
+    // 2. 调用后端 API 更新配置
+    // 3. 显示成功/失败提示
+    await configStore.toggleCollapse()
+    
+    // 可选：如果需要触发其他组件响应折叠状态变化，可以发送事件
+    // emitter.emit('collapse-change', configStore.getIsCollapse())
+}
 
 const modifyRefresh = () => {
     stringStore.refresh = !stringStore.refresh
