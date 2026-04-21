@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" tabPosition="left">
+  <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" tabPosition="top">
     <el-tab-pane label="前台" name="client">
       <div class="config-container">
         <el-form label-width="140px" label-position="left">
@@ -7,8 +7,8 @@
           <el-form-item label="评论显示">
             <el-switch
               :model-value="configStore.commentEnabled"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="true"
+              :inactive-value="false"
               @change="configStore.toggleComment"
             />
           </el-form-item>
@@ -17,8 +17,8 @@
           <el-form-item label="锚点显示">
             <el-switch
               :model-value="configStore.anchorEnabled"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="true"
+              :inactive-value="false"
               @change="configStore.toggleAnchor"
             />
           </el-form-item>
@@ -26,9 +26,9 @@
           <!-- 前端登录 -->
           <el-form-item label="前端登录">
             <el-switch
-              :model-value="configStore.loginDisabled"
-              :active-value="0"
-              :inactive-value="1"
+              :model-value="configStore.loginEnabled"
+              :active-value="true"
+              :inactive-value="false"
               @change="configStore.toggleLogin"
             />
           </el-form-item>
@@ -49,7 +49,7 @@
         <el-form label-width="160px" label-position="left">
 
           <el-form-item label="菜单折叠">
-            <el-switch :model-value="!configStore.getIsCollapse()" @change="configStore.toggleCollapse" />
+            <el-switch :model-value="configStore.getIsCollapse()" @change="configStore.toggleCollapse" />
           </el-form-item>
 
           <el-form-item label="图标搜索增强">
@@ -60,18 +60,18 @@
           <el-form-item label="文章置顶数量限制">
             <el-input-number
               v-model="configStore.articleTopLimit"
-              :min="-1"
+              :min="1"
               :max="99"
               @change="configStore.setArticleTopLimit"
             />
-            <span class="form-tip">（-1表示无限制）</span>
+            <!-- <span class="form-tip">（-1表示无限制）</span> -->
           </el-form-item>
 
           <!-- 轮播图数量限制 -->
           <el-form-item label="轮播图数量限制">
             <el-input-number
               v-model="configStore.carouselLimit"
-              :min="-1"
+              :min="0"
               :max="99"
               @change="configStore.setCarouselLimit"
             />

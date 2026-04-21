@@ -3,25 +3,25 @@ import { getConfigApi, updateConfigValueApi } from "@/api/config"
 import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
 
-// 字段映射配置
+// 字段映射配置（重构后）
 const FIELD_MAP = {
   // 前端驼峰命名 -> 后端下划线命名
   articleTopLimit: { backend: 'article_top_limit', type: 'number', message: '文章置顶数量限制' },
+  carouselLimit: { backend: 'carousel_limit', type: 'number', message: '轮播图数量限制' },
+  theme: { backend: 'theme', type: 'radio', message: '前端主题' },
   commentEnabled: { backend: 'comment_enabled', type: 'switch', message: '评论显示' },
   anchorEnabled: { backend: 'anchor_enabled', type: 'switch', message: '锚点显示' },
-  theme: { backend: 'theme', type: 'radio', message: '前端主题' },
-  loginDisabled: { backend: 'login_disabled', type: 'switch', message: '前端登录' },
-  carouselLimit: { backend: 'carousel_limit', type: 'number', message: '轮播图数量限制' },
-  isCollapse: { backend: 'is_collapse', type: 'switch', message: '菜单折叠' },
+  loginEnabled: { backend: 'login_enabled', type: 'switch', message: '前端登录' },
+  collapseEnabled: { backend: 'collapse_enabled', type: 'switch', message: '菜单折叠' },
   iconEnabled: { backend: 'icon_enabled', type: 'switch', message: '图标搜索增强' }
 }
 
-// 提示消息映射
+// 提示消息映射（重构后）
 const MESSAGE_MAP = {
-  // Switch 类型 (value: 0=开启, 1=禁用)
+  // Switch 类型 (true=开启, false=禁用)
   switch: {
-    0: (fieldName) => `${fieldName}已开启`,
-    1: (fieldName) => `${fieldName}已禁用`
+    true: (fieldName) => `${fieldName}已开启`,
+    false: (fieldName) => `${fieldName}已禁用`
   },
   // 主题类型
   theme: {
@@ -30,7 +30,6 @@ const MESSAGE_MAP = {
   },
   // 数字类型
   number: {
-    '-1': (fieldName) => `${fieldName}已设为无限制`,
     default: (fieldName, value) => `${fieldName}已设为 ${value}`
   }
 }
@@ -40,20 +39,20 @@ export const useConfigStore = defineStore({
   state: () => ({
     // 文章置顶数量限制
     articleTopLimit: 3,
-    // 评论显示（0开启，1禁用）
-    commentEnabled: 0,
-    // 锚点显示（0开启，1禁用）
-    anchorEnabled: 0,
-    // 前端主题（0：github主题，1：vuepress主题）
-    theme: 0,
-    // 前端登录（0开启，1禁用）
-    loginDisabled: 0,
     // 轮播图数量限制
     carouselLimit: 3,
-    // 菜单是否折叠（0折叠，1不折叠）
-    isCollapse: 1,
-    // 图标搜索增强（0开启增强搜索，1关闭）
-    iconEnabled: 0,
+    // 前端主题（0：github主题，1：vuepress主题）
+    theme: 0,
+    // 评论显示（true开启，false禁用）
+    commentEnabled: true,
+    // 锚点显示（true开启，false禁用）
+    anchorEnabled: true,
+    // 前端登录（true开启，false禁用）
+    loginEnabled: true,
+    // 菜单是否折叠（true折叠，false不折叠）
+    collapseEnabled: false,
+    // 图标搜索增强（true开启，false关闭）
+    iconEnabled: true,
     // 加载状态
     loading: false
   }),
@@ -66,8 +65,10 @@ export const useConfigStore = defineStore({
       this.loading = true
       try {
         const res = await getConfigApi()
+        if (res.code === 200 && res.data) {
           Object.assign(this.$state, res.data)
           this.executeInit()
+        }
       } catch (error) {
         console.error('加载配置失败:', error)
         ElMessage.error('加载配置失败')
@@ -122,11 +123,7 @@ export const useConfigStore = defineStore({
       } else if (type === 'radio' && key === 'theme') {
         message = MESSAGE_MAP.theme[value] || `${fieldName}已切换`
       } else if (type === 'number') {
-        if (value === -1) {
-          message = MESSAGE_MAP.number['-1'](fieldName)
-        } else {
-          message = MESSAGE_MAP.number.default(fieldName, value)
-        }
+        message = MESSAGE_MAP.number.default(fieldName, value)
       } else {
         message = `${fieldName}已更新`
       }
@@ -146,8 +143,8 @@ export const useConfigStore = defineStore({
      * 执行初始化逻辑
      */
     executeInit() {
-      // 图标搜索增强：当 iconEnabled = 0 时开启增强搜索
-      if (this.iconEnabled === 0) {
+      // 图标搜索增强：当 iconEnabled = true 时开启增强搜索
+      if (this.iconEnabled === true) {
         const iconStore = useIconStore()
         iconStore.resetIconConditions()
       }
@@ -159,24 +156,21 @@ export const useConfigStore = defineStore({
      * 切换评论显示
      */
     toggleComment() {
-      const newValue = this.commentEnabled === 0 ? 1 : 0
-      this.updateConfig('commentEnabled', newValue)
+      this.updateConfig('commentEnabled', !this.commentEnabled)
     },
 
     /**
      * 切换锚点显示
      */
     toggleAnchor() {
-      const newValue = this.anchorEnabled === 0 ? 1 : 0
-      this.updateConfig('anchorEnabled', newValue)
+      this.updateConfig('anchorEnabled', !this.anchorEnabled)
     },
 
     /**
      * 切换前端登录
      */
     toggleLogin() {
-      const newValue = this.loginDisabled === 0 ? 1 : 0
-      this.updateConfig('loginDisabled', newValue)
+      this.updateConfig('loginEnabled', !this.loginEnabled)
     },
 
     /**
@@ -190,16 +184,14 @@ export const useConfigStore = defineStore({
      * 切换菜单折叠
      */
     toggleCollapse() {
-      const newValue = this.isCollapse === 1 ? 0 : 1
-      this.updateConfig('isCollapse', newValue)
+      this.updateConfig('collapseEnabled', !this.collapseEnabled)
     },
 
     /**
      * 切换图标搜索增强
      */
     toggleIconEnabled() {
-      const newValue = this.iconEnabled === 0 ? 1 : 0
-      this.updateConfig('iconEnabled', newValue)
+      this.updateConfig('iconEnabled', !this.iconEnabled)
     },
 
     /**
@@ -219,18 +211,18 @@ export const useConfigStore = defineStore({
     // ========== Getter 方法 ==========
     
     getIsCollapse() {
-      return this.isCollapse === 1
+      return this.collapseEnabled === true
     },
 
     getIconEnabled() {
-      return this.iconEnabled === 0
+      return this.iconEnabled === true
     }
   },
 
   getters: {
-    isCommentEnabled: (state) => state.commentEnabled === 0,
-    isAnchorEnabled: (state) => state.anchorEnabled === 0,
-    isLoginEnabled: (state) => state.loginDisabled === 0,
+    isCommentEnabled: (state) => state.commentEnabled === true,
+    isAnchorEnabled: (state) => state.anchorEnabled === true,
+    isLoginEnabled: (state) => state.loginEnabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
   }
 })

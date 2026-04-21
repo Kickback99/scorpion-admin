@@ -1,6 +1,6 @@
 <template>
     <div class="logo">
-        <img :src="settingStore.logo" alt="" :style="{marginLeft:!configStore.getIsCollapse()?27 +'px': '0'}">
+        <img :src="settingStore.logo" alt="" :style="{marginLeft:configStore.getIsCollapse()?27 +'px': '0'}">
         <p :style="{color:colorStore.logoTitleColor}"> {{ settingStore.title }} </p>
     </div>
 </template>

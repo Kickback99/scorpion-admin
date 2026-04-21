@@ -23,7 +23,7 @@
           @clear="onClear"
         />
         
-      <div class="flex justify-between" v-if="!configStore.iconEnabled">
+      <div class="flex justify-between" v-if="configStore.iconEnabled">
         <div class="flex items-center">
           <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
           <el-switch 
@@ -307,7 +307,7 @@ const tabsList = [
 const filteredTabsList = computed(() => {
   return tabsList.filter(tab => {
     // 如果当前是"批量图标已使用"标签页，且开启了增强搜索（iconEnabled === 0），则隐藏
-    if (tab.name === 'batchUsed' && configStore.iconEnabled === 0) {
+    if (tab.name === 'batchUsed' && configStore.getIconEnabled()) {
       return false
     }
     if (tab.show) return tab.show()
