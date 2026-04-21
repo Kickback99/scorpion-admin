@@ -10,7 +10,7 @@
           :default-active="handelUrl"
           :text-color="finalColor"
           mode="vertical"
-          :collapse="!configStore.getIsCollapse()"
+          :collapse="configStore.getIsCollapse()"
           :collapse-transition="false"
         >
           <el-menu-item index="/index">
