@@ -1,6 +1,6 @@
 <template>
     <div class="logo">
-        <img :src="settingStore.logo" alt="" :style="{marginLeft:settingStore.isCollapse?27 +'px': '0'}">
+        <img :src="settingStore.logo" alt="" :style="{marginLeft:!configStore.getIsCollapse()?27 +'px': '0'}">
         <p :style="{color:colorStore.logoTitleColor}"> {{ settingStore.title }} </p>
     </div>
 </template>
@@ -8,9 +8,11 @@
 <script setup>
 import { useSettingStore } from '@/setting';
 import { useColorStore } from '@/store/color';
+import { useConfigStore } from '@/store/config';
 
 const settingStore = useSettingStore()
 const colorStore = useColorStore()
+const configStore = useConfigStore()
 </script>
 
 <style scoped lang="scss">

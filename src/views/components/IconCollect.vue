@@ -1,5 +1,4 @@
 <template>
-  <el-button @click="configStore.setIconEnabled()">关闭增强搜索</el-button>
     <!-- 隐藏的预加载容器 -->
     <div style="display: none;">
       <component 
@@ -24,7 +23,7 @@
           @clear="onClear"
         />
         
-      <div class="flex justify-between" v-if="configStore.iconEnabled">
+      <div class="flex justify-between" v-if="!configStore.iconEnabled">
         <div class="flex items-center">
           <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
           <el-switch 
@@ -307,6 +306,10 @@ const tabsList = [
 // 过滤后的标签页列表（不显示空分类）
 const filteredTabsList = computed(() => {
   return tabsList.filter(tab => {
+    // 如果当前是"批量图标已使用"标签页，且开启了增强搜索（iconEnabled === 0），则隐藏
+    if (tab.name === 'batchUsed' && configStore.iconEnabled === 0) {
+      return false
+    }
     if (tab.show) return tab.show()
     return true
   })
