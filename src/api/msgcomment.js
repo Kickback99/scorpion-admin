@@ -27,3 +27,8 @@ export const getCommentsApi = (pageNum, pageSize, searchData) =>
  */
 export const addCommentApi = ( data ) => 
   http.post('/admin/msg/comment', data)
+
+
+// 🟢 根据ID获取单个评论
+export const getCommentByIdApi = (id) => 
+  http.get(`/admin/msg/comment/${id}`)
