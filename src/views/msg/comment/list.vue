@@ -65,7 +65,29 @@
                     挑拣
                     <!-- {{ row.rootId === -1 ?'挑选子集':'挑拣父集' }} -->
                 </el-button>
-                <el-button type="danger"  size="small" plain  @click="handleDelete(row.id)">删除</el-button>
+
+                <!-- 待审核：显示审核按钮（带气泡确认框） -->
+                <el-popconfirm
+                v-if="row.status === 2"
+                title="请选择审核结果"
+                width="200"
+                :hide-after="0"
+                @confirm="handleApprove(row)"
+                @cancel="handleReject(row)"
+                confirm-button-text="通过"
+                cancel-button-text="驳回"
+                >
+                <template #reference>
+                    <el-button type="warning" size="small">审核</el-button>
+                </template>
+                </el-popconfirm>
+
+                 <!-- 已通过/已驳回显示删除按钮 -->
+                <el-popconfirm v-if="row.status === 0 || row.status === 1" title="你确定要删除吗" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+                    <template #reference>
+                        <el-button type="danger" size="small" plain >删除</el-button>
+                    </template>
+                </el-popconfirm>
                 <el-button type="warning" size="small" plain @click="handleInfo(row)">详情</el-button>
             </template>
         </el-table-column>
@@ -144,7 +166,7 @@
 </template>
 
 <script setup>
-import { addCommentApi, getCommentsApi } from '@/api/msgcomment';
+import { addCommentApi, getCommentsApi, removeApi } from '@/api/msgcomment';
 import { nextTick, reactive, ref } from 'vue';
 
 const tableData = ref([])
@@ -390,6 +412,12 @@ const onDetailError = (error) => {
   console.error('❌ 详情加载失败:', error)
   ElMessage.error('加载详情失败')
   drawerLoading.value = false
+}
+
+const handleDelete = async(ids) => {
+    await removeApi(ids)
+    ElMessage.success('删除成功')
+    render()
 }
 
 </script>

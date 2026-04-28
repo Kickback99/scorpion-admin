@@ -32,3 +32,12 @@ export const addCommentApi = ( data ) =>
 // 🟢 根据ID获取单个评论
 export const getCommentByIdApi = (id) => 
   http.get(`/admin/msg/comment/${id}`)
+
+
+/**
+ * 
+ * @param {ids} ids 评论ids
+ * @returns 
+ */
+export const removeApi = (ids) =>
+  http.delete(`/admin/msg/comment/${ids}`)
