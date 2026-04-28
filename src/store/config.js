@@ -13,7 +13,8 @@ const FIELD_MAP = {
   anchorEnabled: { backend: 'anchor_enabled', type: 'switch', message: '锚点显示' },
   loginEnabled: { backend: 'login_enabled', type: 'switch', message: '前端登录' },
   collapseEnabled: { backend: 'collapse_enabled', type: 'switch', message: '菜单折叠' },
-  iconEnabled: { backend: 'icon_enabled', type: 'switch', message: '图标搜索增强' }
+  iconEnabled: { backend: 'icon_enabled', type: 'switch', message: '图标搜索增强' },
+  childCommentLimit: { backend: 'child_comment_limit', type: 'number', message: '子评论默认显示数量' },
 }
 
 // 提示消息映射（重构后）
@@ -53,6 +54,8 @@ export const useConfigStore = defineStore({
     collapseEnabled: false,
     // 图标搜索增强（true开启，false关闭）
     iconEnabled: true,
+    // 子评论默认显示数量（超过此数量显示分页）
+    childCommentLimit: 3,
     // 加载状态
     loading: false
   }),
@@ -208,6 +211,13 @@ export const useConfigStore = defineStore({
       this.updateConfig('carouselLimit', value)
     },
 
+    /**
+     * 设置子评论默认显示数量
+     */
+    setChildCommentLimit(value) {
+      this.updateConfig('childCommentLimit', value)
+    },
+
     // ========== Getter 方法 ==========
     
     getIsCollapse() {
@@ -216,6 +226,10 @@ export const useConfigStore = defineStore({
 
     getIconEnabled() {
       return this.iconEnabled === true
+    },
+    
+    getChildCommentLimit() {
+      return this.childCommentLimit
     }
   },
 
