@@ -44,6 +44,17 @@
                 <el-radio :value="1">vuepress主题</el-radio>
               </el-radio-group>
             </el-form-item>
+
+            <!-- 子评论默认显示数量 -->
+            <el-form-item label="子评论默认显示数量">
+              <el-input-number
+                :model-value="configStore.childCommentLimit"
+                :min="0"
+                :max="20"
+                @change="configStore.setChildCommentLimit"
+              />
+              <span class="form-tip">（超过此数量显示分页）</span>
+            </el-form-item>
           </el-form>
         </div>
       </el-tab-pane>
