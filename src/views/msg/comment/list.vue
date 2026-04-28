@@ -43,7 +43,7 @@
 
 
     <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="title" label="标题" />
+        <el-table-column prop="title" label="标题" show-overflow-tooltip />
         <el-table-column label="评论类型" >
             <template #default="{row}">
                 {{ row.type === '0' ? '文章评论':'友链评论' }}
@@ -54,9 +54,9 @@
                 {{ row.rootId === -1 ? '根评论':'子评论' }}
             </template>
         </el-table-column>
-        <el-table-column prop="content" label="评论内容" />
+        <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
         <el-table-column prop="username" label="创建者" />
-        <el-table-column prop="createTime" label="创建日期" />
+        <el-table-column prop="createTime" label="创建日期" width="190"/>
         <el-table-column label="操作" width="280">
             <template #default="{ row }">
                 <el-button type="success"  size="small" plain  @click="handleReply(row)">回复 </el-button>
@@ -66,11 +66,13 @@
                     <!-- {{ row.rootId === -1 ?'挑选子集':'挑拣父集' }} -->
                 </el-button>
                 <el-button type="danger"  size="small" plain  @click="handleDelete(row.id)">删除</el-button>
+                <el-button type="warning" size="small" plain @click="handleInfo(row)">详情</el-button>
             </template>
         </el-table-column>
     </el-table>
 
     <el-pagination
+        class="mt-5"
 		v-model:current-page="params.pageNum"
 		v-model:page-size="params.pageSize"
 		:page-sizes="[2,3,5,7]"
@@ -105,6 +107,40 @@
             <el-button type="primary" @click="submitReply">确定</el-button>
         </template>
     </el-dialog>
+
+    <!-- 右侧抽屉 - 评论详情 -->
+    <el-drawer
+        v-model="drawerVisible"
+        title="📋 评论详情"
+        direction="rtl"
+        size="50%"
+        :with-header="true"
+        destroy-on-close
+    >
+        <template #header>
+        <div class="drawer-header">
+            <span class="drawer-title">📋 评论详情</span>
+            <el-tag :type="currentDetailComment?.rootId === -1 ? 'success' : 'info'" size="small">
+            {{ currentDetailComment?.rootId === -1 ? '根评论' : '子评论' }}
+            </el-tag>
+        </div>
+        </template>
+        
+        <!-- 加载状态 -->
+        <div v-if="drawerLoading" class="drawer-loading">
+        <el-icon class="is-loading"><Loading /></el-icon>
+        <span>加载详情中...</span>
+        </div>
+        
+        <!-- 详情内容 -->
+        <CommentDetail 
+        v-else
+        ref="detailRef"
+        :comment="currentDetailComment"
+        @loaded="onDetailLoaded"
+        @error="onDetailError"
+        />
+    </el-drawer>
 </template>
 
 <script setup>
@@ -314,6 +350,47 @@ const submitReply = async () => {
     render()
 }
 
+// 抽屉相关
+const drawerVisible = ref(false)
+const drawerLoading = ref(false)
+const currentDetailComment = ref(null)
+const detailRef = ref()
+
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+
+/**
+ * 详情按钮逻辑 - 打开右侧抽屉
+ */
+const handleInfo = async (comment) => {
+  console.log('🔍 点击详情按钮，评论数据:', comment)
+  
+  // 设置当前评论
+  currentDetailComment.value = comment
+  
+  // 打开抽屉并显示加载状态
+  drawerVisible.value = true
+  drawerLoading.value = true
+  
+  // 等待详情组件加载完成
+  await nextTick()
+  
+  // 延迟一点关闭加载状态（让组件有时间加载）
+  setTimeout(() => {
+    drawerLoading.value = false
+  }, 500)
+}
+
+// 详情加载完成回调
+const onDetailLoaded = (data) => {
+  console.log('✅ 详情加载完成:', data)
+}
+
+// 详情加载错误回调
+const onDetailError = (error) => {
+  console.error('❌ 详情加载失败:', error)
+  ElMessage.error('加载详情失败')
+  drawerLoading.value = false
+}
 
 </script>
 
@@ -336,5 +413,44 @@ const submitReply = async () => {
         color: #409eff;
         font-size: 14px;
     }
+}
+
+
+// 抽屉头部样式
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  
+  .drawer-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
+// 加载样式
+.drawer-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px;
+  color: #909399;
+  font-size: 14px;
+  
+  .el-icon {
+    font-size: 24px;
+  }
+}
+
+.original-content {
+  padding: 10px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  color: #606266;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-all;
 }
 </style>
