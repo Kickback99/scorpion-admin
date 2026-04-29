@@ -10,7 +10,7 @@
             <!-- 评论显示 -->
             <el-form-item label="评论显示">
               <el-switch
-                :model-value="configStore.commentEnabled"
+                :model-value="configStore.comment.commentEnabled"
                 :active-value="true"
                 :inactive-value="false"
                 @change="configStore.toggleComment"
@@ -48,12 +48,22 @@
             <!-- 子评论默认显示数量 -->
             <el-form-item label="子评论默认显示数量">
               <el-input-number
-                :model-value="configStore.childCommentLimit"
+                :model-value="configStore.comment.childCommentLimit"
                 :min="0"
                 :max="20"
                 @change="configStore.setChildCommentLimit"
               />
               <span class="form-tip">（超过此数量显示分页）</span>
+            </el-form-item>
+
+            <el-form-item label="子评论分页大小">
+              <el-input-number
+                :model-value="configStore.comment.childPageSize"
+                :min="5"
+                :max="50"
+                @change="configStore.setChildPageSize"
+              />
+              <span class="form-tip">（查看更多所加载的数量）</span>
             </el-form-item>
           </el-form>
         </div>
