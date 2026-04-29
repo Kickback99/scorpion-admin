@@ -3,33 +3,33 @@ import { getConfigApi, updateConfigValueApi } from "@/api/config"
 import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
 
-// 字段映射配置（重构后）
-const FIELD_MAP = {
-  // 前端驼峰命名 -> 后端下划线命名
-  articleTopLimit: { backend: 'article_top_limit', type: 'number', message: '文章置顶数量限制' },
-  carouselLimit: { backend: 'carousel_limit', type: 'number', message: '轮播图数量限制' },
-  theme: { backend: 'theme', type: 'radio', message: '前端主题' },
-  commentEnabled: { backend: 'comment_enabled', type: 'switch', message: '评论显示' },
-  anchorEnabled: { backend: 'anchor_enabled', type: 'switch', message: '锚点显示' },
-  loginEnabled: { backend: 'login_enabled', type: 'switch', message: '前端登录' },
-  collapseEnabled: { backend: 'collapse_enabled', type: 'switch', message: '菜单折叠' },
-  iconEnabled: { backend: 'icon_enabled', type: 'switch', message: '图标搜索增强' },
-  childCommentLimit: { backend: 'child_comment_limit', type: 'number', message: '子评论默认显示数量' },
+// 🎯 统一配置定义 - 扩展时只需在这里添加一行
+const CONFIG_DEFINITIONS = {
+  // 顶层配置
+  articleTopLimit: { type: 'number', message: '文章置顶数量限制' },
+  carouselLimit: { type: 'number', message: '轮播图数量限制' },
+  theme: { type: 'radio', message: '前端主题' },
+  anchorEnabled: { type: 'switch', message: '锚点显示' },
+  loginEnabled: { type: 'switch', message: '前端登录' },
+  collapseEnabled: { type: 'switch', message: '菜单折叠' },
+  iconEnabled: { type: 'switch', message: '图标搜索增强' },
+  
+  // 🎯 嵌套配置 - 使用点号路径作为 key
+  'comment.commentEnabled': { type: 'switch', message: '评论显示' },
+  'comment.childCommentLimit': { type: 'number', message: '子评论默认显示数量' },
+  'comment.childPageSize': { type: 'number', message: '子评论分页大小' }
 }
 
-// 提示消息映射（重构后）
+// 提示消息映射
 const MESSAGE_MAP = {
-  // Switch 类型 (true=开启, false=禁用)
   switch: {
     true: (fieldName) => `${fieldName}已开启`,
     false: (fieldName) => `${fieldName}已禁用`
   },
-  // 主题类型
   theme: {
     0: '主题已切换为 Github',
     1: '主题已切换为 Vuepress'
   },
-  // 数字类型
   number: {
     default: (fieldName, value) => `${fieldName}已设为 ${value}`
   }
@@ -37,27 +37,23 @@ const MESSAGE_MAP = {
 
 export const useConfigStore = defineStore({
   id: 'config',
+  
   state: () => ({
-    // 文章置顶数量限制
+    loading: false,
+    // 顶层配置
     articleTopLimit: 3,
-    // 轮播图数量限制
     carouselLimit: 3,
-    // 前端主题（0：github主题，1：vuepress主题）
     theme: 0,
-    // 评论显示（true开启，false禁用）
-    commentEnabled: true,
-    // 锚点显示（true开启，false禁用）
     anchorEnabled: true,
-    // 前端登录（true开启，false禁用）
     loginEnabled: true,
-    // 菜单是否折叠（true折叠，false不折叠）
     collapseEnabled: false,
-    // 图标搜索增强（true开启，false关闭）
     iconEnabled: true,
-    // 子评论默认显示数量（超过此数量显示分页）
-    childCommentLimit: 3,
-    // 加载状态
-    loading: false
+    // 嵌套配置
+    comment: {
+      commentEnabled: true,
+      childCommentLimit: 3,
+      childPageSize: 10
+    }
   }),
 
   actions: {
@@ -81,44 +77,44 @@ export const useConfigStore = defineStore({
     },
 
     /**
-     * 更新单个配置项（简化版）
-     * @param {string} key 配置key（前端驼峰命名）
+     * 更新单个配置项
+     * @param {string} key 配置key（如 'comment.commentEnabled'）
      * @param {any} value 新值
      */
     async updateConfig(key, value) {
-      const fieldConfig = FIELD_MAP[key]
-      if (!fieldConfig) {
+      const def = CONFIG_DEFINITIONS[key]
+      if (!def) {
         console.error(`未找到配置项: ${key}`)
         return
       }
 
       try {
-        const res = await updateConfigValueApi(fieldConfig.backend, value)
+        const res = await updateConfigValueApi(key, value)
         if (res.code === 200) {
-          // 更新 store 中的值
-          this[key] = value
-          // 显示提示消息
-          this.showMessage(key, value, fieldConfig)
-          // 更新后执行初始化
+          // 🎯 直接更新 store 中的值
+          if (key.includes('.')) {
+            const parts = key.split('.')
+            this[parts[0]][parts[1]] = value
+          } else {
+            this[key] = value
+          }
+          this.showMessage(def.message, value, def.type, key)
           this.executeInit()
         } else {
           ElMessage.error(res.message || '更新失败')
-          await this.loadConfig() // 回滚
+          await this.loadConfig()
         }
       } catch (error) {
         console.error('更新配置失败:', error)
         ElMessage.error('更新失败')
-        await this.loadConfig() // 回滚
+        await this.loadConfig()
       }
     },
 
     /**
      * 显示提示消息
      */
-    showMessage(key, value, fieldConfig) {
-      const fieldName = fieldConfig.message
-      const type = fieldConfig.type
-      
+    showMessage(fieldName, value, type, key) {
       let message = ''
       
       if (type === 'switch') {
@@ -146,7 +142,6 @@ export const useConfigStore = defineStore({
      * 执行初始化逻辑
      */
     executeInit() {
-      // 图标搜索增强：当 iconEnabled = true 时开启增强搜索
       if (this.iconEnabled === true) {
         const iconStore = useIconStore()
         iconStore.resetIconConditions()
@@ -155,67 +150,44 @@ export const useConfigStore = defineStore({
 
     // ========== 便捷方法 ==========
     
-    /**
-     * 切换评论显示
-     */
     toggleComment() {
-      this.updateConfig('commentEnabled', !this.commentEnabled)
+      this.updateConfig('comment.commentEnabled', !this.comment.commentEnabled)
     },
 
-    /**
-     * 切换锚点显示
-     */
     toggleAnchor() {
       this.updateConfig('anchorEnabled', !this.anchorEnabled)
     },
 
-    /**
-     * 切换前端登录
-     */
     toggleLogin() {
       this.updateConfig('loginEnabled', !this.loginEnabled)
     },
 
-    /**
-     * 切换主题
-     */
     setTheme(value) {
       this.updateConfig('theme', value)
     },
 
-    /**
-     * 切换菜单折叠
-     */
     toggleCollapse() {
       this.updateConfig('collapseEnabled', !this.collapseEnabled)
     },
 
-    /**
-     * 切换图标搜索增强
-     */
     toggleIconEnabled() {
       this.updateConfig('iconEnabled', !this.iconEnabled)
     },
 
-    /**
-     * 设置文章置顶数量
-     */
     setArticleTopLimit(value) {
       this.updateConfig('articleTopLimit', value)
     },
 
-    /**
-     * 设置轮播图数量
-     */
     setCarouselLimit(value) {
       this.updateConfig('carouselLimit', value)
     },
 
-    /**
-     * 设置子评论默认显示数量
-     */
     setChildCommentLimit(value) {
-      this.updateConfig('childCommentLimit', value)
+      this.updateConfig('comment.childCommentLimit', value)
+    },
+
+    setChildPageSize(value) {
+      this.updateConfig('comment.childPageSize', value)
     },
 
     // ========== Getter 方法 ==========
@@ -229,12 +201,20 @@ export const useConfigStore = defineStore({
     },
     
     getChildCommentLimit() {
-      return this.childCommentLimit
+      return this.comment?.childCommentLimit ?? 3
+    },
+
+    getChildPageSize() {
+      return this.comment?.childPageSize ?? 10
+    },
+
+    getCommentEnabled() {
+      return this.comment?.commentEnabled ?? true
     }
   },
 
   getters: {
-    isCommentEnabled: (state) => state.commentEnabled === true,
+    isCommentEnabled: (state) => state.comment?.commentEnabled === true,
     isAnchorEnabled: (state) => state.anchorEnabled === true,
     isLoginEnabled: (state) => state.loginEnabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
