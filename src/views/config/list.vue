@@ -45,26 +45,37 @@
               </el-radio-group>
             </el-form-item>
 
-            <!-- 子评论默认显示数量 -->
-            <el-form-item label="子评论默认显示数量">
-              <el-input-number
-                :model-value="configStore.comment.childCommentLimit"
-                :min="0"
-                :max="20"
-                @change="configStore.setChildCommentLimit"
-              />
-              <span class="form-tip">（超过此数量显示分页）</span>
-            </el-form-item>
+          <!-- 子评论默认显示数量 -->
+          <el-form-item label="子评论默认显示数量">
+            <el-input-number
+              :model-value="configStore.comment.childCommentLimit"
+              :min="0"
+              :max="20"
+              @change="configStore.setChildCommentLimit"
+            />
+            <el-tooltip content="子评论默认显示的数量，超过此数量显示「查看更多」按钮" placement="right">
+              <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </el-form-item>
 
-            <el-form-item label="子评论分页大小">
-              <el-input-number
-                :model-value="configStore.comment.childPageSize"
-                :min="5"
-                :max="50"
-                @change="configStore.setChildPageSize"
-              />
-              <span class="form-tip">（查看更多所加载的数量）</span>
-            </el-form-item>
+          <!-- 子评论分页大小 -->
+          <el-form-item label="子评论分页大小">
+            <el-input-number
+              :model-value="configStore.comment.childPageSize"
+              :min="5"
+              :max="50"
+              @change="configStore.setChildPageSize"
+            />
+            <el-tooltip placement="right">
+              <template #content>
+                  <div>
+                    点击「查看更多」时每次加载的数量<br />
+                    <span style="color: #ff7875;">⚠️ 该值必须大于「子评论默认显示数量」</span>
+                  </div>
+              </template>
+              <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </el-form-item>
           </el-form>
         </div>
       </el-tab-pane>
@@ -170,10 +181,19 @@ const handleClick = (tab, event) => {
   max-width: 600px;
 }
 
+/*
 .form-tip {
   margin-left: 12px;
   color: #909399;
   font-size: 12px;
+}*/
+
+.form-tip-icon {
+  margin-left: 8px;
+  color: #909399;
+  font-size: 14px;
+  cursor: help;
+  vertical-align: middle;
 }
 
 :deep(.el-form-item) {
