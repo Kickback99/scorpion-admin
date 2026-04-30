@@ -167,6 +167,18 @@ const replyToComment = ref(null)  // 被回复的评论（情况3使用）
 
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
+
+// 评论查询失败时的降级兜底数据
+const fallbackComment = (comment) => {
+    return {
+        username: comment.toCommentUserName || '用户已注销',
+        content: '该评论已被删除',
+        createTime: '',
+        userAvatar: comment.toCommentUserAvatar || null
+    }
+}
+
+
 /**
  * 加载详情
  * 后端返回的评论数据已包含 username、userAvatar、toCommentUserName 等字段
@@ -196,15 +208,30 @@ const loadDetail = async () => {
     } else if (comment.toCommentUserId !== -1 && comment.toCommentId === comment.rootId) {
       // 情况2：子评论 - 查询父评论
       detailMode.value = 'childReply'
-      const parentRes = await getCommentByIdApi(comment.rootId)
-      parentComment.value = parentRes.data
+      let parentData = null
+      try {
+          const parentRes = await getCommentByIdApi(comment.rootId)
+          parentData = parentRes.data
+      } catch (error) {
+          console.warn('父评论可能已被删除:', error)
+          parentData = null
+      }
+      parentComment.value = parentData || fallbackComment(comment)
     } else if (comment.toCommentUserId !== -1 && comment.toCommentId !== comment.rootId) {
       // 情况3：嵌套评论 - 查询父评论和被回复的评论
       detailMode.value = 'nestedReply'
       const parentRes = await getCommentByIdApi(comment.rootId)
       parentComment.value = parentRes.data
-      const replyToRes = await getCommentByIdApi(comment.toCommentId)
-      replyToComment.value = replyToRes.data
+      // 查询被回复的评论
+      let replyToData = null
+      try {
+          const replyToRes = await getCommentByIdApi(comment.toCommentId)
+          replyToData = replyToRes.data
+      } catch (error) {
+          console.warn('被回复的评论可能已被删除:', error)
+          replyToData = null
+      }
+      replyToComment.value = replyToData || fallbackComment(comment)
     } else {
       detailMode.value = 'simple'
     }
