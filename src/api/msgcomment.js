@@ -39,5 +39,24 @@ export const getCommentByIdApi = (id) =>
  * @param {ids} ids 评论ids
  * @returns 
  */
-export const removeApi = (ids) =>
+export const removeCommentApi = (ids) =>
   http.delete(`/admin/msg/comment/${ids}`)
+
+
+
+// 批量审核（通过/驳回）
+export const auditCommentsApi = (ids, status) => {
+    return http({
+        url: `/admin/msg/comment/audit?status=${status}`,
+        method: 'put',
+        data: ids
+    })
+}
+
+// 单个审核
+export const auditCommentApi = (id, status) => {
+    return http({
+        url: `/admin/msg/comment/audit/${id}/${status}`,
+        method: 'put'
+    })
+}
