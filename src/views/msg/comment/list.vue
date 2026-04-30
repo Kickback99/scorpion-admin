@@ -1,5 +1,4 @@
 <template>
-
     <div class="layout">
 
         <!-- 添加返回按钮 -->
@@ -26,8 +25,17 @@
             </el-form-item>
 
             <el-form-item>
+                    <el-select  style="width: 200px" v-model="searchData.status" placeholder="请选择评论状态">
+                        <el-option label="请选择评论状态" value="" />
+                        <el-option label="已通过" :value="0" />
+                        <el-option label="已驳回" :value="1" />
+                        <el-option label="待审核" :value="2" />
+                    </el-select>
+            </el-form-item>
+
+            <el-form-item>
                     <el-select  style="width: 200px" v-model="searchData.rootId" placeholder="请选择评论类型">
-                        <el-option label="请选择评论类型" value="" />
+                        <el-option label="请选择评论层级" value="" />
                         <el-option label="根评论" :value="-1" />
                         <el-option label="子评论" :value="0" />
                     </el-select>
@@ -41,20 +49,37 @@
 
     </div>
 
+    <div class="right mb-5 ml-4">
+        <el-button @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Check"  type="success" plain :dark="isDark" >批量通过</el-button>
+        <el-button @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Close"  type="warning" plain :dark="isDark" >批量驳回</el-button>
+        <el-button @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete"  type="danger"   plain :dark="isDark" >批量删除</el-button>
+    </div>
 
-    <el-table :data="tableData" style="width: 100%">
+
+    <el-table :data="tableData" style="width: 100%"
+    ref="multipleTableRef"
+    @selection-change="handleMultiple"
+    >
+        <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column prop="title" label="标题" show-overflow-tooltip />
         <el-table-column label="评论类型" >
             <template #default="{row}">
                 {{ row.type === '0' ? '文章评论':'友链评论' }}
             </template>
         </el-table-column>
-        <el-table-column label="评论类别">
+        <el-table-column label="评论层级">
             <template #default="{row}">
                 {{ row.rootId === -1 ? '根评论':'子评论' }}
             </template>
         </el-table-column>
         <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
+        <el-table-column prop ="status" label="评论状态">
+            <template #default="{row}">
+                <el-tag type="primary" v-if="row.status === 0">已通过</el-tag>
+                <el-tag type="danger" v-if="row.status === 1">已驳回</el-tag>
+                <el-tag type="warning" v-if="row.status === 2">待审核</el-tag>
+            </template>
+        </el-table-column>
         <el-table-column prop="username" label="创建者" />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
         <el-table-column label="操作" width="280">
@@ -83,7 +108,7 @@
                 </el-popconfirm>
 
                  <!-- 已通过/已驳回显示删除按钮 -->
-                <el-popconfirm v-if="row.status === 0 || row.status === 1" title="你确定要删除吗" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+                <el-popconfirm v-if="row.status === 0 || row.status === 1" :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
                         <el-button type="danger" size="small" plain >删除</el-button>
                     </template>
@@ -166,8 +191,9 @@
 </template>
 
 <script setup>
-import { addCommentApi, getCommentsApi, removeApi } from '@/api/msgcomment';
+import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, removeCommentApi } from '@/api/msgcomment';
 import { nextTick, reactive, ref } from 'vue';
+import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 
 const tableData = ref([])
 
@@ -257,7 +283,7 @@ const onReset = () => {
     pickMode.value = null
     currentPickComment.value = null
     params.pageNum = 1
-    Object.assign(searchData,{keyword:'',type:null,rootId:-1})
+    Object.assign(searchData,{keyword:'',type:null,rootId:-1,status:null})
     render()
 }
 
@@ -414,8 +440,97 @@ const onDetailError = (error) => {
   drawerLoading.value = false
 }
 
+const handleTitle = (rootId) => {
+    if(rootId === -1) return '删除父评论，该子评论一律删除'
+    else return '你确定要删除这条评论吗？' 
+}
+
+// 批量业务相关
+const multipleTableRef = ref()
+const multipleSelection = ref([])
+
+const handleMultiple = (raw) => {
+    console.log(raw)
+    multipleSelection.value = raw
+}
+
+
+// 批量通过
+const batchApproveRows = async () => {
+    // 检查选中项是否全部为待通过状态
+    const check = checkApproveValid(multipleSelection.value)
+    
+    if (!check.valid) {
+        ElMessage.warning(check.message)
+        return
+    }
+    
+    await confirmBatchAction(check.validRows.length, '通过')
+    
+    const ids = multipleSelection.value.map(row => row.id)
+    await auditCommentsApi(ids, 0)
+    ElMessage.success(`成功通过${ids.length}条评论`)
+    render()
+}
+
+// 批量驳回
+const batchRejectRows = async () => {
+    const check = checkRejectValid(multipleSelection.value)
+    
+    if (!check.valid) {
+        ElMessage.warning(check.message)
+        return
+    }
+    
+    await confirmBatchAction(check.validRows.length, '驳回')
+    
+    const ids = multipleSelection.value.map(row => row.id)
+    await auditCommentsApi(ids, 1)
+    ElMessage.success(`成功驳回${ids.length}条评论`)
+    render()
+}
+
+
+// 批量删除
+const batchDeleteRows = async() => {
+    let title;
+    if(multipleSelection.value.length === 0){
+        ElMessage.error('请先勾选要删除的评论')
+        return
+    }
+    const rowIds = multipleSelection.value.map(row => row.id)
+    const rootIds = multipleSelection.value.map(row => row.rootId)
+    if(rootIds.length > 0){
+        title = 
+        `你选择了${rootIds.length}个根评论，你确认要删除吗？
+        删除后，子评论也一律删除
+        `
+        console.log('rootIds',rootIds)
+    }else title = '你确认要进行删除么'
+
+    await ElMessageBox.confirm(title,'温馨提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    handleDelete(rowIds)
+
+}
+
+const handleApprove = async (row) => {
+    await auditCommentApi(row.id, 0)
+    ElMessage.success('审核通过')
+    render()
+}
+
+const handleReject = async (row) => {
+    await auditCommentApi(row.id, 1)
+    ElMessage.success('已驳回')
+    render()
+}
+
 const handleDelete = async(ids) => {
-    await removeApi(ids)
+    await removeCommentApi(ids)
     ElMessage.success('删除成功')
     render()
 }
@@ -425,7 +540,7 @@ const handleDelete = async(ids) => {
 <style scoped lang="scss">
 .layout {
     @include flex(space-between, null, null);
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
 }
 
 .back-bar {
