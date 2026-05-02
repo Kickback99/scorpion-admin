@@ -42,6 +42,18 @@
             </el-form-item>
 
             <el-form-item>
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px;" placeholder="请选择排序(默认创建时间)">
+                </SmartSelector>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
+                    @click="setSortOrder('ASC')" />
+                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
+                    @click="setSortOrder('DESC')" />
+            </el-form-item>
+
+            <el-form-item>
                 <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
                 <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
             </el-form-item>            
@@ -194,6 +206,7 @@
 import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, removeCommentApi } from '@/api/msgcomment';
 import { nextTick, reactive, ref } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
+import SmartSelector from '@/views/components/SmartSelector.vue';
 
 const tableData = ref([])
 
@@ -205,7 +218,10 @@ const params = reactive({
 const total = ref(null)
 
 const searchData = reactive({
-    rootId: -1
+    rootId: -1,
+    sortOrder:'DESC',
+    sortField:'create_time',
+
 })
 
 // 标识当前模式：null-正常模式，'children'-挑拣子集模式，'parent'-挑拣父集模式
@@ -283,7 +299,7 @@ const onReset = () => {
     pickMode.value = null
     currentPickComment.value = null
     params.pageNum = 1
-    Object.assign(searchData,{keyword:'',type:null,rootId:-1,status:null})
+    Object.assign(searchData,{keyword:'',type:null,rootId:-1,status:null,sortOrder:'DESC',sortField:'create_time'})
     render()
 }
 
@@ -534,6 +550,19 @@ const handleDelete = async(ids) => {
     ElMessage.success('删除成功')
     render()
 }
+
+// 设置排序方向
+const setSortOrder = (order) => {
+  searchData.sortOrder = order
+}
+
+const fields = ref([
+    {label:'请选择排序(默认创建时间)',value:''},
+    {label:'评论内容',value:'content'},
+    {label:'评论状态',value:'status'},
+    {label:'创建时间',value:'create_time'},
+    {label:'修改时间',value:'update_time'},
+])
 
 </script>
 
