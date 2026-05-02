@@ -319,11 +319,10 @@ const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         ElMessage.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
-    // 搜索时退出挑拣模式，恢复到正常模式
-    if (viewMode.value === 'pick') {
-        viewMode.value = 'normal'
+    // 挑拣模式下，不清空 currentPickComment，保持挑拣上下文
+    if (viewMode.value !== 'pick') {
+        currentPickComment.value = null
     }
-    currentPickComment.value = null
     params.pageNum = 1
     render()
 }
@@ -363,7 +362,7 @@ const handleSelectParent = async (row) => {
     // pickMode.value = 'parent'
     updateModeSettings()  // 手动调用
     currentPickComment.value = row
-    searchData.rootId = ''
+    // searchData.rootId = ''
     params.pageNum = 1
     await render()
     ElMessage.success(`正在查看「${row.content}」的父评论及其所有子评论`)
