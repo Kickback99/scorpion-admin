@@ -1,18 +1,18 @@
 <template>
     <div class="layout">
 
-        <!-- 添加返回按钮 -->
-        <div v-if="pickMode" class="back-bar">
-            <el-button type="primary" plain @click="backToRootList">
-                ← 返回根评论列表
-            </el-button>
-            <span class="parent-info">
-                当前模式：{{ pickMode === 'children' ? '挑拣子集' : '挑拣父集' }} - 
-                当前查看：{{ currentPickComment?.content }}
-            </span>
-        </div>
-
         <el-form ref="formRef" :model="form" label-width="auto" inline> 
+
+            <!-- 模式切换按钮组 - 新增挑拣模式（只读，不可选择） -->
+            <el-form-item>
+                <el-radio-group v-model="viewMode" @change="handleModeChange" size="small">
+                    <el-radio-button label="normal">正常模式</el-radio-button>
+                    <el-radio-button label="audit">审核模式</el-radio-button>
+                    <!-- 挑拣模式(动态只读)：只有进入挑拣模式时才解除禁用，其他模式时禁用 -->
+                    <el-radio-button label="pick" :disabled="viewMode !== 'pick'">挑拣模式</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+
             <el-form-item>
                  <el-input v-model="searchData.keyword" placeholder="请输入标题 | 用户名"></el-input>   
             </el-form-item>
@@ -94,38 +94,66 @@
         </el-table-column>
         <el-table-column prop="username" label="创建者" />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
-        <el-table-column label="操作" width="280">
+        <!-- 操作列 - 根据模式动态显示不同按钮 -->
+        <el-table-column label="操作" width="280" fixed="right">
             <template #default="{ row }">
-                <el-button type="success"  size="small" plain  @click="handleReply(row)">回复 </el-button>
-                <el-button type="primary"  size="small" plain 
-                @click="row.rootId === -1?handleSelectChildren(row):handleSelectParent(row)">
-                    挑拣
-                    <!-- {{ row.rootId === -1 ?'挑选子集':'挑拣父集' }} -->
-                </el-button>
-
-                <!-- 待审核：显示审核按钮（带气泡确认框） -->
-                <el-popconfirm
-                v-if="row.status === 2"
-                title="请选择审核结果"
-                width="200"
-                :hide-after="0"
-                @confirm="handleApprove(row)"
-                @cancel="handleReject(row)"
-                confirm-button-text="通过"
-                cancel-button-text="驳回"
-                >
-                <template #reference>
-                    <el-button type="warning" size="small">审核</el-button>
+                <!--  审核模式：显示 通过/驳回/删除/详情 -->
+                <template v-if="viewMode === 'audit'">
+                    <el-popconfirm 
+                        title="确认通过该评论吗？" 
+                        @confirm="handleApprove(row)" 
+                        width="200px"
+                        :disabled="row.status === 0"
+                    >
+                        <template #reference>
+                            <el-button 
+                                type="success" 
+                                size="small" 
+                                plain
+                                :disabled="row.status === 0"
+                            >通过</el-button>
+                        </template>
+                    </el-popconfirm>
+                    
+                    <el-popconfirm 
+                        title="确认驳回该评论吗？" 
+                        @confirm="handleReject(row)" 
+                        width="200px"
+                        :disabled="row.status === 1"
+                    >
+                        <template #reference>
+                            <el-button 
+                                type="warning" 
+                                size="small" 
+                                plain
+                                :disabled="row.status === 1"
+                            >驳回</el-button>
+                        </template>
+                    </el-popconfirm>
+                    
+                    <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+                        <template #reference>
+                            <el-button type="danger" size="small" plain>删除</el-button>
+                        </template>
+                    </el-popconfirm>
+                    
+                    <el-button type="info" size="small" plain @click="handleInfo(row)">详情</el-button>
                 </template>
-                </el-popconfirm>
 
-                 <!-- 已通过/已驳回显示删除按钮 -->
-                <el-popconfirm v-if="row.status === 0 || row.status === 1" :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
-                    <template #reference>
-                        <el-button type="danger" size="small" plain >删除</el-button>
-                    </template>
-                </el-popconfirm>
-                <el-button type="warning" size="small" plain @click="handleInfo(row)">详情</el-button>
+                <!-- 正常模式/挑拣模式：显示 回复/挑拣/删除/详情 -->
+                <template v-else>
+                    <el-button type="success" size="small" plain @click="handleReply(row)">回复</el-button>
+                    <el-button type="primary" size="small" plain 
+                        @click="row.rootId === -1 ? handleSelectChildren(row) : handleSelectParent(row)">
+                        挑拣
+                    </el-button>
+                    <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+                        <template #reference>
+                            <el-button type="danger" size="small" plain>删除</el-button>
+                        </template>
+                    </el-popconfirm>
+                    <el-button type="info" size="small" plain @click="handleInfo(row)">详情</el-button>
+                </template>
             </template>
         </el-table-column>
     </el-table>
@@ -207,6 +235,12 @@ import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, remov
 import { nextTick, reactive, ref } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
+// 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
+const viewMode = ref('normal')
+const currentPickComment = ref(null)
+
+// 标识当前模式：null-正常模式，'children'-挑拣子集模式，'parent'-挑拣父集模式
+// const pickMode = ref(null)
 
 const tableData = ref([])
 
@@ -224,39 +258,37 @@ const searchData = reactive({
 
 })
 
-// 标识当前模式：null-正常模式，'children'-挑拣子集模式，'parent'-挑拣父集模式
-const pickMode = ref(null)
-const currentPickComment = ref(null)
-
-const render = async() => {
+const render = async () => {
     let res
-    if (pickMode.value === 'children' && currentPickComment.value) {
-        // 挑拣子集模式：查询子评论
+    // 挑拣模式逻辑（整合 v1 后端的 pickParent 逻辑）
+    if (viewMode.value === 'pick' && currentPickComment.value) {
+        const isRootComment = currentPickComment.value.rootId === -1
         const searchParams = {
-            rootId: currentPickComment.value.id  // 传递父评论id
+            // 子集模式：传当前评论id作为 rootId
+            // 父集模式：传当前评论的 rootId 作为 rootId
+            rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
         }
-        if (searchData.keyword) searchParams.keyword = searchData.keyword
-        if (searchData.type) searchParams.type = searchData.type
         
-        res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
-        tableData.value = res.data.items
-        total.value = res.data.total
-    } else if (pickMode.value === 'parent' && currentPickComment.value) {
-        // 挑拣父集模式：查询父评论和所有子评论
-        const searchParams = {
-            rootId: currentPickComment.value.rootId,  // 传递父评论id
-            pickParent: true,  // 标识这是挑拣父集模式
-            currentCommentId: currentPickComment.value.id  // 传递当前评论id
+        // 父集模式需要额外参数
+        if (!isRootComment) {
+            searchParams.pickParent = true
+            searchParams.currentCommentId = currentPickComment.value.id
         }
+        
+        // 添加其他筛选条件
         if (searchData.keyword) searchParams.keyword = searchData.keyword
         if (searchData.type) searchParams.type = searchData.type
+        if (searchData.status !== undefined && searchData.status !== null && searchData.status !== '') searchParams.status = searchData.status
+        if (searchData.sortField) searchParams.sortField = searchData.sortField
+        if (searchData.sortOrder) searchParams.sortOrder = searchData.sortOrder
         
         res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
         tableData.value = res.data.items
         total.value = res.data.total
     } else {
-        // 正常模式
-        res = await getCommentsApi(params.pageNum, params.pageSize, searchData)
+        // 正常模式/审核模式
+        const searchParams = { ...searchData }
+        res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
         tableData.value = res.data.items
         total.value = res.data.total
     }
@@ -287,28 +319,38 @@ const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         ElMessage.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
-    // 搜索时重置模式
-    pickMode.value = null
+    // 搜索时退出挑拣模式，恢复到正常模式
+    if (viewMode.value === 'pick') {
+        viewMode.value = 'normal'
+    }
     currentPickComment.value = null
     params.pageNum = 1
     render()
 }
 
 const onReset = () => {
-    // 重置时重置模式
-    pickMode.value = null
+    // 重置时退出挑拣模式，恢复到正常模式
+    if (viewMode.value === 'pick') {
+        viewMode.value = 'normal'
+    }
+    if(viewMode.value === 'normal'){
+        Object.assign(searchData, { keyword: '', type: null, rootId: -1, status: null, sortOrder: 'DESC', sortField: 'create_time' })
+    }else {
+        Object.assign(searchData, { keyword: '', type: null, rootId: '', status: null, sortOrder: 'DESC', sortField: 'status' })
+    }
     currentPickComment.value = null
-    params.pageNum = 1
-    Object.assign(searchData,{keyword:'',type:null,rootId:-1,status:null,sortOrder:'DESC',sortField:'create_time'})
+    params.pageNum = 1    
     render()
 }
 
 // 挑选子集
 const handleSelectChildren = async (row) => {
     // console.log('挑选子集', row)
-    pickMode.value = 'children'
+    viewMode.value = 'pick' // 此时 pick 按钮的 disabled 变为 false
+    // pickMode.value = 'children'
+    updateModeSettings()  // 手动调用
     currentPickComment.value = row
-    searchData.rootId = ''
+    // searchData.rootId = ''
     params.pageNum = 1
     await render()
     ElMessage.success(`正在查看「${row.content}」的子评论`)
@@ -317,7 +359,9 @@ const handleSelectChildren = async (row) => {
 // 挑拣父集
 const handleSelectParent = async (row) => {
     // console.log('挑拣父集', row)
-    pickMode.value = 'parent'
+    viewMode.value = 'pick' //  此时 pick 按钮的 disabled 变为 false
+    // pickMode.value = 'parent'
+    updateModeSettings()  // 手动调用
     currentPickComment.value = row
     searchData.rootId = ''
     params.pageNum = 1
@@ -325,9 +369,34 @@ const handleSelectParent = async (row) => {
     ElMessage.success(`正在查看「${row.content}」的父评论及其所有子评论`)
 }
 
+// 抽离公共方法
+const updateModeSettings = () => {
+    if (viewMode.value === 'audit') {
+        searchData.sortField = 'status'
+        searchData.sortOrder = 'DESC'
+        searchData.rootId = ''
+    } else if (viewMode.value === 'normal') {
+        searchData.sortField = 'create_time'
+        searchData.sortOrder = 'DESC'
+        searchData.rootId = -1
+    } else if (viewMode.value === 'pick') {
+        searchData.rootId = ''
+    }
+}
+
+// 切换模式（用户点击正常/审核模式时自动退出挑拣模式）
+const handleModeChange = () => {
+    updateModeSettings()
+    if (viewMode.value !== 'pick') {
+        currentPickComment.value = null
+    }
+    params.pageNum = 1
+    render()
+}
+
 
 // 返回根评论列表（挑拣父集）
-const backToRootList = () => {
+/* const backToRootList = () => {
     // 返回时重置模式
     pickMode.value = null
     currentPickComment.value = null
@@ -343,7 +412,7 @@ const backToRootList = () => {
     render()
     
     ElMessage.info('已返回根评论列表')
-}
+} */
 
 
 
@@ -570,21 +639,6 @@ const fields = ref([
 .layout {
     @include flex(space-between, null, null);
     // margin-bottom: 20px;
-}
-
-.back-bar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-    padding: 10px;
-    background-color: #f0f9ff;
-    border-radius: 4px;
-    
-    .parent-info {
-        color: #409eff;
-        font-size: 14px;
-    }
 }
 
 
