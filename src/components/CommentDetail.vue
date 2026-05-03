@@ -152,6 +152,15 @@ const props = defineProps({
   autoLoad: {
     type: Boolean,
     default: true
+  },
+  // 🟢 新增：排序参数
+  sortField: {
+      type: String,
+      default: 'create_time'
+  },
+  sortOrder: {
+      type: String,
+      default: 'DESC'
   }
 })
 
@@ -202,7 +211,11 @@ const loadDetail = async () => {
     if (comment.rootId === -1) {
       // 情况1：根评论 - 查询子评论列表
       detailMode.value = 'parent'
-      const res = await getCommentsApi(1, 999, { rootId: comment.id })
+      const res = await getCommentsApi(1, 999, { 
+        rootId: comment.id,
+        sortField: props.sortField,
+        sortOrder: props.sortOrder
+    })
       // 过滤掉父评论本身（后端可能把父评论也返回了）
       children.value = (res.data.items || []).filter(item => item.id !== comment.id)
     } else if (comment.toCommentUserId !== -1 && comment.toCommentId === comment.rootId) {
