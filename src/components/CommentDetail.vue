@@ -81,53 +81,54 @@
 
     <!-- 情况3：嵌套评论（回复子评论）- 展示父评论 + 被回复评论 + 当前评论（当前高亮） -->
     <div v-else-if="detailMode === 'nestedReply'" class="detail-box">
-      <!-- 父评论（普通样式） -->
-      <div class="sub-title">父评论</div>
-      <div class="comment-card">
-        <div class="comment-card-header">
-          <el-avatar :size="32" :src="parentComment?.userAvatar || defaultAvatar" />
-          <div class="comment-card-info">
-            <span class="username">{{ parentComment?.username || '未知用户' }}</span>
-            <span class="time">{{ parentComment?.createTime || '未知时间' }}</span>
-          </div>
+        <!-- 父评论 -->
+        <div class="sub-title">父评论</div>
+        <div class="comment-card">
+            <div class="comment-card-header">
+                <el-avatar :size="32" :src="parentComment?.userAvatar || defaultAvatar" />
+                <div class="comment-card-info">
+                    <span class="username">{{ parentComment?.username || '未知用户' }}</span>
+                    <span class="time">{{ parentComment?.createTime || '未知时间' }}</span>
+                </div>
+            </div>
+            <div class="comment-card-content">{{ parentComment?.content || '无内容' }}</div>
         </div>
-        <div class="comment-card-content">{{ parentComment?.content || '无内容' }}</div>
-      </div>
 
-      <!-- 被回复的评论（普通样式） -->
-      <div class="sub-title">被回复的评论</div>
-      <div class="comment-card">
-        <div class="comment-card-header">
-          <el-avatar :size="32" :src="replyToComment?.userAvatar || defaultAvatar" />
-          <div class="comment-card-info">
-            <span class="username">{{ replyToComment?.username || '未知用户' }}</span>
-            <span class="time">{{ replyToComment?.createTime || '未知时间' }}</span>
-          </div>
-        </div>
-        <div class="comment-card-content">
-          <!-- 被回复的评论如果是嵌套评论，也要显示它的回复目标 -->
-          <span v-if="replyToComment?.toCommentId !== replyToComment?.rootId && replyToComment?.toCommentUserName" class="reply-tag">
-            @{{ replyToComment.toCommentUserName }}
-          </span>
-          {{ replyToComment?.content || '无内容' }}
-        </div>
-      </div>
+        <!-- 回复关联：被回复评论 + 当前回复（在同一个容器内） -->
+        <div class="sub-title">回复关联</div>
+        <div class="reply-group">
+            <!-- 被回复的评论 -->
+            <div class="comment-card replied-card">
+                <div class="comment-card-header">
+                    <el-avatar :size="28" :src="replyToComment?.userAvatar || defaultAvatar" />
+                    <div class="comment-card-info">
+                        <span class="username">{{ replyToComment?.username || '未知用户' }}</span>
+                        <span class="time">{{ replyToComment?.createTime || '未知时间' }}</span>
+                    </div>
+                </div>
+                <div class="comment-card-content">
+                    <span v-if="replyToComment?.toCommentId !== replyToComment?.rootId && replyToComment?.toCommentUserName" class="reply-tag">
+                        @{{ replyToComment.toCommentUserName }}
+                    </span>
+                    {{ replyToComment?.content || '无内容' }}
+                </div>
 
-      <!-- 当前嵌套评论（高亮 + 绿色边框） -->
-      <div class="sub-title">当前回复</div>
-      <div class="comment-card current-card">
-        <div class="comment-card-header">
-          <el-avatar :size="32" :src="comment.userAvatar || defaultAvatar" />
-          <div class="comment-card-info">
-            <span class="username">{{ comment.username }}</span>
-            <span class="time">{{ comment.createTime }}</span>
-          </div>
+            <!-- 当前嵌套评论（左边距 + 高亮） -->
+            <div class="comment-card current-card current-reply">
+                <div class="comment-card-header">
+                    <el-avatar :size="28" :src="comment.userAvatar || defaultAvatar" />
+                    <div class="comment-card-info">
+                        <span class="username">{{ comment.username }}</span>
+                        <span class="time">{{ comment.createTime }}</span>
+                    </div>
+                </div>
+                <div class="comment-card-content">
+                    <span class="reply-tag">@{{ replyToComment?.username }}</span>
+                    {{ comment.content }}
+                </div>
+            </div>
+            </div>
         </div>
-        <div class="comment-card-content">
-          <span class="reply-tag">@{{ replyToComment?.username }}</span>
-          {{ comment.content }}
-        </div>
-      </div>
     </div>
 
     <!-- 加载中 -->
@@ -153,7 +154,7 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  // 🟢 新增：排序参数
+  // 新增：排序参数
   sortField: {
       type: String,
       default: 'create_time'
@@ -386,5 +387,18 @@ defineExpose({
   gap: 8px;
   padding: 40px;
   color: #909399;
+}
+
+// 回复关联容器样式
+.reply-group {
+    background-color: #fafafa;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+// 关联容器内的当前回复（左上边距）
+.reply-group .current-reply {
+    margin-left: 24px;
+    margin-top: 12px;
 }
 </style>
