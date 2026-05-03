@@ -269,8 +269,12 @@ const render = async () => {
             rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
         }
         
-        // 父集模式需要额外参数
-        if (!isRootComment) {
+        // 区分挑拣子集和挑拣父集
+        if (isRootComment) {
+            // 子集模式（点击的是根评论）
+            searchParams.pickChildren = true
+        } else {
+            // 父集模式（点击的是子评论）
             searchParams.pickParent = true
             searchParams.currentCommentId = currentPickComment.value.id
         }
@@ -379,6 +383,8 @@ const updateModeSettings = () => {
         searchData.sortOrder = 'DESC'
         searchData.rootId = -1
     } else if (viewMode.value === 'pick') {
+        searchData.sortField = 'group'
+        searchData.sortOrder = 'DESC'
         searchData.rootId = ''
     }
 }
@@ -630,6 +636,7 @@ const fields = ref([
     {label:'评论状态',value:'status'},
     {label:'创建时间',value:'create_time'},
     {label:'修改时间',value:'update_time'},
+    {label:'自定义分组',value:'group'},
 ])
 
 </script>
