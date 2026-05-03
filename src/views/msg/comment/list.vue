@@ -225,6 +225,8 @@
         v-else
         ref="detailRef"
         :comment="currentDetailComment"
+        :sortField="searchData.sortField"
+        :sortOrder="searchData.sortOrder"
         @loaded="onDetailLoaded"
         @error="onDetailError"
         />
