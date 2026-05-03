@@ -69,6 +69,7 @@
 
 
     <el-table :data="tableData" style="width: 100%"
+    v-loading="loading"
     ref="multipleTableRef"
     @selection-change="handleMultiple"
     >
@@ -87,15 +88,15 @@
         <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
         <el-table-column prop ="status" label="评论状态">
             <template #default="{row}">
-                <el-tag type="primary" v-if="row.status === 0">已通过</el-tag>
-                <el-tag type="danger" v-if="row.status === 1">已驳回</el-tag>
-                <el-tag type="warning" v-if="row.status === 2">待审核</el-tag>
+                <el-text type="primary" v-if="row.status === 0">已通过</el-text>
+                <el-text type="danger" v-if="row.status === 1">已驳回</el-text>
+                <el-text type="warning" v-if="row.status === 2">待审核</el-text>
             </template>
         </el-table-column>
         <el-table-column prop="username" label="创建者" />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
         <!-- 操作列 - 根据模式动态显示不同按钮 -->
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="280" >
             <template #default="{ row }">
                 <!--  审核模式：显示 通过/驳回/删除/详情 -->
                 <template v-if="viewMode === 'audit'">
@@ -162,7 +163,7 @@
         class="mt-5"
 		v-model:current-page="params.pageNum"
 		v-model:page-size="params.pageSize"
-		:page-sizes="[2,3,5,7]"
+		:page-sizes="[2,5,7,10]"
 		:small="false"
 		:disabled="false"
 		:background="false"
@@ -246,10 +247,12 @@ const tableData = ref([])
 
 const params = reactive({
     pageNum:1,
-    pageSize:7
+    pageSize:10
 })
 
 const total = ref(null)
+// 默认关闭loading
+const loading = ref(false)
 
 const searchData = reactive({
     rootId: -1,
@@ -259,42 +262,49 @@ const searchData = reactive({
 })
 
 const render = async () => {
-    let res
-    // 挑拣模式逻辑（整合 v1 后端的 pickParent 逻辑）
-    if (viewMode.value === 'pick' && currentPickComment.value) {
-        const isRootComment = currentPickComment.value.rootId === -1
-        const searchParams = {
-            // 子集模式：传当前评论id作为 rootId
-            // 父集模式：传当前评论的 rootId 作为 rootId
-            rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
-        }
-        
-        // 区分挑拣子集和挑拣父集
-        if (isRootComment) {
-            // 子集模式（点击的是根评论）
-            searchParams.pickChildren = true
+    // 开启loading动效
+    loading.value = true
+    try{
+        let res
+        // 挑拣模式逻辑（整合 v1 后端的 pickParent 逻辑）
+        if (viewMode.value === 'pick' && currentPickComment.value) {
+            const isRootComment = currentPickComment.value.rootId === -1
+            const searchParams = {
+                // 子集模式：传当前评论id作为 rootId
+                // 父集模式：传当前评论的 rootId 作为 rootId
+                rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
+            }
+            
+            // 区分挑拣子集和挑拣父集
+            if (isRootComment) {
+                // 子集模式（点击的是根评论）
+                searchParams.pickChildren = true
+            } else {
+                // 父集模式（点击的是子评论）
+                searchParams.pickParent = true
+                searchParams.currentCommentId = currentPickComment.value.id
+            }
+            
+            // 添加其他筛选条件
+            if (searchData.keyword) searchParams.keyword = searchData.keyword
+            if (searchData.type) searchParams.type = searchData.type
+            if (searchData.status !== undefined && searchData.status !== null && searchData.status !== '') searchParams.status = searchData.status
+            if (searchData.sortField) searchParams.sortField = searchData.sortField
+            if (searchData.sortOrder) searchParams.sortOrder = searchData.sortOrder
+            
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            tableData.value = res.data.items
+            total.value = res.data.total
         } else {
-            // 父集模式（点击的是子评论）
-            searchParams.pickParent = true
-            searchParams.currentCommentId = currentPickComment.value.id
+            // 正常模式/审核模式
+            const searchParams = { ...searchData }
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            tableData.value = res.data.items
+            total.value = res.data.total
         }
-        
-        // 添加其他筛选条件
-        if (searchData.keyword) searchParams.keyword = searchData.keyword
-        if (searchData.type) searchParams.type = searchData.type
-        if (searchData.status !== undefined && searchData.status !== null && searchData.status !== '') searchParams.status = searchData.status
-        if (searchData.sortField) searchParams.sortField = searchData.sortField
-        if (searchData.sortOrder) searchParams.sortOrder = searchData.sortOrder
-        
-        res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
-        tableData.value = res.data.items
-        total.value = res.data.total
-    } else {
-        // 正常模式/审核模式
-        const searchParams = { ...searchData }
-        res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
-        tableData.value = res.data.items
-        total.value = res.data.total
+    }finally{
+        // 关闭loading动效
+        loading.value = false
     }
 }
 
