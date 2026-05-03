@@ -77,6 +77,27 @@
         </div>
         <div class="comment-card-content">{{ comment.content }}</div>
       </div>
+
+      <!-- 谁回复了我 -->
+      <div class="sub-title">谁回复了我 ({{ whoRepliedToMe.length }})</div>
+      <div class="reply-group" v-if="whoRepliedToMe.length > 0">
+          <div v-for="reply in whoRepliedToMe" :key="reply.id" class="comment-card">
+              <div class="comment-card-header">
+                  <el-avatar :size="28" :src="reply.userAvatar || defaultAvatar" />
+                  <div class="comment-card-info">
+                      <span class="username">{{ reply.username }}</span>
+                      <span class="time">{{ reply.createTime }}</span>
+                  </div>
+              </div>
+              <div class="comment-card-content">
+                  <span v-if="reply.toCommentId !== reply.rootId && reply.toCommentUserName" class="reply-tag">
+                      @{{ reply.toCommentUserName }}
+                  </span>
+                  {{ reply.content }}
+              </div>
+          </div>
+      </div>
+      <div v-else class="empty-tip">暂无回复</div>
     </div>
 
     <!-- 情况3：嵌套评论（回复子评论）- 展示父评论 + 被回复评论 + 当前评论（当前高亮） -->
@@ -129,6 +150,27 @@
             </div>
             </div>
         </div>
+
+        <!-- 谁回复了我 -->
+        <div class="sub-title">谁回复了我 ({{ whoRepliedToMe.length }})</div>
+        <div class="reply-group" v-if="whoRepliedToMe.length > 0">
+            <div v-for="reply in whoRepliedToMe" :key="reply.id" class="comment-card">
+                <div class="comment-card-header">
+                    <el-avatar :size="28" :src="reply.userAvatar || defaultAvatar" />
+                    <div class="comment-card-info">
+                        <span class="username">{{ reply.username }}</span>
+                        <span class="time">{{ reply.createTime }}</span>
+                    </div>
+                </div>
+                <div class="comment-card-content">
+                    <span v-if="reply.toCommentId !== reply.rootId && reply.toCommentUserName" class="reply-tag">
+                        @{{ reply.toCommentUserName }}
+                    </span>
+                    {{ reply.content }}
+                </div>
+            </div>
+        </div>
+        <div v-else class="empty-tip">暂无回复</div>
     </div>
 
     <!-- 加载中 -->
@@ -174,6 +216,8 @@ const detailMode = ref(null)  // 'parent', 'childReply', 'nestedReply'
 const children = ref([])      // 子评论列表（情况1使用）
 const parentComment = ref(null)  // 父评论信息（情况2、3使用）
 const replyToComment = ref(null)  // 被回复的评论（情况3使用）
+// 谁回复了我
+const whoRepliedToMe = ref([])
 
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
@@ -216,41 +260,47 @@ const loadDetail = async () => {
         rootId: comment.id,
         sortField: props.sortField,
         sortOrder: props.sortOrder
-    })
-      // 过滤掉父评论本身（后端可能把父评论也返回了）
+      })
       children.value = (res.data.items || []).filter(item => item.id !== comment.id)
-    } else if (comment.toCommentUserId !== -1 && comment.toCommentId === comment.rootId) {
-      // 情况2：子评论 - 查询父评论
-      detailMode.value = 'childReply'
-      let parentData = null
-      try {
+    } else {
+        // 情况2和3：先查询父评论
+        let parentData = null
+        try {
           const parentRes = await getCommentByIdApi(comment.rootId)
           parentData = parentRes.data
-      } catch (error) {
-          console.warn('父评论可能已被删除:', error)
+        } catch (error) {
           parentData = null
-      }
-      parentComment.value = parentData || fallbackComment(comment)
-    } else if (comment.toCommentUserId !== -1 && comment.toCommentId !== comment.rootId) {
-      // 情况3：嵌套评论 - 查询父评论和被回复的评论
-      detailMode.value = 'nestedReply'
-      const parentRes = await getCommentByIdApi(comment.rootId)
-      parentComment.value = parentRes.data
-      // 查询被回复的评论
-      let replyToData = null
-      try {
-          const replyToRes = await getCommentByIdApi(comment.toCommentId)
-          replyToData = replyToRes.data
-      } catch (error) {
-          console.warn('被回复的评论可能已被删除:', error)
-          replyToData = null
-      }
-      replyToComment.value = replyToData || fallbackComment(comment)
-    } else {
-      detailMode.value = 'simple'
-    }
+        }
+        parentComment.value = parentData || fallbackComment(comment)
 
-    emit('loaded', { mode: detailMode.value, comment: props.comment })
+        // 在这里添加 ==========================================
+        // 查询当前评论下的所有子评论
+        const allChildrenRes = await getCommentsApi(1, 999, { 
+            rootId: comment.rootId
+        })
+        // 前端过滤：谁回复了我（toCommentId === comment.id）
+        const replyToMeList = (allChildrenRes.data.items || []).filter(item => item.toCommentId === comment.id)
+        whoRepliedToMe.value = replyToMeList
+        // ====================================================
+
+        // 判断当前评论类型
+        if (comment.toCommentUserId !== -1 && comment.toCommentId === comment.rootId) {
+          detailMode.value = 'childReply'
+        } else if (comment.toCommentUserId !== -1 && comment.toCommentId !== comment.rootId) {
+          detailMode.value = 'nestedReply'
+          // 查询被回复的评论
+          let replyToData = null
+          try {
+            const replyToRes = await getCommentByIdApi(comment.toCommentId)
+            replyToData = replyToRes.data
+          } catch (error) {
+            replyToData = null
+          }
+          replyToComment.value = replyToData || fallbackComment(comment)
+        }
+      }
+
+      emit('loaded', { mode: detailMode.value, comment: props.comment })
   } catch (error) {
     console.error('加载详情失败:', error)
     emit('error', error)
@@ -265,6 +315,7 @@ const resetState = () => {
   children.value = []
   parentComment.value = null
   replyToComment.value = null
+  whoRepliedToMe.value = []
 }
 
 // 监听comment变化
