@@ -272,15 +272,12 @@ const loadDetail = async () => {
           parentData = null
         }
         parentComment.value = parentData || fallbackComment(comment)
-
-        // 在这里添加 ==========================================
-        // 查询当前评论下的所有子评论
-        const allChildrenRes = await getCommentsApi(1, 999, { 
-            rootId: comment.rootId
+        const res = await getCommentsApi(1, 999, { 
+            rootId: comment.rootId,
+            toCommentId: comment.id  // 后端支持这个参数
         })
         // 前端过滤：谁回复了我（toCommentId === comment.id）
-        const replyToMeList = (allChildrenRes.data.items || []).filter(item => item.toCommentId === comment.id)
-        whoRepliedToMe.value = replyToMeList
+        whoRepliedToMe.value = (res.data.items || []).filter(item => item.toCommentId === comment.id)
         // ====================================================
 
         // 判断当前评论类型
