@@ -7,9 +7,9 @@
             <el-form-item>
                 <el-radio-group v-model="viewMode" @change="handleModeChange" size="small">
                     <el-radio-button label="normal">正常模式</el-radio-button>
-                    <el-radio-button label="audit">审核模式</el-radio-button>
                     <!-- 挑拣模式(动态只读)：只有进入挑拣模式时才解除禁用，其他模式时禁用 -->
                     <el-radio-button label="pick" :disabled="viewMode !== 'pick'">挑拣模式</el-radio-button>
+                    <el-radio-button label="audit">审核模式</el-radio-button>
                 </el-radio-group>
             </el-form-item>
 
@@ -241,11 +241,6 @@ import SmartSelector from '@/views/components/SmartSelector.vue';
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
 const viewMode = ref('normal')
 const currentPickComment = ref(null)
-// 记录进入审核模式前的模式
-const previousMode = ref('normal')
-
-// 标识当前模式：null-正常模式，'children'-挑拣子集模式，'parent'-挑拣父集模式
-// const pickMode = ref(null)
 
 const tableData = ref([])
 
@@ -271,12 +266,9 @@ const render = async () => {
     try{
         let res
 
-        // 审核模式特殊处理
-        if (viewMode.value === 'audit' && previousMode.value === 'pick') {
+        // 审核模式 + 从挑拣进来的（有 currentPickComment 说明是从挑拣进来的）
+        if (viewMode.value === 'audit' && currentPickComment.value) {
             const searchParams = { ...searchData }
-            
-            // 如果是从挑拣模式进来的，需要带上挑拣上下文
-            if (previousMode.value === 'pick' && currentPickComment.value) {
                 const isRootComment = currentPickComment.value.rootId === -1
                 searchParams.rootId = isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
                 if (isRootComment) {
@@ -285,7 +277,6 @@ const render = async () => {
                     searchParams.pickParent = true
                     searchParams.currentCommentId = currentPickComment.value.id
                 }
-            }
             
             res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
             tableData.value = res.data.items
@@ -380,8 +371,6 @@ const onReset = () => {
         Object.assign(searchData, { keyword: '', type: null, rootId: '', status: null, sortOrder: 'DESC', sortField: 'status' })
     }
     currentPickComment.value = null
-    //  重置 previousMode
-    previousMode.value = 'normal'
     params.pageNum = 1    
     render()
 }
@@ -390,8 +379,10 @@ const onReset = () => {
 const handleSelectChildren = async (row) => {
     // console.log('挑选子集', row)
     viewMode.value = 'pick' // 此时 pick 按钮的 disabled 变为 false
+    searchData.sortField = 'group'
+    searchData.sortOrder = 'DESC'
+    searchData.rootId = ''
     // pickMode.value = 'children'
-    updateModeSettings()  // 手动调用
     currentPickComment.value = row
     // searchData.rootId = ''
     params.pageNum = 1
@@ -403,6 +394,9 @@ const handleSelectChildren = async (row) => {
 const handleSelectParent = async (row) => {
     // console.log('挑拣父集', row)
     viewMode.value = 'pick' //  此时 pick 按钮的 disabled 变为 false
+    searchData.sortField = 'group'
+    searchData.sortOrder = 'DESC'
+    searchData.rootId = ''
     // pickMode.value = 'parent'
     updateModeSettings()  // 手动调用
     currentPickComment.value = row
@@ -417,28 +411,32 @@ const updateModeSettings = () => {
     if (viewMode.value === 'audit') {
         searchData.sortField = 'status'
         searchData.sortOrder = 'DESC'
-        if(previousMode.value === 'normal'){
+        // 没有挑拣上下文时清空 rootId（说明是从正常模式进来的）
+        if (!currentPickComment.value) {
             searchData.rootId = ''
+        }else {
+            // 否则是挑拣模式进来的
+            /* searchData.sortField = 'group'
+            searchData.sortOrder = 'DESC' */
         }
     } else if (viewMode.value === 'normal') {
         searchData.sortField = 'create_time'
         searchData.sortOrder = 'DESC'
         searchData.rootId = -1
-    } else if (viewMode.value === 'pick') {
-        searchData.sortField = 'group'
-        searchData.sortOrder = 'DESC'
-        // searchData.rootId = ''
-        previousMode.value = viewMode.value
     }
 }
 
 // 切换模式（用户点击正常/审核模式时自动退出挑拣模式）
 const handleModeChange = () => {
     updateModeSettings()
+    const isPickToAudit = (viewMode.value === 'audit' && currentPickComment.value)
+
+    if (!isPickToAudit) {
+        params.pageNum = 1
+    }
     if (viewMode.value === 'normal') {
         currentPickComment.value = null
     }
-    params.pageNum = 1
     render()
 }
 
