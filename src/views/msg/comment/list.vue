@@ -241,6 +241,8 @@ import SmartSelector from '@/views/components/SmartSelector.vue';
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
 const viewMode = ref('normal')
 const currentPickComment = ref(null)
+// 记录进入审核模式前的模式
+const previousMode = ref('normal')
 
 // 标识当前模式：null-正常模式，'children'-挑拣子集模式，'parent'-挑拣父集模式
 // const pickMode = ref(null)
@@ -268,6 +270,29 @@ const render = async () => {
     loading.value = true
     try{
         let res
+
+        // 审核模式特殊处理
+        if (viewMode.value === 'audit' && previousMode.value === 'pick') {
+            const searchParams = { ...searchData }
+            
+            // 如果是从挑拣模式进来的，需要带上挑拣上下文
+            if (previousMode.value === 'pick' && currentPickComment.value) {
+                const isRootComment = currentPickComment.value.rootId === -1
+                searchParams.rootId = isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
+                if (isRootComment) {
+                    searchParams.pickChildren = true
+                } else {
+                    searchParams.pickParent = true
+                    searchParams.currentCommentId = currentPickComment.value.id
+                }
+            }
+            
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            tableData.value = res.data.items
+            total.value = res.data.total
+            return
+        }
+
         // 挑拣模式逻辑（整合 v1 后端的 pickParent 逻辑）
         if (viewMode.value === 'pick' && currentPickComment.value) {
             const isRootComment = currentPickComment.value.rootId === -1
@@ -335,8 +360,9 @@ const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         ElMessage.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
-    // 挑拣模式下，不清空 currentPickComment，保持挑拣上下文
-    if (viewMode.value !== 'pick') {
+    // 只有切换到正常模式时才清空挑拣上下文
+    // 切换到审核模式时，保留 currentPickComment（因为需要它的数据）
+    if (viewMode.value === 'normal') {
         currentPickComment.value = null
     }
     params.pageNum = 1
@@ -354,6 +380,8 @@ const onReset = () => {
         Object.assign(searchData, { keyword: '', type: null, rootId: '', status: null, sortOrder: 'DESC', sortField: 'status' })
     }
     currentPickComment.value = null
+    //  重置 previousMode
+    previousMode.value = 'normal'
     params.pageNum = 1    
     render()
 }
@@ -389,7 +417,9 @@ const updateModeSettings = () => {
     if (viewMode.value === 'audit') {
         searchData.sortField = 'status'
         searchData.sortOrder = 'DESC'
-        searchData.rootId = ''
+        if(previousMode.value === 'normal'){
+            searchData.rootId = ''
+        }
     } else if (viewMode.value === 'normal') {
         searchData.sortField = 'create_time'
         searchData.sortOrder = 'DESC'
@@ -397,14 +427,15 @@ const updateModeSettings = () => {
     } else if (viewMode.value === 'pick') {
         searchData.sortField = 'group'
         searchData.sortOrder = 'DESC'
-        searchData.rootId = ''
+        // searchData.rootId = ''
+        previousMode.value = viewMode.value
     }
 }
 
 // 切换模式（用户点击正常/审核模式时自动退出挑拣模式）
 const handleModeChange = () => {
     updateModeSettings()
-    if (viewMode.value !== 'pick') {
+    if (viewMode.value === 'normal') {
         currentPickComment.value = null
     }
     params.pageNum = 1
