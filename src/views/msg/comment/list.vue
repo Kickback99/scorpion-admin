@@ -36,8 +36,8 @@
             <el-form-item>
                     <el-select  style="width: 200px" v-model="searchData.rootId" placeholder="请选择评论类型">
                         <el-option label="请选择评论层级" value="" />
-                        <el-option label="根评论" :value="-1" />
-                        <el-option label="子评论" :value="0" />
+                        <el-option label="根评论" :value="-1" :disabled="viewMode === 'pick'" />
+                        <el-option label="子评论" :value="0"  :disabled="viewMode === 'pick'" />
                     </el-select>
             </el-form-item>
 
@@ -183,6 +183,7 @@
                 <el-input 
                     v-model="replyModel.content" 
                     type="textarea" 
+                    ref="replyInputRef"
                     :rows="4" 
                     placeholder="请输入回复内容"
                     maxlength="512"
@@ -235,7 +236,7 @@
 
 <script setup>
 import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, removeCommentApi } from '@/api/msgcomment';
-import { nextTick, reactive, ref } from 'vue';
+import { nextTick, reactive, ref, computed } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
@@ -368,7 +369,7 @@ const onReset = () => {
     if(viewMode.value === 'normal'){
         Object.assign(searchData, { keyword: '', type: null, rootId: -1, status: null, sortOrder: 'DESC', sortField: 'create_time' })
     }else {
-        Object.assign(searchData, { keyword: '', type: null, rootId: '', status: null, sortOrder: 'DESC', sortField: 'status' })
+        Object.assign(searchData, { keyword: '', type: null, rootId: '', status: 2, sortOrder: 'DESC', sortField: 'status' })
     }
     currentPickComment.value = null
     params.pageNum = 1    
@@ -411,6 +412,7 @@ const updateModeSettings = () => {
     if (viewMode.value === 'audit') {
         searchData.sortField = 'status'
         searchData.sortOrder = 'DESC'
+        searchData.status = 2
         // 没有挑拣上下文时清空 rootId（说明是从正常模式进来的）
         if (!currentPickComment.value) {
             searchData.rootId = ''
@@ -423,6 +425,7 @@ const updateModeSettings = () => {
         searchData.sortField = 'create_time'
         searchData.sortOrder = 'DESC'
         searchData.rootId = -1
+        searchData.status = null
     }
 }
 
@@ -465,6 +468,7 @@ const handleModeChange = () => {
 const replyDialogVisible = ref(false)
 const replyModelRef = ref()
 const replyModel = reactive({})
+const replyInputRef = ref(null)
 
 const replyRules = {
     content: [
@@ -481,10 +485,6 @@ const handleReply = (row) => {
     
     // 清空回复内容
     replyModel.content = ''
-
-    nextTick(()=>{
-        replyModelRef.value.resetFields(['content'])
-    })
     
     // 设置请求参数
     replyModel.articleId = row.articleId
@@ -504,6 +504,18 @@ const handleReply = (row) => {
     
     // 打开对话框
     replyDialogVisible.value = true
+
+    nextTick(()=>{
+        replyModelRef.value.resetFields(['content'])
+
+        setTimeout(() => {
+            if (replyInputRef.value) {
+                const textarea = replyInputRef.value.$el.querySelector('textarea')
+                textarea?.focus()
+            }
+        })
+
+    })
 }
 
 const submitReply = async () => {
@@ -671,13 +683,13 @@ const setSortOrder = (order) => {
   searchData.sortOrder = order
 }
 
-const fields = ref([
-    {label:'请选择排序(默认创建时间)',value:''},
-    {label:'评论内容',value:'content'},
-    {label:'评论状态',value:'status'},
-    {label:'创建时间',value:'create_time'},
-    {label:'修改时间',value:'update_time'},
-    {label:'自定义分组',value:'group'},
+const fields = computed(() => [
+    {label:'请选择排序(默认创建时间)', value:''},
+    {label:'评论内容', value:'content'},
+    {label:'评论状态', value:'status'},
+    {label:'创建时间', value:'create_time'},
+    {label:'修改时间', value:'update_time'},
+    {label:'自定义分组', value:'group', disabled: viewMode.value != 'pick'},
 ])
 
 </script>
