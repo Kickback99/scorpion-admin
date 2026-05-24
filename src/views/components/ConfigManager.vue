@@ -25,8 +25,6 @@
             <el-icon v-if="row.isObject" class="object-icon"><Folder /></el-icon>
             <el-icon v-else class="field-icon"><Document /></el-icon>
             {{ row.displayKey }}
-              <!-- 系统保留字段标识 -->
-            <el-tag v-if="row.isSystem" type="danger" size="small" effect="plain" style="margin-left: 8px">系统</el-tag>
           </span>
         </template>
       </el-table-column>
@@ -92,7 +90,7 @@
             <el-button type="primary" link size="small" @click="handleEdit(row)" :disabled="row.isObject">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
-            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="row.isObject || row.isSystem">
+            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="row.isObject">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
             <el-button type="success" link size="small" @click="handleAddChild(row)" v-if="row.isObject">
@@ -159,7 +157,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
-import { CONFIG_DEFINITIONS, useConfigStore } from '@/store/config'
+import { useConfigStore } from '@/store/config'
 import { useColorStore } from '@/store/color'
 import { updateAllConfigApi, getConfigApi, updateConfigValueApi, deleteConfigValueApi } from '@/api/config'
 
@@ -191,11 +189,6 @@ const addRules = {
 
 let nextId = 100
 
-// 检查是否为系统保留字段
-const isSystemField = (key) => {
-  return key in CONFIG_DEFINITIONS
-}
-
 // 将配置对象转换为树形表格数据
 const convertToTreeData = (obj, parentPath = '') => {
   const result = []
@@ -217,8 +210,7 @@ const convertToTreeData = (obj, parentPath = '') => {
       children: [],
       parentPath: parentPath,
       min: getMinValue(key, fullPath),
-      max: getMaxValue(key, fullPath),
-      isSystem: isSystemField(fullPath)  // 动态判断是否为系统字段
+      max: getMaxValue(key, fullPath)
     }
     
     if (isObject && value !== null) {
@@ -266,54 +258,19 @@ const loadConfigData = async () => {
   }
 }
 
-// 重置配置 - 重置到 configStore 的 $state
+// 重置配置
 const handleReset = async () => {
   try {
-    await ElMessageBox.confirm('重置将放弃所有未保存的修改，恢复到系统默认配置，确定要重置吗？', '提示', {
+    await ElMessageBox.confirm('重置将放弃所有未保存的修改，确定要重置吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
-    // 构建默认配置对象（从 configStore 的 $state）
-    const defaultConfig = buildDefaultConfigFromStore()
-    
-    // 调用更新全部配置接口
-    const res = await updateAllConfigApi(defaultConfig)
-    if (res.code === 200) {
-      ElMessage.success('已重置为默认配置')
-      // 重新加载配置
-      await configStore.loadConfig()
-      await loadConfigData()
-    } else {
-      ElMessage.error(res.message || '重置失败')
-    }
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('重置失败:', error)
-      ElMessage.error('重置失败')
-    }
+    await loadConfigData()
+    ElMessage.success('已重置')
+  } catch {
+    // 取消操作
   }
-}
-
-// 从 configStore 构建默认配置对象
-const buildDefaultConfigFromStore = () => {
-  const config = {}
-  const state = configStore.$state
-  
-  // 遍历 state 中的所有字段
-  for (const key in state) {
-    if (key !== 'loading' && typeof state[key] !== 'function') {
-      if (key === 'comment' && state[key] && typeof state[key] === 'object') {
-        // 处理嵌套对象
-        config[key] = { ...state[key] }
-      } else {
-        config[key] = state[key]
-      }
-    }
-  }
-  
-  return config
 }
 
 // 编辑配置
@@ -393,12 +350,6 @@ const handleCancel = (row) => {
 
 // 删除配置
 const handleDelete = async (row) => {
-  // 系统字段不可删除
-  if (row.isSystem) {
-    ElMessage.warning('系统保留字段不允许删除')
-    return
-  }
-  
   try {
     await ElMessageBox.confirm(
       `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`,
@@ -411,11 +362,9 @@ const handleDelete = async (row) => {
       }
     )
     
-    // 调用删除API
     const res = await deleteConfigValueApi(row.key)
     if (res.code === 200) {
       ElMessage.success('删除成功')
-      // 重新加载配置
       await configStore.loadConfig()
       await loadConfigData()
     } else {
