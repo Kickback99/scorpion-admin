@@ -3,21 +3,21 @@ import { getConfigApi, updateConfigValueApi } from "@/api/config"
 import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
 
-// 🎯 统一配置定义 - 扩展时只需在这里添加一行
+// 统一配置定义 - 扩展时只需在这里添加一行
 const CONFIG_DEFINITIONS = {
   // 顶层配置
-  articleTopLimit: { type: 'number', message: '文章置顶数量限制' },
-  carouselLimit: { type: 'number', message: '轮播图数量限制' },
+  article_top_limit: { type: 'number', message: '文章置顶数量限制' },
+  carousel_limit: { type: 'number', message: '轮播图数量限制' },
   theme: { type: 'radio', message: '前端主题' },
-  anchorEnabled: { type: 'switch', message: '锚点显示' },
-  loginEnabled: { type: 'switch', message: '前端登录' },
-  collapseEnabled: { type: 'switch', message: '菜单折叠' },
-  iconEnabled: { type: 'switch', message: '图标搜索增强' },
+  anchor_enabled: { type: 'switch', message: '锚点显示' },
+  login_enabled: { type: 'switch', message: '前端登录' },
+  collapse_enabled: { type: 'switch', message: '菜单折叠' },
+  icon_enabled: { type: 'switch', message: '图标搜索增强' },
   
-  // 🎯 嵌套配置 - 使用点号路径作为 key
-  'comment.commentEnabled': { type: 'switch', message: '评论显示' },
-  'comment.childCommentLimit': { type: 'number', message: '子评论默认显示数量' },
-  'comment.childPageSize': { type: 'number', message: '子评论分页大小' }
+  // 嵌套配置 - 使用点号路径作为 key
+  'comment.comment_enabled': { type: 'switch', message: '评论显示' },
+  'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量' },
+  'comment.child_page_size': { type: 'number', message: '子评论分页大小' }
 }
 
 // 提示消息映射
@@ -41,18 +41,18 @@ export const useConfigStore = defineStore({
   state: () => ({
     loading: false,
     // 顶层配置
-    articleTopLimit: 3,
-    carouselLimit: 3,
+    article_top_limit: 3,
+    carousel_limit: 3,
     theme: 0,
-    anchorEnabled: true,
-    loginEnabled: true,
-    collapseEnabled: false,
-    iconEnabled: true,
+    anchor_enabled: true,
+    login_enabled: true,
+    collapse_enabled: false,
+    icon_enabled: true,
     // 嵌套配置
     comment: {
-      commentEnabled: true,
-      childCommentLimit: 3,
-      childPageSize: 10
+      comment_enabled: true,
+      child_comment_limit: 3,
+      child_page_size: 10
     }
   }),
 
@@ -91,7 +91,7 @@ export const useConfigStore = defineStore({
       try {
         const res = await updateConfigValueApi(key, value)
         if (res.code === 200) {
-          // 🎯 直接更新 store 中的值
+          // 直接更新 store 中的值
           if (key.includes('.')) {
             const parts = key.split('.')
             this[parts[0]][parts[1]] = value
@@ -151,15 +151,15 @@ export const useConfigStore = defineStore({
     // ========== 便捷方法 ==========
     
     toggleComment() {
-      this.updateConfig('comment.commentEnabled', !this.comment.commentEnabled)
+      this.updateConfig('comment.comment_enabled', !this.comment.comment_enabled)
     },
 
     toggleAnchor() {
-      this.updateConfig('anchorEnabled', !this.anchorEnabled)
+      this.updateConfig('anchor_enabled', !this.anchor_enabled)
     },
 
     toggleLogin() {
-      this.updateConfig('loginEnabled', !this.loginEnabled)
+      this.updateConfig('login_enabled', !this.login_enabled)
     },
 
     setTheme(value) {
@@ -167,56 +167,72 @@ export const useConfigStore = defineStore({
     },
 
     toggleCollapse() {
-      this.updateConfig('collapseEnabled', !this.collapseEnabled)
+      this.updateConfig('collapse_enabled', !this.collapse_enabled)
     },
 
     toggleIconEnabled() {
-      this.updateConfig('iconEnabled', !this.iconEnabled)
+      this.updateConfig('icon_enabled', !this.icon_enabled)
     },
 
     setArticleTopLimit(value) {
-      this.updateConfig('articleTopLimit', value)
+      this.updateConfig('article_top_limit', value)
     },
 
     setCarouselLimit(value) {
-      this.updateConfig('carouselLimit', value)
+      this.updateConfig('carousel_limit', value)
     },
 
     setChildCommentLimit(value) {
-      this.updateConfig('comment.childCommentLimit', value)
+      this.updateConfig('comment.child_comment_limit', value)
     },
 
     setChildPageSize(value) {
-      this.updateConfig('comment.childPageSize', value)
+      this.updateConfig('comment.child_page_size', value)
     },
 
     // ========== Getter 方法 ==========
     
     getIsCollapse() {
-      return this.collapseEnabled === true
+      return this.collapse_enabled === true
+    },
+
+    getLoginEnabled(){
+      return this.login_enabled === true
+    },
+
+    getAnchorEnabled(){
+      return this.anchor_enabled === true
     },
 
     getIconEnabled() {
-      return this.iconEnabled === true
+      return this.icon_enabled === true
+    },
+
+    getArticleTopLimit(){
+      return this.article_top_limit ?? 3
+    },
+
+    getCarouselLimit(){
+      return this.carousel_limit ?? 3
     },
     
     getChildCommentLimit() {
-      return this.comment?.childCommentLimit ?? 3
+      return this.comment?.child_comment_limit ?? 3
     },
 
     getChildPageSize() {
-      return this.comment?.childPageSize ?? 10
+      return this.comment?.child_page_size ?? 7
     },
 
     getCommentEnabled() {
-      return this.comment?.commentEnabled ?? true
+      return this.comment?.comment_enabled ?? true
     }
   },
 
   getters: {
-    isCommentEnabled: (state) => state.comment?.commentEnabled === true,
-    isAnchorEnabled: (state) => state.anchorEnabled === true,
-    isLoginEnabled: (state) => state.loginEnabled === true,
+    isCommentEnabled: (state) => state.comment?.comment_enabled === true,
+    isAnchorEnabled: (state) => state.anchor_enabled === true,
+    isLoginEnabled: (state) => state.login_enabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
   }
 })
