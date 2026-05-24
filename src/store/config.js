@@ -3,8 +3,25 @@ import { getConfigApi, updateConfigValueApi } from "@/api/config"
 import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
 
+export const DEFAULT_CONFIG = {
+  // 顶层配置
+  article_top_limit: 3,
+  carousel_limit: 3,
+  theme: 0,
+  anchor_enabled: true,
+  login_enabled: true,
+  collapse_enabled: false,
+  icon_enabled: true,
+  // 嵌套配置
+  comment: {
+    comment_enabled: true,
+    child_comment_limit: 3,
+    child_page_size: 10
+  }
+}
+
 // 统一配置定义 - 扩展时只需在这里添加一行
-const CONFIG_DEFINITIONS = {
+export const CONFIG_DEFINITIONS = {
   // 顶层配置
   article_top_limit: { type: 'number', message: '文章置顶数量限制' },
   carousel_limit: { type: 'number', message: '轮播图数量限制' },
@@ -38,23 +55,7 @@ const MESSAGE_MAP = {
 export const useConfigStore = defineStore({
   id: 'config',
   
-  state: () => ({
-    loading: false,
-    // 顶层配置
-    article_top_limit: 3,
-    carousel_limit: 3,
-    theme: 0,
-    anchor_enabled: true,
-    login_enabled: true,
-    collapse_enabled: false,
-    icon_enabled: true,
-    // 嵌套配置
-    comment: {
-      comment_enabled: true,
-      child_comment_limit: 3,
-      child_page_size: 10
-    }
-  }),
+  state: () => JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
 
   actions: {
     /**
@@ -65,7 +66,9 @@ export const useConfigStore = defineStore({
       try {
         const res = await getConfigApi()
         if (res.code === 200 && res.data) {
-          Object.assign(this.$state, res.data)
+          // 合并配置，确保 DEFAULT_CONFIG 中定义的字段都存在
+          const mergedConfig = this.mergeWithDefault(res.data)
+          Object.assign(this.$state, mergedConfig)
           this.executeInit()
         }
       } catch (error) {
@@ -75,6 +78,28 @@ export const useConfigStore = defineStore({
         this.loading = false
       }
     },
+
+    /**
+     * 合并配置，确保 DEFAULT_CONFIG 中定义的字段都存在
+     */
+    mergeWithDefault(config) {
+      const result = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+      
+      // 合并顶层配置
+      for (const key in config) {
+        if (key !== 'comment' && typeof config[key] !== 'object') {
+          result[key] = config[key]
+        }
+      }
+      
+      // 合并 comment 嵌套配置
+      if (config.comment && typeof config.comment === 'object') {
+        result.comment = { ...result.comment, ...config.comment }
+      }
+      
+      return result
+    },
+
 
     /**
      * 更新单个配置项
@@ -134,7 +159,8 @@ export const useConfigStore = defineStore({
      * 批量更新配置
      */
     async batchUpdateConfig(configData) {
-      Object.assign(this.$state, configData)
+      const mergedConfig = this.mergeWithDefault(configData)
+      Object.assign(this.$state, mergedConfig)
       this.executeInit()
     },
 
@@ -145,6 +171,22 @@ export const useConfigStore = defineStore({
       if (this.iconEnabled === true) {
         const iconStore = useIconStore()
         iconStore.resetIconConditions()
+      }
+    },
+
+    /**
+     * 重置配置到默认值
+     */
+    async resetToDefault() {
+      const defaultConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+      Object.assign(this.$state, defaultConfig)
+      
+      const res = await updateAllConfigApi(defaultConfig)
+      if (res.code === 200) {
+        ElMessage.success('已重置为默认配置')
+        this.executeInit()
+      } else {
+        ElMessage.error(res.message || '重置失败')
       }
     },
 
