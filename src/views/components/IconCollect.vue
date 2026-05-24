@@ -23,7 +23,7 @@
           @clear="onClear"
         />
         
-      <div class="flex justify-between" v-if="configStore.iconEnabled">
+      <div class="flex justify-between" v-if="configStore.getIconEnabled()">
         <div class="flex items-center">
           <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
           <el-switch 
