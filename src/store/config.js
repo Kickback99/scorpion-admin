@@ -3,6 +3,20 @@ import { getConfigApi, updateConfigValueApi } from "@/api/config"
 import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
 
+// 系统预定义配置项的 key 列表（只有这些才是系统字段，不可删除）
+const SYSTEM_CONFIG_KEYS = [
+  'article_top_limit',
+  'carousel_limit',
+  'theme',
+  'anchor_enabled',
+  'login_enabled',
+  'collapse_enabled',
+  'icon_enabled',
+  'comment.comment_enabled',
+  'comment.child_comment_limit',
+  'comment.child_page_size'
+]
+
 // 统一配置定义 - 扩展时只需在这里添加一行
 const CONFIG_DEFINITIONS = {
   // 顶层配置
@@ -59,10 +73,16 @@ export const useConfigStore = defineStore({
   }),
 
   actions: {
+
+    /**
+     * 判断是否为系统字段（基于 SYSTEM_CONFIG_KEYS 数组）
+     */
+    isSystemConfig(key) {
+      return SYSTEM_CONFIG_KEYS.includes(key)
+    },
+
     /**
      * 获取配置项的定义（从 CONFIG_DEFINITIONS）
-     * @param {string} key 配置项路径
-     * @returns {object|undefined}
      */
     getConfigDefinition(key) {
       return CONFIG_DEFINITIONS[key]
