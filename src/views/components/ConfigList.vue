@@ -49,8 +49,8 @@
             <el-form-item label="子评论默认显示数量">
               <el-input-number
                 :model-value="configStore.getChildCommentLimit()"
-                :min="0"
-                :max="20"
+                :min="getMin('comment.child_comment_limit')"
+                :max="getMax('comment.child_comment_limit')"
                 @change="configStore.setChildCommentLimit"
               />
               <el-tooltip content="子评论默认显示的数量，超过此数量显示「查看更多」按钮" placement="right">
@@ -62,8 +62,8 @@
             <el-form-item label="子评论分页大小">
               <el-input-number
                 :model-value="configStore.getChildPageSize()"
-                :min="5"
-                :max="50"
+                :min="getMin('comment.child_page_size')"
+                :max="getMax('comment.child_page_size')"
                 @change="configStore.setChildPageSize"
               />
               <el-tooltip placement="right">
@@ -96,8 +96,8 @@
             <el-form-item label="文章置顶数量限制">
               <el-input-number
                 :model-value="configStore.getArticleTopLimit()"
-                :min="1"
-                :max="99"
+                :min="getMin('article_top_limit')"
+                :max="getMax('article_top_limit')"
                 @change="configStore.setArticleTopLimit"
               />
               <!-- <span class="form-tip">（-1表示无限制）</span> -->
@@ -107,8 +107,8 @@
             <el-form-item label="轮播图数量限制">
               <el-input-number
                 :model-value="configStore.getCarouselLimit()"
-                :min="0"
-                :max="99"
+                :min="getMin('carousel_limit')"
+                :max="getMax('carousel_limit')"
                 @change="configStore.setCarouselLimit"
               />
             </el-form-item>
@@ -132,6 +132,18 @@ const activeName = ref('client')
 // Tab 切换处理
 const handleClick = (tab, event) => {
   console.log(tab, event)
+}
+
+// 获取配置项的最小值
+const getMin = (key) => {
+  const limit = configStore.getLimitMin(key)
+  return limit !== undefined ? limit : -Infinity
+}
+
+// 获取配置项的最大值
+const getMax = (key) => {
+  const limit = configStore.getLimitMax(key)
+  return limit !== undefined ? limit : Infinity
 }
 </script>
 
