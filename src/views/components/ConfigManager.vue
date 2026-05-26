@@ -25,6 +25,8 @@
             <el-icon v-if="row.isObject" class="object-icon"><Folder /></el-icon>
             <el-icon v-else class="field-icon"><Document /></el-icon>
             {{ row.displayKey }}
+            <!-- 系统预设配置标识 -->
+            <el-tag v-if="row.isSystem" type="danger" size="small" effect="plain" style="margin-left: 8px">系统</el-tag>
           </span>
         </template>
       </el-table-column>
@@ -90,7 +92,8 @@
             <el-button type="primary" link size="small" @click="handleEdit(row)" :disabled="row.isObject">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
-            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="row.isObject && hasChildren(row)">
+            <!-- 删除按钮：对象有子节点 或 系统预设配置 时禁用 -->
+            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || row.isSystem">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
             <el-button type="success" link size="small" @click="handleAddChild(row)" v-if="row.isObject">
@@ -211,6 +214,11 @@ const addRules = {
 
 let nextId = 100
 
+// 检查是否为系统预设配置（使用 store 的 isSystemConfig 方法）
+const isSystemField = (key) => {
+  return configStore.isSystemConfig(key)
+}
+
 // 获取字段的最小值限制（统一从 numberLimits 读取）
 const getFieldMin = (key) => {
   const limit = configStore.getLimitMin(key)
@@ -249,6 +257,8 @@ const convertToTreeData = (obj, parentPath = '') => {
       parentPath: parentPath,
       min: isFinite(min) ? min : undefined,
       max: isFinite(max) ? max : undefined,
+      // 动态判断是否为系统预设配置
+      isSystem: isSystemField(fullPath)
     }
     
     if (isObject && value !== null) {
@@ -378,15 +388,22 @@ const hasChildren = (row) => {
 // 删除配置
 const handleDelete = async (row) => {
 
-  // 检查是否为系统预设配置
-  const isSystemPreset = !!configStore.getConfigDefinition(row.key)
-  
+  // 系统预设配置不允许删除（系统预设配置按钮已禁用，此方法不会执行，但保留逻辑）
+  if (row.isSystem) {
+    ElMessage.warning('系统预设配置不可删除')
+    return
+  }
+
+  // 检查是否为已定义的配置项（存在于 CONFIG_DEFINITIONS）
+  const isDefined = !!configStore.getConfigDefinition(row.key)
+
   let confirmMessage = ''
-  if (isSystemPreset) {
-    confirmMessage = `配置项 "${row.displayKey}" 是系统预设配置，删除后如需恢复需要修改 CONFIG_DEFINITIONS 源码。确定要删除吗？`
+  if (isDefined) {
+    confirmMessage = `配置项 "${row.displayKey}" 是已定义的配置项，删除后需要在 CONFIG_DEFINITIONS 源码中删除该项。确定要删除吗？`
   } else {
     confirmMessage = `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`
   }
+
 
   try {
     await ElMessageBox.confirm(
@@ -460,9 +477,8 @@ const handleConfirmAdd = async () => {
         const fullKey = addForm.parentPath ? `${addForm.parentPath}.${addForm.key}` : addForm.key
 
         // 检查是否在 CONFIG_DEFINITIONS 中已存在
-        const existingDef = configStore.getConfigDefinition(fullKey)
-        if (existingDef) {
-          ElMessage.warning(`配置项 "${addForm.key}" 是系统预设配置，不能重复添加`)
+        if (configStore.getConfigDefinition(fullKey)) {
+          ElMessage.warning(`配置项 "${addForm.key}" 已在 CONFIG_DEFINITIONS 源码中定义，不能重复添加`)
           return
         }
         
