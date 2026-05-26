@@ -90,7 +90,7 @@
             <el-button type="primary" link size="small" @click="handleEdit(row)" :disabled="row.isObject">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
-            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="row.isObject">
+            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="row.isObject && hasChildren(row)">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
             <el-button type="success" link size="small" @click="handleAddChild(row)" v-if="row.isObject">
@@ -348,6 +348,13 @@ const handleCancel = (row) => {
   row.editValue = cloneValue(row.value)
 }
 
+// 判断节点是否有子节点（非空对象）
+const hasChildren = (row) => {
+  if (!row.isObject) return false
+  // 如果 children 数组存在且有内容，返回 true
+  return row.children && row.children.length > 0
+}
+
 // 删除配置
 const handleDelete = async (row) => {
   try {
@@ -378,24 +385,30 @@ const handleDelete = async (row) => {
   }
 }
 
-// 新增根配置
-const handleAddRoot = () => {
+// 重置新增表单
+const resetAddForm = () => {
   addForm.key = ''
   addForm.type = 'string'
   addForm.value = ''
   addForm.min = 0
   addForm.max = 100
-  addDialogVisible.value = true
+  
+  // 清除表单校验状态和错误信息
+  if (addFormRef.value) {
+    addFormRef.value.resetFields()
+  }
+}
+
+// 新增根配置
+const handleAddRoot = () => {
+  resetAddForm()
   addForm.parentPath = ''
+  addDialogVisible.value = true
 }
 
 // 新增子配置
 const handleAddChild = (row) => {
-  addForm.key = ''
-  addForm.type = 'string'
-  addForm.value = ''
-  addForm.min = 0
-  addForm.max = 100
+  resetAddForm()
   addForm.parentPath = row.key
   addDialogVisible.value = true
 }
