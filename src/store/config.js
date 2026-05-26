@@ -6,8 +6,8 @@ import { useIconStore } from "./icon"
 // 统一配置定义 - 扩展时只需在这里添加一行
 const CONFIG_DEFINITIONS = {
   // 顶层配置
-  article_top_limit: { type: 'number', message: '文章置顶数量限制' },
-  carousel_limit: { type: 'number', message: '轮播图数量限制' },
+  article_top_limit: { type: 'number', message: '文章置顶数量限制', min:1, max:99},
+  carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
   theme: { type: 'radio', message: '前端主题' },
   anchor_enabled: { type: 'switch', message: '锚点显示' },
   login_enabled: { type: 'switch', message: '前端登录' },
@@ -16,8 +16,8 @@ const CONFIG_DEFINITIONS = {
   
   // 嵌套配置 - 使用点号路径作为 key
   'comment.comment_enabled': { type: 'switch', message: '评论显示' },
-  'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量' },
-  'comment.child_page_size': { type: 'number', message: '子评论分页大小' }
+  'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量', min:0, max:20 },
+  'comment.child_page_size': { type: 'number', message: '子评论分页大小', min:5, max: 50  }
 }
 
 // 提示消息映射
@@ -53,10 +53,75 @@ export const useConfigStore = defineStore({
       comment_enabled: true,
       child_comment_limit: 3,
       child_page_size: 10
-    }
+    },
+    // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
+    numberLimits: {}
   }),
 
   actions: {
+    /**
+     * 获取配置项的定义（从 CONFIG_DEFINITIONS）
+     * @param {string} key 配置项路径
+     * @returns {object|undefined}
+     */
+    getConfigDefinition(key) {
+      return CONFIG_DEFINITIONS[key]
+    },
+
+    /**
+     * 🦄 初始化数字限制（从 CONFIG_DEFINITIONS 加载）
+     */
+    initNumberLimits() {
+      for (const [key, def] of Object.entries(CONFIG_DEFINITIONS)) {
+        if (def.type === 'number' && (def.min !== undefined || def.max !== undefined)) {
+          if (!this.numberLimits[key]) {
+            this.numberLimits[key] = {}
+          }
+          if (def.min !== undefined) {
+            this.numberLimits[key].min = def.min
+          }
+          if (def.max !== undefined) {
+            this.numberLimits[key].max = def.max
+          }
+        }
+      }
+    },
+
+    /**
+     * 设置数字配置项的限制范围
+     * @param {string} key 配置项路径，如 'vote' 或 'comment.child_comment_limit'
+     * @param {number} min 最小值
+     * @param {number} max 最大值
+     */
+    setNumberLimit(key, min, max) {
+      if (!this.numberLimits[key]) {
+        this.numberLimits[key] = {}
+      }
+      if (min !== undefined && min !== null) {
+        this.numberLimits[key].min = min
+      }
+      if (max !== undefined && max !== null) {
+        this.numberLimits[key].max = max
+      }
+    },
+
+    /**
+     * 获取数字配置项的限制范围
+     * @param {string} key 配置项路径
+     * @returns {{ min: number|undefined, max: number|undefined }}
+     */
+    getNumberLimit(key) {
+      return this.numberLimits[key] || { min: undefined, max: undefined }
+    },
+
+    /**
+     * 删除数字配置项的限制范围
+     * @param {string} key 配置项路径
+     */
+    removeNumberLimit(key) {
+      delete this.numberLimits[key]
+    },
+
     /**
      * 加载所有配置
      */
@@ -226,6 +291,15 @@ export const useConfigStore = defineStore({
 
     getCommentEnabled() {
       return this.comment?.comment_enabled ?? true
+    },
+
+    // 获取数字配置项的最小值限制
+    getLimitMin(key) {
+      return this.numberLimits[key]?.min
+    },
+    // 获取数字配置项的最大值限制
+    getLimitMax(key) {
+      return this.numberLimits[key]?.max
     }
   },
 
@@ -234,5 +308,11 @@ export const useConfigStore = defineStore({
     isAnchorEnabled: (state) => state.anchor_enabled === true,
     isLoginEnabled: (state) => state.login_enabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
-  }
+  },
+
+  // 配置持久化
+  persist: {
+    key: 'scorpion-config',
+    paths: ['numberLimits']  // 只持久化 numberLimits
+  },
 })

@@ -133,17 +133,37 @@
           <el-input-number
             v-else-if="addForm.type === 'number'"
             v-model="addForm.value"
-            :min="addForm.min"
-            :max="addForm.max"
+          :min="addForm.min !== null ? addForm.min : undefined"
+          :max="addForm.max !== null ? addForm.max : undefined"
           />
           <el-switch v-else-if="addForm.type === 'boolean'" v-model="addForm.value" />
         </el-form-item>
-        <el-form-item label="最小值" v-if="addForm.type === 'number'">
-          <el-input-number v-model="addForm.min" :min="-Infinity" />
+        
+        <!-- 阈值设置开关 -->
+        <el-form-item v-if="addForm.type === 'number'">
+          <el-checkbox v-model="addForm.enableThreshold">
+            设置数值范围限制
+          </el-checkbox>
+          <div class="form-tip">不设置则使用系统默认配置</div>
         </el-form-item>
-        <el-form-item label="最大值" v-if="addForm.type === 'number'">
-          <el-input-number v-model="addForm.max" />
-        </el-form-item>
+        
+        <!-- 阈值设置区域（仅在开启时显示） -->
+        <template v-if="addForm.type === 'number' && addForm.enableThreshold">
+          <el-form-item label="最小值">
+            <el-input-number 
+              v-model="addForm.min" 
+              :min="-Infinity" 
+              :max="addForm.max !== null ? addForm.max : Infinity"
+            />
+          </el-form-item>
+          <el-form-item label="最大值">
+            <el-input-number 
+              v-model="addForm.max" 
+              :min="addForm.min !== null ? addForm.min : -Infinity"
+              :max="Infinity"
+            />
+          </el-form-item>
+        </template>
       </el-form>
       <template #footer>
         <el-button @click="addDialogVisible = false">取消</el-button>
@@ -154,7 +174,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
 import { useConfigStore } from '@/store/config'
@@ -174,8 +194,10 @@ const addForm = reactive({
   key: '',
   type: 'string',
   value: '',
-  min: 0,
-  max: 100
+  min: null,           // 默认为 null，表示不设置
+  max: null,           // 默认为 null，表示不设置
+  enableThreshold: false,  // 是否启用阈值设置
+  parentPath: ''
 })
 
 // 表单验证规则
@@ -189,6 +211,18 @@ const addRules = {
 
 let nextId = 100
 
+// 获取字段的最小值限制（统一从 numberLimits 读取）
+const getFieldMin = (key) => {
+  const limit = configStore.getLimitMin(key)
+  return limit !== undefined ? limit : -Infinity
+}
+
+// 获取字段的最大值限制（统一从 numberLimits 读取）
+const getFieldMax = (key) => {
+  const limit = configStore.getLimitMax(key)
+  return limit !== undefined ? limit : Infinity
+}
+
 // 将配置对象转换为树形表格数据
 const convertToTreeData = (obj, parentPath = '') => {
   const result = []
@@ -196,6 +230,10 @@ const convertToTreeData = (obj, parentPath = '') => {
   for (const [key, value] of Object.entries(obj)) {
     const fullPath = parentPath ? `${parentPath}.${key}` : key
     const isObject = value !== null && typeof value === 'object' && !Array.isArray(value)
+
+    // 获取该字段的限制（统一从 numberLimits 读取）
+    const min = getFieldMin(fullPath)
+    const max = getFieldMax(fullPath)
     
     const node = {
       id: nextId++,
@@ -209,8 +247,8 @@ const convertToTreeData = (obj, parentPath = '') => {
       editValue: isObject ? null : value,
       children: [],
       parentPath: parentPath,
-      min: getMinValue(key, fullPath),
-      max: getMaxValue(key, fullPath)
+      min: isFinite(min) ? min : undefined,
+      max: isFinite(max) ? max : undefined,
     }
     
     if (isObject && value !== null) {
@@ -221,27 +259,6 @@ const convertToTreeData = (obj, parentPath = '') => {
   }
   
   return result
-}
-
-// 获取字段的数值范围限制（从原有配置定义中获取）
-const getMinValue = (key, fullPath) => {
-  const limits = {
-    articleTopLimit: { min: 1, max: 99 },
-    carouselLimit: { min: 0, max: 99 },
-    childCommentLimit: { min: 0, max: 20 },
-    childPageSize: { min: 5, max: 50 },
-  }
-  return limits[key]?.min ?? limits[fullPath]?.min
-}
-
-const getMaxValue = (key, fullPath) => {
-  const limits = {
-    articleTopLimit: { min: 1, max: 99 },
-    carouselLimit: { min: 0, max: 99 },
-    childCommentLimit: { min: 0, max: 20 },
-    childPageSize: { min: 5, max: 50 }
-  }
-  return limits[key]?.max ?? limits[fullPath]?.max
 }
 
 // 加载配置数据
@@ -298,13 +315,16 @@ const handleSave = async (row) => {
         ElMessage.error('请输入有效的数字')
         return
       }
-      // 检查数值范围
-      if (row.min !== undefined && newValue < row.min) {
-        ElMessage.error(`值不能小于 ${row.min}`)
+
+      // 检查数值范围（使用当前的 min/max）
+      const currentMin = row.min !== undefined ? row.min : -Infinity
+      const currentMax = row.max !== undefined ? row.max : Infinity
+      if (newValue < currentMin) {
+        ElMessage.error(`值不能小于 ${currentMin}`)
         return
       }
-      if (row.max !== undefined && newValue > row.max) {
-        ElMessage.error(`值不能大于 ${row.max}`)
+      if (newValue > currentMax) {
+        ElMessage.error(`值不能大于 ${currentMax}`)
         return
       }
     } else if (row.type === 'boolean') {
@@ -357,9 +377,20 @@ const hasChildren = (row) => {
 
 // 删除配置
 const handleDelete = async (row) => {
+
+  // 检查是否为系统预设配置
+  const isSystemPreset = !!configStore.getConfigDefinition(row.key)
+  
+  let confirmMessage = ''
+  if (isSystemPreset) {
+    confirmMessage = `配置项 "${row.displayKey}" 是系统预设配置，删除后如需恢复需要修改 CONFIG_DEFINITIONS 源码。确定要删除吗？`
+  } else {
+    confirmMessage = `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`
+  }
+
   try {
     await ElMessageBox.confirm(
-      `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`,
+      confirmMessage,
       '提示',
       {
         confirmButtonText: '确定删除',
@@ -368,6 +399,11 @@ const handleDelete = async (row) => {
         confirmButtonClass: 'el-button--danger'
       }
     )
+
+    // 如果是数字类型，移除 store 中的限制
+    if (row.type === 'number') {
+      configStore.removeNumberLimit(row.key)
+    }
     
     const res = await deleteConfigValueApi(row.key)
     if (res.code === 200) {
@@ -390,8 +426,9 @@ const resetAddForm = () => {
   addForm.key = ''
   addForm.type = 'string'
   addForm.value = ''
-  addForm.min = 0
-  addForm.max = 100
+  addForm.min = null
+  addForm.max = null
+  addForm.enableThreshold = false
   
   // 清除表单校验状态和错误信息
   if (addFormRef.value) {
@@ -419,8 +456,18 @@ const handleConfirmAdd = async () => {
   
   await addFormRef.value.validate(async (valid) => {
     if (valid) {
-      try {
+      try {        
+        const fullKey = addForm.parentPath ? `${addForm.parentPath}.${addForm.key}` : addForm.key
+
+        // 检查是否在 CONFIG_DEFINITIONS 中已存在
+        const existingDef = configStore.getConfigDefinition(fullKey)
+        if (existingDef) {
+          ElMessage.warning(`配置项 "${addForm.key}" 是系统预设配置，不能重复添加`)
+          return
+        }
+        
         const fullConfig = buildFullConfig()
+        
         let targetObj = fullConfig
         
         if (addForm.parentPath) {
@@ -439,8 +486,19 @@ const handleConfirmAdd = async () => {
         
         // 设置新值
         let value = addForm.value
+
         if (addForm.type === 'number') {
           value = Number(value)
+
+          // 只有在用户启用了阈值设置且设置了有效值时，才保存到 numberLimits
+          if (addForm.enableThreshold) {
+            const minToSave = addForm.min !== null ? addForm.min : undefined
+            const maxToSave = addForm.max !== null ? addForm.max : undefined
+            if (minToSave !== undefined || maxToSave !== undefined) {
+              configStore.setNumberLimit(fullKey, minToSave, maxToSave)
+            }
+          }
+          // 如果用户没有启用阈值设置，不保存任何限制（使用 CONFIG_DEFINITIONS 的配置）
         } else if (addForm.type === 'boolean') {
           value = Boolean(value)
         } else if (addForm.type === 'object') {
@@ -515,7 +573,66 @@ const updateNestedValue = (obj, pathParts, value) => {
 
 // 监听配置store变化，同步表格数据
 onMounted(() => {
+  configStore.initNumberLimits()
   loadConfigData()
+})
+
+// 调整默认值使其在范围内
+const adjustValueToRange = () => {
+  if (addForm.type !== 'number') return
+  if (!addForm.enableThreshold) return  // 未启用阈值时，不调整
+  
+  let currentValue = addForm.value
+  let min = addForm.min
+  let max = addForm.max
+  
+  // 注意：min 和 max 可能为 null，需要处理
+  if (min !== null && currentValue < min) {
+    addForm.value = min
+  }
+  if (max !== null && currentValue > max) {
+    addForm.value = max
+  }
+}
+
+// 监听 min 变化
+watch(() => addForm.min, () => {
+  adjustValueToRange()
+})
+
+// 监听 max 变化
+watch(() => addForm.max, () => {
+  adjustValueToRange()
+})
+
+// 监听类型变化
+watch(() => addForm.type, (newType) => {
+    if (newType === 'number') {
+    // 重置数值相关字段
+    addForm.value = 0
+    addForm.min = null
+    addForm.max = null
+    addForm.enableThreshold = false
+    // 未启用阈值，不调整范围
+  }else if (newType === 'boolean') {
+    addForm.value = true
+  } else if (newType === 'string') {
+    addForm.value = ''
+  }
+})
+
+// 监听启用阈值开关变化
+watch(() => addForm.enableThreshold, (enabled) => {
+  if (!enabled) {
+    // 关闭时清空 min/max
+    addForm.min = null
+    addForm.max = null
+  } else {
+    // 开启时设置默认值
+    if (addForm.min === null) addForm.min = 0
+    if (addForm.max === null) addForm.max = 100
+    adjustValueToRange()
+  }
 })
 </script>
 
