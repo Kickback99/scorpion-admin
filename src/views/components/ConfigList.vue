@@ -37,6 +37,16 @@
               />
             </el-form-item>
 
+            <!-- 前端友链 -->
+            <el-form-item label="前端友链">
+              <el-switch
+                :model-value="configStore.getFriendLinkEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleFriendLinkEnabled"
+              />
+            </el-form-item>
+
             <!-- 前端主题 -->
             <el-form-item label="前端主题">
               <el-radio-group :model-value="configStore.theme" @change="configStore.setTheme" class="vertical-radio-group">
