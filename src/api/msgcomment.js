@@ -60,3 +60,16 @@ export const auditCommentApi = (id, status) => {
         method: 'put'
     })
 }
+
+/**
+ * 获取评论统计数据
+ * @param {Object} params - 查询参数（与列表查询参数一致）
+ * @returns {Promise} 返回统计数据 { total, pending, approved, rejected }
+ */
+export const getCommentStatisticsApi = (params) => {
+    return http({
+        url: '/admin/msg/comment/statistics',
+        method: 'get',
+        params
+    })
+}
