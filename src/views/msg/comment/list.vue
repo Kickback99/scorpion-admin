@@ -61,10 +61,48 @@
 
     </div>
 
-    <div class="right mb-5 ml-4">
-        <el-button @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Check"  type="success" plain :dark="isDark" >批量通过</el-button>
-        <el-button @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Close"  type="warning" plain :dark="isDark" >批量驳回</el-button>
-        <el-button @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete"  type="danger"   plain :dark="isDark" >批量删除</el-button>
+    <div class="action-bar">
+        <div class="action-buttons">
+            <el-button @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Check"  type="success" plain :dark="isDark" >批量通过</el-button>
+            <el-button @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Close"  type="warning" plain :dark="isDark" >批量驳回</el-button>
+            <el-button @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete"  type="danger"   plain :dark="isDark" >批量删除</el-button>
+        </div>
+
+        <!-- 统计区域：按钮显示状态文字，数字单独显示 -->
+        <div class="statistics-buttons">
+            <!-- 总评论 -->
+            <div class="stat-item" :class="{ 'is-dark': isDark }">
+                <el-button class="stat-btn total-btn">
+                    <span class="stat-label">总评论</span>
+                </el-button>
+                <span class="stat-number">{{ statistics.total }}</span>
+            </div>
+
+            <!-- 待审核 -->
+            <div class="stat-item" :class="{ 'is-dark': isDark }">
+                <el-button class="stat-btn pending-btn">
+                    <span class="stat-label">待审核</span>
+                </el-button>
+                <span class="stat-number">{{ statistics.pending }}</span>
+            </div>
+
+            <!-- 已通过 -->
+            <div class="stat-item" :class="{ 'is-dark': isDark }">
+                <el-button class="stat-btn approved-btn">
+                    <span class="stat-label">已通过</span>
+                </el-button>
+                <span class="stat-number">{{ statistics.approved }}</span>
+            </div>
+
+            <!-- 已驳回 -->
+            <div class="stat-item" :class="{ 'is-dark': isDark }">
+                <el-button class="stat-btn rejected-btn">
+                    <span class="stat-label">已驳回</span>
+                </el-button>
+                <span class="stat-number">{{ statistics.rejected }}</span>
+            </div>
+        </div>
+
     </div>
 
 
@@ -235,10 +273,16 @@
 </template>
 
 <script setup>
-import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, removeCommentApi } from '@/api/msgcomment';
+import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, getCommentStatisticsApi, removeCommentApi } from '@/api/msgcomment';
 import { nextTick, reactive, ref, computed } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
+import { storeToRefs } from 'pinia'
+import { useColorStore } from '@/store/color';
+
+const colorStore = useColorStore()
+const { isDark } = storeToRefs(colorStore)
+
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
 const viewMode = ref('normal')
 const currentPickComment = ref(null)
@@ -282,6 +326,7 @@ const render = async () => {
             res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
             tableData.value = res.data.items
             total.value = res.data.total
+            await loadStatistics()
             return
         }
 
@@ -321,6 +366,8 @@ const render = async () => {
             tableData.value = res.data.items
             total.value = res.data.total
         }
+
+        await loadStatistics()
     }finally{
         // 关闭loading动效
         loading.value = false
@@ -692,6 +739,64 @@ const fields = computed(() => [
     {label:'自定义分组', value:'group', disabled: viewMode.value != 'pick'},
 ])
 
+const statistics = reactive({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0
+})
+
+// 构建统计参数（通用方法）
+const buildStatsParams = () => {
+    const statsParams = { ...searchData }
+    
+    // 审核模式：只有当用户没有主动选择状态时，才默认查询待审核状态
+    /* if (viewMode.value === 'audit') {
+        // 检查 searchData.status 是否为空（未选择）或为 undefined
+        const hasUserSelectedStatus = searchData.status !== undefined 
+                                    && searchData.status !== null 
+                                    && searchData.status !== ''
+        if (!hasUserSelectedStatus) {
+            statsParams.status = 2  // 默认查询待审核
+        }
+    } */
+    
+    // 如果有挑拣上下文（无论是 pick 模式还是 audit 模式从挑拣进来）
+    if (currentPickComment.value) {
+        const isRootComment = currentPickComment.value.rootId === -1
+        if (isRootComment) {
+            statsParams.rootId = currentPickComment.value.id
+            statsParams.pickChildren = true
+            delete statsParams.pickParent
+        } else {
+            statsParams.rootId = currentPickComment.value.rootId
+            statsParams.pickParent = true
+            statsParams.currentCommentId = currentPickComment.value.id
+            delete statsParams.pickChildren
+        }
+    }
+    
+    return statsParams
+}
+
+/**
+ * 加载统计数据（复用当前筛选条件）
+ */
+const loadStatistics = async () => {
+    try {
+        const statsParams = buildStatsParams()
+        const res = await getCommentStatisticsApi(statsParams)
+        if (res.code === 200 && res.data) {
+            statistics.total = res.data.total || 0
+            statistics.pending = res.data.pending || 0
+            statistics.approved = res.data.approved || 0
+            statistics.rejected = res.data.rejected || 0
+        }
+    } catch (error) {
+        console.error('加载统计数据失败:', error)
+    }
+}
+
 </script>
 
 <style scoped lang="scss">
@@ -737,5 +842,158 @@ const fields = computed(() => [
   font-size: 14px;
   line-height: 1.5;
   word-break: break-all;
+}
+
+/* ==================== 统计卡片样式 ==================== */
+/* 操作栏布局 */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* 统计按钮组 */
+.statistics-buttons {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* 单个统计项 */
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 统计按钮样式 */
+.stat-btn {
+    min-width: 70px;
+    height: auto;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: default;
+    
+    &:hover {
+        transform: translateY(-1px);
+    }
+    
+    .stat-label {
+        line-height: 1;
+    }
+}
+
+/* 总评论按钮样式 */
+.total-btn {
+    background-color: #f5f7fa;
+    border-color: #dcdfe6;
+    color: #606266;
+    
+    &:hover {
+        background-color: #e9ecef;
+    }
+}
+
+/* 待审核按钮样式 */
+.pending-btn {
+    background-color: #fdf6ec;
+    border-color: #faecd8;
+    color: #e6a23c;
+    
+    &:hover {
+        background-color: #f9e6d2;
+    }
+}
+
+/* 已通过按钮样式 */
+.approved-btn {
+    background-color: #ecf5ff;
+    border-color: #d9ecff;
+    color: #409eff;
+    
+    &:hover {
+        background-color: #d9ecff;
+    }
+}
+
+/* 已驳回按钮样式 */
+.rejected-btn {
+    background-color: #fef0f0;
+    border-color: #fde2e2;
+    color: #f56c6c;
+    
+    &:hover {
+        background-color: #fde2e2;
+    }
+}
+
+/* 统计数字样式 */
+.stat-number {
+    font-size: 15px;
+    font-weight: 600;
+    color: #303133;
+    line-height: 1;
+}
+
+/* 深色模式适配 */
+.stat-item.is-dark {
+    .total-btn {
+        background-color: #2c2c2c;
+        border-color: #3a3a3a;
+        color: #c0c4cc;
+        
+        &:hover {
+            background-color: #3a3a3a;
+        }
+    }
+    
+    .pending-btn {
+        background-color: #2b2b1f;
+        border-color: #3a3620;
+        color: #e6a23c;
+        
+        &:hover {
+            background-color: #3a3620;
+        }
+    }
+    
+    .approved-btn {
+        background-color: #1f2d3d;
+        border-color: #2a3a4a;
+        color: #409eff;
+        
+        &:hover {
+            background-color: #2a3a4a;
+        }
+    }
+    
+    .rejected-btn {
+        background-color: #2d1f1f;
+        border-color: #3a2525;
+        color: #f56c6c;
+        
+        &:hover {
+            background-color: #3a2525;
+        }
+    }
+
+    /* 评论数样式 */
+    .stat-number {
+        color: #e5e7eb;
+    }
 }
 </style>
