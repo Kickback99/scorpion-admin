@@ -27,6 +27,7 @@ const CONFIG_DEFINITIONS = {
   login_enabled: { type: 'switch', message: '前端登录' },
   collapse_enabled: { type: 'switch', message: '菜单折叠' },
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
+  friend_link_enabled: { type: 'switch', message: '友链显示' },
   
   // 嵌套配置 - 使用点号路径作为 key
   'comment.comment_enabled': { type: 'switch', message: '评论显示' },
@@ -62,6 +63,7 @@ export const useConfigStore = defineStore({
     login_enabled: true,
     collapse_enabled: false,
     icon_enabled: true,
+    friend_link_enabled: false,
     // 嵌套配置
     comment: {
       comment_enabled: true,
@@ -259,6 +261,10 @@ export const useConfigStore = defineStore({
       this.updateConfig('icon_enabled', !this.icon_enabled)
     },
 
+    toggleFriendLinkEnabled() {
+      this.updateConfig('friend_link_enabled', !this.friend_link_enabled)
+    },
+
     setArticleTopLimit(value) {
       this.updateConfig('article_top_limit', value)
     },
@@ -283,6 +289,10 @@ export const useConfigStore = defineStore({
 
     getLoginEnabled(){
       return this.login_enabled === true
+    },
+
+    getFriendLinkEnabled(){
+      return this.friend_link_enabled === true
     },
 
     getAnchorEnabled(){
