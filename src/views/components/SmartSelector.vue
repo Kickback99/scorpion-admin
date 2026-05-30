@@ -14,7 +14,7 @@ defineProps({
     },
     data:{
         type:Array,
-        required:null
+        required:true
     }
 })
 </script>
