@@ -9,12 +9,12 @@ const SYSTEM_CONFIG_KEYS = [
   'carousel_limit',
   'theme',
   'anchor_enabled',
-  'login_enabled',
   'collapse_enabled',
   'icon_enabled',
   'comment.comment_enabled',
   'comment.child_comment_limit',
-  'comment.child_page_size'
+  'comment.child_page_size',
+  'nav.login_enabled'
 ]
 
 // 统一配置定义 - 扩展时只需在这里添加一行
@@ -24,15 +24,17 @@ const CONFIG_DEFINITIONS = {
   carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
   theme: { type: 'radio', message: '前端主题' },
   anchor_enabled: { type: 'switch', message: '锚点显示' },
-  login_enabled: { type: 'switch', message: '前端登录' },
   collapse_enabled: { type: 'switch', message: '菜单折叠' },
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
-  friend_link_enabled: { type: 'switch', message: '友链显示' },
   
-  // 嵌套配置 - 使用点号路径作为 key
+  // 评论相关
   'comment.comment_enabled': { type: 'switch', message: '评论显示' },
   'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量', min:0, max:20 },
-  'comment.child_page_size': { type: 'number', message: '子评论分页大小', min:5, max: 50  }
+  'comment.child_page_size': { type: 'number', message: '子评论分页大小', min:5, max: 50  },
+
+  // 导航相关
+  'nav.login_enabled': { type: 'switch', message: '前端登录' },
+  'nav.friend_link_enabled':{ type: 'switch', message: '前端友链' }
 }
 
 // 提示消息映射
@@ -60,15 +62,17 @@ export const useConfigStore = defineStore({
     carousel_limit: 3,
     theme: 0,
     anchor_enabled: true,
-    login_enabled: true,
     collapse_enabled: false,
     icon_enabled: true,
-    friend_link_enabled: false,
     // 嵌套配置
     comment: {
       comment_enabled: true,
       child_comment_limit: 3,
       child_page_size: 10
+    },
+    nav:{
+      login_enabled:true,
+      friend_link_enabled: false,
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -238,15 +242,11 @@ export const useConfigStore = defineStore({
     // ========== 便捷方法 ==========
     
     toggleComment() {
-      this.updateConfig('comment.comment_enabled', !this.comment.comment_enabled)
+      this.updateConfig('comment.comment_enabled', !this.comment?.comment_enabled)
     },
 
     toggleAnchor() {
       this.updateConfig('anchor_enabled', !this.anchor_enabled)
-    },
-
-    toggleLogin() {
-      this.updateConfig('login_enabled', !this.login_enabled)
     },
 
     setTheme(value) {
@@ -261,8 +261,12 @@ export const useConfigStore = defineStore({
       this.updateConfig('icon_enabled', !this.icon_enabled)
     },
 
+    toggleLogin() {
+      this.updateConfig('nav.login_enabled', !this.nav?.login_enabled)
+    },
+
     toggleFriendLinkEnabled() {
-      this.updateConfig('friend_link_enabled', !this.friend_link_enabled)
+      this.updateConfig('nav.friend_link_enabled', !this.nav?.friend_link_enabled)
     },
 
     setArticleTopLimit(value) {
@@ -288,11 +292,11 @@ export const useConfigStore = defineStore({
     },
 
     getLoginEnabled(){
-      return this.login_enabled === true
+      return this.nav?.login_enabled === true
     },
 
     getFriendLinkEnabled(){
-      return this.friend_link_enabled === true
+      return this.nav?.friend_link_enabled === true
     },
 
     getAnchorEnabled(){
@@ -336,7 +340,7 @@ export const useConfigStore = defineStore({
   getters: {
     isCommentEnabled: (state) => state.comment?.comment_enabled === true,
     isAnchorEnabled: (state) => state.anchor_enabled === true,
-    isLoginEnabled: (state) => state.login_enabled === true,
+    isLoginEnabled: (state) => state.nav.login_enabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
   },
 
