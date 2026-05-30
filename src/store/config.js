@@ -11,7 +11,7 @@ const SYSTEM_CONFIG_KEYS = [
   'anchor_enabled',
   'collapse_enabled',
   'icon_enabled',
-  'comment.comment_enabled',
+  'comment.article_comment_enabled',
   'comment.child_comment_limit',
   'comment.child_page_size',
   'nav.login_enabled'
@@ -28,7 +28,8 @@ const CONFIG_DEFINITIONS = {
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
   
   // 评论相关
-  'comment.comment_enabled': { type: 'switch', message: '评论显示' },
+  'comment.article_comment_enabled': { type: 'switch', message: '文章评论显示' },
+  'comment.friend_link_comment_enabled': { type: 'switch', message: '友链评论显示' },
   'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量', min:0, max:20 },
   'comment.child_page_size': { type: 'number', message: '子评论分页大小', min:5, max: 50  },
 
@@ -66,7 +67,8 @@ export const useConfigStore = defineStore({
     icon_enabled: true,
     // 嵌套配置
     comment: {
-      comment_enabled: true,
+      article_comment_enabled: true,
+      friend_link_comment_enabled: false,
       child_comment_limit: 3,
       child_page_size: 10
     },
@@ -241,8 +243,12 @@ export const useConfigStore = defineStore({
 
     // ========== 便捷方法 ==========
     
-    toggleComment() {
-      this.updateConfig('comment.comment_enabled', !this.comment?.comment_enabled)
+    toggleArticleComment() {
+      this.updateConfig('comment.article_comment_enabled', !this.comment?.article_comment_enabled)
+    },
+
+    toggleFriendLinkComment() {
+      this.updateConfig('comment.friend_link_comment_enabled', !this.comment?.friend_link_comment_enabled)
     },
 
     toggleAnchor() {
@@ -323,8 +329,12 @@ export const useConfigStore = defineStore({
       return this.comment?.child_page_size ?? 7
     },
 
-    getCommentEnabled() {
-      return this.comment?.comment_enabled ?? true
+    getArticleCommentEnabled() {
+      return this.comment?.article_comment_enabled ?? true
+    },
+
+    getFriendLinkCommentEnabled() {
+      return this.comment?.friend_link_comment_enabled ?? true
     },
 
     // 获取数字配置项的最小值限制
@@ -338,9 +348,10 @@ export const useConfigStore = defineStore({
   },
 
   getters: {
-    isCommentEnabled: (state) => state.comment?.comment_enabled === true,
     isAnchorEnabled: (state) => state.anchor_enabled === true,
     isLoginEnabled: (state) => state.nav.login_enabled === true,
+    isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
+    isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
     currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
   },
 

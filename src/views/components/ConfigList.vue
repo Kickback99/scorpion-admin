@@ -7,16 +7,6 @@
       <el-tab-pane label="前台" name="client">
         <div class="config-container">
           <el-form label-width="140px" label-position="left">
-            <!-- 评论显示 -->
-            <el-form-item label="评论显示">
-              <el-switch
-                :model-value="configStore.getCommentEnabled()"
-                :active-value="true"
-                :inactive-value="false"
-                @change="configStore.toggleComment"
-              />
-            </el-form-item>
-
             <!-- 锚点显示 -->
             <el-form-item label="锚点显示">
               <el-switch
@@ -44,6 +34,26 @@
                 :active-value="true"
                 :inactive-value="false"
                 @change="configStore.toggleFriendLinkEnabled"
+              />
+            </el-form-item>
+
+            <!-- 文章评论显示 -->
+            <el-form-item label="文章评论">
+              <el-switch
+                :model-value="configStore.getArticleCommentEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleArticleComment()"
+              />
+            </el-form-item>
+
+            <!-- 友链评论显示 -->
+            <el-form-item label="友链评论">
+              <el-switch
+                :model-value="configStore.getFriendLinkCommentEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleFriendLinkComment()"
               />
             </el-form-item>
 
