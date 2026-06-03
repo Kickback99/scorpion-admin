@@ -13,7 +13,7 @@
                 :model-value="configStore.getAnchorEnabled()"
                 :active-value="true"
                 :inactive-value="false"
-                @change="configStore.toggleAnchor"
+                @change="configStore.toggleAnchorEnabled"
               />
             </el-form-item>
 
@@ -23,7 +23,7 @@
                 :model-value="configStore.getLoginEnabled()"
                 :active-value="true"
                 :inactive-value="false"
-                @change="configStore.toggleLogin"
+                @change="configStore.toggleLoginEnabled"
               />
             </el-form-item>
 
@@ -43,7 +43,7 @@
                 :model-value="configStore.getArticleCommentEnabled()"
                 :active-value="true"
                 :inactive-value="false"
-                @change="configStore.toggleArticleComment()"
+                @change="configStore.toggleArticleCommentEnabled()"
               />
             </el-form-item>
 
@@ -53,7 +53,7 @@
                 :model-value="configStore.getFriendLinkCommentEnabled()"
                 :active-value="true"
                 :inactive-value="false"
-                @change="configStore.toggleFriendLinkComment()"
+                @change="configStore.toggleFriendLinkCommentEnabled()"
               />
             </el-form-item>
 
@@ -105,7 +105,7 @@
           <el-form label-width="160px" label-position="left">
 
             <el-form-item label="菜单折叠">
-              <el-switch :model-value="configStore.getIsCollapse()" @change="configStore.toggleCollapse" />
+              <el-switch :model-value="configStore.getIsCollapse()" @change="configStore.toggleCollapseEnabled" />
             </el-form-item>
 
             <el-form-item label="图标搜索增强">

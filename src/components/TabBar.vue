@@ -207,7 +207,7 @@ const handleToggleCollapse = async () => {
     // 1. 切换本地 isCollapse 状态（0: 折叠, 1: 展开）
     // 2. 调用后端 API 更新配置
     // 3. 显示成功/失败提示
-    await configStore.toggleCollapse()
+    await configStore.toggleCollapseEnabled()
     
     // 可选：如果需要触发其他组件响应折叠状态变化，可以发送事件
     // emitter.emit('collapse-change', configStore.getIsCollapse())
