@@ -35,7 +35,12 @@ const CONFIG_DEFINITIONS = {
 
   // 导航相关
   'nav.login_enabled': { type: 'switch', message: '前端登录' },
-  'nav.friend_link_enabled':{ type: 'switch', message: '前端友链' }
+  'nav.friend_link_enabled':{ type: 'switch', message: '前端友链' },
+
+  // 个人中心相关
+  'profile.my_publishes_enabled': {type:'switch', message: '我的发布'},
+  'profile.my_comments_enabled': {type:'switch', message:'我的评论'},
+  'profile.my_favorites_enabled': {type:'switch', message:'我的收藏'}
 }
 
 // 提示消息映射
@@ -75,6 +80,11 @@ export const useConfigStore = defineStore({
     nav:{
       login_enabled:true,
       friend_link_enabled: false,
+    },
+    profile:{
+      my_publishes_enabled: false,
+      my_comments_enabled: true,
+      my_favorites_enabled: true
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -291,6 +301,18 @@ export const useConfigStore = defineStore({
       this.updateConfig('comment.child_page_size', value)
     },
 
+    toggleMyPublishesEnabled(){
+      this.updateConfig('profile.my_publishes_enabled',!this.profile.my_publishes_enabled)
+    },
+
+    toggleMyCommentsEnabled(){
+      this.updateConfig('profile.my_comments_enabled',!this.profile.my_comments_enabled)
+    },
+
+    toggleMyFavoritesEnabled(){
+      this.updateConfig('profile.my_favorites_enabled',!this.profile.my_favorites_enabled)
+    },
+
     // ========== Getter 方法 ==========
     
     getIsCollapse() {
@@ -337,6 +359,18 @@ export const useConfigStore = defineStore({
       return this.comment?.friend_link_comment_enabled ?? true
     },
 
+    getMyPublishesEnabled() {
+      return this.profile?.my_publishes_enabled ?? true
+    },
+
+    getMyCommentsEnabled() {
+      return this.profile?.my_comments_enabled ?? true
+    },
+
+    getMyFavoritesEnabled() {
+      return this.profile?.my_favorites_enabled ?? true
+    },
+
     // 获取数字配置项的最小值限制
     getLimitMin(key) {
       return this.numberLimits[key]?.min
@@ -352,7 +386,10 @@ export const useConfigStore = defineStore({
     isLoginEnabled: (state) => state.nav.login_enabled === true,
     isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
     isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
-    currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress'
+    currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress',
+    isMyPublishesEnabled: (state) => state.profile?.my_publishes_enabled ?? true,
+    isMyCommentsEnabled: (state) => state.profile?.my_comments_enabled ?? true,
+    isMyFavoritesEnabled: (state) => state.profile?.my_favorites_enabled ?? true,
   },
 
   // 配置持久化
