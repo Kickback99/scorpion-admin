@@ -243,15 +243,15 @@ export const useConfigStore = defineStore({
 
     // ========== 便捷方法 ==========
     
-    toggleArticleComment() {
+    toggleArticleCommentEnabled() {
       this.updateConfig('comment.article_comment_enabled', !this.comment?.article_comment_enabled)
     },
 
-    toggleFriendLinkComment() {
+    toggleFriendLinkCommentEnabled() {
       this.updateConfig('comment.friend_link_comment_enabled', !this.comment?.friend_link_comment_enabled)
     },
 
-    toggleAnchor() {
+    toggleAnchorEnabled() {
       this.updateConfig('anchor_enabled', !this.anchor_enabled)
     },
 
@@ -259,7 +259,7 @@ export const useConfigStore = defineStore({
       this.updateConfig('theme', value)
     },
 
-    toggleCollapse() {
+    toggleCollapseEnabled() {
       this.updateConfig('collapse_enabled', !this.collapse_enabled)
     },
 
@@ -267,7 +267,7 @@ export const useConfigStore = defineStore({
       this.updateConfig('icon_enabled', !this.icon_enabled)
     },
 
-    toggleLogin() {
+    toggleLoginEnabled() {
       this.updateConfig('nav.login_enabled', !this.nav?.login_enabled)
     },
 
