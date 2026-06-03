@@ -96,6 +96,37 @@
                 <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
               </el-tooltip>
             </el-form-item>
+
+            <!-- 我的发布 显示 -->
+            <el-form-item label="我的发布">
+              <el-switch
+                :model-value="configStore.getMyPublishesEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleMyPublishesEnabled()"
+              />
+            </el-form-item>
+
+            <!-- 我的评论 显示 -->
+            <el-form-item label="我的评论">
+              <el-switch
+                :model-value="configStore.getMyCommentsEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleMyCommentsEnabled()"
+              />
+            </el-form-item>
+
+            <!-- 我的收藏 显示 -->
+            <el-form-item label="我的收藏">
+              <el-switch
+                :model-value="configStore.getMyFavoritesEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleMyFavoritesEnabled()"
+              />
+            </el-form-item>
+
           </el-form>
         </div>
       </el-tab-pane>
