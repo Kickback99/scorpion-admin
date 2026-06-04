@@ -7,16 +7,6 @@
       <el-tab-pane label="前台" name="client">
         <div class="config-container">
           <el-form label-width="140px" label-position="left">
-            <!-- 锚点显示 -->
-            <el-form-item label="锚点显示">
-              <el-switch
-                :model-value="configStore.getAnchorEnabled()"
-                :active-value="true"
-                :inactive-value="false"
-                @change="configStore.toggleAnchorEnabled"
-              />
-            </el-form-item>
-
             <!-- 前端登录 -->
             <el-form-item label="前端登录">
               <el-switch
@@ -57,12 +47,32 @@
               />
             </el-form-item>
 
-            <!-- 前端主题 -->
-            <el-form-item label="前端主题">
-              <el-radio-group :model-value="configStore.theme" @change="configStore.setTheme" class="vertical-radio-group">
+            <!-- 文章主题 -->
+            <el-form-item label="文章主题">
+              <el-radio-group :model-value="configStore.getArticleTheme()" @change="configStore.setArticleTheme" class="vertical-radio-group">
                 <el-radio :value="0">github主题</el-radio>
                 <el-radio :value="1">vuepress主题</el-radio>
               </el-radio-group>
+            </el-form-item>
+
+            <!-- 文章锚点 -->
+            <el-form-item label="文章锚点">
+              <el-switch
+                :model-value="configStore.getAnchorEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleAnchorEnabled"
+              />
+            </el-form-item>
+
+            <!-- 文章收藏数 -->
+            <el-form-item label="文章收藏数">
+              <el-switch
+                :model-value="configStore.getFavoriteCountEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleFavoriteCountEnabled()"
+              />
             </el-form-item>
 
             <!-- 子评论默认显示数量 -->
