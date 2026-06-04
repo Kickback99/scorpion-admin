@@ -7,14 +7,14 @@ import { useIconStore } from "./icon"
 const SYSTEM_CONFIG_KEYS = [
   'article_top_limit',
   'carousel_limit',
-  'theme',
-  'anchor_enabled',
   'collapse_enabled',
   'icon_enabled',
   'comment.article_comment_enabled',
   'comment.child_comment_limit',
   'comment.child_page_size',
-  'nav.login_enabled'
+  'nav.login_enabled',
+  'article_detail.theme',
+  'article_detail.anchor_enabled'
 ]
 
 // 统一配置定义 - 扩展时只需在这里添加一行
@@ -22,8 +22,6 @@ const CONFIG_DEFINITIONS = {
   // 顶层配置
   article_top_limit: { type: 'number', message: '文章置顶数量限制', min:1, max:99},
   carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
-  theme: { type: 'radio', message: '前端主题' },
-  anchor_enabled: { type: 'switch', message: '锚点显示' },
   collapse_enabled: { type: 'switch', message: '菜单折叠' },
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
   
@@ -40,7 +38,13 @@ const CONFIG_DEFINITIONS = {
   // 个人中心相关
   'profile.my_publishes_enabled': {type:'switch', message: '我的发布'},
   'profile.my_comments_enabled': {type:'switch', message:'我的评论'},
-  'profile.my_favorites_enabled': {type:'switch', message:'我的收藏'}
+  'profile.my_favorites_enabled': {type:'switch', message:'我的收藏'},
+
+  // 文章详情相关
+  'article_detail.theme': { type: 'radio', message: '文章主题' },
+  'article_detail.anchor_enabled': { type: 'switch', message: '文章锚点' },
+  'article_detail.favorite_count_enabled': { type: 'switch', message: '文章收藏数' }
+
 }
 
 // 提示消息映射
@@ -49,7 +53,7 @@ const MESSAGE_MAP = {
     true: (fieldName) => `${fieldName}已开启`,
     false: (fieldName) => `${fieldName}已禁用`
   },
-  theme: {
+  'article_detail.theme': {
     0: '主题已切换为 Github',
     1: '主题已切换为 Vuepress'
   },
@@ -66,8 +70,6 @@ export const useConfigStore = defineStore({
     // 顶层配置
     article_top_limit: 3,
     carousel_limit: 3,
-    theme: 0,
-    anchor_enabled: true,
     collapse_enabled: false,
     icon_enabled: true,
     // 嵌套配置
@@ -85,6 +87,11 @@ export const useConfigStore = defineStore({
       my_publishes_enabled: false,
       my_comments_enabled: true,
       my_favorites_enabled: true
+    },
+    article_detail:{
+      theme: 0,
+      anchor_enabled: true,
+      favorite_count_enabled: true
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -222,8 +229,10 @@ export const useConfigStore = defineStore({
       
       if (type === 'switch') {
         message = MESSAGE_MAP.switch[value]?.(fieldName) || `${fieldName}已更新`
-      } else if (type === 'radio' && key === 'theme') {
-        message = MESSAGE_MAP.theme[value] || `${fieldName}已切换`
+      } else if (type === 'radio' && MESSAGE_MAP[key]) {
+      // 下面这个写法也可以的
+      // else if (type === 'radio' && key === 'article_detail.theme') {
+        message = MESSAGE_MAP[key][value] || `${fieldName}已切换`
       } else if (type === 'number') {
         message = MESSAGE_MAP.number.default(fieldName, value)
       } else {
@@ -259,14 +268,6 @@ export const useConfigStore = defineStore({
 
     toggleFriendLinkCommentEnabled() {
       this.updateConfig('comment.friend_link_comment_enabled', !this.comment?.friend_link_comment_enabled)
-    },
-
-    toggleAnchorEnabled() {
-      this.updateConfig('anchor_enabled', !this.anchor_enabled)
-    },
-
-    setTheme(value) {
-      this.updateConfig('theme', value)
     },
 
     toggleCollapseEnabled() {
@@ -313,6 +314,18 @@ export const useConfigStore = defineStore({
       this.updateConfig('profile.my_favorites_enabled',!this.profile.my_favorites_enabled)
     },
 
+    setArticleTheme(value) {
+      this.updateConfig('article_detail.theme', value)
+    },
+
+    toggleAnchorEnabled() {
+      this.updateConfig('article_detail.anchor_enabled', !this.article_detail?.anchor_enabled)
+    },
+
+    toggleFavoriteCountEnabled(){
+      this.updateConfig('article_detail.favorite_count_enabled', !this.article_detail?.favorite_count_enabled)
+    },
+
     // ========== Getter 方法 ==========
     
     getIsCollapse() {
@@ -325,10 +338,6 @@ export const useConfigStore = defineStore({
 
     getFriendLinkEnabled(){
       return this.nav?.friend_link_enabled === true
-    },
-
-    getAnchorEnabled(){
-      return this.anchor_enabled === true
     },
 
     getIconEnabled() {
@@ -371,6 +380,18 @@ export const useConfigStore = defineStore({
       return this.profile?.my_favorites_enabled ?? true
     },
 
+    getArticleTheme(){
+      return this.article_detail.theme
+    },
+
+    getAnchorEnabled(){
+      return this.article_detail?.anchor_enabled ?? true
+    },
+
+    getFavoriteCountEnabled(){
+      return this.article_detail?.favorite_count_enabled ?? true
+    },
+
     // 获取数字配置项的最小值限制
     getLimitMin(key) {
       return this.numberLimits[key]?.min
@@ -382,14 +403,15 @@ export const useConfigStore = defineStore({
   },
 
   getters: {
-    isAnchorEnabled: (state) => state.anchor_enabled === true,
     isLoginEnabled: (state) => state.nav.login_enabled === true,
     isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
     isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
-    currentTheme: (state) => state.theme === 0 ? 'github' : 'vuepress',
     isMyPublishesEnabled: (state) => state.profile?.my_publishes_enabled ?? true,
     isMyCommentsEnabled: (state) => state.profile?.my_comments_enabled ?? true,
     isMyFavoritesEnabled: (state) => state.profile?.my_favorites_enabled ?? true,
+    currentArticleTheme: (state) => state.article_detail?.theme === 0 ? 'github' : 'vuepress',
+    isAnchorEnabled: (state) => state.article_detail?.anchor_enabled ?? true,
+    isFavoriteCountEnabled: (state) => state.article_detail?.favorite_count_enabled ?? true
   },
 
   // 配置持久化
