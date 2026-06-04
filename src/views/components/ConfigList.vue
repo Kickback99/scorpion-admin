@@ -137,6 +137,36 @@
               />
             </el-form-item>
 
+            <!-- 列表浏览 显示 -->
+            <el-form-item label="列表浏览">
+              <el-switch
+                :model-value="configStore.getListViewEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleListViewEnabled()"
+              />
+            </el-form-item>
+
+            <!-- 列表收藏 显示 -->
+            <el-form-item label="列表收藏">
+              <el-switch
+                :model-value="configStore.getListFavoriteEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleListFavoriteEnabled()"
+              />
+            </el-form-item>
+
+            <!-- 列表评论 显示 -->
+            <el-form-item label="列表评论">
+              <el-switch
+                :model-value="configStore.getListCommentEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleListCommentEnabled()"
+              />
+            </el-form-item>
+
           </el-form>
         </div>
       </el-tab-pane>
