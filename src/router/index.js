@@ -64,6 +64,7 @@ const conModules = import.meta.glob('../views/content/**/*.vue')
 const msgModules = import.meta.glob('../views/msg/**/*.vue')
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
 const configModules = import.meta.glob('../views/config/*.vue')
+const taskModules = import.meta.glob('../views/task/*.vue')
 
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
@@ -89,6 +90,9 @@ function routesHandler(router,parentType=null){
             switch(route.type){
                 case 'config':
                     modules = configModules
+                    break
+                case 'task':
+                    modules = taskModules
                     break
                 default:
                     modules = null
