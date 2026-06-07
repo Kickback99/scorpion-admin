@@ -1,4 +1,4 @@
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import { useTokenStore } from '@/store/token'
 import { useUserStore } from '@/store/user'
 import router from '@/router';
@@ -104,6 +104,14 @@ class WebSocketManager {
   // 处理接收到的消息
   handleMessage(messageData) {
     try {
+
+      // 判断是否是纯文本消息（定时任务结果）
+      if (typeof messageData === 'string' && !messageData.startsWith('{')) {
+        // 🎯 定时任务结果消息，直接显示
+        ElMessage.success(messageData)
+        return
+    }
+
       const data = JSON.parse(messageData)
       console.log('📨 收到 WebSocket 消息:', data)
 
@@ -121,6 +129,11 @@ class WebSocketManager {
           this.showSessionExpiredDialog(data.title, data.message)
           break
         default:
+          // 普通任务结果消息
+          if (data.message) {
+            ElMessage.success(data.message)
+            return
+          }
           console.warn('未知的消息类型:', data.type)
       }
     } catch (error) {
