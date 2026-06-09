@@ -14,7 +14,7 @@ class WebSocketManager {
   }
 
   // 初始化 WebSocket 连接
-  init(userId) {
+  init(userId, role = 'admin') { // 管理端默认 role='admin'
     if (!userId) {
       console.warn('❌ 没有用户ID，无法初始化 WebSocket')
       return
@@ -36,11 +36,11 @@ class WebSocketManager {
     this.isConnecting = true
     
     try {
-      const wsUrl = `ws://localhost:8800/websocket/${userId}`
+      const wsUrl = `ws://localhost:8800/websocket/${role}/${userId}`
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        console.log('✅ WebSocket 连接成功，用户ID:', userId)
+        console.log(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
         this.isConnecting = false
         this.reconnectAttempts = 0
       }
@@ -56,7 +56,7 @@ class WebSocketManager {
 
         // 只在应该重连且不是手动关闭才重连
         if (this.shouldReconnectOnClose(event.code) && !this.isManualClose) {
-            this.handleReconnect(userId)
+            this.handleReconnect(userId, role)
         }
       }
 
@@ -88,13 +88,13 @@ class WebSocketManager {
   }
 
   // 处理重连逻辑
-  handleReconnect(userId) {
+  handleReconnect(userId, role) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
       console.log(`🔄 尝试重新连接 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
       
       setTimeout(() => {
-        this.init(userId)
+        this.init(userId, role)
       }, this.reconnectInterval)
     } else {
       console.warn('❌ 达到最大重连次数，停止重连')
