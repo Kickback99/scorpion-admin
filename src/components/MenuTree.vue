@@ -39,6 +39,9 @@ const handleChildren = (menu) => {
         case 'msg':
             prefix = 'msg'
             break
+        case 'monitor':
+            prefix = 'monitor'
+            break
         case 'resource':
             prefix = 'resource'
             break

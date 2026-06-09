@@ -62,6 +62,7 @@ export const routes = [
 const sysModules = import.meta.glob('../views/system/**/*.vue')
 const conModules = import.meta.glob('../views/content/**/*.vue')
 const msgModules = import.meta.glob('../views/msg/**/*.vue')
+const monitorModules = import.meta.glob("../views/monitor/**/*.vue")
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
 const configModules = import.meta.glob('../views/config/*.vue')
 const taskModules = import.meta.glob('../views/task/*.vue')
@@ -119,6 +120,9 @@ function routesHandler(router,parentType=null){
                     break
                 case 'msg':
                     modules = msgModules
+                    break
+                case 'monitor':
+                    modules = monitorModules
                     break
                 case 'resource':
                     modules = resourceModules
