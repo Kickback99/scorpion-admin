@@ -42,6 +42,11 @@ export function useWebSocket(role = 'admin') {
     }) */
   }
 
+  // 获取原始 socket
+  const getSocket = () => {
+        return websocketManager.getSocket()
+  }
+
   // 手动关闭连接
   const closeWebSocket = () => {
     websocketManager.close()
@@ -61,6 +66,7 @@ export function useWebSocket(role = 'admin') {
     initWebSocketListener,
     closeWebSocket,
     getWebSocketStatus,
-    sendWebSocketMessage
+    sendWebSocketMessage,
+    getSocket 
   }
 }
