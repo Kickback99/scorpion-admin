@@ -11,6 +11,7 @@ class WebSocketManager {
     this.reconnectInterval = 3000
     this.isConnecting = false
     this.isManualClose = false  // 是否手动关闭
+    this.cachedOnlineUsers = null  // 缓存在线用户
   }
 
   // 初始化 WebSocket 连接
@@ -72,6 +73,10 @@ class WebSocketManager {
     }
   }
 
+  getSocket() {
+        return this.socket
+  }
+
     // 判断是否应该重连
   shouldReconnectOnClose(code) {
     // 正常关闭，不重连
@@ -128,6 +133,15 @@ class WebSocketManager {
         case 'session_expired':
           this.showSessionExpiredDialog(data.title, data.message)
           break
+        case 'online_users_update':
+          // 缓存数据
+          this.cachedOnlineUsers = data
+          console.log('缓存在线用户数据:', data)
+          // 触发全局事件
+          window.dispatchEvent(new CustomEvent('online-users-update', {
+              detail: data
+          }))
+          break
         default:
           // 普通任务结果消息
           if (data.message) {
@@ -139,6 +153,11 @@ class WebSocketManager {
     } catch (error) {
       console.error('解析 WebSocket 消息失败:', error)
     }
+  }
+
+  // 获取缓存
+  getCachedOnlineUsers() {
+      return this.cachedOnlineUsers
   }
 
   // 显示强制退出对话框
