@@ -2,7 +2,7 @@ import { watch, onUnmounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import websocketManager from '@/server/websocketManager'
 
-export function useWebSocket() {
+export function useWebSocket(role = 'admin') {
 
   // 初始化 WebSocket 监听
 /*   const initWebSocketListener = () => {
@@ -29,8 +29,8 @@ export function useWebSocket() {
         watch(() => userStore.userInfo, (newUserInfo,oldUserInfo) => {
             console.log('👤 用户信息发生变化:', newUserInfo,oldUserInfo)
             if (newUserInfo?.id) {
-                console.log('✅ 检测到有效userId，初始化WebSocket')
-               websocketManager.init(newUserInfo.id)
+                console.log(`✅ 检测到有效userId，初始化WebSocket (角色: ${role})`)
+               websocketManager.init(newUserInfo.id, role)
             }
         }, { deep: true, immediate: true })
 
