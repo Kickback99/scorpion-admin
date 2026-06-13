@@ -112,7 +112,7 @@ class WebSocketManager {
 
       // 判断是否是纯文本消息（定时任务结果）
       if (typeof messageData === 'string' && !messageData.startsWith('{')) {
-        // 🎯 定时任务结果消息，直接显示
+        // sendMessage，直接显示(目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截)
         ElMessage.success(messageData)
         return
     }
@@ -211,8 +211,10 @@ class WebSocketManager {
 
   // 关闭 WebSocket 连接
   close() {
-    this.isManualClose = true  // 标记为手动关闭，防止重连
-    if (this.socket) {
+    // 连接正在建立或已建立，才需要关闭
+    // readyState 小于 2 表示正在连接或已连接
+    if (this.socket && this.socket.readyState < 2) {
+      this.isManualClose = true  // 标记为手动关闭，防止重连
       console.log('🔌 手动关闭 WebSocket 连接')
       this.socket.close(1000, 'Manual close')
       this.socket = null
