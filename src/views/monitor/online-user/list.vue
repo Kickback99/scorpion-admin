@@ -15,6 +15,9 @@
                     <el-button icon="Refresh" type="warning" @click="onReset" plain>重置</el-button>
                 </el-form-item>
             </el-form>
+            <div>
+                <el-button @click="cleanZombieUsers" type="danger">清理僵尸用户</el-button>
+            </div>
         </div>
 
         <!-- 表格 -->
@@ -32,11 +35,18 @@
             <el-table-column prop="browser" label="浏览器" min-width="100" />
             <el-table-column prop="location" label="登录地点" min-width="100" />
             <el-table-column prop="loginTime" label="登录时间" min-width="160" />
-            <el-table-column label="操作" width="80" fixed="right">
+            <el-table-column label="操作" width="180" fixed="right">
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
-                            <el-button type="danger" size="small" icon="SwitchButton" circle />
+                        <el-button 
+                            type="danger" 
+                            size="small"
+                            :loading="kickingMap[row.userId + '_' + row.role]"
+                            :disabled="kickingMap[row.userId + '_' + row.role]"
+                            > 
+                            {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }} 
+                        </el-button>
                         </template>
                     </el-popconfirm>
                 </template>
@@ -61,7 +71,7 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
-import { getOnlineListApi, kickUserApi } from '@/api/onlineUser'
+import { cleanZombieApi, getOnlineListApi, kickUserApi } from '@/api/onlineUser'
 import websocketManager from '@/server/websocketManager'
 
 // 数据
@@ -86,11 +96,23 @@ const roleOptions = [
     { label: '前台用户', value: 'user' }
 ]
 
+// 记录每行的 loading 状态（用对象）
+const kickingMap = ref({})
+
+// 处理数据更新（统一重置 loading）
+const resetKickingMap = () => {
+    kickingMap.value = {}
+}
+
 // 处理数据更新
 const updateOnlineUsers = (data) => {
     if (data && data.type === 'online_users_update') {
         allTableData.value = [...data.data]
         updateFilteredData()
+
+        // 收到新的在线列表时，清理所有 loading 状态
+        // 因为表格数据已更新，之前的 loading 已经无意义
+        resetKickingMap()
     }
 }
 
@@ -150,11 +172,28 @@ const onCurrentChange = () => {
 
 // 强退
 const handleKick = async (row) => {
+
+    // 超级管理员不能踢出自己
+    if (row.userId === "1" && row.role === 'admin') {
+        ElMessage.warning('超级管理员不能踢出自己')
+        return
+    }
+
+    const key = `${row.userId}_${row.role}`
+    
+    // 如果已经在 loading，直接返回
+    if (kickingMap.value[key]) return
+    
+    // 设置 loading 状态
+    kickingMap.value[key] = true
+
     try {
         await kickUserApi(row.userId, row.role)
         ElMessage.success(`已向 ${row.username} 发送强退指令`)
     } catch (error) {
         ElMessage.error('强退失败')
+        // 失败时才清除 loading，因为行还在
+        kickingMap.value[key] = false
     }
 }
 
@@ -169,8 +208,25 @@ const loadOnlineList = async () => {
         const onlineData = res.data.data || res.data || []
         allTableData.value = onlineData
         updateFilteredData()
+        resetKickingMap() 
     } catch (error) {
         console.error('加载在线列表失败:', error)
+    }
+}
+
+const cleaning = ref(false)
+
+const cleanZombieUsers = async () => {
+    cleaning.value = true
+    try {
+        const res = await cleanZombieApi()
+        ElMessage.success(res.message || `已清理 ${res.data.count} 个僵尸用户`)
+        // 刷新列表
+        await loadOnlineList()
+    } catch (error) {
+        ElMessage.error('清理失败')
+    } finally {
+        cleaning.value = false
     }
 }
 
