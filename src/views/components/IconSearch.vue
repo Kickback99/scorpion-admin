@@ -120,7 +120,7 @@ const tabsList = [
       105 
   */
 const pageList = computed(() =>{
-  console.log(currentActiveType.value)
+  // scorpioncode(currentActiveType.value)
   return copyIconList[currentActiveType.value]
     .filter(i => i.includes(filterValue.value))
     .slice(

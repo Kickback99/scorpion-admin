@@ -159,7 +159,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //console.log(`onSizeChange：每页显示${size}条`)
+    //// scorpioncode(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     params.value.pageNum = 1
     //更新每页条数
@@ -169,7 +169,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //console.log(`onCurrentChange：当前第${page}页`)
+    //// scorpioncode(`onCurrentChange：当前第${page}页`)
     //更新当前页
     params.value.pageNum = page
     //重新渲染
@@ -199,7 +199,7 @@ const removeRow = async(id) => {
 
 // t_log_request：登录日志批量删除请求
 const deleteSelectRows = async() => {
-    console.log(multipleSelection.value.length)
+    // scorpioncode(multipleSelection.value.length)
     if(multipleSelection.value.length === 0){
         ElMessage.error('请先勾选要删除的行')
         return
@@ -215,9 +215,9 @@ const deleteSelectRows = async() => {
 }
 
 const removeMultiple = (raw) =>{
-    console.log(raw)
+    // scorpioncode(raw)
     multipleSelection.value = raw
-    // console.log(multipleSelection.value)
+    // // scorpioncode(multipleSelection.value)
 }
 
 // 计算属性：返回需要禁用的选项值

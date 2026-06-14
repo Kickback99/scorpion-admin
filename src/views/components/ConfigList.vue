@@ -235,7 +235,7 @@ const activeName = ref('client')
 
 // Tab 切换处理
 const handleClick = (tab, event) => {
-  console.log(tab, event)
+  // scorpioncode(tab, event)
 }
 
 // 获取配置项的最小值
