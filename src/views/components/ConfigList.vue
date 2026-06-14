@@ -175,10 +175,6 @@
         <div class="config-container">
           <el-form label-width="160px" label-position="left">
 
-            <el-form-item label="菜单折叠">
-              <el-switch :model-value="configStore.getIsCollapse()" @change="configStore.toggleCollapseEnabled" />
-            </el-form-item>
-
             <el-form-item label="图标搜索增强">
               <el-switch :model-value="configStore.getIconEnabled()" @change="configStore.toggleIconEnabled" />
             </el-form-item>
@@ -206,6 +202,23 @@
           </el-form>
         </div>
       </el-tab-pane>
+
+
+      <el-tab-pane label="用户配置" name="user">
+        <div class="config-container">
+          <el-form label-width="160px" label-position="left">
+
+            <el-form-item label="菜单折叠">
+              <el-switch :model-value="configStore.getUserCollapseEnabled()" @change="configStore.toggleUserCollapseEnabled" />
+            </el-form-item>
+
+            <el-form-item label="深色主题">
+              <el-switch :model-value="configStore.getUserDarkEnabled()" @change="configStore.toggleUserDarkEnabled" />
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-tab-pane>
+
     </el-tabs>
   </div>
 </template>

@@ -7,7 +7,6 @@ import { useIconStore } from "./icon"
 const SYSTEM_CONFIG_KEYS = [
   'article_top_limit',
   'carousel_limit',
-  'collapse_enabled',
   'icon_enabled',
   'comment.article_comment_enabled',
   'comment.child_comment_limit',
@@ -22,7 +21,6 @@ const CONFIG_DEFINITIONS = {
   // 顶层配置
   article_top_limit: { type: 'number', message: '文章置顶数量限制', min:1, max:99},
   carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
-  collapse_enabled: { type: 'switch', message: '菜单折叠' },
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
   
   // 评论相关
@@ -50,6 +48,10 @@ const CONFIG_DEFINITIONS = {
   'article_list.favorite_enabled': { type: 'switch', message: '文章收藏' },
   'article_list.comment_enabled': { type: 'switch', message: '文章评论' },
 
+  // 用户配置
+  'user_config.collapse_enabled': {type:'switch', message:'菜单折叠'},
+  'user_config.dark_enabled': {type:'switch', message:'深色模式'}
+
 }
 
 // 提示消息映射
@@ -75,7 +77,6 @@ export const useConfigStore = defineStore({
     // 顶层配置
     article_top_limit: 3,
     carousel_limit: 3,
-    collapse_enabled: false,
     icon_enabled: true,
     // 嵌套配置
     comment: {
@@ -102,6 +103,10 @@ export const useConfigStore = defineStore({
       view_enabled: true,
       favorite_enabled: true,
       comment_enabled: true
+    },
+    user_config:{
+      collapse_enabled: false,
+      dark_enabled: false
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -280,10 +285,6 @@ export const useConfigStore = defineStore({
       this.updateConfig('comment.friend_link_comment_enabled', !this.comment?.friend_link_comment_enabled)
     },
 
-    toggleCollapseEnabled() {
-      this.updateConfig('collapse_enabled', !this.collapse_enabled)
-    },
-
     toggleIconEnabled() {
       this.updateConfig('icon_enabled', !this.icon_enabled)
     },
@@ -348,11 +349,15 @@ export const useConfigStore = defineStore({
       this.updateConfig('article_list.comment_enabled', !this.article_list?.comment_enabled)
     },
 
-    // ========== Getter 方法 ==========
-    
-    getIsCollapse() {
-      return this.collapse_enabled === true
+    toggleUserCollapseEnabled(){
+      this.updateConfig('user_config.collapse_enabled', !this.user_config?.collapse_enabled)
     },
+
+    toggleUserDarkEnabled(){
+      this.updateConfig('user_config.dark_enabled', !this.user_config?.dark_enabled)
+    },
+
+    // ========== Getter 方法 ==========
 
     getLoginEnabled(){
       return this.nav?.login_enabled === true
@@ -426,6 +431,14 @@ export const useConfigStore = defineStore({
       return this.article_list?.comment_enabled ?? true
     },
 
+    getUserCollapseEnabled() {
+      return this.user_config?.collapse_enabled ?? true
+    },
+
+    getUserDarkEnabled(){
+      return this.user_config?.dark_enabled ?? true
+    },
+
     // 获取数字配置项的最小值限制
     getLimitMin(key) {
       return this.numberLimits[key]?.min
@@ -448,7 +461,9 @@ export const useConfigStore = defineStore({
     isFavoriteCountEnabled: (state) => state.article_detail?.favorite_count_enabled ?? true,
     isListViewEnabled: (state) => state.article_list?.view_enabled ?? true,
     isListFavoriteEnabled: (state) => state.article_list?.favorite_enabled ?? true,
-    isListCommentEnabled: (state) => state.article_list?.comment_enabled ?? true
+    isListCommentEnabled: (state) => state.article_list?.comment_enabled ?? true,
+    isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
+    isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true
   },
 
   // 配置持久化
