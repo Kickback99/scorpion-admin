@@ -10,7 +10,7 @@
           :default-active="handelUrl"
           :text-color="finalColor"
           mode="vertical"
-          :collapse="configStore.getIsCollapse()"
+          :collapse="userConfigStore.collapse_enabled"
           :collapse-transition="false"
         >
           <el-menu-item index="/index">
@@ -82,7 +82,7 @@ import { useRoute } from 'vue-router'
 import Logo from '@/components/logo/index.vue';
 import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
-import { useConfigStore } from '@/store/config';
+import { useUserConfigStore } from '@/store/userConfig';
 
 // 方式一：使用css变量动态设置el-menu的text-color属性值
 // const textColor = ref('')
@@ -110,7 +110,7 @@ const listData = computed(()=>
 )
 
 // 配置存储
-const configStore = useConfigStore()
+const userConfigStore = useUserConfigStore()
 
 const route = useRoute()
 
