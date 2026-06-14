@@ -113,7 +113,11 @@ class WebSocketManager {
       // 判断是否是纯文本消息（定时任务结果）
       if (typeof messageData === 'string' && !messageData.startsWith('{')) {
         // sendMessage，直接显示(目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截)
-        ElMessage.success(messageData)
+        ElMessage.success({
+          message: messageData.replace(/\n/g, '<br><br>'),
+          dangerouslyUseHTMLString: true,
+        })
+
         return
     }
 
