@@ -2,7 +2,7 @@
     <div class="left">
         <!-- 折叠 -->
         <el-icon style="margin-right: 10px;" @click="handleToggleCollapse">
-            <component :is="configStore.getIsCollapse()?'Expand':'Fold'"></component>
+            <component :is="userConfigStore.getCollapseEnabled() ?'Expand':'Fold'"></component>
         </el-icon>
         <!-- 面包屑 -->
         <el-breadcrumb separator-icon="ArrowRight">
@@ -29,6 +29,10 @@
                     <el-form-item label="暗黑模式">
                         <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
                             inactive-icon="Sunny" />
+                    </el-form-item>
+                    <el-form-item label="菜单折叠">
+                        <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
+                            inactive-icon="Fold" />
                     </el-form-item>
                     <el-divider border-style="dashed" />
                     <el-form-item label="菜单标题">
@@ -146,10 +150,12 @@ const { initWebSocketListener, closeWebSocket } = useWebSocket()
 // 导入全局事件总线对象
 import emitter from '@/utils/event-bus.js' // 引入事件总线
 import { useTabStore } from "@/store/tabs";
-import { useConfigStore } from "@/store/config";
+import { useUserConfigStore } from "@/store/userConfig";
+
 const avatarUrlWithTimestamp = ref('') // 带时间戳的头像URL
 // const avatarKey = ref(Date.now()) // 初始key
 const userStore = useUserStore()
+const userConfigStore = useUserConfigStore()
 const handleUrl = computed(()=>{
     return avatarUrlWithTimestamp.value || userStore.userInfo.avatar || avatar
 })
@@ -199,18 +205,16 @@ const displayName = computed(() => {
 // 处理菜单折叠
 const stringStore = useSettingStore()
 
-const configStore = useConfigStore()
-
 const handleToggleCollapse = async () => {
-    // 调用 configStore 的 toggleCollapse 方法
+    // 调用 userConfigStore 的 toggleCollapse 方法
     // 该方法会：
     // 1. 切换本地 isCollapse 状态（0: 折叠, 1: 展开）
     // 2. 调用后端 API 更新配置
     // 3. 显示成功/失败提示
-    await configStore.toggleCollapseEnabled()
+    await userConfigStore.toggleCollapse()
     
     // 可选：如果需要触发其他组件响应折叠状态变化，可以发送事件
-    // emitter.emit('collapse-change', configStore.getIsCollapse())
+    // emitter.emit('collapse-change', userConfigStore.getUserCollapseEnabled())
 }
 
 const modifyRefresh = () => {
