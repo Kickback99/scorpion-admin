@@ -50,7 +50,7 @@ const render = async () => {
     const result = await allocMenusApi(roleId);
     sysMenuList.value = result.data;
     const checkedIds = getCheckedIds(sysMenuList.value);
-    console.log('getPermissions() checkedIds', checkedIds);
+    // scorpioncode('getPermissions() checkedIds', checkedIds);
     treeRef.value.setCheckedKeys(checkedIds)
     // ...省略其他逻辑
 };
@@ -75,10 +75,10 @@ const userStore = useUserStore()
 const save = async () => {
     // 获得当前所有选中包括上级所组成的数组
     const allCheckedNodes = treeRef.value.getCheckedNodes(false, true)
-    console.log('selectedArr',allCheckedNodes)
+    // scorpioncode('selectedArr',allCheckedNodes)
      // 获得当前所有选中包括上级所组成的ids
     let idList = allCheckedNodes.map(node => node.id);
-    console.log('selectedIds',idList)
+    // scorpioncode('selectedIds',idList)
     let assignMenuVo = {
           roleId: route.query.id,
           menuIdList: idList

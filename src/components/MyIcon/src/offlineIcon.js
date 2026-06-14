@@ -17,7 +17,7 @@ addIcon("ep:aim",{
 })
 
 const renderIcon = (icon) => {
-  console.log(getIcon(icon))
+  // scorpioncode(getIcon(icon))
   addIcon(icon, getIcon(icon));
 }
 
@@ -41,7 +41,7 @@ export default defineComponent({
       if (props.isCollect && props.icon) {
         const iconStore = useIconStore();
         onMounted(() => {
-          console.log('避免输出多次...')
+          // scorpioncode('避免输出多次...')
           const uniqueIcons = new Set([
             ...iconStore.batchUsedIcons,
             props.icon

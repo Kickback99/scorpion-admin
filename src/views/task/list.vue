@@ -180,7 +180,7 @@ const loadTaskList = async () => {
   try {
     const res = await listApi()
     tableData.value = res.data || res
-    console.log('任务列表加载成功:', tableData.value)
+    // scorpioncode('任务列表加载成功:', tableData.value)
   } catch (error) {
     ElMessage.error('加载任务列表失败')
     console.error(error)
