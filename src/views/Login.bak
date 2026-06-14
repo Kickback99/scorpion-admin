@@ -133,7 +133,7 @@
       await ruleFormRef.value.validate()
       delete formData.value.repassword
       await userRegisterService(formData.value)
-      // console.log('开始发送注册请求...')
+      // // scorpioncode('开始发送注册请求...')
       ElMessage.success('注册成功')
   
       
@@ -148,7 +148,7 @@
     loading.value = true
     try {
     const res = await adminLoginApi(formData.value)
-    console.log(res.data)
+    // scorpioncode(res.data)
     tokenStore.setToken(res.data)
     ElMessage.success('登录成功')
     loading.value = false
@@ -157,7 +157,7 @@
      // 如果存在保存的路由信息，则重定向到该路由
       if (originalRouteQuery) {
         // 使用带有查询参数的路径重定向用户
-        console.log('从本地跳转')
+        // scorpioncode('从本地跳转')
         if(originalRouteQuery.path === '/404'){
           router.push('/')
           localStorage.removeItem('originalRouteQuery');
@@ -168,7 +168,7 @@
         localStorage.removeItem('originalRouteQuery');
       } else {
         // 如果没有保存的路由信息，可以重定向到首页或其他默认页面
-        console.log('开始重定向')
+        // scorpioncode('开始重定向')
         let redirect = route.query.redirect
         router.push({path: redirect || '/'});
       }

@@ -10,13 +10,13 @@ export function useWebSocket(role = 'admin') {
     const stopWatch = watch(
       () => userStore.userInfo?.id,
       (newUserId, oldUserId) => {
-        console.log('👤 用户ID变化:', { old: oldUserId, new: newUserId })
+        // scorpioncode('👤 用户ID变化:', { old: oldUserId, new: newUserId })
         
         if (newUserId && newUserId !== oldUserId) {
-          console.log('✅ 检测到新用户ID，初始化 WebSocket')
+          // scorpioncode('✅ 检测到新用户ID，初始化 WebSocket')
           websocketManager.init(newUserId)
         } else if (!newUserId && oldUserId) {
-          console.log('❌ 用户ID被清空，关闭 WebSocket')
+          // scorpioncode('❌ 用户ID被清空，关闭 WebSocket')
           websocketManager.close()
         }
       },
@@ -27,9 +27,9 @@ export function useWebSocket(role = 'admin') {
       const userStore = useUserStore()
     // 监听用户信息变化
         watch(() => userStore.userInfo, (newUserInfo,oldUserInfo) => {
-            console.log('👤 用户信息发生变化:', newUserInfo,oldUserInfo)
+            // scorpioncode('👤 用户信息发生变化:', newUserInfo,oldUserInfo)
             if (newUserInfo?.id) {
-                console.log(`✅ 检测到有效userId，初始化WebSocket (角色: ${role})`)
+                // scorpioncode(`✅ 检测到有效userId，初始化WebSocket (角色: ${role})`)
                websocketManager.init(newUserInfo.id, role)
             }
         }, { deep: true, immediate: true })

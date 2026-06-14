@@ -167,13 +167,13 @@ async function overwriteAvatarUrl() {
     // 1. 添加时间戳
     const timestamp = new Date().getTime()
     avatarUrlWithTimestamp.value = `${userStore.userInfo.avatar}?_t=${timestamp}`
-    // console.log('添加时间戳:', avatarUrlWithTimestamp.value)
+    // // scorpioncode('添加时间戳:', avatarUrlWithTimestamp.value)
     // 2. 更新key强制重新创建组件（只在这里改key）
     // avatarKey.value = timestamp
     // 1秒后去掉时间戳，恢复原始URL
     setTimeout(() => {
       avatarUrlWithTimestamp.value = ''
-    //   console.log('恢复原始URL')
+    //   // scorpioncode('恢复原始URL')
     }, 1000)
   }
 }
@@ -199,7 +199,7 @@ const displayName = computed(() => {
 })
 
 /* const queryRouter = (item) =>{
-    console.log(item.path)
+    // scorpioncode(item.path)
 } */
 
 // 处理菜单折叠
@@ -232,7 +232,7 @@ const fullScreen = () => {
 
 // 处理下拉事件
 const handleCommand = async (key) => {
-    console.log('下拉事件执行了')
+    // scorpioncode('下拉事件执行了')
     if (key === 'logout') {
         await ElMessageBox.confirm('你确认要退出登录吗', '温馨提示', {
             type: 'warning',
@@ -244,12 +244,12 @@ const handleCommand = async (key) => {
         closeWebSocket()
         // 清空token
         tokenStore.removeToken()
-        console.log('清空前', router.getRoutes())
+        // scorpioncode('清空前', router.getRoutes())
         // 清空用户信息
         // clearUserInfo()
         // 清空动态路由数据
         clearRoute(userStore.userMenu)
-        console.log('清空后', router.getRoutes())
+        // scorpioncode('清空后', router.getRoutes())
         // 清空用户信息和菜单
         userStore.clearUserStore()
         // 清空标签页
@@ -347,14 +347,14 @@ const currentBg = (color) => {
 const color = ref(colorStore.menuTextColor)
 // 点击确定后的颜色
 const setColor = () => {
-    console.log('change事件触发了...')
+    // scorpioncode('change事件触发了...')
     colorStore.setMenuTextColor(color.value)
     initColorModule()
 }
 
 // 当前激活的颜色
 const currentColor = (color) => {
-    console.log('active-change事件触发了...')
+    // scorpioncode('active-change事件触发了...')
     colorStore.setMenuTextColor(color)
 }
 
@@ -455,7 +455,7 @@ const  initColorModule = () => {
     dark.value ? html.className = 'dark' : html.className = ''
   
   const { menuBg, menuTextColor, menuActive, logoTitleColor, themes } = colorStore;
-  console.log('themes',themes)
+  // scorpioncode('themes',themes)
   
   colorModule.value = themes.find(({ bg, textColor, active, title }) => 
     bg === menuBg &&
@@ -474,8 +474,8 @@ const changeColor = () => {
     // 如果dark为真，给html标签添加dark类
     dark.value ? html.className = 'dark' : html.className = ''
     const selected = colorStore.themes.find((item)=> item.value === colorModule.value)
-    console.log(selected)
-    console.log(colorModule.value)
+    // scorpioncode(selected)
+    // scorpioncode(colorModule.value)
     bg.value = selected.bg
     color.value = selected.textColor
     active.value = selected.active
@@ -547,11 +547,11 @@ const rules = {
   }
 
  const resetColor = async() =>{
-    console.log(colorStore.menuBg)
+    // scorpioncode(colorStore.menuBg)
     /* if(withAnyBg(colorStore.menuBg,themeBgs)){
-        console.log('仓库主题有1个与当前主题相同')
+        // scorpioncode('仓库主题有1个与当前主题相同')
     }else {
-        console.log('仓库主题没有包含当前的主题')
+        // scorpioncode('仓库主题没有包含当前的主题')
     } */
    if(colorStore.themes.length === lightMenuThemes.length){
         ElMessage.error('你没有定义任何的主题，赶快添加吧')
@@ -591,7 +591,7 @@ const rules = {
  }
 
   const batchSetMenuStore = (data)=>{
-    console.log('data',data)
+    // scorpioncode('data',data)
     colorStore.setMenuBg(data.menuBg)
     colorStore.setMenuTextColor(data.menuTextColor)
     colorStore.setMenuActive(data.menuActive)

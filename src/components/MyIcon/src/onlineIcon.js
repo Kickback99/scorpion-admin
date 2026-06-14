@@ -22,7 +22,7 @@ export default defineComponent({
     if (props.isCollect && props.icon) {
       const iconStore = useIconStore();
       onMounted(() => {
-        console.log('避免输出多次...')
+        // scorpioncode('避免输出多次...')
         const uniqueIcons = new Set([
           ...iconStore.onlineIcons,
           props.icon

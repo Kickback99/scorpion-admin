@@ -150,9 +150,9 @@ onMounted(async () => {
     
     const allComponents = [...plainComData,...localComponents,...dynamicComponents];
     /* allComponents.forEach((item)=>{
-      console.log('打印每个元素的component',item.component)
+      // scorpioncode('打印每个元素的component',item.component)
     }) */
-    // console.log('All route components:', allComponents);
+    // // scorpioncode('All route components:', allComponents);
     
     // 初始化预加载组件数组
     preloadedComponents.value = allComponents.map(route => ({
@@ -167,7 +167,7 @@ onMounted(async () => {
     // 并行加载所有组件
     const loadPromises = allComponents.map(async (route, index) => {
       if (loadStore.isComponentLoaded(route.name)) {
-        console.log(`⏩ 已跳过加载: ${route.name} (已缓存)`)
+        // scorpioncode(`⏩ 已跳过加载: ${route.name} (已缓存)`)
         return
       }
       
@@ -177,7 +177,7 @@ onMounted(async () => {
           
         const importPath = getComponentImportPath(route.component);
         if (importPath) {
-          // console.log(`🔍 分析组件: ${importPath}`);
+          // // scorpioncode(`🔍 分析组件: ${importPath}`);
           hasIcon = await analyzeComponent(importPath);
         } else {
           // console.warn(`⚠️ 无法分析组件 ${route.name}`);
@@ -191,32 +191,32 @@ onMounted(async () => {
             ? await route.component() 
             : route.component;
           
-          console.log('module',module)
+          // scorpioncode('module',module)
           preloadedComponents.value[index].component = module.default || module;
           preloadedComponents.value[index].loaded = true;
           preloadedComponents.value[index].hasIcon = true;
           
           loadStore.setComponentLoaded(route.name);
           
-          console.log(`✅ 已加载包含图标的组件: ${route.name}`);
+          // scorpioncode(`✅ 已加载包含图标的组件: ${route.name}`);
         } else {
           // 不包含图标的组件，只标记为已加载但不实际加载组件
           preloadedComponents.value[index].loaded = true;
           loadStore.setComponentLoaded(route.name);
-          // console.log(`⏭️  跳过加载无图标组件: ${route.name}`);
+          // // scorpioncode(`⏭️  跳过加载无图标组件: ${route.name}`);
         }
       } catch (error) {
         // console.error(`❌ 处理组件 ${route.name} 失败:`, error);
       }
     });
     
-    console.log('preloadedComponents', preloadedComponents.value);
+    // scorpioncode('preloadedComponents', preloadedComponents.value);
     await Promise.all(loadPromises);
-    // console.log("所有路由组件已处理完成");
+    // // scorpioncode("所有路由组件已处理完成");
 
     // 输出包含图标的组件总结
     /* const componentsWithIcons = preloadedComponents.value.filter(comp => comp.hasIcon);
-    console.log('🎯 包含图标的组件:', componentsWithIcons.map(comp => ({
+    // scorpioncode('🎯 包含图标的组件:', componentsWithIcons.map(comp => ({
       name: comp.name,
       icon: comp.iconName
     }))); */
@@ -225,7 +225,7 @@ onMounted(async () => {
     // 所有组件加载完成后，在下一个tick中统一销毁
     if (preloadedComponents.value.some(comp => comp.loaded)) {
       nextTick(() => {
-        console.log('所有组件已挂载，开始清理...')
+        // scorpioncode('所有组件已挂载，开始清理...')
         preloadedComponents.value = []
       })
     }
@@ -241,7 +241,7 @@ onMounted(async () => {
    const module = await import("@/views/Index.vue");
   IndexComponent.value = module.default;
       await collectIconsFromSource()
-  console.log("Index.vue 已加载并挂载（但隐藏）"); 
+  // scorpioncode("Index.vue 已加载并挂载（但隐藏）"); 
 }); */
 
 /* onMounted(async () => {
@@ -416,7 +416,7 @@ const setIconColor = (item) => {
 const visibleInlineIcon = (item) => {
   if(currentActiveType.value === 'batch' && iconStore.showBatchUsedIcons){
     const iconArr = iconStore.batchUsedIcons
-    console.log(iconArr)
+    // scorpioncode(iconArr)
     if(iconArr.length > 0 && iconArr.includes(item)){
       return true 
     }else return false

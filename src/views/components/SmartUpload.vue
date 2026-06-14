@@ -42,7 +42,7 @@ const handleAction = computed(()=>{
 
 // 图片上传成功之后的回调
 const onSuccess = (res,uploadFile) => {
-    console.log(res)
+    // scorpioncode(res)
     // 用URL来做图片的本地预览
     imageUrl.value = URL.createObjectURL(uploadFile.raw)
     // 把后端图片的地址传递给父组件 formModel.cover
@@ -76,8 +76,8 @@ const handleProgress = (event) => {
 
 // 对外暴露handleImage方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {
-  console.log('SmartUpload的handleImage被调用了....')
-      console.log(params)
+  // scorpioncode('SmartUpload的handleImage被调用了....')
+      // scorpioncode(params)
       imageUrl.value = params
 }
 

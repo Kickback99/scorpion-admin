@@ -9,7 +9,7 @@ export async function analyzeComponent(importPath) {
     const templateMatch = rawModule.default.match(/<template[^>]*>([\s\S]*?)<\/template>/);
     const styleMatch = rawModule.default.match(/<style[^>]*>([\s\S]*?)<\/style>/);
     
-    console.log('正在分析的组件路径:', importPath);
+    // scorpioncode('正在分析的组件路径:', importPath);
     
     if (!templateMatch) {
       return false;
@@ -38,7 +38,7 @@ export async function analyzeComponent(importPath) {
     // 5. 立即保存所有图标到 store
     saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath);
     
-    console.log(`🎯 ${importPath} 分析结果:`, { 
+    // scorpioncode(`🎯 ${importPath} 分析结果:`, { 
       hasValidIcon, 
       svgCount: svgIcons.length, 
       alibabaCount: alibabaIcons.length,
@@ -101,7 +101,7 @@ function collectElementPlusIcons(content, elementIcons, importPath) {
   });
 
   const foundIcons = Array.from(iconSet);
-  console.log(`🔍 ${importPath} 发现 Element Plus 图标:`, foundIcons);
+  // scorpioncode(`🔍 ${importPath} 发现 Element Plus 图标:`, foundIcons);
 
   // 添加到当前文件的图标数组
   if (foundIcons.length > 0) {
@@ -140,12 +140,12 @@ function isValidElementIconName(name) {
   
   if (!isValid) {
     if (isValidFormat) {
-      console.log(`❌ 图标不在白名单中: ${name}`);
+      // scorpioncode(`❌ 图标不在白名单中: ${name}`);
     } else {
-      console.log(`❌ 图标格式无效: ${name}`);
+      // scorpioncode(`❌ 图标格式无效: ${name}`);
     }
   } else {
-    console.log(`✅ 验证通过: ${name}`);
+    // scorpioncode(`✅ 验证通过: ${name}`);
   }
   
   return isValid;
@@ -207,7 +207,7 @@ function collectSvgIcons(template, svgIcons) {
       color
     });
     
-    console.log(`🔍 发现 SVG 图标: ${name}`, color ? `[颜色: ${color}]` : '');
+    // scorpioncode(`🔍 发现 SVG 图标: ${name}`, color ? `[颜色: ${color}]` : '');
   }
 }
 
@@ -264,7 +264,7 @@ function collectAlibabaIcons(template, styleContent, alibabaIcons) {
       color
     });
     
-    console.log(`🔍 发现阿里巴巴图标:`, { type, icon, color });
+    // scorpioncode(`🔍 发现阿里巴巴图标:`, { type, icon, color });
   }
 }
 
@@ -307,7 +307,7 @@ function saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath) {
     });
     
     iconStore.svgIcons = finalSvgIcons;
-    console.log(`💾 保存 SVG 图标:`, finalSvgIcons.length);
+    // scorpioncode(`💾 保存 SVG 图标:`, finalSvgIcons.length);
   }
   
   // 保存阿里巴巴图标（去重）
@@ -337,12 +337,12 @@ function saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath) {
     });
     
     iconStore.alibabaIcons = finalAlibabaIcons;
-    console.log(`💾 保存阿里巴巴图标:`, finalAlibabaIcons.length);
+    // scorpioncode(`💾 保存阿里巴巴图标:`, finalAlibabaIcons.length);
   }
   
   // 保存 Element Plus 图标（跨文件合并）
   if (elementIcons.length > 0) {
-    console.log(`💾 合并 Element Plus 图标:`, elementIcons.length);
+    // scorpioncode(`💾 合并 Element Plus 图标:`, elementIcons.length);
     
     // 创建临时 Map 来合并数据
     const iconMap = new Map();
@@ -372,7 +372,7 @@ function saveAllIconsToStore(svgIcons, alibabaIcons, elementIcons, importPath) {
     })).sort((a, b) => a.icon.localeCompare(b.icon));
     
     iconStore.elementIcons = mergedElementIcons;
-    console.log(`💾 最终 Element Plus 图标:`, mergedElementIcons.length);
+    // scorpioncode(`💾 最终 Element Plus 图标:`, mergedElementIcons.length);
   }
 }
 

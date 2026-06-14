@@ -196,7 +196,7 @@ import { createMarkdownPreview } from '@/utils/markdown-config'
 const colorStore = useColorStore()
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
-  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
+  // scorpioncode('创建主题:', colorStore.isDark?"vuepress":"github")
   return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
 })
 
@@ -223,7 +223,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //console.log(`onSizeChange：每页显示${size}条`)
+    //// scorpioncode(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     params.pageNum = 1
     //更新每页条数
@@ -233,7 +233,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //console.log(`onCurrentChange：当前第${page}页`)
+    //// scorpioncode(`onCurrentChange：当前第${page}页`)
     //更新当前页
     params.pageNum = page
     //重新渲染
@@ -317,9 +317,9 @@ const removeRow = async(id) => {
 }
 
 const removeMultiple = (raw) =>{
-    console.log(raw)
+    // scorpioncode(raw)
     multipleSelection.value = raw
-    // console.log(multipleSelection.value)
+    // // scorpioncode(multipleSelection.value)
 }
 
 // t_log_request：操作日志批量删除请求

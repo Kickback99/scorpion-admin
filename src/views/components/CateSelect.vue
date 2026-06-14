@@ -25,9 +25,9 @@ const modelValue = defineModel()
 const cateData = ref([])
 
 const render = async() => {
-  console.log('分类列表...')
+  // scorpioncode('分类列表...')
     const res = await listApi()
-    console.log(res)
+    // scorpioncode(res)
     /* cateData.value = res.data.map(item => {
         return {
             ...item,

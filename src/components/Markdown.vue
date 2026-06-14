@@ -29,7 +29,7 @@ import { createMarkdownPreview } from '@/utils/markdown-config'
 
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
-  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
+  // scorpioncode('创建主题:', colorStore.isDark?"vuepress":"github")
   return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
 })
 
