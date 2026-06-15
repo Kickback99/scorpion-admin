@@ -104,7 +104,7 @@ function routesHandler(router,parentType=null){
                 const compName = route.component
                 // 注意：这里 component 字段存储的是相对路径，如 'config/sysConfig/list'
                 const path = `../views/${route.name}/${compName}.vue`
-                // scorpioncode('加载配置管理组件:', path)
+                console.log('加载配置管理组件:', path)
                 route.component = modules[path]
             }}else {
         // 如果是子路由，继承父路由的type属性
@@ -146,8 +146,8 @@ function routesHandler(router,parentType=null){
                 route.name = route.path
                 const compName = route.component
                 const path = `../views/${compName}.vue`
-                // scorpioncode('到底加载的是哪个组件--------')
-                // scorpioncode(modules[path])
+                console.log('到底加载的是哪个组件--------')
+                console.log(modules[path])
                 route.component = modules[path]
             }
         }
@@ -158,7 +158,7 @@ function routesHandler(router,parentType=null){
             const compName = route.component
             const path = `../views/${compName}.vue`
             route.component = modules[path]
-            // scorpioncode(modules[path])
+            console.log(modules[path])
             // route.component = () => import(`@/views/system/${compName}.vue`)
         } */
 
@@ -174,7 +174,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     const userStore = useUserStore()
     const configStore = useConfigStore()
     const userConfigStore = useUserConfigStore();  // 新增
-    // scorpioncode('请求菜单')
+    console.log('请求菜单')
 
     /* if(loadUserInfo){
         userStore.setUserInfo(res.data.userInfo)
@@ -211,14 +211,14 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // ================= 2. 权限校验阶段 =================
         // 情况1：前台用户拦截
         if (userStore.userInfo.type !== 0) {
-            // scorpioncode('情况1拦截')
+            console.log('情况1拦截')
             return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
         }
 
 
         // 情况2：无菜单权限拦截
         if (menuData.routers.length === 0 ) {
-            // scorpioncode('情况2拦截')
+            console.log('情况2拦截')
         add403Routes(router); // 确保403路由存在
         return Promise.reject({ 
             noMenuPermission: true, 
@@ -234,17 +234,17 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
     // 3.2 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
-    // scorpioncode('后端返回',menuData.routers)
-    // scorpioncode('路由数据',asyncRoutes) 
+    console.log('后端返回',menuData.routers)
+    console.log('路由数据',asyncRoutes) 
     asyncRoutes.forEach(route => {
         if (route._addToParentNode) {
             // 配置管理类菜单添加到 parentNode 下
             router.addRoute('parentNode', route);
-            // scorpioncode(`添加配置管理路由到 parentNode: ${route.path}`);
+            console.log(`添加配置管理路由到 parentNode: ${route.path}`);
         } else {
             // Layout 顶层路由正常添加
             router.addRoute(route);
-            // scorpioncode(`添加普通路由: ${route.path}`);
+            console.log(`添加普通路由: ${route.path}`);
         }
     });
 
@@ -258,10 +258,10 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     add404Routes(router)
     add403Routes(router);
 
-    /* scorpioncode('动态路由更新完成', {
+    console.log('动态路由更新完成', {
       routes: router.getRoutes(),
       permissions: menuData.permissions
-    }); */
+    });
     
     
     // 用户菜单权限不足校验
@@ -269,18 +269,18 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         if(from.path != '/login'){
             return next('/404')
         }
-        // scorpioncode('router.getRoutes()',router.getRoutes())
-        // scorpioncode('用户菜单权限不足')
+        console.log('router.getRoutes()',router.getRoutes())
+        console.log('用户菜单权限不足')
         return Promise.reject({ 
             noMenuAccess: true, 
             message: '该用户无菜单权限' 
         });
     }
-   // scorpioncode('router.getRoutes()',router.getRoutes())
-   // scorpioncode('用户菜单权限充足')
+   console.log('router.getRoutes()',router.getRoutes())
+   console.log('用户菜单权限充足')
     return true;
     } catch (error) {
-        // scorpioncode('error,',error)
+        console.log('error,',error)
     // 情况4：请求失败（如网络错误或API错误）
     return Promise.reject(error);
     }
@@ -372,32 +372,32 @@ router.beforeEach((to, from, next) => {
     nprogress.start()
     const settings =  useSettingStore()
     ++count;
-    // scorpioncode('路由前置守卫执行')
-    // scorpioncode(from)
-    // scorpioncode(to.path)
-    // scorpioncode(to.fullPath)
+    console.log('路由前置守卫执行')
+    console.log(from)
+    console.log(to.path)
+    console.log(to.fullPath)
     const userStore = useUserStore()
     const tokenStore = useTokenStore()
-    // scorpioncode('userStore.userMenu.length',userStore.userMenu.length )
+    console.log('userStore.userMenu.length',userStore.userMenu.length )
 
     if(to.path === '/403' && settings.isManualTo403){
-        // scorpioncode('跳转到403 count次')
+        console.log('跳转到403 count次')
         settings.isManualTo403 = false
-        // scorpioncode('settings.isManualTo403',settings.isManualTo403)
+        console.log('settings.isManualTo403',settings.isManualTo403)
         return next()
     }
 
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
-        // scorpioncode('已登录不能输入登录地址回到登录页')
+        console.log('已登录不能输入登录地址回到登录页')
         ElMessage.warning('请先退出登录')
         return next(from.fullPath);
     }
 
     // 白名单放行
     if(whiteList.includes(to.path)){
-        // scorpioncode('白名单放行')
+        console.log('白名单放行')
       return next();
     }
 
@@ -416,7 +416,7 @@ router.beforeEach((to, from, next) => {
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
-        // scorpioncode('已登录，有菜单')
+        console.log('已登录，有菜单')
         return next()
     }
 
@@ -443,12 +443,12 @@ router.beforeEach((to, from, next) => {
                 if(hasRouteByPath(to.path)){
                     next()
                 }else {
-                    // scorpioncode('拦截2')
+                    console.log('拦截2')
                 settings.isManualTo403 = true;
                 next('/403');
                 }
             }else if(error.noMenuAccess){
-                // scorpioncode('拦截1')
+                console.log('拦截1')
                 settings.isManualTo403 = true;
                 next('/403');   
             }else {
@@ -463,7 +463,7 @@ router.beforeEach((to, from, next) => {
         // 后台用户，没有菜单，跳到首页
         // 前台用户，跳到404
     /* if(to.path === '/index'){
-        // scorpioncode('放首页')
+        console.log('放首页')
         return next()
     } */
 });

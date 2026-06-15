@@ -139,7 +139,7 @@ const handleToggle = async(param) => {
     // 回显
       dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
-    // scorpioncode("回显res.data",res.data)
+    console.log("回显res.data",res.data)
     const {title,content,...rest} = res.data
     blogData.value = {title,content}  
     Object.assign(formModel,rest)
@@ -202,7 +202,7 @@ const handleOpen = async() => {
   // 现在 SmartUpload 组件已经创建
   if (uploadRef.value && uploadRef.value.handleImage) {
     const imageUrl = !formModel.id ? '' : formModel.cover
-    // scorpioncode('对话框打开后调用 handleImage:', imageUrl)
+    console.log('对话框打开后调用 handleImage:', imageUrl)
     uploadRef.value.handleImage(imageUrl)
   }
 }

@@ -149,7 +149,7 @@ const render = async() => {
      // 开启loading动效
      loading.value = true
      const res = await listApi()
-     // scorpioncode(res)
+     console.log(res)
      tableData.value = res.data
      // 关闭loading动效
      loading.value = false
@@ -177,9 +177,9 @@ const treeProps = reactive({
 })
 
 /* const removeMultiple = (raw) =>{
-    // scorpioncode(raw)
+    console.log(raw)
     multipleSelection.value = raw
-    // // scorpioncode(multipleSelection.value)
+    // console.log(multipleSelection.value)
 } */
 
 /* const selectable = (row) => {
@@ -282,7 +282,7 @@ watch(
 
 // 在表格中点击添加按钮的事件
 const addMenuButton = (row) => {
-    // scorpioncode(row)
+    console.log(row)
     // 重置数据
     formModel.value = {...defaultForm}
 
@@ -338,14 +338,14 @@ const editMenu = (row) =>{
     }
     title.value = '修改菜单'
     dialogVisible.value = true
-    // scorpioncode(row.type)
+    console.log(row.type)
     nextTick(()=>{
       if(row.type != 2 && isAllEmpty(row.icon)){
       iconRef.value.removeIcon()
-      // // scorpioncode(iconRef.value)
+      // console.log(iconRef.value)
     }
     })
-    // scorpioncode(row.icon)
+    console.log(row.icon)
     // baseIcon =  row.icon
     formModel.value =  {...row}
     typeDisabled.value = true

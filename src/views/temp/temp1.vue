@@ -320,7 +320,7 @@ const defaultProps = {
 }
 
 const handleReply = (item) => {
-  // scorpioncode('回复', item)
+  console.log('回复', item)
   alert(`回复：${item.username}`)
 }
 </script>

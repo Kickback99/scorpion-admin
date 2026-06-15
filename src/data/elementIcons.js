@@ -23,7 +23,7 @@ export const icons = Object.fromEntries(
 // 导出注册函数
 export const registerIcons = (app) => {
   elIcons.forEach(name => {
-    // // scorpioncode('注册图标:', name)
+    // console.log('注册图标:', name)
     app.component(name, AllIcons[name])
   })
 }

@@ -62,7 +62,7 @@ const tabsList = [
       105 
   */
 const pageList = computed(() =>{
-  // scorpioncode(currentActiveType.value)
+  console.log(currentActiveType.value)
   return copyIconList[currentActiveType.value]
     .filter(i => i.includes(filterValue.value))
     .slice(
@@ -152,7 +152,7 @@ function onClear() {
 
 // 向外部暴露一个removeIcon，用于删除icon.value的值
 const removeIcon = () => {
-  // scorpioncode('删除icon中')
+  console.log('删除icon中')
   icon.value = ''
 }
 

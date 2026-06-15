@@ -378,7 +378,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //// scorpioncode(`onSizeChange：每页显示${size}条`)
+    //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     params.pageNum = 1
     //更新每页条数
@@ -388,7 +388,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //// scorpioncode(`onCurrentChange：当前第${page}页`)
+    //console.log(`onCurrentChange：当前第${page}页`)
     //更新当前页
     params.pageNum = page
     //重新渲染
@@ -425,7 +425,7 @@ const onReset = () => {
 
 // 挑选子集
 const handleSelectChildren = async (row) => {
-    // // scorpioncode('挑选子集', row)
+    // console.log('挑选子集', row)
     viewMode.value = 'pick' // 此时 pick 按钮的 disabled 变为 false
     searchData.sortField = 'group'
     searchData.sortOrder = 'DESC'
@@ -440,7 +440,7 @@ const handleSelectChildren = async (row) => {
 
 // 挑拣父集
 const handleSelectParent = async (row) => {
-    // // scorpioncode('挑拣父集', row)
+    // console.log('挑拣父集', row)
     viewMode.value = 'pick' //  此时 pick 按钮的 disabled 变为 false
     searchData.sortField = 'group'
     searchData.sortOrder = 'DESC'
@@ -525,7 +525,7 @@ const replyRules = {
 }
 
 const handleReply = (row) => {
-    // scorpioncode('回复的评论:', row)
+    console.log('回复的评论:', row)
     
     // 设置原内容
     replyModel.originalContent = row.content
@@ -578,7 +578,7 @@ const submitReply = async () => {
         content: replyModel.content
     }
     
-    // scorpioncode('提交数据:', requestData)
+    console.log('提交数据:', requestData)
     
     await addCommentApi(requestData)
     ElMessage.success('回复成功')
@@ -600,7 +600,7 @@ const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
  * 详情按钮逻辑 - 打开右侧抽屉
  */
 const handleInfo = async (comment) => {
-  // scorpioncode('🔍 点击详情按钮，评论数据:', comment)
+  console.log('🔍 点击详情按钮，评论数据:', comment)
   
   // 设置当前评论
   currentDetailComment.value = comment
@@ -620,7 +620,7 @@ const handleInfo = async (comment) => {
 
 // 详情加载完成回调
 const onDetailLoaded = (data) => {
-  // scorpioncode('✅ 详情加载完成:', data)
+  console.log('✅ 详情加载完成:', data)
 }
 
 // 详情加载错误回调
@@ -640,7 +640,7 @@ const multipleTableRef = ref()
 const multipleSelection = ref([])
 
 const handleMultiple = (raw) => {
-    // scorpioncode(raw)
+    console.log(raw)
     multipleSelection.value = raw
 }
 
@@ -695,7 +695,7 @@ const batchDeleteRows = async() => {
         `你选择了${rootIds.length}个根评论，你确认要删除吗？
         删除后，子评论也一律删除
         `
-        // scorpioncode('rootIds',rootIds)
+        console.log('rootIds',rootIds)
     }else title = '你确认要进行删除么'
 
     await ElMessageBox.confirm(title,'温馨提示', {
