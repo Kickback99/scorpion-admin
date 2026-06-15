@@ -34,7 +34,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     res=>{
         if(res.data.code === 0 || res.data.code === 200){
-            // scorpioncode('哈哈')
+            console.log('哈哈')
             return res.data
         }
         
@@ -45,7 +45,7 @@ instance.interceptors.response.use(
        if(regex.test(res.data.code)) {
 
             if(res.data.code === 401){
-                // scorpioncode('响应拦截器执行...')
+                console.log('响应拦截器执行...')
                 // 处理token过期或者篡改
                 const tokenStore = useTokenStore()
                 const userStore = useUserStore()
@@ -81,7 +81,7 @@ instance.interceptors.response.use(
     },
     err=>{
         alert('服务异常');
-        // scorpioncode('请求异常执行...')
+        console.log('请求异常执行...')
         return Promise.reject(err);//异步的状态转化成失败的状态
     }
 )

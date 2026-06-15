@@ -118,7 +118,7 @@ const updateOnlineUsers = (data) => {
 
 // WebSocket 自定义事件处理
 const handleOnlineUsersUpdate = (event) => {
-    // scorpioncode('list.vue 收到 WebSocket 推送:', event.detail)
+    console.log('list.vue 收到 WebSocket 推送:', event.detail)
     updateOnlineUsers(event.detail)
 }
 
@@ -203,7 +203,7 @@ const handleKick = async (row) => {
 const loadOnlineList = async () => {
     try {
         const res = await getOnlineListApi()
-        // scorpioncode('📊 HTTP 主动加载在线列表:', res.data)
+        console.log('📊 HTTP 主动加载在线列表:', res.data)
         // 兼容接口返回格式：假设 res.data 是 { data: [...], total: ... }
         const onlineData = res.data.data || res.data || []
         allTableData.value = onlineData
@@ -233,12 +233,12 @@ const cleanZombieUsers = async () => {
 // 监听 window 上的自定义事件
 onMounted(() => {
     
-    // // scorpioncode('list.vue 挂载')
+    // console.log('list.vue 挂载')
 
     // 1. 取缓存（解决管理端刷新问题）
     const cached = websocketManager.getCachedOnlineUsers()
     if (cached) {
-        // scorpioncode('📦 使用缓存数据')
+        console.log('📦 使用缓存数据')
         updateOnlineUsers(cached)
     }else {
         loadOnlineList() // 主动请求后端接口
@@ -247,12 +247,12 @@ onMounted(() => {
     // 2. 监听后续推送（解决用户端登录问题）
     window.addEventListener('online-users-update', handleOnlineUsersUpdate)
 
-    // // scorpioncode('已添加 WebSocket 监听')
+    // console.log('已添加 WebSocket 监听')
 
 })
 
 onUnmounted(() => {
-    // // scorpioncode('list.vue 卸载，移除监听')
+    // console.log('list.vue 卸载，移除监听')
     window.removeEventListener('online-users-update', handleOnlineUsersUpdate)
 })
 </script>

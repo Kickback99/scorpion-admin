@@ -101,7 +101,7 @@ export function generateNameFromPath(path) {
     return cleanedPath.replace(/\//g, '-')
   }
   
-  // scorpioncode('cleanedPath',cleanedPath)
+  console.log('cleanedPath',cleanedPath)
 
   // 单个斜杠的情况：直接返回去掉首尾斜杠的结果
   return cleanedPath

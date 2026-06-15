@@ -138,7 +138,7 @@ const tableData = ref([])
 // t_article_request：文章列表请求
 const render = async() => {
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    // scorpioncode(res)
+    console.log(res)
     tableData.value = res.data.items
     total.value = res.data.total
 }
@@ -147,7 +147,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //// scorpioncode(`onSizeChange：每页显示${size}条`)
+    //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     params.value.pageNum = 1
     //更新每页条数
@@ -157,7 +157,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //// scorpioncode(`onCurrentChange：当前第${page}页`)
+    //console.log(`onCurrentChange：当前第${page}页`)
     //更新当前页
     params.value.pageNum = page
     //重新渲染
@@ -186,7 +186,7 @@ const onReset = () => {
 const maskRef = ref()
 
 const handleAdd = (param) => {
-    // scorpioncode('hello')
+    console.log('hello')
     maskRef.value.openMask()
     maskRef.value.handleToggle(param)
 }
@@ -198,7 +198,7 @@ const handleEdit = (param) => {
 
 // t_article_request：文章删除请求
 const handleDelete = async(id) => {
-    // scorpioncode(id)
+    console.log(id)
     await removeApi(id)
     ElMessage.success('删除成功')
     render()

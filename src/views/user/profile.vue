@@ -261,7 +261,7 @@ const handleSelectAvatar = (file) => {
 }
 
 const handleSave = async () => {
-  // scorpioncode(userInfo === userStore.userInfo)
+  console.log(userInfo === userStore.userInfo)
   if (!formRef.value) return
   
   try {

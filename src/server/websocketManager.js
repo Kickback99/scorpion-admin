@@ -28,7 +28,7 @@ class WebSocketManager {
     // 如果正在连接或已连接，先关闭
     if (this.isConnecting || this.socket) {
       if (this.socket) {
-        // scorpioncode('🔌 关闭现有连接，准备重新连接')
+        console.log('🔌 关闭现有连接，准备重新连接')
         this.socket.close()
         this.socket = null
       }
@@ -41,7 +41,7 @@ class WebSocketManager {
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        // scorpioncode(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
+        console.log(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
         this.isConnecting = false
         this.reconnectAttempts = 0
       }
@@ -51,7 +51,7 @@ class WebSocketManager {
       }
 
       this.socket.onclose = (event) => {
-        // scorpioncode('🔌 WebSocket 连接关闭:', event.code, event.reason)
+        console.log('🔌 WebSocket 连接关闭:', event.code, event.reason)
         this.isConnecting = false
         // this.handleReconnect(userId)
 
@@ -96,7 +96,7 @@ class WebSocketManager {
   handleReconnect(userId, role) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
-      // scorpioncode(`🔄 尝试重新连接 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
+      console.log(`🔄 尝试重新连接 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
       
       setTimeout(() => {
         this.init(userId, role)
@@ -122,7 +122,7 @@ class WebSocketManager {
     }
 
       const data = JSON.parse(messageData)
-      // scorpioncode('📨 收到 WebSocket 消息:', data)
+      console.log('📨 收到 WebSocket 消息:', data)
 
       switch (data.type) {
         case 'force_logout':
@@ -140,7 +140,7 @@ class WebSocketManager {
         case 'online_users_update':
           // 缓存数据
           this.cachedOnlineUsers = data
-          // scorpioncode('缓存在线用户数据:', data)
+          console.log('缓存在线用户数据:', data)
           // 触发全局事件
           window.dispatchEvent(new CustomEvent('online-users-update', {
               detail: data
@@ -219,7 +219,7 @@ class WebSocketManager {
     // readyState 小于 2 表示正在连接或已连接
     if (this.socket && this.socket.readyState < 2) {
       this.isManualClose = true  // 标记为手动关闭，防止重连
-      // scorpioncode('🔌 手动关闭 WebSocket 连接')
+      console.log('🔌 手动关闭 WebSocket 连接')
       this.socket.close(1000, 'Manual close')
       this.socket = null
     }
