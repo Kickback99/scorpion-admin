@@ -158,8 +158,9 @@ const disabledAddParent = ref(false)
 const handleTest = (node,data) => {
   /* const flag =  node.parent.data.children.some(item => item.id === currentEditID.value)
   console.log(flag) */
-  console.log(handleComment())
+  // console.log(handleComment())
   console.log(node)
+  console.log(data)
 } 
 
 /* watch(treeList,() => {
@@ -620,9 +621,19 @@ const handleParentBlur = (node,data) => {
       }else {
         isEndParent.value = false
       }
-      // 移除新增的子节点
-      removeParentElement(node,data)
-      if(!isNormal.value){
+
+       // 如果是父节点(非叶子节点)且输入为空，则复原回上一次的值
+      if(!isNormal.value && parentData.value && !node.isLeaf){
+        console.log(`==================== parentData.value ${parentData.value} ====================`)
+        category[data.id] = parentData.value
+      }else {
+        // 移除新增的子节点
+        console.log("==================== 为空删除整个节点 ====================")
+        removeParentElement(node,data)
+      }
+
+      // 如果是子节点且输入为空，那么执行filterArr过滤操作
+      if(!isNormal.value && node.isLeaf){
         removeParentFilter(node,data)
         if(handleIsEndLeafParent(node)){
           console.log('没有进入表达式1吗？')
@@ -641,6 +652,8 @@ const handleParentBlur = (node,data) => {
           isEndParent.value = false
         }
       }
+
+
       ElMessage.error('请输入内容')
       if(treeList.value.length === 0){
         ElMessage.error('回到最原始的数据')
@@ -658,6 +671,7 @@ const handleParentBlur = (node,data) => {
         enabledCheckboxes()
       }
       isReturn.value = true
+      handleParentBlurCallback(data)
       return;
     }
 
@@ -683,8 +697,19 @@ const handleParentBlur = (node,data) => {
         }else {
          isEndParent.value = false
       }
-      removeParentElement(node,data)
-      if (!isNormal.value) {
+
+      // 如果是父节点(非叶子节点)且输入重复，则复原回上一次的值
+      if(!isNormal.value && parentData.value && !node.isLeaf){
+        console.log(`==================== parentData.value ${parentData.value} ====================`)
+        category[data.id] = parentData.value
+      }else {
+        // 移除重复的子节点
+        console.log("==================== 重复删除整个节点 ====================")
+        removeParentElement(node,data)
+      }
+
+      // 如果是子节点且输入重复，那么执行filterArr过滤操作
+      if (!isNormal.value && node.isLeaf) {
         removeParentFilter(node, data)
         if (handleIsEndLeafParent(node)) {
           // isChild.value = false
@@ -711,6 +736,7 @@ const handleParentBlur = (node,data) => {
       filterArr.push(data.id)
       if(node.level > 1){
         isChildId.value = data.id
+        parentData.value = node.parent.data.name
       }
       if(findPrevSubCate().length > 0){
           // 说明有子节点
@@ -743,8 +769,11 @@ const handleParentBlur = (node,data) => {
           return;
         }
 
+        handleParentBlurCallback(data)
+}
 
-  // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
+const handleParentBlurCallback = (data) => {
+    // 更新子分类名称(针对新增模式，往 treeList 数据赋值，提交服务器)
   data.name = category[data.id]
   const subItem = treeList.value.find(item => item.cate_id === data.id)
   if (subItem) {
@@ -762,7 +791,6 @@ const handleParentBlur = (node,data) => {
       // 显示虚拟恢复按钮
       data.isReset = true
     }, 200);
-
 }
 
 
@@ -1120,6 +1148,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
       return showParent(node,data) || handleLastParent(node,data)
     } else return isEnd.value === data.id
   } else {
+    console.log("表达式1.2执行......")
     return (!isEdit.value && data.isSave && !data.isParent && handleChildToggle(node,data)) || (!isEdit.value && data.isSave && handleParentToggle(node, data) && nativeData.find(item => item.id != data.id))
   }
 
@@ -1627,6 +1656,8 @@ const isNative = ref(true)
 
 const isBig = ref(false)
 
+const parentData = ref(null)
+
 const handleCheck = (node,data) => {
   data.flag = true
   data.isSave = false
@@ -1643,6 +1674,11 @@ const handleCheck = (node,data) => {
 
     if(node.level < 2){
       isBig.value = true
+      // 新增：每次点击修改时，更新 parentData 为当前父分类名
+    if (node.parent && node.data) {
+        parentData.value = node.data.name;
+        console.log("handleCheck 中更新 parentData:", parentData.value);
+    }
     }else isBig.value = false
 
     nextTick(() => {
@@ -1806,6 +1842,7 @@ const handleParentRevert = (node,data) => {
     isParentChild.value = false
     isChild.value = false
     isChildId.value = null
+    isHasChild.value = false
     // 启用复选框
     enabledCheckboxes()
     allShow.value = true
