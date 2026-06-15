@@ -124,8 +124,8 @@ const render = async(pager = 1) => {
     params.value.pageNum =  pager
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
     tableData.value = res.data.items
-    // scorpioncode(res.data.items)
-    // scorpioncode('表格数据')
+    console.log(res.data.items)
+    console.log('表格数据')
     total.value = res.data.total
     // 关闭loading动效
     loading.value = false
@@ -135,7 +135,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //// scorpioncode(`onSizeChange：每页显示${size}条`)
+    //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     // params.value.pageNum = 1
     //更新每页条数
@@ -145,7 +145,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //// scorpioncode(`onCurrentChange：当前第${size}页`)
+    //console.log(`onCurrentChange：当前第${size}页`)
     //更新当前页
     // params.value.pageNum = page
     //重新渲染
@@ -164,9 +164,9 @@ const removeRole = async(id) =>{
 const multipleSelection = ref([])
 
 const removeMultiple = (raw) =>{
-    // scorpioncode(raw)
+    console.log(raw)
     multipleSelection.value = raw
-    // // scorpioncode(multipleSelection.value)
+    // console.log(multipleSelection.value)
 }
 
 // 批量删除
@@ -238,8 +238,8 @@ const onReset = () => {
     const addRole = async() => {
         await ruleFormRef.value.validate()
         const res = await addApi(dialogData.value)
-        // scorpioncode('增加请求')
-        // scorpioncode(res)
+        console.log('增加请求')
+        console.log(res)
         dialogVisible.value = false
         ElMessage.success('添加成功')
         render()

@@ -221,8 +221,8 @@ const render = async(pager = 1) =>{
     loading.value = true
     params.value.pageNum =  pager
     const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    // scorpioncode('请求用户列表-------------------------------------------')
-    // scorpioncode(res.data)
+    console.log('请求用户列表-------------------------------------------')
+    console.log(res.data)
     tableData.value = res.data.items
     total.value = res.data.total
     // 关闭loading动效
@@ -234,7 +234,7 @@ render()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //// scorpioncode(`onSizeChange：每页显示${size}条`)
+    //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     // params.value.pageNum = 1
     //更新每页条数
@@ -244,7 +244,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //// scorpioncode(`onCurrentChange：当前第${size}页`)
+    //console.log(`onCurrentChange：当前第${size}页`)
     //更新当前页
     // params.value.pageNum = page
     //重新渲染
@@ -256,9 +256,9 @@ const multipleTableRef = ref()
 const multipleSelection = ref([])
 
 const removeMultiple = (raw) =>{
-    // scorpioncode(raw)
+    console.log(raw)
     multipleSelection.value = raw
-    // // scorpioncode(multipleSelection.value)
+    // console.log(multipleSelection.value)
 }
 
 // 清空表格
@@ -413,20 +413,20 @@ const showAllocRoles = async(row) =>{
     allRoles.value = res.data.allRoles
     // 把对应用户id的角色ids存入 checkedCities
     checkedCities.value = res.data.userRoleIds
-    // scorpioncode(checkedCities.value)
+    console.log(checkedCities.value)
     checkAll.value = allRoles.value.length === checkedCities.value.length
     isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
 }
 
   //大复选框的事件回调
   const handleCheckAllChange = (val) => {
-    // scorpioncode(val)
+    console.log(val)
     checkedCities.value = val ? allRoles.value.map(item => item.id) : []
     isIndeterminate.value = false
   }
   //小复选框的事件回调
   const handleCheckedCitiesChange = (value) => {
-    // scorpioncode(value)
+    console.log(value)
     const checkedCount = value.length
     checkAll.value = checkedCount === allRoles.value.length && allRoles.length>0
     isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.value.length

@@ -126,7 +126,7 @@ renderFriendLink()
 
 //点击分页事件
 const onSizeChange = (size) => {
-    //// scorpioncode(`onSizeChange：每页显示${size}条`)
+    //console.log(`onSizeChange：每页显示${size}条`)
     //每页条数发生变化时，重新从第一页渲染
     pagination.pageNum = 1
     //更新每页条数
@@ -136,7 +136,7 @@ const onSizeChange = (size) => {
 }
 
 const onCurrentChange = (page) => {
-    //// scorpioncode(`onCurrentChange：当前第${page}页`)
+    //console.log(`onCurrentChange：当前第${page}页`)
     //更新当前页
     pagination.pageNum = page
     //重新渲染
@@ -216,7 +216,7 @@ const handleConfirm = async() => {
 const multipleSelection = ref([])
 
 const handleMultiple = (raw) => {
-    // scorpioncode(raw)
+    console.log(raw)
     multipleSelection.value = raw
 }
 

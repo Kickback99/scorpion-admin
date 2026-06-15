@@ -67,7 +67,7 @@ const handleLogin = async() => {
     loading.value = true
     try {
     const res = await adminLoginApi(formModel.value)
-    // scorpioncode(res.data)
+    console.log(res.data)
     tokenStore.setToken(res.data)
 
     // 处理记住密码逻辑 - 简单判断是否勾选
@@ -94,7 +94,7 @@ const handleLogin = async() => {
                 redirect = decodeURIComponent(redirect)
             } catch (e) {
                 // 如果解码失败，说明可能已经是解码状态，使用原值
-                // scorpioncode('Redirect path is already decoded or invalid')
+                console.log('Redirect path is already decoded or invalid')
             }
         }
         router.push(redirect || '/')
@@ -111,7 +111,7 @@ const handleLogin = async() => {
     }, 300); */
 
     } catch (error) {
-        // scorpioncode(error)
+        console.log(error)
         loading.value = false
         throw(error)
     }
