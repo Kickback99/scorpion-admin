@@ -832,6 +832,7 @@ const handleBlur = (node, data) => {
         expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
+        // ElMessage.error('数据恢复成功')
       }else {
         differentArr.forEach((item,index) => {
           if(index === differentArr.length -1) {
@@ -879,20 +880,16 @@ const handleBlur = (node, data) => {
   // 新增事件的处理(判断名字是否重复)
   if (isEdit.value) {
 
-    const name = revertData(node.level, data)
+    
+  const newName = category[data.id]
+  const originName = revertData(node.level, data)
+  const isDuplicate = checkDuplicateContainName(newName)
 
-    // 不重复的逻辑
-    if (name != category[data.id]) {
-      let isRepeat;
-      if(differentArr.length > 0 ){
-        isRepeat = differentArr.find(item => item === data.id)
-      }
-      // if(!isRepeat && currentRevertId.value != data.id ) differentArr.push(data.id)
-      if(!isRepeat ) differentArr.push(data.id)
-
-    }else {
-      // 重复的逻辑
-      if(differentArr.length === 0){
+  if(isDuplicate){
+    const originalName = revertData(node.level, data)
+    data.name = originalName
+    category[data.id] = originalName
+    if(differentArr.length === 0){
         // t_reset：handleBlur初始化(编辑模式)
         disabledAddParent.value = false
         isDraggable.value = true
@@ -901,8 +898,9 @@ const handleBlur = (node, data) => {
         handleDuplicate(data)
         const arr = handleExpand(node)
         expandKey.value = [...arr]
-      // 启用复选框
-      enabledCheckboxes()
+        // ElMessage.error('数据恢复成功')
+        // 启用复选框
+        enabledCheckboxes()
       } else {
         differentArr.forEach((item, index) => {
           if (index === differentArr.length - 1) {
@@ -915,36 +913,41 @@ const handleBlur = (node, data) => {
         // 禁用复选框
         disabledCheckboxes()
       }
-      ElMessage.error('分类名不能重复')
+      // 如果名字和原先名字不同，则不提示任何修改
+      if(originName != newName){
+        ElMessage.error('分类名不能重复')
+      }
       isReturn.value = true
       return;
-    }
-    
-    
-    /* else {
+  }else {
       let isRepeat;
-      if(sameArr.length > 0){
-        isRepeat = sameArr.find(item => item === data.id)
+      if(differentArr.length > 0 ){
+        isRepeat = differentArr.find(item => item === data.id)
       }
-      if(!isRepeat && currentRevertId.value != data.id)  {
-        sameArr.push(data.id)
-      }
-    } */
-
-    console.log('push',differentArr)
-    // console.log('push',sameArr)
+      // if(!isRepeat && currentRevertId.value != data.id ) differentArr.push(data.id)
+      if(!isRepeat ) differentArr.push(data.id)
+  }
 
   } else {
-    console.log('到底是什么')
-    console.log(node)
     // 排除名字相同的子分类
-    const isDuplicate = node.parent.data.children.find(item => {
+    /* const isDuplicate = node.parent.data.children.find(item => {
       // 把自己排除
       if (data.id != item.id) {
         return item.name === category[data.id]
       }
 
+    }) */
+
+    const nodeList = handleAllNodes(node)
+
+    const isDuplicate = nodeList.find(item => {
+      // 把自己排除
+      if(data.id != item.id){
+        return item.name === category[data.id]
+      }
     })
+
+
 
     // console.log(isDuplicate)
     let afterCount;
@@ -1006,6 +1009,21 @@ const handleBlur = (node, data) => {
     }, 200);
 }
 
+// 封装方法：检查名称是否重复（排除自身）
+const checkDuplicateName = (data, newName) => {
+  return nativeData.some(item => 
+    (item.id !== data.id && item.name === newName) ||
+    (item.children?.some(child => child.id !== data.id && child.name === newName))
+  )
+}
+
+// 封装方法：检查名称是否重复(不排除自身)
+const checkDuplicateContainName = (newName) => {
+  return nativeData.some(item => 
+    item.name === newName ||
+    (item.children?.some(child => child.name === newName))
+  )
+}
 
 const handleDuplicate = (data) => {
   data.isEdit = false
