@@ -2,6 +2,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import { useTokenStore } from '@/store/token'
 import { useUserStore } from '@/store/user'
 import router from '@/router';
+import { useConfigStore } from '@/store/config';
 
 class WebSocketManager {
   constructor() {
@@ -146,6 +147,14 @@ class WebSocketManager {
     
     switch (messageType) {
       case 'comment':  // 评论消息
+
+        // 获取配置 store
+        const configStore = useConfigStore()
+        // 检查评论通知是否开启
+        if (!configStore.getNotificationCommentEnabled()) {
+          return
+        }
+        
         const commentUser = arr[1]  // 评论人
         const commentContent = arr[2]  // 评论内容
         // 格式：评论人：\n评论内容
