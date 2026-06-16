@@ -48,6 +48,9 @@ const CONFIG_DEFINITIONS = {
   'article_list.favorite_enabled': { type: 'switch', message: '文章收藏' },
   'article_list.comment_enabled': { type: 'switch', message: '文章评论' },
 
+  // 通知配置
+  'notification.comment_enabled': {type:'switch', message: '评论通知'},
+
   // 用户配置
   'user_config.collapse_enabled': {type:'switch', message:'菜单折叠'},
   'user_config.dark_enabled': {type:'switch', message:'深色模式'}
@@ -102,6 +105,9 @@ export const useConfigStore = defineStore({
     article_list:{
       view_enabled: true,
       favorite_enabled: true,
+      comment_enabled: true
+    },
+    notification: {
       comment_enabled: true
     },
     user_config:{
@@ -349,6 +355,10 @@ export const useConfigStore = defineStore({
       this.updateConfig('article_list.comment_enabled', !this.article_list?.comment_enabled)
     },
 
+    toggleNotificationCommentEnabled(){
+      this.updateConfig('notification.comment_enabled', !this.notification?.comment_enabled)
+    },
+
     toggleUserCollapseEnabled(){
       this.updateConfig('user_config.collapse_enabled', !this.user_config?.collapse_enabled)
     },
@@ -431,6 +441,10 @@ export const useConfigStore = defineStore({
       return this.article_list?.comment_enabled ?? true
     },
 
+    getNotificationCommentEnabled(){
+      return this.notification?.comment_enabled ?? true
+    },
+
     getUserCollapseEnabled() {
       return this.user_config?.collapse_enabled ?? true
     },
@@ -462,6 +476,7 @@ export const useConfigStore = defineStore({
     isListViewEnabled: (state) => state.article_list?.view_enabled ?? true,
     isListFavoriteEnabled: (state) => state.article_list?.favorite_enabled ?? true,
     isListCommentEnabled: (state) => state.article_list?.comment_enabled ?? true,
+    isNotificationCommentEnabled:(state) => state.notification?.comment_enabled ?? true,
     isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
     isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true
   },
