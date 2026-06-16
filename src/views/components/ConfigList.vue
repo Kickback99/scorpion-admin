@@ -175,6 +175,10 @@
         <div class="config-container">
           <el-form label-width="160px" label-position="left">
 
+            <el-form-item label="评论通知">
+              <el-switch :model-value="configStore.getNotificationCommentEnabled()" @change="configStore.toggleNotificationCommentEnabled" />
+            </el-form-item>
+
             <el-form-item label="图标搜索增强">
               <el-switch :model-value="configStore.getIconEnabled()" @change="configStore.toggleIconEnabled" />
             </el-form-item>
