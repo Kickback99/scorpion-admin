@@ -106,56 +106,113 @@ class WebSocketManager {
     }
   }
 
-  // 处理接收到的消息
+  // 处理接收到的消息（兼容 string、JSON对象、JSON数组）
   handleMessage(messageData) {
     try {
-
-      // 判断是否是纯文本消息（定时任务结果）
-      if (typeof messageData === 'string' && !messageData.startsWith('{')) {
+      // 1. 处理纯文本消息（定时任务结果等）
+      if (typeof messageData === 'string' && !messageData.startsWith('{') && !messageData.startsWith('[')) {
         // sendMessage，直接显示(目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截)
         ElMessage.success({
           message: messageData.replace(/\n/g, '<br><br>'),
           dangerouslyUseHTMLString: true,
         })
-
         return
-    }
+      }
 
+      // 2. 解析 JSON 数据
       const data = JSON.parse(messageData)
       console.log('📨 收到 WebSocket 消息:', data)
 
-      switch (data.type) {
-        case 'force_logout':
-          this.showForceLogoutDialog(data.title, data.message)
-          break
-        case 'password_changed':
-          this.showPasswordChangedDialog(data.title, data.message)
-          break
-        case 'account_disabled':
-          this.showAccountDisabledDialog(data.title, data.message)
-          break
-        case 'session_expired':
-          this.showSessionExpiredDialog(data.title, data.message)
-          break
-        case 'online_users_update':
-          // 缓存数据
-          this.cachedOnlineUsers = data
-          console.log('缓存在线用户数据:', data)
-          // 触发全局事件
-          window.dispatchEvent(new CustomEvent('online-users-update', {
-              detail: data
-          }))
-          break
-        default:
-          // 普通任务结果消息
-          if (data.message) {
-            ElMessage.success(data.message)
-            return
-          }
-          console.warn('未知的消息类型:', data.type)
+      // 3. 处理数组格式消息（评论、任务等）
+      if (Array.isArray(data)) {
+        this.handleArrayMessage(data)
+        return
       }
+
+      // 4. 处理对象格式消息（通知、在线用户列表等）
+      this.handleObjectMessage(data)
+      
     } catch (error) {
-      console.error('解析 WebSocket 消息失败:', error)
+      console.error('❌ 解析 WebSocket 消息失败:', error)
+    }
+  }
+
+  // 处理数组格式消息
+  handleArrayMessage(arr) {
+    // 数组格式：[type, data1, data2, ...]
+    const messageType = arr[0]
+    
+    switch (messageType) {
+      case 'comment':  // 评论消息
+        const commentUser = arr[1]  // 评论人
+        const commentContent = arr[2]  // 评论内容
+        // 格式：评论人：\n评论内容
+        const commentMessage = `${commentUser}发来了评论：<br><br>${commentContent}`
+        ElMessage.success({
+          message: commentMessage,
+          dangerouslyUseHTMLString: true,
+          duration: 5000  // 评论消息显示时间长一点
+        })
+        break
+        
+      case 'task':  // 任务消息
+        const taskTitle = arr[1]
+        const taskContent = arr[2]
+        const taskMessage = `${taskTitle}\n${taskContent}`
+        ElMessage.success({
+          message: taskMessage,
+          dangerouslyUseHTMLString: true
+        })
+        break
+        
+      case 'system':  // 系统消息
+        const systemMsg = arr[1]
+        ElMessage.success({
+          message: systemMsg,
+          dangerouslyUseHTMLString: true
+        })
+        break
+        
+      default:
+        // 未知类型的数组消息，尝试显示
+        console.warn('未知的数组消息类型:', messageType, arr)
+        if (arr.length > 1) {
+          ElMessage.success(String(arr[1]))
+        }
+    }
+  }
+
+  // 处理对象格式消息
+  handleObjectMessage(data) {
+    switch (data.type) {
+      case 'force_logout':
+        this.showForceLogoutDialog(data.title, data.message)
+        break
+      case 'password_changed':
+        this.showPasswordChangedDialog(data.title, data.message)
+        break
+      case 'account_disabled':
+        this.showAccountDisabledDialog(data.title, data.message)
+        break
+      case 'session_expired':
+        this.showSessionExpiredDialog(data.title, data.message)
+        break
+      case 'online_users_update':
+        // 缓存数据
+        this.cachedOnlineUsers = data
+        console.log('缓存在线用户数据:', data)
+        // 触发全局事件
+        window.dispatchEvent(new CustomEvent('online-users-update', {
+            detail: data
+        }))
+        break
+      default:
+        // 普通任务结果消息
+        if (data.message) {
+          ElMessage.success(data.message)
+          return
+        }
+        console.warn('未知的消息类型:', data.type)
     }
   }
 
