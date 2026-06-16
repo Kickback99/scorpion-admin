@@ -115,6 +115,8 @@ class WebSocketManager {
         ElMessage.success({
           message: messageData.replace(/\n/g, '<br><br>'),
           dangerouslyUseHTMLString: true,
+          duration: 5000,  // 消息显示时间长一点
+          customClass: 'message-right-top'
         })
         return
       }
@@ -147,11 +149,12 @@ class WebSocketManager {
         const commentUser = arr[1]  // 评论人
         const commentContent = arr[2]  // 评论内容
         // 格式：评论人：\n评论内容
-        const commentMessage = `${commentUser}发来了评论：<br><br>${commentContent}`
+        const commentMessage = `${commentUser} 发来了评论：<br><br>${commentContent}`
         ElMessage.success({
           message: commentMessage,
           dangerouslyUseHTMLString: true,
-          duration: 5000  // 评论消息显示时间长一点
+          duration: 5000,  // 评论消息显示时间长一点
+          customClass: 'message-right-top'
         })
         break
         

@@ -24,6 +24,12 @@ $code-color:#a0a4ec;
     --text:#FFFFFF;
 }
 
+.message-right-top {
+  inset: 30px 5px auto auto !important;  // top:20px, right:0, left:auto, bottom:auto
+  margin: 0 !important;
+  transform: none !important;
+}
+
 
 // flex函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
