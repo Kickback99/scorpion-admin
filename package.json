@@ -12,6 +12,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@kangc/v-md-editor": "^2.3.18",
     "axios": "^1.6.5",
+    "cronstrue": "^3.14.0",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.11.1",
     "mitt": "^3.0.1",
