@@ -25,6 +25,13 @@
           <el-tag type="primary">{{ row.cronExpression }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="执行周期说明" min-width="200" align="center">
+        <template #default="{ row }">
+            <span style="font-size: 13px; color: var(--el-text-color-primary);">
+              {{ translateCron(row.cronExpression) }}
+            </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="status" label="状态" width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 0 ? 'success' : 'danger'">
@@ -143,6 +150,8 @@ import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { VideoPlay} from '@element-plus/icons-vue'
 import { listApi, addApi, updateApi, executeApi, refreshAllApi, refreshTaskApi, deleteApi } from '@/api/sysTask'
+import cronstrue from 'cronstrue'
+import 'cronstrue/locales/zh_CN'
 
 // ==================== 表格数据 ====================
 const tableData = ref([])
@@ -366,6 +375,20 @@ const deleteTask = async (row) => {
 const setCron = (cronValue) => {
   formData.value.cronExpression = cronValue
   ElMessage.success(`已设置为：${cronValue}`)
+}
+
+// ==================== Cron表达式翻译 ====================
+const translateCron = (cronExpression) => {
+  if (!cronExpression) return '未设置'
+  try {
+    // 指定使用中文
+    return cronstrue.toString(cronExpression, { 
+      locale: 'zh_CN'  // 这里指定使用已注册的中文包
+    })
+  } catch (error) {
+    console.warn('Cron翻译失败:', cronExpression, error)
+    return '无效表达式'
+  }
 }
 
 // ==================== 页面加载 ====================
