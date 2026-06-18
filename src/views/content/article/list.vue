@@ -32,6 +32,7 @@
                     @click="setSortOrder('DESC')" />
             </el-form-item>
             
+            <br>
 
             <el-form-item>
                 <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
@@ -41,19 +42,39 @@
                 </el-select>
             </el-form-item>
 
+            <!-- 快捷选择按钮组 -->
             <el-form-item>
+                <el-button-group>
+                    <el-button size="small" @click="setQuickDate('today')">今天</el-button>
+                    <el-button size="small" @click="setQuickDate('yesterday')">昨天</el-button>
+                    <el-button size="small" @click="setQuickDate('week')">最近一周</el-button>
+                    <el-button size="small" @click="setQuickDate('month')">最近一月</el-button>
+                </el-button-group>
+            </el-form-item>
+
+            <!-- 开始时间选择器（单边） -->
+            <el-form-item label="开始时间">
                 <el-date-picker
-                v-model="dataTimeRange"
-                type="datetimerange"
-                :shortcuts="shortcuts"
-                range-separator="至"
-                start-placeholder="开始日期时间"
-                end-placeholder="结束日期时间"
-                :popper-options="{
-                    placement: 'bottom-start'
-                }"
-                :size="default"
-                @change="updateDataTime"
+                    v-model="startTime"
+                    type="datetime"
+                    placeholder="选择开始时间"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    :clearable="true"
+                    @change="updateStartTime"
+                />
+            </el-form-item>
+
+            <!-- 结束时间选择器（单边） -->
+            <el-form-item label="结束时间">
+                <el-date-picker
+                    v-model="endTime"
+                    type="datetime"
+                    placeholder="选择结束时间"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    :clearable="true"
+                    @change="updateEndTime"
                 />
             </el-form-item>
 
@@ -118,6 +139,7 @@ import { ref, watch } from 'vue';
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs} from 'element-plus';
+import { ElMessage } from 'element-plus';
 
 //搜索相关
 const searchData = ref({
@@ -134,6 +156,10 @@ const params = ref({
 const total = ref(null)
 
 const tableData = ref([])
+
+// 独立的开始和结束时间
+const startTime = ref('')
+const endTime = ref('')
 
 // t_article_request：文章列表请求
 const render = async() => {
@@ -179,7 +205,8 @@ const onReset = () => {
         sortOrder: 'DESC',           // 保留默认排序方向
         timeField: 'create_time',  // 默认按创建时间筛选
     }
-    dataTimeRange.value = []  // 清空日期范围
+    startTime.value = ''   // 清空开始时间
+    endTime.value = ''     // 清空结束时间
     render()
 }
 
@@ -233,121 +260,84 @@ const fields = ref([
 
 // 监听 timeField 变化，重新生成时间参数
 watch(() => searchData.value.timeField, () => {
-    // 如果当前有日期范围，重新生成对应的时间参数
-    if (dataTimeRange.value && dataTimeRange.value.length === 2) {
-        regenerateTimeParams()
-    }
+    // 重新映射当前的时间值到新的时间字段
+    remapTimeParams()
 })
 
-const dataTimeRange = ref([])
-
-const shortcuts = [
-  {
-    text: "今天",
-    value: () => {
-      const now = new Date()
-      const start = new Date(now)
-      start.setHours(0, 0, 0, 0)
-      return [start, now]
-    }
-  },
-  {
-    text: "昨天",
-    value: () => {
-      const end = new Date()
-      end.setHours(0, 0, 0, 0)
-      const start = new Date(end)
-      start.setDate(start.getDate() - 1)
-      return [start, end]
-    }
-  },
-  {
-    text: "最近一周",
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setDate(start.getDate() - 7)
-      return [start, end]
-    }
-  },
-    {
-    text: "上周",
-    value: () => {
-      const end = new Date();
-      const start = new Date();
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-      return [start, end];
-    }
-  },
-  {
-    text: "上个月",
-    value: () => {
-      const end = new Date();
-      const start = new Date();
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-      return [start, end];
-    }
-  },
-  {
-    text: "三个月前",
-    value: () => {
-      const end = new Date();
-      const start = new Date();
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-      return [start, end];
-    }
-  }
-];
-
-const updateDataTime = (range) => {
-    if (!range || range.length !== 2) {
-        // 清空日期时，清空所有时间参数
-        searchData.value.createTimeBegin = null
-        searchData.value.createTimeEnd = null
-        searchData.value.updateTimeBegin = null
-        searchData.value.updateTimeEnd = null
-        return
-    }
+// 重新映射时间参数
+const remapTimeParams = () => {
+    // 清空所有时间字段
+    searchData.value.createTimeBegin = null
+    searchData.value.createTimeEnd = null
+    searchData.value.updateTimeBegin = null
+    searchData.value.updateTimeEnd = null
     
-    // 根据当前 timeField 设置对应的时间参数
-    const beginTime = dayjs(range[0]).format('YYYY-MM-DD HH:mm:ss')
-    const endTime = dayjs(range[1]).format('YYYY-MM-DD HH:mm:ss')
-    
+    // 根据当前 timeField 设置对应的时间字段
     if (searchData.value.timeField === 'create_time') {
-        searchData.value.createTimeBegin = beginTime
-        searchData.value.createTimeEnd = endTime
-        searchData.value.updateTimeBegin = null
-        searchData.value.updateTimeEnd = null
+        searchData.value.createTimeBegin = startTime.value || null
+        searchData.value.createTimeEnd = endTime.value || null
     } else {
-        searchData.value.updateTimeBegin = beginTime
-        searchData.value.updateTimeEnd = endTime
-        searchData.value.createTimeBegin = null
-        searchData.value.createTimeEnd = null
+        searchData.value.updateTimeBegin = startTime.value || null
+        searchData.value.updateTimeEnd = endTime.value || null
     }
 }
 
-
-// 根据当前日期范围和 timeField 重新生成时间参数
-const regenerateTimeParams = () => {
-    const range = dataTimeRange.value
-    if (!range || range.length !== 2) return
-    
-    const beginTime = dayjs(range[0]).format('YYYY-MM-DD HH:mm:ss')
-    const endTime = dayjs(range[1]).format('YYYY-MM-DD HH:mm:ss')
+// 开始时间变化
+const updateStartTime = (value) => {
+    startTime.value = value || ''
     
     if (searchData.value.timeField === 'create_time') {
-        searchData.value.createTimeBegin = beginTime
-        searchData.value.createTimeEnd = endTime
-        // 清空修改时间字段
-        searchData.value.updateTimeBegin = null
-        searchData.value.updateTimeEnd = null
+        searchData.value.createTimeBegin = value || null
     } else {
-        searchData.value.updateTimeBegin = beginTime
-        searchData.value.updateTimeEnd = endTime
-        // 清空创建时间字段
-        searchData.value.createTimeBegin = null
-        searchData.value.createTimeEnd = null
+        searchData.value.updateTimeBegin = value || null
     }
+}
+
+// 结束时间变化
+const updateEndTime = (value) => {
+    endTime.value = value || ''
+    
+    if (searchData.value.timeField === 'create_time') {
+        searchData.value.createTimeEnd = value || null
+    } else {
+        searchData.value.updateTimeEnd = value || null
+    }
+}
+
+// 快捷日期设置
+const setQuickDate = (type) => {
+    const now = new Date()
+    let start = null
+    let end = now
+    
+    switch (type) {
+        case 'today':
+            start = new Date(now)
+            start.setHours(0, 0, 0, 0)
+            break
+        case 'yesterday':
+            start = new Date(now)
+            start.setDate(start.getDate() - 1)
+            start.setHours(0, 0, 0, 0)
+            end = new Date(now)
+            end.setHours(0, 0, 0, 0)
+            break
+        case 'week':
+            start = new Date(now)
+            start.setDate(start.getDate() - 7)
+            break
+        case 'month':
+            start = new Date(now)
+            start.setMonth(start.getMonth() - 1)
+            break
+    }
+    
+    startTime.value = start ? dayjs(start).format('YYYY-MM-DD HH:mm:ss') : ''
+    endTime.value = end ? dayjs(end).format('YYYY-MM-DD HH:mm:ss') : ''
+    
+    // 触发时间更新
+    updateStartTime(startTime.value)
+    updateEndTime(endTime.value)
 }
 
 </script>
