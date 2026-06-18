@@ -2,6 +2,8 @@
     <div class="layout">
         <el-form
             inline
+            ref="formRef"
+            label-width="auto"
             class="demo-ruleForm"
             :size="formSize"
             status-icon
@@ -12,6 +14,48 @@
 
             <el-form-item>
                 <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
+            </el-form-item>
+
+            <!-- 排序字段选择器（SmartSelector） -->
+            <el-form-item>
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序(默认创建时间)">
+                </SmartSelector>
+            </el-form-item>
+
+            <!-- 升序/降序按钮 -->
+            <el-form-item>
+                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
+                    @click="setSortOrder('ASC')" />
+                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
+                    @click="setSortOrder('DESC')" />
+            </el-form-item>
+
+            <br>
+
+            <!-- 时间字段选择器 -->
+            <el-form-item>
+                <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
+                    <el-option label="请选择时间" value="" :disabled="true" />
+                    <el-option label="创建时间" value="create_time" />
+                    <el-option label="修改时间" value="update_time" />
+                </el-select>
+            </el-form-item>
+
+            <!-- 日期时间范围选择器（带 shortcuts） -->
+            <el-form-item>
+                <el-date-picker
+                    v-model="dataTimeRange"
+                    type="datetimerange"
+                    :shortcuts="shortcuts"
+                    range-separator="至"
+                    start-placeholder="开始日期时间"
+                    end-placeholder="结束日期时间"
+                    :popper-options="{
+                        placement: 'bottom-start'
+                    }"
+                    :size="default"
+                    @change="updateDataTime"
+                />
             </el-form-item>
 
             <el-form-item>
@@ -61,6 +105,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
+        <el-table-column prop="updateTime" label="修改时间" align="center" width="180" />
         <el-table-column label="操作" width="150" align="center" >
             <template #default="{row,$index}">
             <el-button  :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" type="primary" icon="Edit"  circle plain/>
@@ -175,6 +220,8 @@ const {auth} = getCurrentInstance()
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
 import { useRouter } from 'vue-router';
+import SmartSelector from '@/views/components/SmartSelector.vue';
+import { dayjs } from 'element-plus';
 
 const handleImage = (row) => {
     if(row.id === userStore.userInfo.id){
@@ -197,7 +244,8 @@ const loading = ref(false)
 
 //搜索相关
 const searchData = ref({
-    
+    sortOrder: 'ASC', // 默认升序
+    timeField: 'create_time', // 默认按创建时间筛选
 })
 
 
@@ -210,6 +258,11 @@ const onSearch = () =>{
 const onReset = () => {
     params.value.pageNum = 1
     searchData.value = {}
+    searchData.value = {
+        sortOrder: 'ASC',
+        timeField: 'create_time',
+    }
+    dataTimeRange.value = [] // 清空日期范围
     render()
 }
 
@@ -467,6 +520,139 @@ const doAllocRoles = async() => {
 
 }
 
+// 排序相关
+// 设置排序方向
+const setSortOrder = (order) => {
+    searchData.value.sortOrder = order
+}
+
+// 排序字段选项
+const fields = ref([
+    { label: '请选择排序(默认创建时间)', value: '' },
+    { label: '用户名', value: 'username' },
+    { label: '呢称', value: 'nickname' },
+    { label: '创建时间', value: 'create_time' },
+    { label: '修改时间', value: 'update_time' },
+])
+
+// 监听 timeField 变化，重新生成时间参数
+watch(() => searchData.value.timeField, () => {
+    // 如果当前有日期范围，重新生成对应的时间参数
+    if (dataTimeRange.value && dataTimeRange.value.length === 2) {
+        regenerateTimeParams()
+    }
+})
+
+// 日期时间范围相关
+const dataTimeRange = ref([])
+
+// shortcuts 快捷选项
+const shortcuts = [
+    {
+        text: "今天",
+        value: () => {
+            const now = new Date()
+            const start = new Date(now)
+            start.setHours(0, 0, 0, 0)
+            return [start, now]
+        }
+    },
+    {
+        text: "昨天",
+        value: () => {
+            const end = new Date()
+            end.setHours(0, 0, 0, 0)
+            const start = new Date(end)
+            start.setDate(start.getDate() - 1)
+            return [start, end]
+        }
+    },
+    {
+        text: "最近一周",
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setDate(start.getDate() - 7)
+            return [start, end]
+        }
+    },
+    {
+        text: "上周",
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            return [start, end]
+        }
+    },
+    {
+        text: "上个月",
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            return [start, end]
+        }
+    },
+    {
+        text: "三个月前",
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            return [start, end]
+        }
+    }
+]
+
+// 日期范围更新处理
+const updateDataTime = (range) => {
+    if (!range || range.length !== 2) {
+        // 清空日期时，清空所有时间参数
+        searchData.value.createTimeBegin = null
+        searchData.value.createTimeEnd = null
+        searchData.value.updateTimeBegin = null
+        searchData.value.updateTimeEnd = null
+        return
+    }
+
+    // 根据当前 timeField 设置对应的时间参数
+    const beginTime = dayjs(range[0]).format('YYYY-MM-DD HH:mm:ss')
+    const endTime = dayjs(range[1]).format('YYYY-MM-DD HH:mm:ss')
+
+    if (searchData.value.timeField === 'create_time') {
+        searchData.value.createTimeBegin = beginTime
+        searchData.value.createTimeEnd = endTime
+        searchData.value.updateTimeBegin = null
+        searchData.value.updateTimeEnd = null
+    } else {
+        searchData.value.updateTimeBegin = beginTime
+        searchData.value.updateTimeEnd = endTime
+        searchData.value.createTimeBegin = null
+        searchData.value.createTimeEnd = null
+    }
+}
+
+// 根据当前日期范围和 timeField 重新生成时间参数
+const regenerateTimeParams = () => {
+    const range = dataTimeRange.value
+    if (!range || range.length !== 2) return
+
+    const beginTime = dayjs(range[0]).format('YYYY-MM-DD HH:mm:ss')
+    const endTime = dayjs(range[1]).format('YYYY-MM-DD HH:mm:ss')
+
+    if (searchData.value.timeField === 'create_time') {
+        searchData.value.createTimeBegin = beginTime
+        searchData.value.createTimeEnd = endTime
+        searchData.value.updateTimeBegin = null
+        searchData.value.updateTimeEnd = null
+    } else {
+        searchData.value.updateTimeBegin = beginTime
+        searchData.value.updateTimeEnd = endTime
+        searchData.value.createTimeBegin = null
+        searchData.value.createTimeEnd = null
+    }
+}
 
 </script>
 
