@@ -28,6 +28,7 @@ const CONFIG_DEFINITIONS = {
   'comment.friend_link_comment_enabled': { type: 'switch', message: '友链评论显示' },
   'comment.child_comment_limit': { type: 'number', message: '子评论默认显示数量', min:0, max:20 },
   'comment.child_page_size': { type: 'number', message: '子评论分页大小', min:5, max: 50  },
+  'comment.parent_page_size':{ type: 'number', message: '父评论分页大小', min:5, max: 15 },
 
   // 导航相关
   'nav.login_enabled': { type: 'switch', message: '前端登录' },
@@ -47,6 +48,9 @@ const CONFIG_DEFINITIONS = {
   'article_list.view_enabled': { type: 'switch', message: '文章浏览' },
   'article_list.favorite_enabled': { type: 'switch', message: '文章收藏' },
   'article_list.comment_enabled': { type: 'switch', message: '文章评论' },
+  'article_list.load_mode': {type: 'string', message: '文章加载方式'},
+  'article_list.scroll_page_size': {type: 'number', message: '滚动模式分页大小', min:5, max: 15},
+  'article_list.pagination_page_size': {type: 'number', message: '分页模式分页大小', min:5, max: 15},
 
   // 通知配置
   'notification.comment_enabled': {type:'switch', message: '评论通知'},
@@ -69,6 +73,13 @@ const MESSAGE_MAP = {
   },
   number: {
     default: (fieldName, value) => `${fieldName}已设为 ${value}`
+  },
+  string: {
+    // 为特定 key 定义值的中文映射
+    'article_list.load_mode': {
+      'scroll': '滚动',
+      'pagination': '分页'
+    }
   }
 }
 
@@ -86,7 +97,8 @@ export const useConfigStore = defineStore({
       article_comment_enabled: true,
       friend_link_comment_enabled: false,
       child_comment_limit: 3,
-      child_page_size: 10
+      child_page_size: 10,
+      parent_page_size:10
     },
     nav:{
       login_enabled:true,
@@ -105,7 +117,10 @@ export const useConfigStore = defineStore({
     article_list:{
       view_enabled: true,
       favorite_enabled: true,
-      comment_enabled: true
+      comment_enabled: true,
+      load_mode: 'scroll',
+      scroll_page_size: 10,
+      pagination_page_size: 7
     },
     notification: {
       comment_enabled: true
@@ -256,6 +271,10 @@ export const useConfigStore = defineStore({
         message = MESSAGE_MAP[key][value] || `${fieldName}已切换`
       } else if (type === 'number') {
         message = MESSAGE_MAP.number.default(fieldName, value)
+      } else if (type === 'string') {
+        const stringMap = MESSAGE_MAP.string?.[key]
+        const displayValue = stringMap?.[value] || value
+        message = `${fieldName}已切换为 ${displayValue}`
       } else {
         message = `${fieldName}已更新`
       }
@@ -319,6 +338,10 @@ export const useConfigStore = defineStore({
       this.updateConfig('comment.child_page_size', value)
     },
 
+    setParentPageSize(value) {
+      this.updateConfig('comment.parent_page_size', value)
+    },
+
     toggleMyPublishesEnabled(){
       this.updateConfig('profile.my_publishes_enabled',!this.profile.my_publishes_enabled)
     },
@@ -353,6 +376,18 @@ export const useConfigStore = defineStore({
 
     toggleListCommentEnabled(){
       this.updateConfig('article_list.comment_enabled', !this.article_list?.comment_enabled)
+    },
+
+    setListLoadMode(value){
+      this.updateConfig('article_list.load_mode', value)
+    },
+
+    setListScrollPageSize(value){
+      this.updateConfig('article_list.scroll_page_size', value)
+    },
+
+    setListPaginationPageSize(value){
+      this.updateConfig('article_list.pagination_page_size', value)
     },
 
     toggleNotificationCommentEnabled(){
@@ -397,6 +432,10 @@ export const useConfigStore = defineStore({
       return this.comment?.child_page_size ?? 7
     },
 
+    getParentPageSize() {
+      return this.comment?.parent_page_size ?? 10
+    },
+
     getArticleCommentEnabled() {
       return this.comment?.article_comment_enabled ?? true
     },
@@ -439,6 +478,18 @@ export const useConfigStore = defineStore({
 
     getListCommentEnabled(){
       return this.article_list?.comment_enabled ?? true
+    },
+
+    getListLoadMode(){
+      return this.article_list?.load_mode
+    },
+
+    getListScrollPageSize(){
+      return this.article_list?.scroll_page_size ?? 10
+    },
+
+    getListPaginationPageSize(){
+      return this.article_list?.pagination_page_size ?? 7
     },
 
     getNotificationCommentEnabled(){

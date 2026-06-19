@@ -50,8 +50,8 @@
             <!-- 文章主题 -->
             <el-form-item label="文章主题">
               <el-radio-group :model-value="configStore.getArticleTheme()" @change="configStore.setArticleTheme" class="vertical-radio-group">
-                <el-radio :value="0">github主题</el-radio>
-                <el-radio :value="1">vuepress主题</el-radio>
+                <el-radio :value="0">github</el-radio>
+                <el-radio :value="1">vuepress</el-radio>
               </el-radio-group>
             </el-form-item>
 
@@ -103,6 +103,19 @@
                       <span style="color: #ff7875;">⚠️ 该值必须大于「子评论默认显示数量」</span>
                     </div>
                 </template>
+                <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </el-form-item>
+
+            <!-- 父评论分页大小 -->
+            <el-form-item label="父评论分页大小">
+              <el-input-number
+                :model-value="configStore.getParentPageSize()"
+                :min="getMin('comment.parent_page_size')"
+                :max="getMax('comment.parent_page_size')"
+                @change="configStore.setParentPageSize"
+              />
+              <el-tooltip content="每次滚动时父评论的分页大小" placement="right">
                 <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
               </el-tooltip>
             </el-form-item>
@@ -165,6 +178,40 @@
                 :inactive-value="false"
                 @change="configStore.toggleListCommentEnabled()"
               />
+            </el-form-item>
+
+            <!-- 文章加载方式 -->
+            <el-form-item label="文章加载">
+              <el-radio-group :model-value="configStore.getListLoadMode()" @change="configStore.setListLoadMode" class="vertical-radio-group">
+                <el-radio value="scroll">滚动</el-radio>
+                <el-radio value="pagination">分页</el-radio>
+              </el-radio-group>
+            </el-form-item>
+
+            <!-- 文章滚动模式分页大小 -->
+            <el-form-item label="滚动大小">
+              <el-input-number
+                :model-value="configStore.getListScrollPageSize()"
+                :min="getMin('article_list.scroll_page_size')"
+                :max="getMax('article_list.scroll_page_size')"
+                @change="configStore.setListScrollPageSize"
+              />
+              <el-tooltip content="文章列表滚动模式的分页大小" placement="right">
+                <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </el-form-item>
+
+            <!-- 文章分页模式分页大小 -->
+            <el-form-item label="分页大小">
+              <el-input-number
+                :model-value="configStore.getListPaginationPageSize()"
+                :min="getMin('article_list.pagination_page_size')"
+                :max="getMax('article_list.pagination_page_size')"
+                @change="configStore.setListPaginationPageSize"
+              />
+              <el-tooltip content="文章列表分页模式的分页大小" placement="right">
+                <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+              </el-tooltip>
             </el-form-item>
 
           </el-form>
@@ -290,11 +337,11 @@ const getMax = (key) => {
   /* background-color: var(--tab-bg); */
 }
 
-.vertical-radio-group {
+/* .vertical-radio-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start; 
-}
+} */
 
 .config-container {
   padding: 20px;
