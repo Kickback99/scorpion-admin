@@ -2,7 +2,7 @@
     <div class="toolbar">
         <el-form label-width="auto" inline> 
             <el-form-item>
-                <el-input v-model="searchData.tagName" placeholder="请输入标签名" />
+                <el-input v-model="searchData.keyword" placeholder="请输入标签名/备注" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
