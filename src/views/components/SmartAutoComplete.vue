@@ -30,9 +30,13 @@
         v-for="(item, index) in filteredSuggestions" 
         :key="index"
         class="suggestion-item"
-        :class="{ 'suggestion-active': activeIndex === index }"
+        :class="{ 
+          'suggestion-active': activeIndex === index,
+          'suggestion-hover': hoverIndex === index && activeIndex !== index
+        }"
         @mousedown="handleSuggestionMouseDown($event, item)"
-        @mouseenter="activeIndex = index"
+        @mouseenter="handleMouseEnter(index)"
+        @mouseleave="hoverIndex = -1"
       >
         <span v-html="highlightMatch(item.value)"></span>
         <el-tag v-if="isTagSelected(item.value)" size="small" type="info">已添加</el-tag>
@@ -120,6 +124,10 @@ let isComposing = false
 
 // 建议数据（存储所有标签）
 const suggestions = ref([])
+
+const hoverIndex = ref(-1)
+const isKeyboardMode = ref(false)
+const keyboardTimer = ref(null)
 
 // 过滤后的建议（排除已选择的 + 拼音匹配）
 const filteredSuggestions = computed(() => {
@@ -370,20 +378,27 @@ const handleBlur = (event) => {
 
 // 滚动到高亮项（平滑滚动）
 const scrollToHighlighted = (index) => {
-  nextTick(() => {
-    if (!suggestionsRef.value) return
-    
-    const items = suggestionsRef.value.querySelectorAll('.suggestion-item')
-    if (!items.length || index < 0 || index >= items.length) return
-    
-    const targetItem = items[index]
-    
-    // 🔥 使用 scrollIntoView 实现平滑滚动
-    targetItem.scrollIntoView({
-      block: 'nearest',
-      behavior: 'smooth'
+  requestAnimationFrame(() => {
+    nextTick(() => {
+      if (!suggestionsRef.value) return
+      
+      const items = suggestionsRef.value.querySelectorAll('.suggestion-item')
+      if (!items.length || index < 0 || index >= items.length) return
+      
+      const targetItem = items[index]
+      
+      // 瞬间滚动到可视区域，无动画
+      targetItem.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth'
+      })
     })
   })
+}
+
+const handleMouseEnter = (index) => {
+  if (isKeyboardMode.value) return
+  activeIndex.value = index
 }
 
 // 处理键盘事件
@@ -414,22 +429,42 @@ const handleKeydown = (event) => {
       
     case 'ArrowDown':
       if (showDropdown.value) {
+        event.preventDefault()
+        isKeyboardMode.value = true
+        hoverIndex.value = -1  // 排它(排除鼠标经过高亮)
         // 更新索引
         const newIndex = Math.min(activeIndex.value + 1, filteredSuggestions.value.length - 1)
         activeIndex.value = newIndex
-        // 🔥 滚动到高亮项
-        scrollToHighlighted(newIndex)
+        // 滚动到高亮项
+        nextTick(()=>{
+          scrollToHighlighted(newIndex)
+        })
+        // 滚动结束后退出键盘模式（比滚动延迟稍长）
+        clearTimeout(keyboardTimer.value)
+        keyboardTimer.value = setTimeout(() => {
+          isKeyboardMode.value = false
+        }, 200)
       }
       break
       
     case 'ArrowUp':
       if (showDropdown.value) {
         event.preventDefault()
+        isKeyboardMode.value = true
+        hoverIndex.value = -1  // 排它(排除鼠标经过高亮)
+        event.preventDefault()
         // 更新索引
         const newIndex = Math.max(activeIndex.value - 1, 0)
         activeIndex.value = newIndex
-        // 🔥 滚动到高亮项
-        scrollToHighlighted(newIndex)
+        // 滚动到高亮项
+        nextTick(()=>{
+          scrollToHighlighted(newIndex)
+        })
+        // 滚动结束后退出键盘模式（比滚动延迟稍长）
+        clearTimeout(keyboardTimer.value)
+        keyboardTimer.value = setTimeout(() => {
+          isKeyboardMode.value = false
+        }, 200)
       }
       break
       
@@ -647,13 +682,19 @@ defineExpose({
   font-size: var(--el-font-size-base);
 }
 
-/* 高亮适配深浅主题 */
-.suggestion-item:hover {
+/* 鼠标经过高亮适配深浅主题 */
+.suggestion-hover {
   background-color: var(--el-fill-color-light);
 }
 
-/* 高亮适配深浅主题 */
+/* 键盘事件高亮适配深浅主题 */
 .suggestion-active {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-text-color-primary);
+}
+
+/* 鼠标和键盘高亮适配深浅主题 */
+.suggestion-active.suggestion-hover {
   background-color: var(--el-color-primary-light-9);
   color: var(--el-text-color-primary);
 }
