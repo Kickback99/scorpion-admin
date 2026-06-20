@@ -4,13 +4,15 @@
     <!-- el-input-tag 基础组件 -->
     <el-input-tag
       ref="inputTagRef"
-      v-model="tags"
+      v-model="modelValue"
       :placeholder="placeholder"
       :max="max"
       :disabled="disabled"
       :size="size"
       :readonly="readonly"
       :clearable="clearable"
+      :trigger="null"
+      tag-type="primary"
       @remove="handleTagRemove"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -32,7 +34,7 @@
         @mousedown="handleSuggestionMouseDown($event, item)"
         @mouseenter="activeIndex = index"
       >
-        <span>{{ item.value }}</span>
+        <span v-html="highlightMatch(item.value)"></span>
         <el-tag v-if="isTagSelected(item.value)" size="small" type="info">已添加</el-tag>
       </div>
       <div v-if="loading" class="suggestion-loading">
@@ -44,16 +46,19 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
+import PinyinMatch from 'pinyin-match'
+
+// ==================== 双向绑定 ====================
+const modelValue = defineModel({
+  type: Array,
+  default: () => []
+})
 
 // ==================== Props ====================
 const props = defineProps({
-  modelValue: {
-    type: Array,
-    default: () => []
-  },
   placeholder: {
     type: String,
     default: '请输入标签，按回车确认'
@@ -93,22 +98,18 @@ const props = defineProps({
   minSearchLength: {
     type: Number,
     default: 1
+  },
+  // 自定义分隔符（通过 Props 传递）
+  separators: {
+    type: RegExp,
+    default: /[\s\-_\.\/]+/
   }
 })
-
-// ==================== Emits ====================
-const emit = defineEmits([
-  'update:modelValue',
-  'tag-add',
-  'tag-remove',
-  'input-change'
-])
 
 // ==================== Refs ====================
 const containerRef = ref(null)
 const inputTagRef = ref(null)
 const suggestionsRef = ref(null)
-const tags = ref([...props.modelValue])
 const currentInput = ref('')
 const showDropdown = ref(false)
 const activeIndex = ref(-1)
@@ -117,10 +118,10 @@ const inputRect = ref({})
 let debounceTimer = null
 let isComposing = false
 
-// 建议数据
+// 建议数据（存储所有标签）
 const suggestions = ref([])
 
-// 过滤后的建议（排除已选择的）
+// 过滤后的建议（排除已选择的 + 拼音匹配）
 const filteredSuggestions = computed(() => {
   return suggestions.value.filter(item => 
     !isTagSelected(item.value)
@@ -137,23 +138,151 @@ const getCurrentInputValue = () => {
 
 // 检查标签是否已选择
 const isTagSelected = (value) => {
-  return tags.value.includes(value)
+  return modelValue.value.includes(value)
 }
+
+// 高亮匹配
+const highlightMatch = (text) => {
+  const query = currentInput.value
+
+  // 🔥 调试日志
+  console.log('highlightMatch 调用:', { query, text, queryLength: query?.length })
+
+  if (!query || !query.trim() || !text) return text
+  
+  const lowerText = text.toLowerCase()
+  const lowerQuery = query.toLowerCase()
+  
+  // 1. 英文直接匹配（优先）
+  const index = lowerText.indexOf(lowerQuery)
+  if (index !== -1) {
+    const before = text.substring(0, index)
+    const match = text.substring(index, index + query.length)
+    const after = text.substring(index + query.length)
+    return `${before}<strong>${match}</strong>${after}`
+  }
+  
+  // 2. PinyinMatch（中文拼音）
+  const pinyinResult = PinyinMatch.match(text, query)
+  if (pinyinResult) {
+    const indices = Array.isArray(pinyinResult) ? pinyinResult : [pinyinResult]
+    const uniqueIndices = [...new Set(indices)]
+    
+    let isContinuous = true
+    for (let i = 1; i < uniqueIndices.length; i++) {
+      if (uniqueIndices[i] !== uniqueIndices[i - 1] + 1) {
+        isContinuous = false
+        break
+      }
+    }
+    
+    const highlightIndices = isContinuous ? uniqueIndices : [uniqueIndices[0]]
+    
+    let html = ''
+    let lastIndex = 0
+    for (let i = 0; i < highlightIndices.length; i++) {
+      const index = highlightIndices[i]
+      if (index > lastIndex) {
+        html += text.substring(lastIndex, index)
+      }
+      html += `<strong>${text[index]}</strong>`
+      lastIndex = index + 1
+    }
+    if (lastIndex < text.length) {
+      html += text.substring(lastIndex)
+    }
+    return html
+  }
+  
+  // 3. 复合词首字母匹配（使用 props.separators）
+  const words = text.split(props.separators)
+  if (words.length > 1) {
+    const initials = words.map(word => word[0]).join('')
+    if (initials.toLowerCase().includes(lowerQuery)) {
+      let html = ''
+      let currentPos = 0
+      const queryChars = lowerQuery.split('')
+      let queryIndex = 0
+      
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i]
+        if (i > 0) {
+          const sepMatch = text.substring(currentPos).match(props.separators)
+          if (sepMatch) {
+            const separator = sepMatch[0]
+            html += separator
+            currentPos += separator.length
+          }
+        }
+        
+        if (queryIndex < queryChars.length && word[0].toLowerCase() === queryChars[queryIndex]) {
+          html += `<strong>${word[0]}</strong>`
+          html += word.substring(1)
+          queryIndex++
+        } else {
+          html += word
+        }
+        currentPos += word.length
+      }
+      return html
+    }
+  }
+  
+  // 4. 单词内字符匹配（使用 props.separators）
+  if (lowerQuery.length > 1) {
+    let html = ''
+    let lastIndex = 0
+    let queryIndex = 0
+    
+    for (let i = 0; i < text.length && queryIndex < lowerQuery.length; i++) {
+      if (text[i].toLowerCase() === lowerQuery[queryIndex]) {
+        if (i > lastIndex) {
+          html += text.substring(lastIndex, i)
+        }
+        html += `<strong>${text[i]}</strong>`
+        lastIndex = i + 1
+        queryIndex++
+      }
+    }
+    
+    if (queryIndex === lowerQuery.length) {
+      if (lastIndex < text.length) {
+        html += text.substring(lastIndex)
+      }
+      return html
+    }
+  }
+  
+  return text
+}
+
 
 // 更新输入框值
 const updateCurrentInput = () => {
-  currentInput.value = getCurrentInputValue()
-  emit('input-change', currentInput.value)
+  const inputValue = getCurrentInputValue()
+  currentInput.value = inputValue
+  // emit('input-change', inputValue)
   
-  // 如果输入内容变化，触发搜索
-  if (currentInput.value && currentInput.value.length >= props.minSearchLength) {
-    debounceSearch(currentInput.value)
-  } else {
-    // 输入为空或太短，隐藏下拉
+  // 🔥 如果输入框为空，立即清空所有状态
+  if (!inputValue || inputValue.length === 0) {
     showDropdown.value = false
     suggestions.value = []
+    activeIndex.value = -1
+    clearTimeout(debounceTimer)
+    return
+  }
+  
+  // 如果输入内容长度达到最小搜索长度，触发搜索
+  if (inputValue.length >= props.minSearchLength) {
+    debounceSearch(inputValue)
+  } else {
+    // 输入太短，隐藏下拉
+    showDropdown.value = false
+    suggestions.value = []
+    activeIndex.value = -1
   }
 }
+
 
 // 防抖搜索
 const debounceSearch = (query) => {
@@ -170,11 +299,8 @@ const fetchSuggestions = async (query) => {
   loading.value = true
   
   try {
+    // 调用父组件的搜索函数（内部使用 pinyin-match）
     const result = await props.fetchSuggestionsApi({ keyword: query })
-
-    // 🔥 关键打印3：组件接收到的数据
-    console.log('组件接收 result:', result)
-    console.log('是否是数组:', Array.isArray(result))
     
     // ✅ 直接使用，假设 result 已经是数组
     const data = Array.isArray(result) ? result : []
@@ -242,6 +368,24 @@ const handleBlur = (event) => {
   }, 200)
 }
 
+// 滚动到高亮项（平滑滚动）
+const scrollToHighlighted = (index) => {
+  nextTick(() => {
+    if (!suggestionsRef.value) return
+    
+    const items = suggestionsRef.value.querySelectorAll('.suggestion-item')
+    if (!items.length || index < 0 || index >= items.length) return
+    
+    const targetItem = items[index]
+    
+    // 🔥 使用 scrollIntoView 实现平滑滚动
+    targetItem.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth'
+    })
+  })
+}
+
 // 处理键盘事件
 const handleKeydown = (event) => {
   // 处理中文输入法
@@ -270,15 +414,22 @@ const handleKeydown = (event) => {
       
     case 'ArrowDown':
       if (showDropdown.value) {
-        event.preventDefault()
-        activeIndex.value = Math.min(activeIndex.value + 1, filteredSuggestions.value.length - 1)
+        // 更新索引
+        const newIndex = Math.min(activeIndex.value + 1, filteredSuggestions.value.length - 1)
+        activeIndex.value = newIndex
+        // 🔥 滚动到高亮项
+        scrollToHighlighted(newIndex)
       }
       break
       
     case 'ArrowUp':
       if (showDropdown.value) {
         event.preventDefault()
-        activeIndex.value = Math.max(activeIndex.value - 1, -1)
+        // 更新索引
+        const newIndex = Math.max(activeIndex.value - 1, 0)
+        activeIndex.value = newIndex
+        // 🔥 滚动到高亮项
+        scrollToHighlighted(newIndex)
       }
       break
       
@@ -312,25 +463,23 @@ const addTagFromSuggestion = (tagValue) => {
   
   if (!trimmedValue) return
   
-  if (tags.value.includes(trimmedValue)) {
+  if (modelValue.value.includes(trimmedValue)) {
     ElMessage.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
   
-  if (tags.value.length >= props.max) {
+  if (modelValue.value.length >= props.max) {
     ElMessage.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
   
   // 添加标签
-  tags.value = [...tags.value, trimmedValue]
-  emit('update:modelValue', tags.value)
-  emit('tag-add', trimmedValue)
+  modelValue.value = [...modelValue.value, trimmedValue]
   
   // 清空输入和下拉
-  clearInput()
+  immediateClearInput()
   showDropdown.value = false
   suggestions.value = []
   activeIndex.value = -1
@@ -341,44 +490,47 @@ const addCurrentInputAsTag = (inputValue) => {
   const trimmedValue = inputValue.trim()
   if (!trimmedValue) return
   
-  if (tags.value.includes(trimmedValue)) {
+  if (modelValue.value.includes(trimmedValue)) {
     ElMessage.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
   
-  if (tags.value.length >= props.max) {
+  if (modelValue.value.length >= props.max) {
     ElMessage.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
   
-  tags.value = [...tags.value, trimmedValue]
-  emit('update:modelValue', tags.value)
-  emit('tag-add', trimmedValue)
+  modelValue.value = [...modelValue.value, trimmedValue]
   
-  clearInput()
+  immediateClearInput()
   showDropdown.value = false
   suggestions.value = []
+}
+
+const immediateClearInput = () => {
+  const inputElement = inputTagRef.value?.$el?.querySelector('input')
+  if (inputElement) {
+    inputElement.value = ''
+    // 触发 input 事件，让组件知道值已改变
+    const inputEvent = new Event('input', { bubbles: true, cancelable: true })
+    inputElement.dispatchEvent(inputEvent)
+    currentInput.value = ''
+    // emit('input-change', '')
+  }
 }
 
 // 清空输入框
 const clearInput = () => {
   nextTick(() => {
-    const inputElement = inputTagRef.value?.$el?.querySelector('input')
-    if (inputElement) {
-      inputElement.value = ''
-      currentInput.value = ''
-      emit('input-change', '')
-    }
+    immediateClearInput()
   })
 }
 
 // 处理标签移除
 const handleTagRemove = (tag, index) => {
-  tags.value = tags.value.filter((_, i) => i !== index)
-  emit('update:modelValue', tags.value)
-  emit('tag-remove', tag, index)
+  modelValue.value = modelValue.value.filter((_, i) => i !== index)
 }
 
 // 计算建议框样式
@@ -413,11 +565,6 @@ const handleCompositionEnd = () => {
 }
 
 // ==================== 生命周期 ====================
-
-// 监听外部 modelValue 变化
-watch(() => props.modelValue, (newVal) => {
-  tags.value = [...newVal]
-}, { deep: true })
 
 // 设置输入监听
 onMounted(() => {
@@ -454,17 +601,15 @@ defineExpose({
     inputTagRef.value?.focus()
   },
   clear: () => {
-    tags.value = []
-    emit('update:modelValue', [])
+    modelValue.value = []
     clearInput()
     showDropdown.value = false
     suggestions.value = []
   },
-  getTags: () => tags.value,
+  /* getTags: () => modelValue.value,
   setTags: (newTags) => {
-    tags.value = [...newTags]
-    emit('update:modelValue', [...newTags])
-  }
+    modelValue.value = [...newTags]
+  } */
 })
 </script>
 
@@ -509,6 +654,12 @@ defineExpose({
 .suggestion-item .el-tag {
   margin-left: 8px;
   flex-shrink: 0;
+}
+
+/* 高亮样式 */
+.suggestion-item :deep(strong) {
+  color: #409eff;
+  font-weight: bold;
 }
 
 .suggestion-loading {
