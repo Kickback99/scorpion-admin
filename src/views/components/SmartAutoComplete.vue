@@ -369,6 +369,8 @@ const handleBlur = (event) => {
       if (value) {
         addCurrentInputAsTag(value)
       } else {
+         // 没有内容或只有空白，清空输入框
+        immediateClearInput()
         // 没有输入内容，关闭下拉
         showDropdown.value = false
       }
