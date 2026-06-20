@@ -49,18 +49,22 @@
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
                 </el-form-item>
 
+              <!-- 将el-input-tag放在el-form-item中 -->
+              <el-form-item label="文章标签" prop="tagNames">
+                <SmartAutoComplete
+                    v-model="formModel.tagNames"
+                    :fetch-suggestions-api="fetchTags"
+                    :separators="/[\s\-_\.\/:]+/"
+                    placeholder="请输入标签名称"
+                    :max="10"
+                    :debounce-delay="100"
+                    :min-search-length="1"
+                />
+              </el-form-item>
+
                 <el-form-item label="文章封面" prop="cover">
                     <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
                 </el-form-item>
-
-                <!-- 将el-input-tag放在el-form-item中 -->
-              <el-form-item label="文章标签" prop="tagNames">
-                <el-input-tag
-                  v-model="formModel.tagNames"
-                  placeholder="请输入标签，按回车确认"
-                  style="width: 100%"
-                />
-              </el-form-item>
 
             </el-form>
 
@@ -76,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
@@ -85,6 +89,85 @@ import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()
 let mdHeight = window.innerHeight - 30 - 70 - 200
+import PinyinMatch from 'pinyin-match';
+import { listApi } from '@/api/contag.js';
+import SmartAutoComplete from './SmartAutoComplete.vue';
+
+// ==================== 标签相关 ====================
+
+// 标签数据
+const tagList = ref([])
+
+// 加载所有标签数据
+const loadAllTags = async () => {
+  const res = await listApi(1, 999, {})
+  const items = res.data?.items || []
+  tagList.value = items.map(item => ({
+    value: item.name.trim(),
+    id: item.id,
+    remark: item.remark
+  }))
+  console.log('加载所有标签:', tagList.value.length, '条')
+}
+
+// 前端搜索函数
+const fetchTags = async (params) => {
+  const query = params.keyword || ''
+  
+  if (!query) {
+    return tagList.value
+  }
+  
+  const lowerQuery = query.toLowerCase()
+  
+  const matched = tagList.value.filter(item => {
+    const text = item.value
+    const lowerText = text.toLowerCase()
+    
+    // 1. 英文直接包含匹配
+    if (lowerText.includes(lowerQuery)) {
+      return true
+    }
+    
+    // 2. PinyinMatch（中文拼音）
+    if (PinyinMatch.match(text, query)) {
+      return true
+    }
+    
+    // 3. 单词前缀匹配
+    const words = lowerText.split(/[\s\-_]+/)
+    for (const word of words) {
+      if (word.startsWith(lowerQuery)) {
+        return true
+      }
+    }
+    
+    // 4. 复合词首字母匹配
+    if (words.length > 1) {
+      const initials = words.map(word => word[0]).join('')
+      if (initials.includes(lowerQuery)) {
+        return true
+      }
+    }
+    
+    // 5. 单词内字符匹配
+    let charIndex = 0
+    for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
+      if (lowerText[i] === lowerQuery[charIndex]) {
+        charIndex++
+      }
+    }
+    if (charIndex === lowerQuery.length) {
+      return true
+    }
+    
+    return false
+  })
+  
+  return matched
+}
+
+// ==================== 文章相关 ====================
 
 const blogData = ref({
     title: '',
@@ -103,11 +186,6 @@ const dialogTitle = ref('')
 
 // mask弹窗
 const maskVisible = ref(false)
-
-const input = ref([])
-
-// 暴露打开方法
-
 
 // 暴露打开遮罩层方法
 // 无论是添加文章还是编辑文章，都需要打开mask弹窗
@@ -244,6 +322,10 @@ const handlePublish = async(status) => {
     emit('reRender')
 }
 
+// 组件挂载时加载标签数据
+onMounted(() => {
+    loadAllTags()
+})
 </script>
 
 <style scoped lang="scss">
