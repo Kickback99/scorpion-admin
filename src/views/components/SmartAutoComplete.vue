@@ -624,7 +624,8 @@ defineExpose({
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  /* 适配深浅主题 */
+  background: var(--el-bg-color);
   border: 1px solid #e4e7ed;
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -641,14 +642,20 @@ defineExpose({
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.2s;
+  /* 适配深浅主题 */
+  color: var(--el-text-color-regular);
+  font-size: var(--el-font-size-base);
 }
 
+/* 高亮适配深浅主题 */
 .suggestion-item:hover {
-  background-color: #f5f7fa;
+  background-color: var(--el-fill-color-light);
 }
 
+/* 高亮适配深浅主题 */
 .suggestion-active {
-  background-color: #ecf5ff;
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-text-color-primary);
 }
 
 .suggestion-item .el-tag {
@@ -658,14 +665,15 @@ defineExpose({
 
 /* 高亮样式 */
 .suggestion-item :deep(strong) {
-  color: #409eff;
+  color: var(--el-color-primary);
   font-weight: bold;
 }
 
 .suggestion-loading {
   padding: 12px;
   text-align: center;
-  color: #909399;
+  /* 适配深浅主题 */
+  color: var(--el-text-color-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -674,5 +682,24 @@ defineExpose({
 
 .suggestion-loading .el-icon {
   font-size: 16px;
+}
+
+/* 滚动条样式 - 适配深浅主题 */
+.suggestions-popover::-webkit-scrollbar {
+  width: 4px;
+}
+
+.suggestions-popover::-webkit-scrollbar-track {
+  background: var(--el-fill-color);
+  border-radius: 3px;
+}
+
+.suggestions-popover::-webkit-scrollbar-thumb {
+  background: var(--el-border-color);
+  border-radius: 3px;
+}
+
+.suggestions-popover::-webkit-scrollbar-thumb:hover {
+  background: var(--el-border-color-hover);
 }
 </style>
