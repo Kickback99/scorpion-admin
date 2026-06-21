@@ -56,3 +56,9 @@ export const getCarouselByIdApi = (id) =>
 // 更新轮播
 export const updateCarouselApi = (params) => 
     http.put(`${API.CAROUSEL_URL}`, params)
+
+// 新增轮播
+export const addCarouselApi = (params) => http.post(`${API.CAROUSEL_URL}/add`, params)
+
+// 获取所有已发布的文章（用于前端联想搜索）
+export const listAllArticlesApi = () => http.get(`${API.ARTICLE_URL}/list/all`)
