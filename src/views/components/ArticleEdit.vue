@@ -66,6 +66,36 @@
                     <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
                 </el-form-item>
 
+              <!-- 轮播设置区域（极简版） -->
+              <el-form-item label="轮播设置">
+                  <el-radio-group v-model="carouselData.isCarousel" @change="handleCarouselChange">
+                      <el-radio :label="true">开启</el-radio>
+                      <el-radio :label="false">关闭</el-radio>
+                  </el-radio-group>
+              </el-form-item>
+            
+              <!-- 排序输入框（条件渲染） -->
+              <el-form-item v-if="carouselData.isCarousel" label="轮播排序">
+                  <el-input-number 
+                      v-model="carouselData.sort" 
+                      :min="0" 
+                      :max="999" 
+                      controls-position="right"
+                      placeholder="自动"
+                      style="width:150px;"
+                      class="carousel-input"
+                       @change="handleSortChange"
+                  />
+                  <el-tooltip placement="right">
+                  <template #content>
+                      <div>
+                        <span>数字越小越靠前，留空自动排最后</span>
+                      </div>
+                  </template>
+                  <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                </el-tooltip>
+              </el-form-item>
+
             </el-form>
 
             <template #footer>
@@ -84,7 +114,7 @@ import { ref, reactive, onMounted, nextTick } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
-import { addApi, findApi, modifyApi } from '@/api/conarticle';
+import { addApi, findApi, getCarouselByArticleApi, modifyApi, removeCarouselApi, saveCarouselApi } from '@/api/conarticle';
 import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()
@@ -181,6 +211,32 @@ const formModel = reactive({
   description: null,       // 实际提交给后端的值
   tagNames:[]
 })
+
+// 独立轮播数据
+const carouselData = ref({
+    isCarousel: false,    // 是否在轮播中
+    sort: null,           // 排序号
+    carouselId: null,     // 轮播记录ID（用于更新/删除）
+    articleId: null       // 关联的文章ID
+})
+
+// 重置轮播数据
+const resetCarouselData = () => {
+    carouselData.value = {
+        isCarousel: false,
+        sort: null,
+        carouselId: null,
+        articleId: null
+    }
+}
+
+// 处理排序变化：0 自动转为 null（自动）
+const handleSortChange = (val) => {
+    if (val === 0) {
+        carouselData.value.sort = null
+    }
+}
+
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 
@@ -191,6 +247,13 @@ const maskVisible = ref(false)
 // 无论是添加文章还是编辑文章，都需要打开mask弹窗
 const openMask = () => {
     maskVisible.value = !maskVisible.value
+}
+
+// 处理轮播开关变化
+const handleCarouselChange = (val) => {
+    if (!val) {
+        carouselData.value.sort = null
+    }
 }
 
 // 组件对外暴露一个方法handleToggle
@@ -230,6 +293,21 @@ const handleToggle = async(param) => {
           formModel.customDescription = res.data.description
     }
 
+    // 查询轮播信息并回显到 carouselData
+    try {
+        const carouselRes = await getCarouselByArticleApi(param.id)
+        if (carouselRes.data) {
+            carouselData.value.isCarousel = true
+            carouselData.value.sort = carouselRes.data.sort
+            carouselData.value.carouselId = carouselRes.data.id
+            carouselData.value.articleId = param.id
+        } else {
+            resetCarouselData()
+        }
+    } catch (e) {
+        // 没有轮播记录，保持默认状态
+        resetCarouselData()
+    }
    }
 }
 
@@ -285,6 +363,20 @@ const handleOpen = async() => {
   }
 }
 
+// 保存到轮播表的独立函数
+const saveCarousel = async (articleId) => {
+    if (!articleId) return
+    
+    if (carouselData.value.isCarousel) {
+        const sort = carouselData.value.sort || 0
+        await saveCarouselApi({ articleId, sort })
+    } else {
+        if (carouselData.value.carouselId) {
+            await removeCarouselApi(carouselData.value.carouselId)
+        } // 如果没有 carouselId，说明本来就没有轮播记录，直接跳过
+    }
+}
+
 const handlePublish = async(status) => {
 
     formModel.status = status
@@ -310,13 +402,18 @@ const handlePublish = async(status) => {
 
     if(!formModel.id){
         // t_article_request：文章新增请求
-        await addApi(data)
+        const res = await addApi(data)
+        const articleId = res.data
+        console.log("==================== articleId ====================", articleId)
+        await saveCarousel(articleId)
         ElMessage.success('添加成功')
     }else {
         // t_article_request：文章修改请求
         await modifyApi(data)
         ElMessage.success('修改成功')
+        await saveCarousel(formModel.id)
     }
+
     dialogVisible.value = false
     openMask()
     emit('reRender')
@@ -342,5 +439,18 @@ onMounted(() => {
  :deep(.dark-mode .el-input__wrapper .el-input__inner){
    color: #fff !important;
  }
+
+
+ .form-tip-icon {
+  margin-left: 8px;
+  color: #909399;
+  font-size: 14px;
+  cursor: help;
+  vertical-align: middle;
+}
+
+:deep(.el-form .el-form-item .el-form-item__content .el-input__wrapper .el-input__inner ){
+   color: var(--el-text-color-regular);
+}
 
 </style>

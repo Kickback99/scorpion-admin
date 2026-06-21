@@ -6,7 +6,9 @@ const API = {
     ARTICLE_URL : '/admin/content/article',
     ARTICLE_BY_ID_URL : '/admin/content/article/find',
     ARTICLE_BY_ISTOP : '/admin/content/article/isTop',
-    UPLOAD_URL : '/admin/upload/content'
+    UPLOAD_URL : '/admin/upload/content',
+    CAROUSEL_URL : '/admin/content/carousel',
+    CAROUSEL_BY_ARTICLE_URL : '/admin/content/carousel/findByArticle'
 }
 
 export const addApi = (params) => http.post(`${API.ARTICLE_URL}`,params)
@@ -26,4 +28,16 @@ export const uploadApi = (formData) => http.post(API.UPLOAD_URL,formData)
 export const isTopApi = (id,isTop) => http.put(`${API.ARTICLE_BY_ISTOP}/${id}/${isTop}`)
 
 
-
+// ==================== 文章编辑页轮播设置相关api ====================
+// 根据文章ID查询轮播信息
+export const getCarouselByArticleApi = (articleId) => http.get(`${API.CAROUSEL_BY_ARTICLE_URL}/${articleId}`)
+// 保存轮播信息（新增或更新）
+export const saveCarouselApi = (params) => http.post(`${API.CAROUSEL_URL}`, params)
+// 删除轮播（通过ID或文章ID）
+export const removeCarouselApi = (id, articleId) => {
+    if (id) {
+        return http.delete(`${API.CAROUSEL_URL}/${id}`)
+    } else if (articleId) {
+        return http.delete(`${API.CAROUSEL_URL}/byArticle/${articleId}`)
+    }
+}
