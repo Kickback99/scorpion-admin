@@ -65,7 +65,7 @@
             </el-form-item>
 
             <!-- 关联文章 - 文章选择（仅新增时显示） -->
-            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" label="选择文章">
+            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" label="选择文章" prop="articleId">
                 <SmartAutoComplete
                     v-model="selectedArticles"
                     :fetch-suggestions-api="fetchArticles"
@@ -93,7 +93,7 @@
                     <el-radio :label="false">使用文章标题</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="formModel.hasCustomTitle" label="标题内容">
+            <el-form-item v-if="formModel.hasCustomTitle" label="标题内容" prop="title">
                 <el-input
                     v-model="formModel.title"
                     placeholder="请输入自定义标题"
@@ -280,16 +280,61 @@ const defaultForm = {
 
 const formModel = reactive({ ...defaultForm })
 
-// 表单校验规则
+// 自定义校验器
+const validateTitle = (rule, value, callback) => {
+    // 外链：title 必填
+    if (formModel.carouselType === 1) {
+        if (!value || !value.trim()) {
+            callback(new Error('请输入轮播标题'))
+        } else {
+            callback()
+        }
+        return
+    }
+
+    // 关联文章 + 自定义标题：title 必填
+    if (formModel.carouselType === 0 && formModel.hasCustomTitle) {
+        if (!value || !value.trim()) {
+            callback(new Error('请输入自定义标题'))
+        } else {
+            callback()
+        }
+        return
+    }
+
+    // 关联文章 + 使用文章标题：不需要校验 title
+    callback()
+}
+
+const validateArticleId = (rule, value, callback) => {
+    // 关联文章：articleId 必填
+    if (formModel.carouselType === 0 && !value) {
+        callback(new Error('请选择关联文章'))
+    } else {
+        callback()
+    }
+}
+
+const validateArticleTitle = (rule, value, callback) => {
+    // 编辑时关联文章：articleTitle 必填
+    if (formModel.id && formModel.articleId && !value) {
+        callback(new Error('关联文章不能为空'))
+    } else {
+        callback()
+    }
+}
+
+
+// 校验规则
 const rules = {
+    title: [
+        { required: true, validator: validateTitle, trigger: 'blur' }
+    ],
     articleId: [
-        { required: true, message: '请选择关联文章', trigger: 'change' }
+        { required: true, validator: validateArticleId, trigger: 'blur' }
     ],
     articleTitle: [
-        { required: true, message: '关联文章不能为空', trigger: 'change' }
-    ],
-    title: [
-        { required: true, message: '请输入轮播标题', trigger: 'blur' }
+        { required: true, validator: validateArticleTitle, trigger: 'blur' }
     ]
 }
 
@@ -370,6 +415,8 @@ watch(selectedArticles, (newVal) => {
         formModel.articleId = null
         formModel.articleTitle = ''
     }
+    // 手动触发 articleId 校验
+    // ruleFormRef.value?.validateField('articleId')
 }, { deep: true })
 
 // ==================== 新增 ====================
@@ -387,6 +434,7 @@ const handleAdd = async () => {
         ...defaultForm,
         carouselType: 0
     })
+    
     selectedArticles.value = []
 
     // 预加载文章列表
@@ -489,7 +537,8 @@ const handleTypeChange = (val) => {
         selectedArticles.value = []
     }
     // 切换时清除校验
-    ruleFormRef.value?.clearValidate(['articleId', 'title'])
+    // ruleFormRef.value?.clearValidate(['articleId', 'title'])
+    ruleFormRef.value?.resetFields()
 }
 
 const handleSortChange = (val) => {
@@ -509,9 +558,8 @@ const handleCustomImgChange = (val) => {
 const handleConfirm = async () => {
         try {
 
-        // 动态校验
-        const isValid = await validateForm()
-        if (!isValid) return
+       // 触发表单校验
+        await ruleFormRef.value?.validate()
 
         // 构建提交参数
         const params = {
@@ -548,32 +596,6 @@ const handleConfirm = async () => {
         console.log(error.message)
         ElMessage.error(formModel.id ? '修改失败' : '添加失败')
     }
-}
-
-// 动态校验函数
-const validateForm = async () => {
-    // 外链：title 必填
-    if (formModel.carouselType === 1) {
-        if (!formModel.title || !formModel.title.trim()) {
-            ElMessage.warning('请输入轮播标题')
-            return false
-        }
-        return true
-    }
-
-    // 关联文章：articleId 必填
-    if (!formModel.articleId) {
-        ElMessage.warning('请选择关联文章')
-        return false
-    }
-
-    // 关联文章 + 自定义标题：title 必填
-    if (formModel.hasCustomTitle && (!formModel.title || !formModel.title.trim())) {
-        ElMessage.warning('请输入自定义标题')
-        return false
-    }
-
-    return true
 }
 
 // ==================== 删除 ====================
