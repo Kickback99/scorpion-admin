@@ -41,3 +41,18 @@ export const removeCarouselApi = (id, articleId) => {
         return http.delete(`${API.CAROUSEL_URL}/byArticle/${articleId}`)
     }
 }
+
+
+// ==================== 轮播管理相关api ====================
+
+// 分页查询轮播列表
+export const getCarouselListApi = (pageNum, pageSize, searchData) => 
+    http.get(`${API.CAROUSEL_URL}/${pageNum}/${pageSize}`, { params: searchData })
+
+// 根据ID查询轮播详情
+export const getCarouselByIdApi = (id) => 
+    http.get(`${API.CAROUSEL_URL}/${id}`)
+
+// 更新轮播
+export const updateCarouselApi = (params) => 
+    http.put(`${API.CAROUSEL_URL}`, params)
