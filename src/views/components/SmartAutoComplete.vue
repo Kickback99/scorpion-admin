@@ -107,6 +107,16 @@ const props = defineProps({
   separators: {
     type: RegExp,
     default: /[\s\-_\.\/]+/
+  },
+  // 是否允许自定义输入（不在联想列表中的值）
+  allowCustom: {
+    type: Boolean,
+    default: true
+  },
+  // 自定义输入被禁止时的提示消息
+  customDisabledMessage: {
+    type: String,
+    default: '请输入已存在的选项'
   }
 })
 
@@ -526,6 +536,19 @@ const addTagFromSuggestion = (tagValue) => {
 const addCurrentInputAsTag = (inputValue) => {
   const trimmedValue = inputValue.trim()
   if (!trimmedValue) return
+
+   // 检查是否允许自定义输入
+  if (!props.allowCustom) {
+    // 检查输入的值是否在联想列表中
+    const existsInSuggestions = suggestions.value.some(item => item.value === trimmedValue)
+    if (!existsInSuggestions) {
+      ElMessage.warning(props.customDisabledMessage)
+      clearInput()
+      showDropdown.value = false
+      return
+    }
+  }
+
   
   if (modelValue.value.includes(trimmedValue)) {
     ElMessage.warning(`标签 "${trimmedValue}" 已存在`)
