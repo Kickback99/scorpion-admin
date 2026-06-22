@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center">
         <el-form ref="formRef" :model="searchModel" label-width="auto" inline>
             <el-form-item>
-                <el-input v-model="searchModel.keyword" placeholder="请输入文章标题/描述" />
+                <el-input v-model="searchModel.keyword" placeholder="请输入轮播标题/文章标题" />
             </el-form-item>
             <el-form-item>
                 <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
@@ -28,41 +28,41 @@
         <el-table-column label="轮播标题" min-width="200" show-overflow-tooltip>
             <template #default="{ row }">
                 <!-- 显示标题 -->
-                <span>{{ row.articleId ? (row.title || row.articleTitle) : (row.title || '未命名') }}</span>
+                <span style="position: relative;">{{ row.articleId ? (row.title || row.articleTitle) : (row.title || '未命名') }}</span>
                 
                 <!-- 自定义标题标识：articleId存在 且 title存在 且 title不等于文章标题 -->
-                <el-tag 
+                <el-text 
                     v-if="row.articleId && row.title && row.title !== row.articleTitle" 
                     type="warning" 
                     size="small" 
                     effect="plain" 
-                    style="margin-left: 8px"
+                    style="position: relative; top: -6px; font-size: 10px; margin-left: 2px;"
                 >
                     改
-                </el-tag>
+                </el-text>
                 
                 <!-- 外链标识：没有articleId -->
-                <el-tag 
+                <el-text 
                     v-if="!row.articleId" 
                     type="info" 
                     size="small" 
                     effect="plain" 
-                    style="margin-left: 8px"
+                    style="position: relative; top: -6px; font-size: 10px; margin-left: 2px;"
                 >
                     外链
-                </el-tag>
+                </el-text>
             </template> 
         </el-table-column>
 
         <!-- 类型列 -->
         <el-table-column label="类型" width="80" align="center">
             <template #default="{ row }">
-                <el-tag v-if="row.articleId" size="small" type="success">文章</el-tag>
-                <el-tag v-else size="small" type="info">外链</el-tag>
+                <el-text v-if="row.articleId" size="small" type="success">文章</el-text>
+                <el-text v-else size="small" type="info">外链</el-text>
             </template>
         </el-table-column>
 
-        <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip />
+        <!-- <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip /> -->
         <el-table-column prop="sort" label="排序" width="80" align="center" />
         <el-table-column label="跳转链接" min-width="150" show-overflow-tooltip>
             <template #default="{ row }">
