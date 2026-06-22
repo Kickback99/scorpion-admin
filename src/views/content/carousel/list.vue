@@ -16,20 +16,60 @@
 
     <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple">
         <el-table-column prop="id" label="轮播ID" width="80" />
-        <el-table-column prop="articleTitle" label="文章标题" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip />
+
         <el-table-column label="轮播图" width="120">
             <template #default="{ row }">
                 <el-image style="width: 80px; height: 45px; border-radius: 4px;" :src="row.img" :fit="'cover'" />
             </template>
         </el-table-column>
+
+        <!-- <el-table-column prop="articleTitle" label="文章标题" min-width="150" show-overflow-tooltip /> -->
+
+        <el-table-column label="轮播标题" min-width="200" show-overflow-tooltip>
+            <template #default="{ row }">
+                <!-- 显示标题 -->
+                <span>{{ row.articleId ? (row.title || row.articleTitle) : (row.title || '未命名') }}</span>
+                
+                <!-- 自定义标题标识：articleId存在 且 title存在 且 title不等于文章标题 -->
+                <el-tag 
+                    v-if="row.articleId && row.title && row.title !== row.articleTitle" 
+                    type="warning" 
+                    size="small" 
+                    effect="plain" 
+                    style="margin-left: 8px"
+                >
+                    改
+                </el-tag>
+                
+                <!-- 外链标识：没有articleId -->
+                <el-tag 
+                    v-if="!row.articleId" 
+                    type="info" 
+                    size="small" 
+                    effect="plain" 
+                    style="margin-left: 8px"
+                >
+                    外链
+                </el-tag>
+            </template> 
+        </el-table-column>
+
+        <!-- 类型列 -->
+        <el-table-column label="类型" width="80" align="center">
+            <template #default="{ row }">
+                <el-tag v-if="row.articleId" size="small" type="success">文章</el-tag>
+                <el-tag v-else size="small" type="info">外链</el-tag>
+            </template>
+        </el-table-column>
+
+        <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip />
         <el-table-column prop="sort" label="排序" width="80" align="center" />
         <el-table-column label="跳转链接" min-width="150" show-overflow-tooltip>
             <template #default="{ row }">
-                <span>{{ row.link || '文章详情' }}</span>
+                <span>{{ row.articleId ? '文章详情' : '外链' }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="createTime" label="创建时间" width="200" />
         <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
                 <el-button @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle />
@@ -127,49 +167,79 @@
                 </el-tooltip>
             </el-form-item>
 
-            <!-- 专用图 -->
-            <el-form-item label="专用图">
-                <el-radio-group v-model="formModel.hasCustomImg" @change="handleCustomImgChange">
-                    <el-radio :label="true">使用专用图</el-radio>
-                    <el-radio :label="false">
-                        {{ formModel.articleId ? '使用文章封面' : '使用默认图' }}
-                    </el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="formModel.hasCustomImg" label="上传图片">
-                <el-upload
-                    class="avatar-uploader"
-                    :show-file-list="false"
-                    :auto-upload="false"
-                    :on-change="onSelectFile"
-                >
-                    <img v-if="formModel.imgPreview" :src="formModel.imgPreview" class="avatar" />
-                    <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-                </el-upload>
-                <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
-            </el-form-item>
+            <!-- 专用图：根据类型显示不同内容 -->
+            <template v-if="formModel.carouselType === 0">
+                <el-form-item label="专用图">
+                    <el-radio-group v-model="formModel.hasCustomImg" @change="handleCustomImgChange">
+                        <el-radio :label="true">使用专用图</el-radio>
+                        <el-radio :label="false">使用文章封面</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="formModel.hasCustomImg" label="上传图片">
+                    <el-upload
+                        class="avatar-uploader"
+                        :show-file-list="false"
+                        :auto-upload="false"
+                        :on-change="onSelectFile"
+                    >
+                        <img v-if="formModel.imgPreview" :src="formModel.imgPreview" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                    </el-upload>
+                    <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
+                </el-form-item>
+            </template>
 
-            <!-- 自定义链接 -->
-            <el-form-item label="跳转链接">
-                <el-radio-group v-model="formModel.hasCustomLink">
-                    <el-radio :label="true">自定义链接</el-radio>
-                    <el-radio :label="false">
-                        {{ formModel.articleId ? '跳文章详情' : '无跳转' }}
-                    </el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="formModel.hasCustomLink" label="链接地址">
-                <el-input
-                    v-model="formModel.link"
-                    placeholder="请输入链接地址，如：https://example.com"
-                />
-                <el-tooltip placement="right">
-                    <template #content>
-                        <div>留空则跳转文章详情页</div>
-                    </template>
-                    <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
-                </el-tooltip>
-            </el-form-item>
+            <template v-if="formModel.carouselType === 1">
+                <el-form-item label="轮播图" prop="img">
+                    <el-upload
+                        class="avatar-uploader"
+                        :show-file-list="false"
+                        :auto-upload="false"
+                        :on-change="onSelectFile"
+                    >
+                        <img v-if="formModel.imgPreview" :src="formModel.imgPreview" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                    </el-upload>
+                    <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
+                </el-form-item>
+            </template>
+
+            <!-- 自定义链接：根据类型显示不同内容 -->
+            <template v-if="formModel.carouselType === 0">
+                <el-form-item label="跳转链接">
+                    <el-radio-group v-model="formModel.hasCustomLink">
+                        <el-radio :label="true">自定义链接</el-radio>
+                        <el-radio :label="false">跳文章详情</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="formModel.hasCustomLink" label="链接地址">
+                    <el-input
+                        v-model="formModel.link"
+                        placeholder="请输入链接地址，如：https://example.com"
+                    />
+                    <el-tooltip placement="right">
+                        <template #content>
+                            <div>留空则跳转文章详情页</div>
+                        </template>
+                        <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                </el-form-item>
+            </template>
+
+            <template v-if="formModel.carouselType === 1">
+                <el-form-item label="跳转链接" prop="link">
+                    <el-input
+                        v-model="formModel.link"
+                        placeholder="请输入链接地址，如：https://example.com"
+                    />
+                    <el-tooltip placement="right">
+                        <template #content>
+                            <div>外链跳转地址为必填项</div>
+                        </template>
+                        <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                </el-form-item>
+            </template>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -324,6 +394,21 @@ const validateArticleTitle = (rule, value, callback) => {
     }
 }
 
+// 自定义校验器：校验轮播图
+const validateImg = (rule, value, callback) => {
+    // 外链：img 必填
+    if (formModel.carouselType === 1) {
+        if (!formModel.img || !formModel.imgPreview) {
+            callback(new Error('请上传轮播图'))
+        } else {
+            callback()
+        }
+        return
+    }
+    // 关联文章：img 可选
+    callback()
+}
+
 
 // 校验规则
 const rules = {
@@ -335,6 +420,12 @@ const rules = {
     ],
     articleTitle: [
         { required: true, validator: validateArticleTitle, trigger: 'blur' }
+    ],
+    link:[
+        { required: true, message:'请填写外链', trigger: 'blur' }
+    ],
+    img: [
+        { required: true, validator: validateImg, trigger: 'change' }
     ]
 }
 
@@ -515,6 +606,10 @@ const onSelectFile = (file) => {
     const url = URL.createObjectURL(file.raw)
     formModel.imgPreview = url
     formModel.img = url
+    // 上传后触发 img 校验
+    nextTick(() => {
+        ruleFormRef.value?.validateField('img')
+    })
 }
 
 // ==================== 切换事件 ====================
