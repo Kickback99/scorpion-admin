@@ -113,6 +113,8 @@
                     :max="1"
                     :debounce-delay="300"
                     :min-search-length="1"
+                    :allow-custom="false"
+                    custom-disabled-message="请输入已存在的文章标题"
                 />
             </el-form-item>
 
