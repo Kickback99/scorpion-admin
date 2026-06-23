@@ -3,11 +3,12 @@
       <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
 
       <el-upload v-show="!isProgressVisible" class="avatar-uploader" 
-          :auto-upload="false"
+          :action="handleAction" 
           name="cover" 
+          :headers="headers"
           :show-file-list="false"
+          :on-success="onSuccess"
           :on-progress="handleProgress"
-          :onChange="handleSelectAvatar"
           :before-upload="beforeAvatarUpload">
           <img v-if="imageUrl" :src="imageUrl" class="avatar" @load="isProgressVisible=false"/>
           <el-icon v-else class="avatar-uploader-icon">
@@ -17,11 +18,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
+import { useTokenStore } from '@/store/token';
 const imageUrl = ref('')
 let modelValue = defineModel()
+const tokenStore = useTokenStore()
+
+// 手动设置请求头
+const headers = computed(() => {
+  return {
+    authorization: tokenStore.token || ''
+  }
+})
+
+// t_upload_request：封面图片请求
+// t_env：文章封面上传
+// 处理上传文件地址
+const handleAction = computed(()=>{
+  return `${import.meta.env.VITE_API}/admin/upload/cover`
+})
+
+// 图片上传成功之后的回调
+const onSuccess = (res,uploadFile) => {
+    console.log(res)
+    // 用URL来做图片的本地预览
+    imageUrl.value = URL.createObjectURL(uploadFile.raw)
+    // 把后端图片的地址传递给父组件 formModel.cover
+    modelValue.value = res.data
+}
 
 // 进度条业务
 const percentage = ref(0)
@@ -47,12 +73,6 @@ const beforeAvatarUpload = (rawFile) => {
 const handleProgress = (event) => {
   percentage.value =  Math.floor(event.percent)
 } 
-
-// 文件选择的回调
-const handleSelectAvatar = (file) => {
-    imageUrl.value = URL.createObjectURL(file.raw)
-    modelValue.value = file.raw
-}
 
 // 对外暴露handleImage方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {
