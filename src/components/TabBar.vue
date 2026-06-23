@@ -82,8 +82,8 @@
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
                 <!-- 添加key强制渲染？ -->
-                <!-- <el-avatar :src="handleUrl" :key="avatarKey"/> -->
-                <el-avatar :src="handleUrl"/>
+                <!-- <el-avatar :src="handleAvatar" :key="avatarKey"/> -->
+                <el-avatar :src="handleAvatar"/>
                 <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
                 <!-- {{ displayName }} -->
 
@@ -148,37 +148,14 @@ import {useWebSocket} from '@/server/useWebSocket'
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
 
 // 导入全局事件总线对象
-import emitter from '@/utils/event-bus.js' // 引入事件总线
 import { useTabStore } from "@/store/tabs";
 import { useUserConfigStore } from "@/store/userConfig";
 
-const avatarUrlWithTimestamp = ref('') // 带时间戳的头像URL
-// const avatarKey = ref(Date.now()) // 初始key
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
-const handleUrl = computed(()=>{
-    return avatarUrlWithTimestamp.value || userStore.userInfo.avatar || avatar
+const handleAvatar = computed(()=>{
+    return userStore.userInfo.avatar || avatar
 })
-
-// 处理URL覆盖
-async function overwriteAvatarUrl() {
-    await userStore.getUserInfo(true)
-      if (userStore.userInfo.avatar) {
-    // 1. 添加时间戳
-    const timestamp = new Date().getTime()
-    avatarUrlWithTimestamp.value = `${userStore.userInfo.avatar}?_t=${timestamp}`
-    // console.log('添加时间戳:', avatarUrlWithTimestamp.value)
-    // 2. 更新key强制重新创建组件（只在这里改key）
-    // avatarKey.value = timestamp
-    // 1秒后去掉时间戳，恢复原始URL
-    setTimeout(() => {
-      avatarUrlWithTimestamp.value = ''
-    //   console.log('恢复原始URL')
-    }, 1000)
-  }
-}
-
-emitter.on('changeUrl',overwriteAvatarUrl)
 
 
 
