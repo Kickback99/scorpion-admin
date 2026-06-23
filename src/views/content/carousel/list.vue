@@ -171,13 +171,14 @@
 
             <!-- 专用图：根据类型显示不同内容 -->
             <template v-if="formModel.carouselType === 0">
-                <el-form-item label="专用图">
-                    <el-radio-group v-model="formModel.hasCustomImg" @change="handleCustomImgChange">
-                        <el-radio :label="true">使用专用图</el-radio>
-                        <el-radio :label="false">使用文章封面</el-radio>
+                <el-form-item label="轮播图">
+                     <el-radio-group v-model="formModel.imgOption" @change="handleImgOptionChange">
+                        <el-radio :label="0">使用文章封面</el-radio>
+                        <el-radio :label="1">使用专用图</el-radio>
+                        <el-radio :label="2">自定义链接</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item v-if="formModel.hasCustomImg" label="上传图片">
+                <el-form-item v-if="formModel.imgOption === 1" label="上传图片" prop="img">
                     <el-upload
                         class="avatar-uploader"
                         :show-file-list="false"
@@ -188,11 +189,29 @@
                         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
                     </el-upload>
                     <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
+                </el-form-item>
+                <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
+                    <el-input
+                        v-model="formModel.customImgLink"
+                        placeholder="请输入图片链接地址，如：https://example.com/image.jpg"
+                    />
+                    <el-tooltip placement="right">
+                        <template #content>
+                            <div>输入图片的 URL 地址</div>
+                        </template>
+                        <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                    </el-tooltip>
                 </el-form-item>
             </template>
 
             <template v-if="formModel.carouselType === 1">
-                <el-form-item label="轮播图" prop="img">
+                <el-form-item label="轮播图">
+                    <el-radio-group v-model="formModel.imgOption" @change="handleImgOptionChange">
+                        <el-radio :label="1">使用专用图</el-radio>
+                        <el-radio :label="2">自定义链接</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="formModel.imgOption === 1" label="轮播图" prop="img">
                     <el-upload
                         class="avatar-uploader"
                         :show-file-list="false"
@@ -203,18 +222,30 @@
                         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
                     </el-upload>
                     <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
+                </el-form-item>
+                <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
+                    <el-input
+                        v-model="formModel.customImgLink"
+                        placeholder="请输入图片链接地址，如：https://example.com/image.jpg"
+                    />
+                    <el-tooltip placement="right">
+                        <template #content>
+                            <div>输入图片的 URL 地址</div>
+                        </template>
+                        <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                    </el-tooltip>
                 </el-form-item>
             </template>
 
             <!-- 自定义链接：根据类型显示不同内容 -->
             <template v-if="formModel.carouselType === 0">
-                <el-form-item label="跳转链接">
+                <el-form-item label="轮播链接">
                     <el-radio-group v-model="formModel.hasCustomLink">
-                        <el-radio :label="true">自定义链接</el-radio>
                         <el-radio :label="false">跳文章详情</el-radio>
+                        <el-radio :label="true">自定义链接</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item v-if="formModel.hasCustomLink" label="链接地址">
+                <el-form-item v-if="formModel.hasCustomLink" label="链接地址" prop="link">
                     <el-input
                         v-model="formModel.link"
                         placeholder="请输入链接地址，如：https://example.com"
@@ -229,7 +260,7 @@
             </template>
 
             <template v-if="formModel.carouselType === 1">
-                <el-form-item label="跳转链接" prop="link">
+                <el-form-item label="轮播链接" prop="link">
                     <el-input
                         v-model="formModel.link"
                         placeholder="请输入链接地址，如：https://example.com"
@@ -343,9 +374,10 @@ const defaultForm = {
     title: '',              // 轮播标题
     hasCustomTitle: false,  // 是否自定义标题
     sort: null,
+    imgOption: 0,           // 图片选项 0=使用文章封面/默认, 1=使用专用图, 2=自定义链接
     img: '',
     imgPreview: '',
-    hasCustomImg: false,
+    customImgLink: '',      // 自定义图片链接
     link: '',
     hasCustomLink: false
 }
@@ -399,7 +431,7 @@ const validateArticleTitle = (rule, value, callback) => {
 // 自定义校验器：校验轮播图
 const validateImg = (rule, value, callback) => {
     // 外链：img 必填
-    if (formModel.carouselType === 1) {
+    if (formModel.imgOption === 1) {
         if (!formModel.img || !formModel.imgPreview) {
             callback(new Error('请上传轮播图'))
         } else {
@@ -408,6 +440,19 @@ const validateImg = (rule, value, callback) => {
         return
     }
     // 关联文章：img 可选
+    callback()
+}
+
+// 校验自定义图片链接
+const validateCustomImgLink = (rule, value, callback) => {
+    if (formModel.imgOption === 2) {
+        if (!value || !value.trim()) {
+            callback(new Error('请输入图片链接地址'))
+        } else {
+            callback()
+        }
+        return
+    }
     callback()
 }
 
@@ -428,6 +473,9 @@ const rules = {
     ],
     img: [
         { required: true, validator: validateImg, trigger: 'change' }
+    ],
+    customImgLink: [
+        { required: true, validator: validateCustomImgLink, trigger: 'blur' }
     ]
 }
 
@@ -583,13 +631,15 @@ const handleEdit = async (row) => {
 
     // 专用图回显
     if (data.img) {
-        formModel.hasCustomImg = true
+        formModel.imgOption = 1
         formModel.img = data.img
         formModel.imgPreview = data.img
+        formModel.customImgLink = ''
     } else {
-        formModel.hasCustomImg = false
+        formModel.imgOption = 0
         formModel.img = ''
         formModel.imgPreview = ''
+        formModel.customImgLink = ''
     }
 
     // 链接回显
@@ -624,6 +674,11 @@ const handleTypeChange = (val) => {
         formModel.articleTitle = ''
         formModel.title = ''
         formModel.hasCustomTitle = false
+        formModel.imgOption = 0
+        formModel.img = ''
+        formModel.imgPreview = ''
+        formModel.customImgLink = ''
+        formModel.link = ''
         selectedArticles.value = []
     } else {
         // 外链
@@ -631,6 +686,11 @@ const handleTypeChange = (val) => {
         formModel.articleTitle = ''
         formModel.title = ''  // 外链标题由用户输入
         formModel.hasCustomTitle = false
+        formModel.imgOption = 1
+        formModel.img = ''
+        formModel.imgPreview = ''
+        formModel.customImgLink = ''
+        formModel.link = ''
         selectedArticles.value = []
     }
     // 切换时清除校验
@@ -644,11 +704,19 @@ const handleSortChange = (val) => {
     }
 }
 
-const handleCustomImgChange = (val) => {
-    if (!val) {
+// 图片选项切换
+const handleImgOptionChange = (val) => {
+    if (val === 0) {
         formModel.img = ''
-        formModel.imgPreview = ''
+        // formModel.imgPreview = ''
+        formModel.customImgLink = ''
+    } else if (val === 1) {
+        formModel.customImgLink = ''
+    } else if (val === 2) {
+        formModel.img = ''
+        // formModel.imgPreview = ''
     }
+    ruleFormRef.value?.clearValidate(['img', 'customImgLink'])
 }
 
 // ==================== 保存 ====================
@@ -658,13 +726,22 @@ const handleConfirm = async () => {
        // 触发表单校验
         await ruleFormRef.value?.validate()
 
+        // 根据 imgOption 构建 img
+        let img = null
+        if (formModel.imgOption === 1) {
+            img = formModel.img
+        } else if (formModel.imgOption === 2) {
+            img = formModel.customImgLink
+        } else {
+            img = null
+        }
+
         // 构建提交参数
         const params = {
             id: formModel.id,
             articleId: formModel.articleId,
             sort: formModel.sort || 0,
-            img: formModel.hasCustomImg ? formModel.img : null,
-            link: formModel.hasCustomLink ? formModel.link : null
+            img: img,
         }
 
         // 根据类型处理标题和 articleId
@@ -672,10 +749,12 @@ const handleConfirm = async () => {
             // 外链：articleId 为 null，title 为输入的标题
             params.articleId = null
             params.title = formModel.title || null
+            params.link = formModel.link || null
         } else {
             // 关联文章：articleId 有值，title 根据 hasCustomTitle 决定
             params.articleId = formModel.articleId
             params.title = formModel.hasCustomTitle ? formModel.title : null
+            params.link = formModel.hasCustomLink ? formModel.link : null
         }
 
         if (formModel.id) {
