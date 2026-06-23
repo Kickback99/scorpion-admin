@@ -62,9 +62,32 @@
                 />
               </el-form-item>
 
-                <el-form-item label="文章封面" prop="cover">
-                    <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
-                </el-form-item>
+              <!-- 文章封面：支持文件上传 / 自定义链接 两种模式 -->
+              <el-form-item label="文章封面" prop="cover">
+                  <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
+                      <el-radio :label="true">文件上传</el-radio>
+                      <el-radio :label="false">自定义链接</el-radio>
+                  </el-radio-group>
+              </el-form-item>
+
+              <!-- 文件上传模式 -->
+              <el-form-item v-if="formModel.coverOption === true" label=" " prop="cover">
+                  <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
+              </el-form-item>
+
+              <!-- 自定义链接模式 -->
+              <el-form-item v-if="formModel.coverOption === false" label=" " prop="customCoverLink">
+                  <el-input
+                      v-model="formModel.customCoverLink"
+                      placeholder="请输入图片链接地址，如：https://example.com/cover.jpg"
+                  />
+                  <el-tooltip placement="right">
+                      <template #content>
+                          <div>输入图片的 URL 地址，将直接作为文章封面使用</div>
+                      </template>
+                      <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+                  </el-tooltip>
+              </el-form-item>
 
               <!-- 轮播设置区域（极简版） -->
               <el-form-item label="轮播设置">
@@ -114,7 +137,7 @@ import { ref, reactive, onMounted, nextTick } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
-import { addApi, findApi, getCarouselByArticleApi, modifyApi, removeCarouselApi, saveCarouselApi } from '@/api/conarticle';
+import { addApi, findApi, getCarouselByArticleApi, modifyApi, removeCarouselApi, saveCarouselApi, uploadCoverApi } from '@/api/conarticle';
 import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()
@@ -203,13 +226,20 @@ const blogData = ref({
     title: '',
     content: ''
 })
+
+// 封面上传状态
+const isCoverUploading = ref(false)
+
 const formModel = reactive({
   categoryId: null,
   status:null,
   descriptionType: 'auto', // 默认自动生成
   customDescription: '',   // 自定义摘要内容
   description: null,       // 实际提交给后端的值
-  tagNames:[]
+  tagNames:[],
+  coverOption: true,       // 默认文件上传
+  customCoverLink: '',      // 封面文件对象（File 或 URL 字符串）
+  cover:null                // / 最终存储的封面URL（用于回显）
 })
 
 // 独立轮播数据
@@ -249,6 +279,24 @@ const openMask = () => {
     maskVisible.value = !maskVisible.value
 }
 
+// 封面选项切换时，清空另一个字段的值
+const handleCoverOptionChange = (val) => {
+    if (val === true) {
+        // 切换到文件上传：清空自定义链接
+        formModel.customCoverLink = ''
+        nextTick(() => uploadRef.value?.handleImage(formModel.cover))
+    } else {
+        // 切换到自定义链接：清空文件上传的值
+        if(!formModel.id){
+          formModel.cover = null
+        }
+        // 如果 uploadRef 有清空方法，可以调用
+        /* if (uploadRef.value && uploadRef.value.clear) {
+            uploadRef.value.clear()
+        } */
+    }
+}
+
 // 处理轮播开关变化
 const handleCarouselChange = (val) => {
     if (!val) {
@@ -274,15 +322,20 @@ const handleToggle = async(param) => {
         descriptionType: 'auto', // 默认自动生成
         customDescription: '',   // 自定义摘要内容
         description: null,       // 实际提交给后端的值
-        tagNames: [] // 重置标签
+        tagNames: [],             // 重置标签
+        coverOption: true,        //默认文件上传
+        customCoverLink: '',       // 清空自定义链接
+        cover: null
     })
    }else {
     // 回显
-      dialogTitle.value = '修改文章'
+    dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
     console.log("回显res.data",res.data)
     const {title,content,...rest} = res.data
-    blogData.value = {title,content}  
+    blogData.value = {title,content} 
+    formModel.coverOption = true
+    formModel.customCoverLink = '' 
     Object.assign(formModel,rest)
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
@@ -387,10 +440,20 @@ const handlePublish = async(status) => {
     // formModel.isAutoDescription = null; // 明确设置为null
   }
 
+    let cover;
+    if (formModel.coverOption === false) {
+        if (!formModel.customCoverLink) {
+            ElMessage.warning('请填写自定义图片链接')
+            return
+        }
+        cover = formModel.customCoverLink
+    }
+
     const data = {
       article:{
         ...blogData.value,
-        ...formModel
+        ...formModel,
+        cover: cover
       },
       tagNames: formModel.tagNames
     }
@@ -400,23 +463,42 @@ const handlePublish = async(status) => {
   delete data.article.customDescription
   delete data.article.tagNames // 移除tagNames字段，因为article表中没有这个字段
 
+  try {
+    
+    let articleId = formModel.id
+
     if(!formModel.id){
         // t_article_request：文章新增请求
         const res = await addApi(data)
         const articleId = res.data
         console.log("==================== articleId ====================", articleId)
         await saveCarousel(articleId)
-        ElMessage.success('添加成功')
+        // 如果是文件上传模式，上传封面
+        if (formModel.coverOption === true && formModel.cover instanceof File) {
+            const coverUrl = await uploadCoverApi(articleId, formModel.cover)
+            if (coverUrl) {
+                formModel.cover = coverUrl
+            }
+        }
     }else {
         // t_article_request：文章修改请求
         await modifyApi(data)
-        ElMessage.success('修改成功')
         await saveCarousel(formModel.id)
+        // 如果是文件上传模式，上传封面
+        if (formModel.coverOption === true && formModel.cover instanceof File) {
+            const coverUrl = await uploadCoverApi(articleId, formModel.cover)
+            if (coverUrl) {
+                formModel.cover = coverUrl
+            }
+        }
     }
-
+    ElMessage.success(formModel.id ? '修改成功' : '添加成功')
     dialogVisible.value = false
     openMask()
     emit('reRender')
+  }catch(error){
+    ElMessage.error('提交失败，请重试')
+  }
 }
 
 // 组件挂载时加载标签数据
