@@ -59,6 +59,13 @@
             </el-form-item>            
         </el-form> 
 
+        <!-- 顶部操作栏：新增「回复」按钮 -->
+        <div class="top-action-bar">
+            <el-button type="success" :icon="ChatLineSquare" plain @click="handleTopReply">
+                回复
+            </el-button>
+        </div>
+
     </div>
 
     <div class="action-bar">
@@ -211,12 +218,43 @@
 		@current-change="onCurrentChange"
     />
 
-    <!-- 回复对话框 -->
-    <el-dialog v-model="replyDialogVisible" title="回复评论" width="40%">
-        <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef">
-            <el-form-item label="原内容">
-                <div class="original-content">{{ replyModel.originalContent }}</div>
-            </el-form-item>
+    <!-- 重构：回复对话框（支持原内容 或 评论类型选择） -->
+    <el-dialog v-model="replyDialogVisible" :title="replyDialogTitle" width="40%">
+        <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef" label-width="auto">
+            
+            <!-- 如果是父评论（顶部回复），显示类型选择 -->
+            <template v-if="replyModel.isTopReply">
+                <el-form-item label="评论类型" prop="type">
+                    <el-radio-group v-model="replyModel.type" @change="onSwitchCommentType">
+                        <el-radio :label="'0'">文章评论</el-radio>
+                        <el-radio :label="'1'">友链评论</el-radio>
+                        <el-radio :label="'2'">留言板</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                
+                <!-- 文章评论时显示文章选择 -->
+                <el-form-item v-if="replyModel.type === '0'" label="选择文章" prop="articleId">
+                    <SmartAutoComplete
+                        ref="articleAutoCompleteRef"
+                        v-model="selectedArticles"
+                        :fetch-suggestions-api="fetchArticles"
+                        placeholder="请输入文章标题搜索"
+                        :max="1"
+                        :debounce-delay="300"
+                        :min-search-length="1"
+                        :allow-custom="false"
+                        custom-disabled-message="请输入已存在的文章标题"
+                    />
+                </el-form-item>
+            </template>
+
+            <!-- 子评论（回复已有评论），显示原内容 -->
+            <template v-else>
+                <el-form-item label="原内容">
+                    <el-input :disabled="true" :model-value="replyModel.originalContent"/>
+                </el-form-item>
+            </template>
+
             <el-form-item label="回复内容" prop="content">
                 <el-input 
                     v-model="replyModel.content" 
@@ -279,6 +317,10 @@ import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
 import { useColorStore } from '@/store/color';
+import PinyinMatch from 'pinyin-match'
+import { listAllArticlesApi } from '@/api/conarticle';
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import {ChatLineSquare} from '@element-plus/icons-vue'
 
 const colorStore = useColorStore()
 const { isDark } = storeToRefs(colorStore)
@@ -510,32 +552,173 @@ const handleModeChange = () => {
     ElMessage.info('已返回根评论列表')
 } */
 
-
+// ==================== 回复相关 ====================
 
 const replyDialogVisible = ref(false)
 const replyModelRef = ref()
-const replyModel = reactive({})
 const replyInputRef = ref(null)
 
+// 文章列表（用于联想搜索）
+const articleList = ref([])
+
+// 用于 SmartAutoComplete 的选中值
+const selectedArticles = ref([])
+
+// 加载所有文章
+const loadAllArticles = async () => {
+    const res = await listAllArticlesApi()
+    articleList.value = (res.data || []).map(item => ({
+        value: item.title,
+        id: item.id
+    }))
+    console.log('加载所有文章:', articleList.value.length, '条')
+}
+
+// 前端搜索函数
+const fetchArticles = async (params) => {
+    const query = params.keyword || ''
+    
+    if (articleList.value.length === 0) {
+        await loadAllArticles()
+    }
+    
+    if (!query) {
+        return articleList.value
+    }
+    
+    const lowerQuery = query.toLowerCase()
+    
+    const matched = articleList.value.filter(item => {
+        const text = item.value
+        const lowerText = text.toLowerCase()
+        
+        if (lowerText.includes(lowerQuery)) return true
+        if (PinyinMatch.match(text, query)) return true
+        
+        const words = lowerText.split(/[\s\-_]+/)
+        for (const word of words) {
+            if (word.startsWith(lowerQuery)) return true
+        }
+        
+        if (words.length > 1) {
+            const initials = words.map(word => word[0]).join('')
+            if (initials.includes(lowerQuery)) return true
+        }
+        
+        let charIndex = 0
+        for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
+            if (lowerText[i] === lowerQuery[charIndex]) charIndex++
+        }
+        if (charIndex === lowerQuery.length) return true
+        
+        return false
+    })
+    
+    return matched
+}
+
+// 监听选中变化
+watch(selectedArticles, (newVal) => {
+    if (newVal.length > 0) {
+        const selected = articleList.value.find(item => item.value === newVal[0])
+        if (selected) {
+            replyModel.articleId = selected.id
+        }
+    } else {
+        replyModel.articleId = null
+    }
+}, { deep: true })
+
+// 回复对话框标题
+const replyDialogTitle = ref('回复评论')
+
+// 回复模型
+const replyModel = reactive({
+    isTopReply: false,      // 是否是父评论（顶部回复）
+    type: '0',              // 评论类型：0=文章评论，1=友链评论，2=留言板
+    articleId: null,        // 文章ID（文章评论时需要）
+    originalContent: '',    // 原内容（子评论时显示）
+    content: '',            // 回复内容
+    rootId: -1,             // 根评论ID（固定为-1）
+    toCommentId: -1,        // 目标评论ID（固定为-1）
+    toCommentUserId: -1     // 目标评论用户ID（固定为-1）
+})
+
+// 回复校验规则
 const replyRules = {
+    type: [
+        { required: true, message: '请选择评论类型', trigger: 'change' }
+    ],
+    articleId: [
+        { required: true, message: '请选择关联文章', trigger: 'blur' }
+    ],
     content: [
         { required: true, message: '请输入回复内容', trigger: 'blur' },
         { min: 1, max: 512, message: '长度在 1 到 512 个字符', trigger: 'blur' }
     ]
 }
 
-const handleReply = (row) => {
-    console.log('回复的评论:', row)
+// 声明 ref
+const articleAutoCompleteRef = ref(null)
+
+// 评论类型切换
+const onSwitchCommentType = (val) => {
+    replyModelRef.value?.resetFields(['content'])
+
+    nextTick(()=>{
+        if (val === '0') {
+            // 切换到文章评论，聚焦 SmartAutoComplete
+            articleAutoCompleteRef.value?.focus()
+        } else {
+            // 切换到其他类型，聚焦回复内容输入框
+            if (replyInputRef.value) {
+                const textarea = replyInputRef.value.$el.querySelector('textarea')
+                textarea?.focus()
+            }
+        }
+    })
+}
+
+// 顶部回复按钮 - 父评论
+const handleTopReply = () => {
+    // console.log('顶部回复 - 父评论')
     
-    // 设置原内容
-    replyModel.originalContent = row.content
-    
-    // 清空回复内容
+    // 重置模型为父评论模式
+    replyModel.isTopReply = true
+    replyModel.type = '0'
+    replyModel.articleId = null
+    replyModel.originalContent = ''
     replyModel.content = ''
+    replyModel.rootId = -1
+    replyModel.toCommentId = -1
+    replyModel.toCommentUserId = -1
+    
+    selectedArticles.value = []
+    replyDialogTitle.value = '发布根评论'
+    
+    // 打开对话框
+    replyDialogVisible.value = true
+    
+    nextTick(() => {
+        replyModelRef.value?.resetFields(['content', 'articleId'])
+        setTimeout(() => {
+            articleAutoCompleteRef.value?.focus()
+        })
+    })
+}
+
+// 子评论回复（点击表格中的回复按钮）
+const handleReply = (row) => {
+    // console.log('回复的评论:', row)
+    
+    // 重置为子评论模式
+    replyModel.isTopReply = false
+    replyModel.originalContent = row.content
+    replyModel.content = ''
+    replyModel.type = row.type
     
     // 设置请求参数
     replyModel.articleId = row.articleId
-    replyModel.type = row.type
     
     if (row.rootId === -1) {
         // 回复根评论
@@ -549,33 +732,53 @@ const handleReply = (row) => {
         replyModel.toCommentUserId = row.createBy
     }
     
+    replyDialogTitle.value = '回复评论'
+    
     // 打开对话框
     replyDialogVisible.value = true
-
-    nextTick(()=>{
-        replyModelRef.value.resetFields(['content'])
-
+    
+    nextTick(() => {
+        replyModelRef.value?.resetFields(['content'])
         setTimeout(() => {
             if (replyInputRef.value) {
                 const textarea = replyInputRef.value.$el.querySelector('textarea')
                 textarea?.focus()
             }
         })
-
     })
 }
 
+// 提交回复
 const submitReply = async () => {
     // 表单验证
     await replyModelRef.value.validate()
     
-    const requestData = {
-        articleId: replyModel.articleId,
-        type: replyModel.type,
-        rootId: replyModel.rootId,
-        toCommentId: replyModel.toCommentId,
-        toCommentUserId: replyModel.toCommentUserId,
-        content: replyModel.content
+    let requestData
+    
+    if (replyModel.isTopReply) {
+        // 父评论：rootId = -1, toCommentId = -1, toCommentUserId = -1
+        requestData = {
+            type: replyModel.type,
+            rootId: -1,
+            toCommentId: -1,
+            toCommentUserId: -1,
+            content: replyModel.content
+        }
+        
+        // 文章评论需要 articleId
+        if (replyModel.type === '0') {
+            requestData.articleId = replyModel.articleId
+        }
+    } else {
+        // 子评论
+        requestData = {
+            articleId: replyModel.articleId,
+            type: replyModel.type,
+            rootId: replyModel.rootId,
+            toCommentId: replyModel.toCommentId,
+            toCommentUserId: replyModel.toCommentUserId,
+            content: replyModel.content
+        }
     }
     
     console.log('提交数据:', requestData)
@@ -805,6 +1008,12 @@ const loadStatistics = async () => {
     // margin-bottom: 20px;
 }
 
+// 顶部操作栏
+.top-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
 
 // 抽屉头部样式
 .drawer-header {
@@ -832,16 +1041,6 @@ const loadStatistics = async () => {
   .el-icon {
     font-size: 24px;
   }
-}
-
-.original-content {
-  padding: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  color: #606266;
-  font-size: 14px;
-  line-height: 1.5;
-  word-break: break-all;
 }
 
 /* ==================== 统计卡片样式 ==================== */
