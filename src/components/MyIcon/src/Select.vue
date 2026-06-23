@@ -184,6 +184,17 @@ watch(
   () => filterValue.value,
   () => (currentPage.value = 1)
 );
+
+// 添加对 inputValue 的监听，确保内部状态与外部同步
+watch(
+  () => inputValue.value,
+  (newVal) => {
+    if (!newVal) {
+      icon.value = ''
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
