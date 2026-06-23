@@ -6,7 +6,8 @@ const API = {
     ARTICLE_URL : '/admin/content/article',
     ARTICLE_BY_ID_URL : '/admin/content/article/find',
     ARTICLE_BY_ISTOP : '/admin/content/article/isTop',
-    UPLOAD_URL : '/admin/upload/content',
+    UPLOAD_COVER_URL : '/admin/upload/cover',
+    UPLOAD_CONTENT_URL : '/admin/upload/content',
     CAROUSEL_URL : '/admin/content/carousel',
     CAROUSEL_BY_ARTICLE_URL : '/admin/content/carousel/findByArticle'
 }
@@ -22,7 +23,15 @@ export const findApi = (articleId) => http.get(`${API.ARTICLE_BY_ID_URL}/${artic
 export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData})
 
 //t_upload_api
-export const uploadApi = (formData) => http.post(API.UPLOAD_URL,formData)
+export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData)
+
+//t_upload_api
+export const uploadCoverApi = (articleId,cover) => {
+    const formData = new FormData()
+    formData.append('articleId', articleId)
+    formData.append('cover', cover)
+    http.post(API.UPLOAD_COVER_URL,formData)
+}
 
 // 修改文章置顶
 export const isTopApi = (id,isTop) => http.put(`${API.ARTICLE_BY_ISTOP}/${id}/${isTop}`)
