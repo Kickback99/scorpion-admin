@@ -40,8 +40,6 @@ export const isTopApi = (id,isTop) => http.put(`${API.ARTICLE_BY_ISTOP}/${id}/${
 // ==================== 文章编辑页轮播设置相关api ====================
 // 根据文章ID查询轮播信息
 export const getCarouselByArticleApi = (articleId) => http.get(`${API.CAROUSEL_BY_ARTICLE_URL}/${articleId}`)
-// 保存轮播信息（新增或更新）
-export const saveCarouselApi = (params) => http.post(`${API.CAROUSEL_URL}`, params)
 // 删除轮播（通过ID或文章ID）
 export const removeCarouselApi = (id, articleId) => {
     if (id) {
