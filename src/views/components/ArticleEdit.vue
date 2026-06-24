@@ -137,7 +137,7 @@ import { ref, reactive, onMounted, nextTick } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
-import { addApi, findApi, getCarouselByArticleApi, modifyApi, removeCarouselApi, saveCarouselApi, uploadCoverApi } from '@/api/conarticle';
+import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/conarticle';
 import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()
@@ -416,20 +416,6 @@ const handleOpen = async() => {
   }
 }
 
-// 保存到轮播表的独立函数
-const saveCarousel = async (articleId) => {
-    if (!articleId) return
-    
-    if (carouselData.value.isCarousel) {
-        const sort = carouselData.value.sort || 0
-        await saveCarouselApi({ articleId, sort })
-    } else {
-        if (carouselData.value.carouselId) {
-            await removeCarouselApi(carouselData.value.carouselId)
-        } // 如果没有 carouselId，说明本来就没有轮播记录，直接跳过
-    }
-}
-
 const handlePublish = async(status) => {
 
     formModel.status = status
@@ -455,7 +441,9 @@ const handlePublish = async(status) => {
         ...formModel,
         cover: cover
       },
-      tagNames: formModel.tagNames
+      tagNames: formModel.tagNames,
+      isCarousel: carouselData.value.isCarousel,
+      sort: carouselData.value.sort || 0
     }
 
   // 移除临时字段
@@ -472,7 +460,6 @@ const handlePublish = async(status) => {
         const res = await addApi(data)
         const articleId = res.data
         console.log("==================== articleId ====================", articleId)
-        await saveCarousel(articleId)
         // 如果是文件上传模式，上传封面
         if (formModel.coverOption === true && formModel.cover instanceof File) {
             const coverUrl = await uploadCoverApi(articleId, formModel.cover)
@@ -483,7 +470,6 @@ const handlePublish = async(status) => {
     }else {
         // t_article_request：文章修改请求
         await modifyApi(data)
-        await saveCarousel(formModel.id)
         // 如果是文件上传模式，上传封面
         if (formModel.coverOption === true && formModel.cover instanceof File) {
             const coverUrl = await uploadCoverApi(articleId, formModel.cover)
