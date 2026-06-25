@@ -218,6 +218,13 @@ class WebSocketManager {
             detail: data
         }))
         break
+      case 'carousel_upload_complete':
+        // console.log('📢 收到轮播图上传完成通知:', data)
+        // 触发全局事件，让列表页面刷新
+        window.dispatchEvent(new CustomEvent('carousel-upload-complete', {
+            detail: data
+        }))
+        break
       default:
         // 普通任务结果消息
         if (data.message) {
