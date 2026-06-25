@@ -1,18 +1,13 @@
 <template>
-
-      <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
-
       <el-upload 
-          v-show="!isProgressVisible" 
           class="avatar-uploader" 
           :class="uploaderClass"
           :auto-upload="false"
           name="cover" 
           :show-file-list="false"
-          :on-progress="handleProgress"
           :onChange="handleSelectAvatar"
-          :before-upload="beforeAvatarUpload">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar" @load="isProgressVisible=false"/>
+          >
+          <img v-if="imageUrl" :src="imageUrl" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon">
               <Plus />
           </el-icon>
@@ -42,11 +37,6 @@ const props = defineProps({
 const imageUrl = ref('')
 let modelValue = defineModel()
 
-// 进度条业务
-const percentage = ref(0)
-
-const  isProgressVisible = ref(false)
-
 // 计算动态类名
 const uploaderClass = computed(() => {
   return props.shape === 'rectangle' ? 'rectangle-uploader' : 'square-uploader'
@@ -59,27 +49,27 @@ const sizeTip = computed(() => {
     : '建议尺寸：1 / 1'
 })
 
-// 准备上传的回调
-const beforeAvatarUpload = (rawFile) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!allowedTypes.includes(rawFile.type)){
+// 校验函数（从 beforeAvatarUpload 提取）
+const validateFile = (rawFile) => {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  if (!allowedTypes.includes(rawFile.type)) {
     ElMessage.error('必须为 jpg | png | jpeg 格式')
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
     ElMessage.error('图片不能超过2MB')
     return false
   }
-   isProgressVisible.value = true
   return true
 }
 
-// 上传时的回调
-const handleProgress = (event) => {
-  percentage.value =  Math.floor(event.percent)
-} 
-
 // 文件选择的回调
 const handleSelectAvatar = (file) => {
+
+    // 先进行校验
+    if (!validateFile(file.raw)) {
+      return // 校验失败，不继续执行
+    }
+
     imageUrl.value = URL.createObjectURL(file.raw)
     modelValue.value = file.raw
 
