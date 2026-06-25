@@ -179,15 +179,11 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 1" label="上传图片" prop="img">
-                    <el-upload
-                        class="avatar-uploader"
-                        :show-file-list="false"
-                        :auto-upload="false"
-                        :on-change="onSelectFile"
-                    >
-                        <img v-if="formModel.imgPreview" :src="formModel.imgPreview" class="avatar" />
-                        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-                    </el-upload>
+                    <SmartUpload
+                        ref="uploadRef" 
+                        v-model="formModel.img"
+                        :onValidate="handleImgValidate"
+                    />
                     <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
@@ -212,15 +208,11 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 1" label="轮播图" prop="img">
-                    <el-upload
-                        class="avatar-uploader"
-                        :show-file-list="false"
-                        :auto-upload="false"
-                        :on-change="onSelectFile"
-                    >
-                        <img v-if="formModel.imgPreview" :src="formModel.imgPreview" class="avatar" />
-                        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-                    </el-upload>
+                    <SmartUpload
+                        ref="uploadRef" 
+                        v-model="formModel.img"
+                        :onValidate="handleImgValidate"
+                    />
                     <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
@@ -290,6 +282,7 @@ import { Plus, QuestionFilled } from '@element-plus/icons-vue'
 import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, listAllArticlesApi, addCarouselApi } from '@/api/conarticle'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import PinyinMatch from 'pinyin-match'
+import SmartUpload from '@/views/components/SmartUpload.vue'
 
 // ==================== 数据 ====================
 
@@ -307,6 +300,8 @@ const searchModel = reactive({
 
 // 缓存所有已发布的文章列表
 const articleList = ref([])
+// 上传组件 ref
+const uploadRef = ref(null)
 
 // ==================== 渲染列表 ====================
 
@@ -376,7 +371,6 @@ const defaultForm = {
     sort: null,
     imgOption: 0,           // 图片选项 0=使用文章封面/默认, 1=使用专用图, 2=自定义链接
     img: '',
-    imgPreview: '',
     customImgLink: '',      // 自定义图片链接
     link: '',
     hasCustomLink: false
@@ -432,7 +426,7 @@ const validateArticleTitle = (rule, value, callback) => {
 const validateImg = (rule, value, callback) => {
     // 外链：img 必填
     if (formModel.imgOption === 1) {
-        if (!formModel.img || !formModel.imgPreview) {
+        if (!formModel.img) {
             callback(new Error('请上传轮播图'))
         } else {
             callback()
@@ -582,6 +576,11 @@ const handleAdd = async () => {
     if (articleList.value.length === 0) {
         await loadAllArticles()
     }
+
+    if(formModel.imgOption === 1){
+        // 清空上传组件
+        uploadRef.value.handleImage('')
+    }
 }
 
 
@@ -633,13 +632,15 @@ const handleEdit = async (row) => {
     if (data.img) {
         formModel.imgOption = 1
         formModel.img = data.img
-        formModel.imgPreview = data.img
         formModel.customImgLink = ''
+        // 回显到 SmartUpload 组件
+        await nextTick()
+        uploadRef.value.handleImage(data.img)
     } else {
         formModel.imgOption = 0
         formModel.img = ''
-        formModel.imgPreview = ''
         formModel.customImgLink = ''
+        uploadRef.value.handleImage('')
     }
 
     // 链接回显
@@ -654,11 +655,8 @@ const handleEdit = async (row) => {
 
 // ==================== 图片上传（本地预览） ====================
 
-const onSelectFile = (file) => {
-    const url = URL.createObjectURL(file.raw)
-    formModel.imgPreview = url
-    formModel.img = url
-    // 上传后触发 img 校验
+// 图片校验回调
+const handleImgValidate = () => {
     nextTick(() => {
         ruleFormRef.value?.validateField('img')
     })
@@ -676,7 +674,6 @@ const handleTypeChange = (val) => {
         formModel.hasCustomTitle = false
         formModel.imgOption = 0
         formModel.img = ''
-        formModel.imgPreview = ''
         formModel.customImgLink = ''
         formModel.link = ''
         selectedArticles.value = []
@@ -688,7 +685,6 @@ const handleTypeChange = (val) => {
         formModel.hasCustomTitle = false
         formModel.imgOption = 1
         formModel.img = ''
-        formModel.imgPreview = ''
         formModel.customImgLink = ''
         formModel.link = ''
         selectedArticles.value = []
@@ -705,16 +701,19 @@ const handleSortChange = (val) => {
 }
 
 // 图片选项切换
-const handleImgOptionChange = (val) => {
+const handleImgOptionChange = async(val) => {
     if (val === 0) {
-        formModel.img = ''
-        // formModel.imgPreview = ''
+        // formModel.img = ''
         formModel.customImgLink = ''
+        // uploadRef.value.handleImage('')
     } else if (val === 1) {
         formModel.customImgLink = ''
+        await nextTick()
+        uploadRef.value.handleImage(formModel.img)
     } else if (val === 2) {
-        formModel.img = ''
-        // formModel.imgPreview = ''
+        formModel.customImgLink = ''
+        // formModel.img = ''
+        // uploadRef.value.handleImage('')
     }
     ruleFormRef.value?.clearValidate(['img', 'customImgLink'])
 }
@@ -759,18 +758,24 @@ const handleConfirm = async () => {
 
         if (formModel.id) {
             // 编辑
-            await updateCarouselApi(params)
-            ElMessage.success('修改成功')
+            const res = await updateCarouselApi(params)
+            ElMessage.success({
+                message: res.message?res.message:'添加成功',
+                customClass: 'message-right-top'
+            })
         } else {
             // 新增
-            await addCarouselApi(params)
-            ElMessage.success('添加成功')
+            const res = await addCarouselApi(params)
+            ElMessage.success({
+                message: res.message?res.message:'修改成功',
+                customClass: 'message-right-top'
+            })
         }
         dialogVisible.value = false
         renderCarouselList()
     } catch (error) {
         console.log(error.message)
-        ElMessage.error(formModel.id ? '修改失败' : '添加失败')
+        // ElMessage.error(formModel.id ? '修改失败' : '添加失败')
     }
 }
 
