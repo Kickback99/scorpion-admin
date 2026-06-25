@@ -276,7 +276,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, QuestionFilled } from '@element-plus/icons-vue'
 import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, listAllArticlesApi, addCarouselApi } from '@/api/conarticle'
@@ -320,10 +320,6 @@ const renderCarouselList = async () => {
     tableData.value = res.data.items || []
     total.value = res.data.total || 0
 }
-
-onMounted(() => {
-    renderCarouselList()
-})
 
 // ==================== 分页 ====================
 
@@ -798,6 +794,29 @@ const multipleSelection = ref([])
 const handleMultiple = (raw) => {
     multipleSelection.value = raw
 }
+
+// 轮播图上传完成回调
+const handleCarouselUploadComplete = (event) => {
+    const {message} = event.detail
+    renderCarouselList()
+    ElMessage.success({
+        message,
+        customClass: 'message-right-top'
+    })
+}
+
+onMounted(() => {
+    renderCarouselList()
+
+    // 监听轮播图上传事件
+    window.addEventListener('carousel-upload-complete', handleCarouselUploadComplete)
+})
+
+onUnmounted(()=> {
+    
+    // 移除事件监听
+    window.removeEventListener('carousel-upload-complete', handleCarouselUploadComplete)
+})
 </script>
 
 <style scoped lang="scss">
