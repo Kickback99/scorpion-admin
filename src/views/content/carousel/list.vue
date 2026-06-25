@@ -183,8 +183,8 @@
                         ref="uploadRef" 
                         v-model="formModel.img"
                         :onValidate="handleImgValidate"
+                        shape="rectangle"
                     />
-                    <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
                     <el-input
@@ -212,8 +212,8 @@
                         ref="uploadRef" 
                         v-model="formModel.img"
                         :onValidate="handleImgValidate"
+                        shape="rectangle"
                     />
-                    <span style="font-size:12px; color:#909399; margin-left:12px;">建议尺寸：1920 x 600</span>
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 2" label="图片链接" prop="customImgLink">
                     <el-input
