@@ -20,6 +20,16 @@
 import { ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
+
+// 定义 props
+const props = defineProps({
+    // 父组件传递的回调函数，用于触发校验
+    onValidate: {
+        type: Function,
+        default: null
+    }
+})
+
 const imageUrl = ref('')
 let modelValue = defineModel()
 
@@ -52,17 +62,26 @@ const handleProgress = (event) => {
 const handleSelectAvatar = (file) => {
     imageUrl.value = URL.createObjectURL(file.raw)
     modelValue.value = file.raw
+
+    // 如果父组件传递了 onValidate 回调，则执行
+    if (props.onValidate && typeof props.onValidate === 'function') {
+        props.onValidate()
+    }
 }
 
 // 对外暴露handleImage方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {
-  console.log('SmartAutoUpload的handleImage被调用了....')
-      console.log(params)
-      imageUrl.value = params
+  // 如果 params 是 File 对象，转换为 URL
+  // 新增时，上传图片是 File 对象，编辑是 图片 显示的是 url 字符串
+  if (params instanceof File) {
+    imageUrl.value = URL.createObjectURL(params)
+  } else {
+    imageUrl.value = params
+  }
 }
 
 defineExpose({
-    handleImage
+    handleImage,
 })
 
 
