@@ -2,7 +2,10 @@
 
       <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
 
-      <el-upload v-show="!isProgressVisible" class="avatar-uploader" 
+      <el-upload 
+          v-show="!isProgressVisible" 
+          class="avatar-uploader" 
+          :class="uploaderClass"
           :auto-upload="false"
           name="cover" 
           :show-file-list="false"
@@ -14,10 +17,11 @@
               <Plus />
           </el-icon>
       </el-upload>
+      <span style="font-size:12px; color:#909399; margin-left:12px;">{{ sizeTip }}</span>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 
@@ -27,6 +31,11 @@ const props = defineProps({
     onValidate: {
         type: Function,
         default: null
+    },
+    // 形状类型：'square' | 'rectangle'
+    shape: {
+      type: String,
+      default: 'square',
     }
 })
 
@@ -38,6 +47,17 @@ const percentage = ref(0)
 
 const  isProgressVisible = ref(false)
 
+// 计算动态类名
+const uploaderClass = computed(() => {
+  return props.shape === 'rectangle' ? 'rectangle-uploader' : 'square-uploader'
+})
+
+// 计算建议尺寸文本
+const sizeTip = computed(() => {
+  return props.shape === 'rectangle' 
+    ? '建议尺寸：16 / 9' 
+    : '建议尺寸：1 / 1'
+})
 
 // 准备上传的回调
 const beforeAvatarUpload = (rawFile) => {
@@ -87,19 +107,15 @@ defineExpose({
 
 </script>
 
-<style scoped lang="scss">
-
-</style>
-
 <style lang="scss" scoped>
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
+
 </style>
 
 <style>
+.avatar-uploader .avatar {
+  display: block;
+}
+
 .avatar-uploader .el-upload {
   border: 1px dashed var(--el-border-color);
   border-radius: 6px;
@@ -113,11 +129,31 @@ defineExpose({
   border-color: var(--el-color-primary);
 }
 
-.el-icon.avatar-uploader-icon {
+.avatar-uploader .el-icon.avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
+  text-align: center;
+}
+
+/* ==================== 正方形样式 ==================== */
+.square-uploader .avatar {
   width: 150px;
   height: 150px;
-  text-align: center;
+}
+
+.square-uploader .el-icon.avatar-uploader-icon {
+  width: 150px;
+  height: 150px;
+}
+
+/* ==================== 长方形样式 ==================== */
+.rectangle-uploader .avatar {
+  width: 178px;
+  height: 100px;
+}
+
+.rectangle-uploader .el-icon.avatar-uploader-icon {
+  width: 178px;
+  height: 100px;
 }
 </style>
