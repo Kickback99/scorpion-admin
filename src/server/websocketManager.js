@@ -225,6 +225,12 @@ class WebSocketManager {
             detail: data
         }))
         break
+      case 'carousel_upload_failed':
+        // 可以重新触发列表刷新，显示图片为空或占位图
+        window.dispatchEvent(new CustomEvent('carousel-upload-failed', {
+            detail: data
+        }))
+        break
       default:
         // 普通任务结果消息
         if (data.message) {

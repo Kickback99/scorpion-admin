@@ -805,17 +805,29 @@ const handleCarouselUploadComplete = (event) => {
     })
 }
 
+const handleCarouselUploadFailed = (event) => {
+    const { message } = event.detail
+    // 刷新列表，显示占位图或提示
+    renderCarouselList()
+        ElMessage.error({
+          message,
+          customClass: 'message-right-top'
+    }) 
+}
+
 onMounted(() => {
     renderCarouselList()
 
     // 监听轮播图上传事件
     window.addEventListener('carousel-upload-complete', handleCarouselUploadComplete)
+    window.addEventListener('carousel-upload-failed', handleCarouselUploadFailed)
 })
 
 onUnmounted(()=> {
     
     // 移除事件监听
     window.removeEventListener('carousel-upload-complete', handleCarouselUploadComplete)
+    window.removeEventListener('carousel-upload-failed', handleCarouselUploadFailed)
 })
 </script>
 
