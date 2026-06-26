@@ -38,10 +38,10 @@ export const routes = [
             meta:{
                title:'首页'     
         }},
-        {path:'/user/profile',component:() =>import('@/views/user/profile.vue'),meta:{
+        {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue'),meta:{
             title:'个人资料'
         }},
-        {path:'/user/rePassword',component:() =>import('@/views/user/rePassword.vue'),meta:{
+        {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue'),meta:{
             title:'重置密码'
         }},
         {path:'/test',component:() => import('@/views/Test.vue')}

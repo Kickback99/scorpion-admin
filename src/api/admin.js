@@ -30,6 +30,11 @@ export const userInfoApi = () => {
     return http.get('/admin/userDetailInfo')
 }
 
+// 获取用户统计信息
+export const userStatsApi = () => {
+    return http.get('/admin/stats')
+}
+
 // 修改用户信息
 export const userUpdateInfoApi = (params) => {
     const formData = new FormData()
