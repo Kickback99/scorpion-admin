@@ -30,7 +30,6 @@
               :auto-upload="false"
               :show-file-list="false"
               name="avatar"
-              :before-upload="beforeAvatarUpload"
               :onChange="handleSelectAvatar"
             >
               <el-button type="primary" icon="Upload" size="small">
@@ -116,7 +115,7 @@
                   type="textarea"
                   :rows="3"
                   :disabled="!editMode"
-                  placeholder="请输入个人简介"
+                  placeholder="写点关于你自己的介绍吧～"
                   maxlength="200"
                   show-word-limit
                 />
@@ -145,15 +144,25 @@
           <div class="info-list">
             <div class="info-item">
               <span class="label">注册时间：</span>
-              <span class="value">{{ userInfo.createTime }}</span>
+              <span class="value">{{ profileStats.createTime }}</span>
             </div>
             <div class="info-item">
               <span class="label">最后登录：</span>
-              <span class="value">{{ userInfo.lastLogin }}</span>
+              <span class="value">{{ profileStats.lastLogin }}</span>
             </div>
             <div class="info-item">
               <span class="label">用户角色：</span>
-              <el-tag type="success">{{ userInfo.role }}</el-tag>
+                <div class="role-tags">
+                <el-tag 
+                  v-for="(role, index) in userStore.roleNames" 
+                  :key="index"
+                  type="success"
+                  size="default"
+                  class="role-tag"
+                >
+                  {{ role }}
+                </el-tag>
+              </div>
             </div>
           </div>
         </el-card>
@@ -167,12 +176,12 @@
           <div class="info-list">
             <div class="info-item">
               <span class="label">登录次数：</span>
-              <span class="value">{{ userInfo.loginCount }} 次</span>
+              <span class="value">{{ profileStats.loginCount }} 次次</span>
             </div>
             <div class="info-item">
               <span class="label">账号状态：</span>
-              <el-tag :type="userInfo.status === 'active' ? 'success' : 'danger'">
-                {{ userInfo.status === 'active' ? '正常' : '禁用' }}
+              <el-tag :type="profileStats.status === 0 ? 'success' : 'danger'">
+                {{ profileStats.status === 0 ? '正常' : '禁用' }}
               </el-tag>
             </div>
           </div>
@@ -183,11 +192,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, reactive, onMounted} from 'vue'
+import { ElMessage} from 'element-plus'
 import { useUserStore } from '@/store/user'
 import avatar from '@/assets/images/avatar.png'
-import { userInfoApi, userUpdateInfoApi } from '@/api/admin'
+import { userInfoApi, userStatsApi, userUpdateInfoApi } from '@/api/admin'
 // 响应式数据
 const editMode = ref(false)
 const loading = ref(false)
@@ -200,7 +209,13 @@ const userInfo = reactive({
   ...userStore.userInfo  
 })
 
-
+// 统计数据用本地 ref（不与 store 混合）
+const profileStats = ref({
+    createTime: '',
+    status: 0,
+    lastLogin: '',
+    loginCount: 0
+})
 
 
 // 备份原始数据用于取消编辑时恢复
@@ -221,12 +236,12 @@ const rules = reactive({
 })
 
 // 方法定义
-const beforeAvatarUpload = (file) => {
-  const isJPGOrPNG = file.type === 'image/jpeg' || file.type === 'image/png'
+const validateFile = (file) => {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   const isLt2M = file.size / 1024 / 1024 < 2
 
-  if (!isJPGOrPNG) {
-    ElMessage.error('头像只能是 JPG/PNG 格式!')
+  if (!allowedTypes.includes(file.type)) {
+    ElMessage.error('必须为 jpg | png | jpeg 格式')
     return false
   }
   if (!isLt2M) {
@@ -236,26 +251,36 @@ const beforeAvatarUpload = (file) => {
   return true
 }
 
-/* const handleAvatarUpload = (options) => {
-  const file = options.file
-  // 模拟上传过程
-  loading.value = true
-  setTimeout(() => {
-    // 这里应该是实际上传逻辑，现在用模拟URL
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      userInfo.avatar = e.target.result
-      loading.value = false
-      ElMessage.success('头像上传成功')
-    }
-    reader.readAsDataURL(file)
-  }, 1000)
-} */
-
 const handleSelectAvatar = (file) => {
+
+    // 先进行校验
+    if (!validateFile(file.raw)) {
+      return // 校验失败，不继续执行
+    }
+
     imgUrl.value = URL.createObjectURL(file.raw)
     userInfo.avatar = file.raw
 
+}
+
+/**
+ * 获取用户统计数据
+ */
+const fetchProfileStats = async () => {
+    try {
+        const res = await userStatsApi()
+        if (res.code === 200) {
+            profileStats.value = {
+                createTime: res.data.createTime,
+                status: res.data.status !== undefined ? res.data.status : 0,
+                lastLogin: res.data.lastLogin,
+                loginCount: res.data.loginCount
+            }
+        }
+    } catch (error) {
+        console.error('获取统计数据失败:', error)
+        // 静默失败，不影响主流程
+    }
 }
 
 const handleSave = async () => {
@@ -299,9 +324,12 @@ const handleCancel = () => {
 }
 
 // 初始化备份数据
-onMounted(() => {
+onMounted(async() => {
   Object.assign(originalUserInfo.value, { ...userInfo })
   imgUrl.value = originalUserInfo.value.avatar
+
+   // 获取统计数据
+  await fetchProfileStats()
 })
 </script>
 
@@ -325,6 +353,7 @@ onMounted(() => {
 .card-header .title {
   font-size: 18px;
   font-weight: 600;
+  color: var(--el-text-color-primary);  /* 🔥 新增颜色 */
 }
 
 .profile-content {
@@ -345,9 +374,9 @@ onMounted(() => {
   gap: 15px;
 }
 
-.user-avatar {
+/* .user-avatar {
   border: 3px solid #f0f0f0;
-}
+} */
 
 .info-form {
   width: 100%;
@@ -374,7 +403,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .info-item:last-child {
@@ -382,12 +411,12 @@ onMounted(() => {
 }
 
 .info-item .label {
-  color: #666;
+  color: var(--el-text-color-regular);
   font-weight: 500;
 }
 
 .info-item .value {
-  color: #333;
+  color: var(--el-text-color-regular);
 }
 
 /* 响应式设计 */
