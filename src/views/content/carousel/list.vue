@@ -62,6 +62,23 @@
             </template>
         </el-table-column>
 
+        <el-table-column label="状态" width="100" align="center">
+            <template #default="{ row }">
+                <el-text v-if="row.uploadStatus === 'PENDING'" type="warning" size="small">
+                    上传中
+                </el-text>
+                <el-text v-else-if="row.uploadStatus === 'SUCCESS'" type="success" size="small">
+                    已完成
+                </el-text>
+                <el-text v-else-if="row.uploadStatus === 'FAILED'" type="danger" size="small">
+                    上传失败
+                </el-text>
+                <el-tag v-else type="info" size="small">
+                    未知
+                </el-tag>
+            </template>
+        </el-table-column>
+
         <!-- <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip /> -->
         <el-table-column prop="sort" label="排序" width="80" align="center" />
         <el-table-column label="跳转链接" min-width="150" show-overflow-tooltip>
@@ -72,7 +89,17 @@
         <el-table-column prop="createTime" label="创建时间" width="200" />
         <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
-                <el-button @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle />
+                <!-- 失败状态显示重试按钮 -->
+                <el-button 
+                    v-if="row.uploadStatus === 'FAILED'" 
+                    @click="handleRetry(row)" 
+                    size="small" 
+                    type="primary" 
+                    icon="Refresh"
+                    circle
+                >
+                </el-button>
+                <el-button v-else @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle />
                 <el-popconfirm :title="`你确定要删除「${row.articleTitle}」的轮播吗？`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
                         <el-button size="small" type="danger" icon="Delete" circle />
@@ -369,7 +396,8 @@ const defaultForm = {
     img: '',
     customImgLink: '',      // 自定义图片链接
     link: '',
-    hasCustomLink: false
+    hasCustomLink: false,
+    uploadStatus: '',
 }
 
 const formModel = reactive({ ...defaultForm })
@@ -583,6 +611,9 @@ const handleAdd = async () => {
 // ==================== 编辑 ====================
 
 const handleEdit = async (row) => {
+
+    const savedUploadStatus =  formModel.uploadStatus
+
     dialogVisible.value = true
     dialogTitle.value = '编辑轮播'
 
@@ -624,19 +655,37 @@ const handleEdit = async (row) => {
 
     formModel.sort = data.sort || null
 
-    // 专用图回显
-    if (data.img) {
+    // 如果是从重试进来的，保持 imgOption = 1
+    if (savedUploadStatus === 'FAILED') {
         formModel.imgOption = 1
-        formModel.img = data.img
-        formModel.customImgLink = ''
-        // 回显到 SmartUpload 组件
-        await nextTick()
-        uploadRef.value.handleImage(data.img)
-    } else {
-        formModel.imgOption = 0
+    }
+
+    // 专用图回显
+    // 如果是失败状态重试，保留 imgOption = 1，清空图片
+    if (savedUploadStatus  === 'FAILED') {
+        formModel.imgOption = 1
         formModel.img = ''
         formModel.customImgLink = ''
+        await nextTick()
         uploadRef.value.handleImage('')
+    } else {
+        // 正常编辑，回显图片
+        if (data.img) {
+            formModel.imgOption = 1
+            formModel.img = data.img
+            formModel.customImgLink = ''
+            await nextTick()
+            uploadRef.value.handleImage(data.img)
+        } else {
+            /* formModel.imgOption = 0
+            formModel.img = ''
+            formModel.customImgLink = '' */
+            formModel.imgOption = 1
+            formModel.img = ''
+            formModel.customImgLink = ''
+            await nextTick()
+            uploadRef.value.handleImage('')
+        }
     }
 
     // 链接回显
@@ -646,6 +695,19 @@ const handleEdit = async (row) => {
     } else {
         formModel.hasCustomLink = false
         formModel.link = ''
+    }
+}
+
+// ==================== 重试 ====================
+const handleRetry = (row) => {
+    try {
+        formModel.uploadStatus = 'FAILED' 
+        // 跳转到编辑弹窗，让用户重新上传图片
+        handleEdit(row)
+        // 在弹窗中，用户可以重新选择图片并提交
+        ElMessage.info('请重新选择图片并提交')
+    } catch (error) {
+        ElMessage.error('打开编辑失败')
     }
 }
 
@@ -803,16 +865,18 @@ const handleCarouselUploadComplete = (event) => {
         message,
         customClass: 'message-right-top'
     })
+    formModel.uploadStatus = 'SUCCESS'
 }
 
 const handleCarouselUploadFailed = (event) => {
-    const { message } = event.detail
+    const { message,businessId } = event.detail
     // 刷新列表，显示占位图或提示
     renderCarouselList()
         ElMessage.error({
           message,
           customClass: 'message-right-top'
-    }) 
+    })
+    formModel.uploadStatus = 'FAILED' 
 }
 
 onMounted(() => {
