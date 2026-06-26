@@ -62,20 +62,31 @@
             </template>
         </el-table-column>
 
-        <el-table-column label="状态" width="100" align="center">
+        <el-table-column label="状态" width="180" align="center">
             <template #default="{ row }">
-                <el-text v-if="row.uploadStatus === 'PENDING'" type="warning" size="small">
-                    上传中
-                </el-text>
-                <el-text v-else-if="row.uploadStatus === 'SUCCESS'" type="success" size="small">
+                <!-- 有进度且未完成 -->
+                <div v-if="uploadProgressMap.has(row.id) && uploadProgressMap.get(row.id) < 100">
+                    <el-progress 
+                        :percentage="uploadProgressMap.get(row.id)" 
+                        :stroke-width="16"
+                        :text-inside="true"
+                        :striped="true"
+                        style="width: 100%;"
+                    />
+                </div>
+                <!-- 已完成 -->
+                <el-tag v-else-if="row.uploadStatus === 'SUCCESS'" type="success" size="small">
                     已完成
-                </el-text>
-                <el-text v-else-if="row.uploadStatus === 'FAILED'" type="danger" size="small">
-                    上传失败
-                </el-text>
-                <el-tag v-else type="info" size="small">
-                    未知
                 </el-tag>
+                <!-- 失败 -->
+                <el-tag v-else-if="row.uploadStatus === 'FAILED'" type="danger" size="small">
+                    上传失败
+                </el-tag>
+                <!-- 等待 -->
+                <el-tag v-else-if="row.uploadStatus === 'PENDING'" type="warning" size="small">
+                    等待上传
+                </el-tag>
+                <el-tag v-else type="info" size="small">未知</el-tag>
             </template>
         </el-table-column>
 
@@ -329,6 +340,9 @@ const searchModel = reactive({
 const articleList = ref([])
 // 上传组件 ref
 const uploadRef = ref(null)
+
+// 进度 Map
+const uploadProgressMap = ref(new Map())
 
 // ==================== 渲染列表 ====================
 
@@ -857,6 +871,13 @@ const handleMultiple = (raw) => {
     multipleSelection.value = raw
 }
 
+
+// 监听进度
+const handleCarouselProgress = (event) => {
+    const { carouselId, progress } = event.detail
+    uploadProgressMap.value.set(carouselId, progress)
+}
+
 // 轮播图上传完成回调
 const handleCarouselUploadComplete = (event) => {
     const {message} = event.detail
@@ -883,6 +904,7 @@ onMounted(() => {
     renderCarouselList()
 
     // 监听轮播图上传事件
+    window.addEventListener('carousel-upload-progress', handleCarouselProgress)
     window.addEventListener('carousel-upload-complete', handleCarouselUploadComplete)
     window.addEventListener('carousel-upload-failed', handleCarouselUploadFailed)
 })
@@ -890,6 +912,7 @@ onMounted(() => {
 onUnmounted(()=> {
     
     // 移除事件监听
+    window.removeEventListener('carousel-upload-progress', handleCarouselProgress)
     window.removeEventListener('carousel-upload-complete', handleCarouselUploadComplete)
     window.removeEventListener('carousel-upload-failed', handleCarouselUploadFailed)
 })

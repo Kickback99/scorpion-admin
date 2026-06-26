@@ -189,6 +189,15 @@ class WebSocketManager {
         const carouselStatus = arr[1]    // SUCCESS 或 FAILED
         const carouselMessage = arr[2]   // 消息内容
         const businessId = arr[3]        // 轮播ID
+        // 进度消息
+        if (carouselStatus === 'PROGRESS') {
+            const progress = parseInt(carouselMessage)
+            window.dispatchEvent(new CustomEvent('carousel-upload-progress', {
+                detail: { carouselId: businessId, progress: progress }
+            }))
+            return
+        }
+
         if (carouselStatus === 'SUCCESS') {
           // 上传成功
           window.dispatchEvent(new CustomEvent('carousel-upload-complete', {
