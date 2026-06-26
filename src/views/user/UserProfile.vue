@@ -195,7 +195,7 @@
 import { ref, reactive, onMounted} from 'vue'
 import { ElMessage} from 'element-plus'
 import { useUserStore } from '@/store/user'
-import avatar from '@/assets/images/avatar.png'
+import avatar from '@/assets/images/avatar-circle.png'
 import { userInfoApi, userStatsApi, userUpdateInfoApi } from '@/api/admin'
 // 响应式数据
 const editMode = ref(false)

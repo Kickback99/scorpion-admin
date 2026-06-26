@@ -22,6 +22,15 @@
 
         <!-- 表格 -->
         <el-table :data="filteredTableData" style="width: 100%" stripe>
+            <el-table-column label="头像" width="80" align="center">
+                <template #default="{ row }">
+                    <el-avatar 
+                        :src="row.avatar || avatar" 
+                        :size="40"
+                        :fit="'cover'"
+                    />
+                </template>
+            </el-table-column>
             <el-table-column prop="username" label="用户名" min-width="120" />
             <el-table-column prop="roleName" label="用户类型" min-width="100">
                 <template #default="{row}">
@@ -73,6 +82,7 @@ import { ElMessage } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { cleanZombieApi, getOnlineListApi, kickUserApi } from '@/api/onlineUser'
 import websocketManager from '@/server/websocketManager'
+import avatar from '@/assets/images/avatar-circle.png'
 
 // 数据
 const allTableData = ref([])      // 原始数据（来自 WebSocket）

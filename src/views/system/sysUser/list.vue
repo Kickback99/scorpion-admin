@@ -85,13 +85,13 @@
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="100" align="center" />
-        <el-table-column prop="username" label="用户名" align="center" />
-        <el-table-column prop="nickname" label="呢称" align="center" />
         <el-table-column label="头像" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px" :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
+        <el-table-column prop="username" label="用户名" align="center" />
+        <el-table-column prop="nickname" label="呢称" align="center" />
         <el-table-column prop="roleNames" label="用户角色" align="center" show-overflow-tooltip/>
         <el-table-column prop="phone" label="手机" align="center" />
         <el-table-column label="类型" align="center ">
@@ -222,13 +222,14 @@ import { loadMenu } from '@/router';
 import { useRouter } from 'vue-router';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs } from 'element-plus';
+import avatar from '@/assets/images/avatar-square.png'
 
 const handleImage = (row) => {
     if(row.id === userStore.userInfo.id){
         return userStore.userInfo.avatar
-    }else {
+    }else if(row.avatar){
         return row.avatar
-    }
+    }else return avatar
 }
 
 const params = ref({
