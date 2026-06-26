@@ -184,7 +184,24 @@ class WebSocketManager {
           dangerouslyUseHTMLString: true
         })
         break
-        
+      
+      case 'carousel':
+        const carouselStatus = arr[1]    // SUCCESS 或 FAILED
+        const carouselMessage = arr[2]   // 消息内容
+        const businessId = arr[3]        // 轮播ID
+        if (carouselStatus === 'SUCCESS') {
+          // 上传成功
+          window.dispatchEvent(new CustomEvent('carousel-upload-complete', {
+            detail: { message: carouselMessage, carouselId: businessId }
+          }))
+        }else if (carouselStatus === 'FAILED') {
+          // 上传失败
+          window.dispatchEvent(new CustomEvent('carousel-upload-failed', {
+            detail: { message: carouselMessage, carouselId: businessId }
+          }))
+        }
+        break
+
       default:
         // 未知类型的数组消息，尝试显示
         console.warn('未知的数组消息类型:', messageType, arr)
@@ -215,19 +232,6 @@ class WebSocketManager {
         console.log('缓存在线用户数据:', data)
         // 触发全局事件
         window.dispatchEvent(new CustomEvent('online-users-update', {
-            detail: data
-        }))
-        break
-      case 'carousel_upload_complete':
-        // console.log('📢 收到轮播图上传完成通知:', data)
-        // 触发全局事件，让列表页面刷新
-        window.dispatchEvent(new CustomEvent('carousel-upload-complete', {
-            detail: data
-        }))
-        break
-      case 'carousel_upload_failed':
-        // 可以重新触发列表刷新，显示图片为空或占位图
-        window.dispatchEvent(new CustomEvent('carousel-upload-failed', {
             detail: data
         }))
         break
