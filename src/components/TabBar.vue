@@ -130,7 +130,7 @@
 
 <script setup>
 import Home from "@iconify-icons/ep/home-filled";
-import avatar from '@/assets/images/avatar.png'
+import avatar from '@/assets/images/avatar-circle.png'
 import { useUserStore } from '@/store/user'
 import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
