@@ -381,10 +381,26 @@ const setCron = (cronValue) => {
 const translateCron = (cronExpression) => {
   if (!cronExpression) return '未设置'
   try {
-    // 指定使用中文
-    return cronstrue.toString(cronExpression, { 
-      locale: 'zh_CN'  // 这里指定使用已注册的中文包
+    // 1. 获取中文翻译
+    let result = cronstrue.toString(cronExpression, { 
+      locale: 'zh_CN'
     })
+    
+    // 2. 提取翻译中的小时数字（1-12点）
+    // 匹配 "上午 XX:XX" 或 "上午 XX点" 格式，提取小时数
+    const hourMatch = result.match(/上午\s*(\d{1,2})/)
+    
+    if (hourMatch) {
+      const hour = parseInt(hourMatch[1])
+      // 3. 判断是否为凌晨时段（1:00 - 5:59）
+      if (hour >= 1 && hour <= 5) {
+        result = result.replace(/上午/g, '凌晨')
+      }
+      // 6:00 - 11:59 保持 "上午" 不变
+      // 12:00 以后不会有"上午"（cronstrue 会用"下午"）
+    }
+    
+    return result
   } catch (error) {
     console.warn('Cron翻译失败:', cronExpression, error)
     return '无效表达式'
