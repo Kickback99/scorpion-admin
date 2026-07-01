@@ -22,11 +22,19 @@
                 </el-form-item>
                 
                 <el-form-item label="业务ID">
-                    <el-input 
-                        v-model.number="searchModel.targetId" 
-                        placeholder="请输入业务主键ID" 
-                        clearable
-                        style="width: 180px"
+                    <SmartAutoComplete
+                        v-model="selectedTargetId"
+                        :fetch-suggestions-api="fetchBusinessData"
+                        placeholder="请输入文章标题/用户昵称/用户名搜索"
+                        :max="1"
+                        :debounce-delay="300"
+                        :min-search-length="1"
+                        :allow-custom="false"
+                        custom-disabled-message="请输入已存在的文章标题/昵称/用户名"
+                        :multiple-id-mode="true"
+                        @select-multiple-ids="handleSelectMultipleIds"
+                        @tag-removed="handleTagRemoved"
+                        style="width: 260px"
                     />
                 </el-form-item>
                 
@@ -128,16 +136,23 @@
 </template>
 
 <script setup>
-import { fileMetaListApi } from '@/api/resfilemeta';
+import { fileMetaListApi,getAllBusinessDataApi } from '@/api/resfilemeta';
 import SmartSelector from '@/views/components/SmartSelector.vue';
-import { reactive, ref, nextTick } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import PinyinMatch from 'pinyin-match'
 
 // ==================== 数据定义 ====================
 
 const tableData = ref([]);
 const total = ref(0);
 const loading = ref(false);
+// 缓存所有业务数据（用于联想搜索）
+const businessDataCache = ref([]);
+const selectedTargetId = ref([]);
+// 存储选中的多个ID
+const selectedIds = ref('');
 
 // 分页参数
 const pagination = reactive({
@@ -149,7 +164,7 @@ const pagination = reactive({
 const searchModel = reactive({
     uuid: '',
     fileType: '',
-    targetId: null,
+    targetIds: '',
     isDeleted: null
 });
 
@@ -199,6 +214,133 @@ const getFileTypeTag = (type) => {
     return map[type] || '';
 };
 
+// ==================== SmartAutoComplete 联想搜索 ====================
+
+/**
+ * 加载所有业务数据（用于联想搜索）
+ */
+const loadBusinessData = async () => {
+    try {
+        const res = await getAllBusinessDataApi();
+        if (res.code === 200) {
+            businessDataCache.value = (res.data || []).map(item => ({
+                value: item.title,
+                id: item.id
+            }));
+            console.log('加载业务数据:', businessDataCache.value.length, '条');
+        }
+    } catch (error) {
+        console.error('加载业务数据失败:', error);
+    }
+};
+
+/**
+ * 联想搜索函数（参考 fetchArticles 风格）
+ */
+const fetchBusinessData = async (params) => {
+    const query = params.keyword || '';
+    
+    // 如果还没有加载数据，先加载
+    if (businessDataCache.value.length === 0) {
+        await loadBusinessData();
+    }
+    
+    if (!query) {
+        return businessDataCache.value;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    
+    const matched = businessDataCache.value.filter(item => {
+        const text = item.value;
+        const lowerText = text.toLowerCase();
+        
+        // 1. 英文直接包含匹配
+        if (lowerText.includes(lowerQuery)) {
+            return true;
+        }
+        
+        // 2. PinyinMatch（中文拼音）
+        if (PinyinMatch.match(text, query)) {
+            return true;
+        }
+        
+        // 3. 单词前缀匹配
+        const words = lowerText.split(/[\s\-_]+/);
+        for (const word of words) {
+            if (word.startsWith(lowerQuery)) {
+                return true;
+            }
+        }
+        
+        // 4. 复合词首字母匹配
+        if (words.length > 1) {
+            const initials = words.map(word => word[0]).join('');
+            if (initials.includes(lowerQuery)) {
+                return true;
+            }
+        }
+        
+        // 5. 单词内字符匹配
+        let charIndex = 0;
+        for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
+            if (lowerText[i] === lowerQuery[charIndex]) {
+                charIndex++;
+            }
+        }
+        if (charIndex === lowerQuery.length) {
+            return true;
+        }
+        
+        return false;
+    });
+    
+    return matched;
+};
+
+// 处理多ID选择事件
+const handleSelectMultipleIds = (data) => {
+    console.log('选中的标题:', data.title, '对应的所有ID:', data.ids);
+    // 将多个ID用逗号拼接成字符串
+    selectedIds.value = (data.ids || []).join(',');
+    // 赋值给 searchModel.targetIds
+    searchModel.targetIds = selectedIds.value;
+    
+    // 自动触发搜索
+    if (selectedIds.value) {
+        onSearch();
+    }
+};
+
+// 处理标签移除事件
+const handleTagRemoved = (data) => {
+    console.log('标签已移除:', data.tag, '剩余标签:', data.remainingTags)
+    
+    // 清空选中的ID
+    selectedIds.value = ''
+    searchModel.targetIds = ''
+    
+    // 重新触发搜索（刷新列表）
+    onSearch()
+}
+
+// 监听选中值变化
+watch(selectedTargetId, (newVal) => {
+    if (newVal.length > 0) {
+        // 单个ID模式（当 multipleIdMode 为 false 时使用）
+        // 但由于我们启用了 multipleIdMode，由 handleSelectMultipleIds 处理
+        // 这里保留作为降级处理
+        const selected = businessDataCache.value.find(item => item.value === newVal[0]);
+        if (selected) {
+            searchModel.targetIds = String(selected.id);
+        }
+    } else {
+        // 清空时重置
+        searchModel.targetId = null;
+        selectedIds.value = [];
+    }
+}, { deep: true });
+
 // ==================== 数据请求 ====================
 
 /**
@@ -211,7 +353,7 @@ const renderFileMeta = async () => {
         const params = {};
         if (searchModel.uuid) params.uuid = searchModel.uuid;
         if (searchModel.fileType) params.fileType = searchModel.fileType;
-        if (searchModel.targetId) params.targetId = searchModel.targetId;
+        if (searchModel.targetIds) params.targetIds = searchModel.targetIds;
         if (searchModel.isDeleted !== null && searchModel.isDeleted !== '') {
             params.isDeleted = searchModel.isDeleted;
         }
@@ -239,6 +381,11 @@ const renderFileMeta = async () => {
 
 // 初始加载
 renderFileMeta();
+
+// 预加载业务数据
+onMounted(() => {
+    loadBusinessData();
+});
 
 // ==================== 事件处理 ====================
 
@@ -272,10 +419,12 @@ const onSearch = () => {
  */
 const onReset = () => {
     pagination.pageNum = 1;
+    selectedTargetId.value = [];
+    selectedIds.value = '';
     Object.assign(searchModel, {
         uuid: '',
         fileType: '',
-        targetId: null,
+        targetIds: '',
         isDeleted: null
     });
     renderFileMeta();
