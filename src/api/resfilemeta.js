@@ -15,3 +15,10 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
             ...searchData
         }
     })
+
+/**
+ * 获取所有业务数据（用于联想搜索）
+ * @returns {Promise}
+ */
+export const getAllBusinessDataApi = () => 
+    http.get(`/business/search/all`)
