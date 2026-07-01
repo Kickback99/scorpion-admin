@@ -13,7 +13,7 @@
       :clearable="clearable"
       :trigger="null"
       tag-type="primary"
-      @remove="handleTagRemove"
+      @remove-tag="handleTagRemove"
       @focus="handleFocus"
       @blur="handleBlur"
       @keydown="handleKeydown"
@@ -590,7 +590,9 @@ const clearInput = () => {
 
 // 处理标签移除
 const handleTagRemove = (tag, index) => {
-  modelValue.value = modelValue.value.filter((_, i) => i !== index)
+  console.log("处理标签移除事件",tag)
+  // modelValue.value = modelValue.value.filter((_, i) => i !== index)
+  modelValue.value = modelValue.value.filter(item => item !== tag)
 }
 
 // 计算建议框样式
