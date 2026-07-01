@@ -126,6 +126,11 @@ const props = defineProps({
   multipleIdMode: {
     type: Boolean,
     default: false
+  },
+  // 是否在按回车时自动触发多ID搜索
+  autoSearchOnEnter: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -509,6 +514,41 @@ const handleKeydown = (event) => {
         // 选择高亮的建议项
         addTagFromSuggestion(filteredSuggestions.value[activeIndex.value].value)
       } else if (currentInput.value.trim()) {
+        // 如果开启了 autoSearchOnEnter 且有多ID模式，触发搜索
+        if (props.autoSearchOnEnter && props.multipleIdMode) {
+          const inputValue = currentInput.value.trim()
+          if (inputValue && suggestions.value.length > 0) {
+            const allIds = []
+            const seenIds = new Set()
+            
+            suggestions.value.forEach(item => {
+              if (item.id !== undefined && item.id !== null && !seenIds.has(item.id)) {
+                seenIds.add(item.id)
+                allIds.push(item.id)
+              }
+            })
+            
+            if (allIds.length > 0) {
+              // 触发父组件事件
+              emit('select-multiple-ids', {
+                title: inputValue,
+                ids: allIds
+              })
+              
+              // 添加标签
+              if (!modelValue.value.includes(inputValue)) {
+                modelValue.value = [...modelValue.value, inputValue]
+              }
+              
+              // 清空输入和下拉
+              immediateClearInput()
+              showDropdown.value = false
+              suggestions.value = []
+              activeIndex.value = -1
+              return
+            }
+          }
+        }
         // 添加当前输入作为标签
         addCurrentInputAsTag(currentInput.value)
       }

@@ -29,9 +29,8 @@
                         :max="1"
                         :debounce-delay="300"
                         :min-search-length="1"
-                        :allow-custom="false"
-                        custom-disabled-message="请输入已存在的文章标题/昵称/用户名"
                         :multiple-id-mode="true"
+                        :auto-search-on-enter="true"
                         @select-multiple-ids="handleSelectMultipleIds"
                         @tag-removed="handleTagRemoved"
                         style="width: 260px"
@@ -301,6 +300,15 @@ const fetchBusinessData = async (params) => {
 // 处理多ID选择事件
 const handleSelectMultipleIds = (data) => {
     console.log('选中的标题:', data.title, '对应的所有ID:', data.ids);
+
+    // 如果 ids 为空，清空搜索条件
+    if (!data.ids || data.ids.length === 0) {
+        selectedIds.value = ''
+        searchModel.targetIds = ''
+        onSearch()
+        return
+    }
+
     // 将多个ID用逗号拼接成字符串
     selectedIds.value = (data.ids || []).join(',');
     // 赋值给 searchModel.targetIds
