@@ -40,6 +40,10 @@
       >
         <span v-html="highlightMatch(item.value)"></span>
         <el-tag v-if="isTagSelected(item.value)" size="small" type="info">已添加</el-tag>
+        <!-- 显示重复数量 -->
+        <el-tag v-if="item.count && item.count > 1" size="small" type="warning" style="margin-left: 4px;">
+          {{ item.count }}个
+        </el-tag>
       </div>
       <div v-if="loading" class="suggestion-loading">
         <el-icon class="is-loading"><Loading /></el-icon>
@@ -117,8 +121,17 @@ const props = defineProps({
   customDisabledMessage: {
     type: String,
     default: '请输入已存在的选项'
+  },
+  // 是否启用多ID模式（相同标题返回多个ID）
+  multipleIdMode: {
+    type: Boolean,
+    default: false
   }
 })
+
+// ==================== Emits ====================
+// 多ID选择事件
+const emit = defineEmits(['select-multiple-ids', 'tag-removed'])
 
 // ==================== Refs ====================
 const containerRef = ref(null)
@@ -135,12 +148,52 @@ let isComposing = false
 // 建议数据（存储所有标签）
 const suggestions = ref([])
 
+// 存储原始数据（包含所有ID）
+const rawDataMap = ref(new Map())
+
 const hoverIndex = ref(-1)
 const isKeyboardMode = ref(false)
 const keyboardTimer = ref(null)
 
 // 过滤后的建议（排除已选择的 + 拼音匹配）
 const filteredSuggestions = computed(() => {
+  const selectedValues = modelValue.value
+  
+  // 如果启用多ID模式，按标题去重
+  if (props.multipleIdMode) {
+    const map = new Map()
+    suggestions.value.forEach(item => {
+      const key = item.value
+      if (map.has(key)) {
+        const existing = map.get(key)
+        // 收集所有ID
+        if (item.id !== undefined && item.id !== null) {
+          if (!Array.isArray(existing.ids)) {
+            existing.ids = [existing.id]
+          }
+          if (!existing.ids.includes(item.id)) {
+            existing.ids.push(item.id)
+          }
+          // 更新count
+          existing.count = existing.ids.length
+        }
+      } else {
+        // 首次出现
+        const newItem = {
+          ...item,
+          ids: item.id !== undefined && item.id !== null ? [item.id] : [],
+          count: 1
+        }
+        map.set(key, newItem)
+      }
+    })
+    
+    const result = Array.from(map.values())
+    // 过滤已选择的
+    return result.filter(item => !selectedValues.includes(item.value))
+  }
+  
+  // 原有逻辑：不过滤已选择的
   return suggestions.value.filter(item => 
     !isTagSelected(item.value)
   )
@@ -324,6 +377,28 @@ const fetchSuggestions = async (query) => {
     const data = Array.isArray(result) ? result : []
     
     suggestions.value = data
+    // 构建原始数据映射（用于多ID模式）
+    rawDataMap.value.clear()
+    data.forEach(item => {
+      const key = item.value
+      if (rawDataMap.value.has(key)) {
+        const existing = rawDataMap.value.get(key)
+        if (item.id !== undefined && item.id !== null) {
+          if (!Array.isArray(existing.ids)) {
+            existing.ids = [existing.id]
+          }
+          if (!existing.ids.includes(item.id)) {
+            existing.ids.push(item.id)
+          }
+        }
+      } else {
+        rawDataMap.value.set(key, { 
+          ...item, 
+          ids: item.id !== undefined && item.id !== null ? [item.id] : []
+        })
+      }
+    })
+
     showDropdown.value = suggestions.value.length > 0
     activeIndex.value = -1
     updateSuggestionsPosition()
@@ -524,6 +599,16 @@ const addTagFromSuggestion = (tagValue) => {
   
   // 添加标签
   modelValue.value = [...modelValue.value, trimmedValue]
+
+    // 多ID模式下，触发事件传递所有ID
+  if (props.multipleIdMode) {
+    const rawData = rawDataMap.value.get(trimmedValue)
+    const ids = rawData?.ids || (item.id !== undefined && item.id !== null ? [item.id] : [])
+    emit('select-multiple-ids', {
+      title: trimmedValue,
+      ids: ids
+    })
+  }
   
   // 清空输入和下拉
   immediateClearInput()
@@ -593,6 +678,14 @@ const handleTagRemove = (tag, index) => {
   console.log("处理标签移除事件",tag)
   // modelValue.value = modelValue.value.filter((_, i) => i !== index)
   modelValue.value = modelValue.value.filter(item => item !== tag)
+  
+  // 通知父组件
+  if(props.multipleIdMode){
+    emit('tag-removed', {
+      tag: tag,
+      remainingTags: modelValue.value
+    })
+  }
 }
 
 // 计算建议框样式
