@@ -76,6 +76,12 @@
                     </div>
                 </template>
             </el-table-column>
+
+            <el-table-column label="业务名称" width="200" show-overflow-tooltip >
+                  <template #default="{ row }">
+                     {{  row.title ? row.title : '改业务已删除'  }}
+                  </template>
+            </el-table-column>
             
             <el-table-column prop="uuid" label="文件UUID" width="200" show-overflow-tooltip />
             
