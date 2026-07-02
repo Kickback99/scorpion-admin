@@ -807,12 +807,30 @@ const handleConfirm = async () => {
             img = null
         }
 
+        // 根据 imgOption 决定 uploadStatus
+        let uploadStatus = 'PENDING'
+        if (formModel.imgOption === 0) {
+            // 使用文章封面：图片已存在，无需上传
+            uploadStatus = 'SUCCESS'
+        } else if (formModel.imgOption === 2 && formModel.customImgLink) {
+            // 自定义链接：图片已存在，无需上传
+            uploadStatus = 'SUCCESS'
+        } else if (formModel.imgOption === 1 && formModel.img) {
+            // 使用专用图：需要判断是文件还是已有 URL
+            if (formModel.img instanceof File) {
+                uploadStatus = 'PENDING'  // 文件需要异步上传
+            } else {
+                uploadStatus = 'SUCCESS'  // 已有 URL（编辑回显）
+            }
+        }
+
         // 构建提交参数
         const params = {
             id: formModel.id,
             articleId: formModel.articleId,
             sort: formModel.sort || 0,
             img: img,
+            uploadStatus: uploadStatus
         }
 
         // 根据类型处理标题和 articleId
@@ -886,7 +904,7 @@ const handleCarouselUploadComplete = (event) => {
         message,
         customClass: 'message-right-top'
     })
-    formModel.uploadStatus = 'SUCCESS'
+    // formModel.uploadStatus = 'SUCCESS'
 }
 
 const handleCarouselUploadFailed = (event) => {
@@ -897,7 +915,7 @@ const handleCarouselUploadFailed = (event) => {
           message,
           customClass: 'message-right-top'
     })
-    formModel.uploadStatus = 'FAILED' 
+    // formModel.uploadStatus = 'FAILED' 
 }
 
 onMounted(() => {
