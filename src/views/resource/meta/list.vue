@@ -174,8 +174,9 @@ const fileTypeOptions = [
     { label: '全部', value: '' },
     { label: '头像', value: 'avatar' },
     { label: '封面', value: 'cover' },
-    { label: '轮播图', value: 'carousel' },
-    { label: '内容', value: 'content' }
+    { label: '轮播', value: 'carousel' },
+    { label: '内容', value: 'content' },
+    { label: '孤儿', value: 'orphan' }
 ];
 
 // 删除状态选项
