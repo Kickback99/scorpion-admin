@@ -3,24 +3,6 @@
         <!-- 搜索区域 -->
         <div class="flex justify-between items-center mb-4">
             <el-form ref="formRef" :model="searchModel" label-width="auto" inline>
-                <el-form-item label="文件UUID">
-                    <el-input 
-                        v-model="searchModel.uuid" 
-                        placeholder="请输入文件UUID" 
-                        clearable
-                        style="width: 200px"
-                    />
-                </el-form-item>
-                
-                <el-form-item label="文件类型">
-                    <SmartSelector 
-                        v-model="searchModel.fileType" 
-                        :data="fileTypeOptions" 
-                        placeholder="请选择文件类型"
-                        style="width: 160px"
-                    />
-                </el-form-item>
-                
                 <el-form-item label="业务ID">
                     <SmartAutoComplete
                         v-model="selectedTargetId"
@@ -34,6 +16,24 @@
                         @select-multiple-ids="handleSelectMultipleIds"
                         @tag-removed="handleTagRemoved"
                         style="width: 260px"
+                    />
+                </el-form-item>
+                
+                <el-form-item label="文件类型">
+                    <SmartSelector 
+                        v-model="searchModel.fileType" 
+                        :data="fileTypeOptions" 
+                        placeholder="请选择文件类型"
+                        style="width: 160px"
+                    />
+                </el-form-item>
+
+                <el-form-item label="文件UUID">
+                    <el-input 
+                        v-model="searchModel.uuid" 
+                        placeholder="请输入文件UUID" 
+                        clearable
+                        style="width: 200px"
                     />
                 </el-form-item>
                 
@@ -90,7 +90,7 @@
             <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">
                     <el-tag :type="getFileTypeTag(row.fileType)" size="small">
-                        {{ getFileTypeLabel(row.fileType) }}
+                        {{ row.targetId && row.targetId > 0 ? getFileTypeLabel(row.fileType): '孤儿' }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -99,6 +99,14 @@
                 <template #default="{ row }">
                     <span v-if="row.targetId === 0">-</span>
                     <span v-else>{{ row.targetId }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
+                <template #default="{ row }">
+                    <el-tag :type="row.isDeleted === 0 ? 'success' : 'danger'" size="small">
+                        {{ row.isDeleted === 0 ? '正常' : '已删除' }}
+                    </el-tag>
                 </template>
             </el-table-column>
             
@@ -111,14 +119,6 @@
             <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
                 <template #default="{ row }">
                     {{ row.updateTime }}
-                </template>
-            </el-table-column>
-            
-            <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
-                <template #default="{ row }">
-                    <el-tag :type="row.isDeleted === 0 ? 'success' : 'danger'" size="small">
-                        {{ row.isDeleted === 0 ? '正常' : '已删除' }}
-                    </el-tag>
                 </template>
             </el-table-column>
         </el-table>
