@@ -685,20 +685,23 @@ const handleEdit = async (row) => {
     } else {
         // 正常编辑，回显图片
         if (data.img) {
-            formModel.imgOption = 1
-            formModel.img = data.img
-            formModel.customImgLink = ''
-            await nextTick()
-            uploadRef.value.handleImage(data.img)
-        } else {
-            /* formModel.imgOption = 0
+            if(data.img && data.img.startsWith('http')){
+                // 如果 img 存在且是 http 开头，可能是自定义链接
+                formModel.imgOption = 2
+                formModel.customImgLink = data.img
+            }else {
+                formModel.imgOption = 1
+                formModel.img = data.img
+                formModel.customImgLink = ''
+                await nextTick()
+                uploadRef.value.handleImage(data.img)
+            }
+        }else {
+            formModel.imgOption = 0
             formModel.img = ''
-            formModel.customImgLink = '' */
-            formModel.imgOption = 1
-            formModel.img = ''
             formModel.customImgLink = ''
-            await nextTick()
-            uploadRef.value.handleImage('')
+            /* await nextTick()
+            uploadRef.value.handleImage('') */
         }
     }
 
@@ -738,32 +741,25 @@ const handleImgValidate = () => {
 
 // 轮播类型切换
 const handleTypeChange = (val) => {
-    if (val === 0) {
-        // 关联文章
-        formModel.articleId = null
-        formModel.articleTitle = ''
-        formModel.title = ''
-        formModel.hasCustomTitle = false
-        formModel.imgOption = 0
-        formModel.img = ''
-        formModel.customImgLink = ''
-        formModel.link = ''
-        selectedArticles.value = []
-    } else {
-        // 外链
-        formModel.articleId = null
-        formModel.articleTitle = ''
-        formModel.title = ''  // 外链标题由用户输入
-        formModel.hasCustomTitle = false
-        formModel.imgOption = 1
-        formModel.img = ''
-        formModel.customImgLink = ''
-        formModel.link = ''
-        selectedArticles.value = []
-    }
-    // 切换时清除校验
-    // ruleFormRef.value?.clearValidate(['articleId', 'title'])
-    ruleFormRef.value?.resetFields()
+    // 1. 清空所有相关字段
+    formModel.articleId = null
+    formModel.articleTitle = ''
+    formModel.title = ''
+    formModel.hasCustomTitle = false
+    formModel.imgOption = val === 0 ? 0 : 1
+    formModel.img = ''
+    formModel.customImgLink = ''
+    formModel.link = ''
+    formModel.hasCustomLink = false
+    selectedArticles.value = []
+    
+    // 2. 切换类型
+    formModel.carouselType = val
+    
+    // 3. 清除校验状态
+    nextTick(() => {
+        ruleFormRef.value?.clearValidate(['link', 'title', 'articleId', 'customImgLink'])
+    })
 }
 
 const handleSortChange = (val) => {
@@ -774,18 +770,10 @@ const handleSortChange = (val) => {
 
 // 图片选项切换
 const handleImgOptionChange = async(val) => {
-    if (val === 0) {
-        // formModel.img = ''
-        formModel.customImgLink = ''
-        // uploadRef.value.handleImage('')
-    } else if (val === 1) {
-        formModel.customImgLink = ''
+
+    if (val === 1){
         await nextTick()
         uploadRef.value.handleImage(formModel.img)
-    } else if (val === 2) {
-        formModel.customImgLink = ''
-        // formModel.img = ''
-        // uploadRef.value.handleImage('')
     }
     ruleFormRef.value?.clearValidate(['img', 'customImgLink'])
 }
