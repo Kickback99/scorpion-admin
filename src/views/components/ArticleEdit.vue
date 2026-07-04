@@ -8,8 +8,29 @@
                     :class="{'dark-mode':colorStore.isDark}"
                     placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
+
+            <ImageReference
+              ref="imageReferenceRef"
+              :article-id="formModel.id"
+              :article-title="blogData.title"
+              layout="horizontal"
+              title="引用图片"
+              search-label="搜索"
+              search-placeholder="请输入文章标题搜索已上传的图片"
+              :show-clear="true"
+              :show-hint="true"
+              :disabled="false"
+              :showImageTypeSwitch="true"
+              image-type="all"
+              empty-text="该文章暂无内容图"
+              display-field="uuid"
+              @select-article="handleImageSelectArticle"
+              @insert-image="handleImageInsert"
+              @clear="handleImageClear"
+            />
+
             <el-form-item prop="content">
-         
+
                 <!-- attention -->
                 <!-- 老罗使用的是 -->
             <!--1. 老罗使用的数据库字段是content，markdownContent
@@ -145,6 +166,54 @@ let mdHeight = window.innerHeight - 30 - 70 - 200
 import PinyinMatch from 'pinyin-match';
 import { listApi } from '@/api/contag.js';
 import SmartAutoComplete from './SmartAutoComplete.vue';
+import ImageReference from '@/views/components/ImageReference.vue';
+
+// ==================== 引用图片相关 ====================
+
+const imageReferenceRef = ref(null);
+
+/**
+ * 选择文章时触发
+ */
+const handleImageSelectArticle = (data) => {
+  if (data) {
+    console.log('已选择文章:', data.id, data.title);
+  } else {
+    console.log('已取消选择');
+  }
+};
+
+/**
+ * 插入图片时触发
+ */
+const handleImageInsert = (data) => {
+  console.log('插入图片:', data);
+  
+  // 将图片插入到 Markdown 内容中
+  const currentContent = blogData.value.content || '';
+  blogData.value.content = currentContent + '\n' + data.markdown;
+  
+  ElMessage.success(`图片 "${data.title || '图片'}" 已插入到内容末尾`);
+  
+  // 重置选中状态
+  imageReferenceRef.value?.resetSelection();
+};
+
+/**
+ * 清空时触发
+ */
+const handleImageClear = () => {
+  console.log('已清空');
+};
+
+// 在编辑文章回显时，自动加载图片
+/* const handleToggle = async(param) => {
+  // ... 原有回显逻辑 ...
+  
+  // 编辑文章时，ImageReference 组件会自动通过 articleId 加载图片
+  // 如果需要在特定时机手动触发，可以调用：
+  // await imageReferenceRef.value?.loadByArticleId(param.id);
+} */
 
 // ==================== 标签相关 ====================
 
@@ -520,5 +589,13 @@ onMounted(() => {
 :deep(.el-form .el-form-item .el-form-item__content .el-input__wrapper .el-input__inner ){
    color: var(--el-text-color-regular);
 }
+
+// 覆盖所有 el-form-item__content 会影响 原生 `label` 和 `el-form-item` 的布局
+/* :deep(.el-form-item .el-form-item__content) {
+    display: block !important;
+    width: 100% !important;
+    flex: none !important;
+    align-items: stretch !important;
+} */
 
 </style>
