@@ -493,6 +493,41 @@ const handleMouseEnter = (index) => {
   activeIndex.value = index
 }
 
+/**
+ * 多ID模式 + 回车：收集当前搜索结果的【所有 ID】并 emit 后选中
+ * 与 addTagFromSuggestion 的区别：addTagFromSuggestion 只取单个标题对应的 ID，
+ * 而这里把 suggestions 里所有项的 ID 全部收集 emit
+ * @returns {boolean} 是否成功（找到了至少一个 ID）
+ */
+const handleEnterMultipleIds = () => {
+  const inputValue = currentInput.value.trim()
+  if (!inputValue || suggestions.value.length === 0) return false
+
+  const allIds = []
+  const seenIds = new Set()
+  suggestions.value.forEach(item => {
+    if (item.id !== undefined && item.id !== null && !seenIds.has(item.id)) {
+      seenIds.add(item.id)
+      allIds.push(item.id)
+    }
+  })
+
+  if (allIds.length === 0) return false
+
+  // 独有逻辑：emit 当前搜索结果的所有 ID
+  emit('select-multiple-ids', { title: inputValue, ids: allIds })
+
+  // 加标签 + 清理（与 addTagFromSuggestion 一致的收尾）
+  if (!modelValue.value.includes(inputValue)) {
+    modelValue.value = [...modelValue.value, inputValue]
+  }
+  immediateClearInput()
+  showDropdown.value = false
+  suggestions.value = []
+  activeIndex.value = -1
+  return true
+}
+
 // 处理键盘事件
 const handleKeydown = (event) => {
   // 处理中文输入法
@@ -508,57 +543,29 @@ const handleKeydown = (event) => {
     case 'Enter':
       // 如果正在输入中文，不处理
       if (isComposing) return
-      
+
       event.preventDefault()
+
+      // ① 键盘高亮了某个建议项 → 优先选中
       if (showDropdown.value && activeIndex.value >= 0 && activeIndex.value < filteredSuggestions.value.length) {
-        // 选择高亮的建议项
         addTagFromSuggestion(filteredSuggestions.value[activeIndex.value].value)
-      } else if (currentInput.value.trim()) {
-        // 如果开启了 autoSearchOnEnter 且有多ID模式，触发搜索
-        if (props.autoSearchOnEnter && props.multipleIdMode) {
-          const inputValue = currentInput.value.trim()
-          if (inputValue && suggestions.value.length > 0) {
-            const allIds = []
-            const seenIds = new Set()
-            
-            suggestions.value.forEach(item => {
-              if (item.id !== undefined && item.id !== null && !seenIds.has(item.id)) {
-                seenIds.add(item.id)
-                allIds.push(item.id)
-              }
-            })
-            
-            if (allIds.length > 0) {
-              // 触发父组件事件
-              emit('select-multiple-ids', {
-                title: inputValue,
-                ids: allIds
-              })
-              
-              // 添加标签
-              if (!modelValue.value.includes(inputValue)) {
-                modelValue.value = [...modelValue.value, inputValue]
-              }
-              
-              // 清空输入和下拉
-              immediateClearInput()
-              showDropdown.value = false
-              suggestions.value = []
-              activeIndex.value = -1
-              return
-            }
-          }
+        break
+      }
+
+      // ② autoSearchOnEnter + 有建议 → 自动选中（不管输入是否有文字）
+      if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
+        // 多ID模式 + 有输入文字：收集所有匹配 ID 后 emit
+        if (props.multipleIdMode && currentInput.value.trim() && handleEnterMultipleIds()) {
+          break
         }
-        // 如果开启了 autoSearchOnEnter（普通模式），自动选择第一个建议项
-        if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
-          addTagFromSuggestion(filteredSuggestions.value[0].value)
-          return
-        }
-        // 添加当前输入作为标签
-        addCurrentInputAsTag(currentInput.value)
-      } else if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
-        // 输入为空但下拉有建议 + autoSearchOnEnter → 自动选择第一条
+        // 普通模式 / 空输入 / 多ID降级：自动选第一条建议
         addTagFromSuggestion(filteredSuggestions.value[0].value)
+        break
+      }
+
+      // ③ 兜底：把原始输入当自定义标签
+      if (currentInput.value.trim()) {
+        addCurrentInputAsTag(currentInput.value)
       }
       break
       
