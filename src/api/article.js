@@ -85,6 +85,3 @@ export const addCarouselApi = (params) => {
     const formData = buildFormData(params)
     return http.post(`${API.CAROUSEL_URL}/add`, formData)
 }
-
-// 获取所有已发布的文章（用于前端联想搜索）
-export const listAllArticlesApi = () => http.get(`${API.ARTICLE_URL}/list/all`)
