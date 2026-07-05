@@ -24,10 +24,9 @@
           :max="1"
           :debounce-delay="300"
           :min-search-length="1"
-          :multiple-id-mode="true"
           :auto-search-on-enter="true"
-          @select-multiple-ids="handleArticleSelect"
-          @tag-removed="handleArticleRemoved"
+          :allow-custom="false"
+          custom-disabled-message="请输入已存在的文章标题"
           :style="{ width: searchWidth }"
         />
       </el-form-item>
@@ -305,30 +304,24 @@ const fetchArticleForImage = async (params) => {
 };
 
 /**
- * 处理文章选择：加载该文章关联的图片
+ * 监听文章选择：v-model 双向绑定，选中后加载对应文章图片
  */
-const handleArticleSelect = (data) => {
-  console.log('选中的文章:', data.title, 'ID:', data.ids);
-  
-  if (data.ids && data.ids.length > 0) {
-    const articleId = data.ids[0];
-    loadImages(articleId);
-    emit('select-article', { id: articleId, title: data.title });
-    emit('update:selected', true);
+watch(selectedArticle, (newVal) => {
+  if (newVal.length > 0) {
+    const found = articleCache.value.find(item => item.value === newVal[0]);
+    if (found) {
+      loadImages(found.id);
+      emit('select-article', { id: found.id, title: found.value });
+      emit('update:selected', true);
+    }
   } else {
     imageList.value = [];
-    emit('select-article', null);
+    selectedIndex.value = -1;
+    currentImageType.value = props.imageType;
+    emit('remove-article');
     emit('update:selected', false);
   }
-};
-
-const handleArticleRemoved = () => {
-  imageList.value = [];
-  selectedIndex.value = -1;
-  currentImageType.value = props.imageType;
-  emit('remove-article');
-  emit('update:selected', false);
-};
+}, { deep: true });
 
 // ============================================================
 // 渲染（加载图片）
