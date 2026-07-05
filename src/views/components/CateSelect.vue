@@ -11,7 +11,7 @@
   </template>
 
 <script setup>
-import { listApi } from '@/api/concategory';
+import { listApi } from '@/api/category';
 import { ref } from 'vue';
 
 const defaultProps = {

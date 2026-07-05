@@ -114,7 +114,7 @@
 
 <script setup>
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/resfile';
+import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/file';
 import { ElMessage } from 'element-plus';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { useTokenStore } from '@/store/token';

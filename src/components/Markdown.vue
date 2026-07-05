@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { uploadApi } from '@/api/conarticle'
+import { uploadApi } from '@/api/article'
 import { computed } from 'vue'
 import { useColorStore } from '@/store/color'
 const colorStore = useColorStore()

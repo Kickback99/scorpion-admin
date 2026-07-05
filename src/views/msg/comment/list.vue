@@ -311,14 +311,14 @@
 </template>
 
 <script setup>
-import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, getCommentStatisticsApi, removeCommentApi } from '@/api/msgcomment';
+import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, getCommentStatisticsApi, removeCommentApi } from '@/api/comment';
 import { nextTick, reactive, ref, computed } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
 import { useColorStore } from '@/store/color';
 import PinyinMatch from 'pinyin-match'
-import { listAllArticlesApi } from '@/api/conarticle';
+import { listAllArticlesApi } from '@/api/article';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import {ChatLineSquare} from '@element-plus/icons-vue'
 
