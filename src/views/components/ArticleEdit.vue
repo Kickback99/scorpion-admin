@@ -170,7 +170,7 @@ import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()
 let mdHeight = window.innerHeight - 30 - 70 - 200
 import PinyinMatch from 'pinyin-match';
-import { listApi } from '@/api/contag.js';
+import { getTagListApi } from '@/api/business';
 import SmartAutoComplete from './SmartAutoComplete.vue';
 import ImageReference from '@/views/components/ImageReference.vue';
 
@@ -238,7 +238,7 @@ const tagList = ref([])
 
 // 加载所有标签数据
 const loadAllTags = async () => {
-  const res = await listApi(1, 999, {})
+  const res = await getTagListApi(1, 999, {})
   const items = res.data?.items || []
   tagList.value = items.map(item => ({
     value: item.name.trim(),

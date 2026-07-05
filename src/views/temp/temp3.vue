@@ -21,7 +21,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { listApi } from '@/api/contag'
+import { getTagListApi } from '@/api/business'
 import SmartAutoComplete from '../components/SmartAutoComplete.vue'
 import PinyinMatch from 'pinyin-match'
 
@@ -33,7 +33,7 @@ const tagList = ref([])
 
 // 🟢 加载所有标签数据（一次性加载）
 const loadAllTags = async () => {
-  const res = await listApi(1, 999, {})
+  const res = await getTagListApi(1, 999, {})
   const items = res.data?.items || []
   // 转换为组件需要的格式
   tagList.value = items.map(item => ({

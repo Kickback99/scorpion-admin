@@ -318,7 +318,7 @@ import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
 import { useColorStore } from '@/store/color';
 import PinyinMatch from 'pinyin-match'
-import { listAllArticlesApi } from '@/api/article';
+import { getAllArticlesApi } from '@/api/business';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import {ChatLineSquare} from '@element-plus/icons-vue'
 
@@ -566,7 +566,7 @@ const selectedArticles = ref([])
 
 // 加载所有文章
 const loadAllArticles = async () => {
-    const res = await listAllArticlesApi()
+    const res = await getAllArticlesApi()
     articleList.value = (res.data || []).map(item => ({
         value: item.title,
         id: item.id
