@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { isTopApi, listApi, removeApi } from '@/api/conarticle';
+import { isTopApi, listApi, removeApi } from '@/api/article';
 import CateSelect from '@/views/components/CateSelect.vue';
 import { ref, watch } from 'vue';
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
