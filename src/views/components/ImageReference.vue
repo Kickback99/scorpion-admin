@@ -3,10 +3,10 @@
   <div class="image-reference">
     <div class="image-reference-header">
       <span class="image-reference-title">{{ title }}</span>
-      <el-button 
-        v-if="showClear" 
-        size="small" 
-        type="danger" 
+      <el-button
+        v-if="showClear"
+        size="small"
+        type="danger"
         link
         @click="handleClear"
       >
@@ -15,6 +15,7 @@
     </div>
 
     <el-form label-width="auto">
+      <!-- ===== 搜索栏 ===== -->
       <el-form-item :label="searchLabel">
         <SmartAutoComplete
           v-model="selectedArticle"
@@ -27,7 +28,7 @@
           :auto-search-on-enter="true"
           @select-multiple-ids="handleArticleSelect"
           @tag-removed="handleArticleRemoved"
-          :style="{ width: searchWidth}"
+          :style="{ width: searchWidth }"
         />
       </el-form-item>
 
@@ -48,66 +49,65 @@
         </div>
       </el-form-item>
 
-      <!-- 图片列表 -->
+      <!-- ===== 图片列表 ===== -->
       <el-form-item v-else-if="filteredImageList.length > 0" label=" ">
-        <!-- 统一容器，通过 layout prop 切换类 -->
-        <div 
-        class="image-container"
-        :class="layout === 'horizontal' ? 'layout-horizontal' : 'layout-vertical'"
+        <div
+          class="image-container"
+          :class="layout === 'horizontal' ? 'layout-horizontal' : 'layout-vertical'"
         >
-        <div 
-            v-for="(img, index) in filteredImageList" 
+          <div
+            v-for="(img, index) in filteredImageList"
             :key="img.id || index"
             class="image-item"
-            :class="{ 
-            'image-selected': selectedIndex === index,
-            'image-disabled': disabled
+            :class="{
+              'image-selected': selectedIndex === index,
+              'image-disabled': disabled
             }"
             @click="!disabled && selectImage(index)"
             @dblclick="!disabled && handleInsert(img)"
-        >
-            <el-image 
-            :src="img.img || img.url" 
-            :fit="'cover'"
-            loading="lazy"
+          >
+            <el-image
+              :src="img.img || img.url"
+              :fit="'cover'"
+              loading="lazy"
             >
-            <template #error>
+              <template #error>
                 <div class="image-placeholder">
-                <el-icon><Picture /></el-icon>
-                <span>加载失败</span>
+                  <el-icon><Picture /></el-icon>
+                  <span>加载失败</span>
                 </div>
-            </template>
+              </template>
             </el-image>
-            
+
             <div class="image-info">
-            <span class="image-id">
-              {{ displayField === 'uuid' ? img.uuid : (img.targetId || img.id) }}
-            </span>
-            <span class="image-type">{{ getTypeLabel(img.fileType) }}</span>
+              <span class="image-id">
+                {{ displayField === 'uuid' ? img.uuid : (img.targetId || img.id) }}
+              </span>
+              <span class="image-type">{{ getTypeLabel(img.fileType) }}</span>
             </div>
 
             <div v-if="selectedIndex === index" class="image-check">
-            <el-icon><Check /></el-icon>
+              <el-icon><Check /></el-icon>
             </div>
 
-            <el-button 
-            v-if="!disabled"
-            class="image-insert-btn"
-            size="small" 
-            type="primary"
-            @click.stop="handleInsert(img)"
+            <el-button
+              v-if="!disabled"
+              class="image-insert-btn"
+              size="small"
+              type="primary"
+              @click.stop="handleInsert(img)"
             >
-            <el-icon><Plus /></el-icon> 插入
+              <el-icon><Plus /></el-icon> 插入
             </el-button>
-        </div>
+          </div>
         </div>
       </el-form-item>
 
       <!-- 空状态 -->
       <el-form-item v-else-if="selectedArticle.length > 0" label=" ">
-        <el-empty 
-          :description="emptyText" 
-          :image-size="60" 
+        <el-empty
+          :description="emptyText"
+          :image-size="60"
         />
       </el-form-item>
 
@@ -123,132 +123,118 @@
 </template>
 
 <script setup>
+// ============================================================
+// 依赖导入
+// ============================================================
 import { ref, watch, computed } from 'vue';
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { ElMessage } from 'element-plus';
 import { Check, Plus, Loading, Picture, InfoFilled } from '@element-plus/icons-vue';
-import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import PinyinMatch from 'pinyin-match';
 
-// ==================== Props ====================
+// ============================================================
+// Props & Emits
+// ============================================================
 
 const props = defineProps({
-  // 布局模式：'vertical'（竖排网格） | 'horizontal'（横排滚动）
   layout: {
     type: String,
     default: 'vertical',
     validator: (val) => ['vertical', 'horizontal'].includes(val)
   },
-  // 标题
   title: {
     type: String,
     default: '引用图片'
   },
-  // 搜索框标签
   searchLabel: {
     type: String,
     default: '搜索文章'
   },
-  // 搜索框占位符
   searchPlaceholder: {
     type: String,
     default: '请输入文章标题搜索已上传的图片'
   },
-  // 搜索框宽度
   searchWidth: {
     type: String,
     default: '400px'
   },
-  // 空状态文案
   emptyText: {
     type: String,
     default: '该文章暂无可用图片'
   },
-  // 提示文案
   hintText: {
     type: String,
     default: '请搜索并选择一篇文章，将显示该文章关联的图片'
   },
-  // 是否显示提示
   showHint: {
     type: Boolean,
     default: true
   },
-  // 是否显示清空按钮
   showClear: {
     type: Boolean,
     default: true
   },
-  // 是否禁用
   disabled: {
     type: Boolean,
     default: false
   },
-  // 预选的文章ID（用于回显）
   articleId: {
     type: Number,
     default: null
   },
-  // 自定义获取文章列表的 API
   fetchArticlesApi: {
     type: Function,
     default: null
   },
-  // 自定义获取图片列表的 API
   fetchImagesApi: {
     type: Function,
     default: null
   },
-  // 图片类型：'all' | 'cover' | 'content'
   imageType: {
     type: String,
     default: 'all',
     validator: (val) => ['all', 'cover', 'content'].includes(val)
   },
-  // 是否显示图片类型切换器
   showImageTypeSwitch: {
     type: Boolean,
     default: true
   },
-   // 图片信息显示字段：'id' | 'uuid'
   displayField: {
     type: String,
     default: 'id',
     validator: (val) => ['id', 'uuid'].includes(val)
   },
-  // 文章标题，用于编辑回显
   articleTitle: {
     type: String,
     default: ''
   }
 });
 
-// ==================== Emits ====================
-
 const emit = defineEmits([
-  'select-article',   // 选择文章时触发
-  'remove-article',   // 移除文章时触发
-  'select-image',     // 选择图片时触发
-  'insert-image',     // 插入图片时触发
-  'clear',            // 清空时触发
-  'image-type-change',  // 图片类型切换事件
-  'update:selected'   // 通知父组件是否选中了文章
+  'select-article',
+  'remove-article',
+  'select-image',
+  'insert-image',
+  'clear',
+  'image-type-change',
+  'update:selected'
 ]);
 
-// ==================== 数据 ====================
+// ============================================================
+// 数据
+// ============================================================
 
 const selectedArticle = ref([]);
 const imageList = ref([]);
 const selectedIndex = ref(-1);
 const loading = ref(false);
 const articleCache = ref([]);
-// 当前选中的图片类型
 const currentImageType = ref(props.imageType);
 
-// ==================== 计算属性 ====================
+// ============================================================
+// 计算属性
+// ============================================================
 
-/**
- * 过滤后的图片列表
- */
 const filteredImageList = computed(() => {
   if (currentImageType.value === 'all') {
     return imageList.value;
@@ -256,97 +242,19 @@ const filteredImageList = computed(() => {
   return imageList.value.filter(img => img.fileType === currentImageType.value);
 });
 
-// ==================== 方法 ====================
+// ============================================================
+// 搜索
+// ============================================================
 
 /**
- * 获取文件类型标签
- */
-const getTypeLabel = (type) => {
-  const map = {
-    'cover': '封面',
-    'content': '内容图',
-    'carousel': '轮播图',
-    'avatar': '头像'
-  };
-  return map[type] || type || '未知';
-};
-
-/**
- * 加载文章关联的图片
- */
-const loadImages = async (articleId) => {
-  if (!articleId) {
-    imageList.value = [];
-    return;
-  }
-
-  loading.value = true;
-  try {
-    if (props.fetchImagesApi) {
-      const result = await props.fetchImagesApi(articleId);
-      imageList.value = Array.isArray(result) ? result : [];
-    } else {
-      const { fileMetaListApi } = await import('@/api/resfilemeta');
-      const res = await fileMetaListApi(1, 100, {
-        targetIds: articleId,
-        fileType: ''
-      });
-      if (res.code === 200) {
-        // 根据 imageType 过滤
-        const allowedTypes = currentImageType.value === 'all' 
-          ? ['cover', 'content'] 
-          : [currentImageType.value];
-        imageList.value = (res.data.items || []).filter(item => 
-          allowedTypes.includes(item.fileType) && item.img
-        );
-      } else {
-        imageList.value = [];
-      }
-    }
-  } catch (error) {
-    console.error('加载文章图片失败:', error);
-    imageList.value = [];
-    ElMessage.warning('加载图片失败，请重试');
-  } finally {
-    loading.value = false;
-  }
-};
-
-/**
- * 处理图片类型切换
- */
-const handleImageTypeChange = (val) => {
-  // 重新加载图片
-  if (selectedArticle.value.length > 0) {
-    const articleId = props.articleId || getCurrentArticleId();
-    if (articleId) {
-      loadImages(articleId);
-    }
-  }
-  // 重置选中状态
-  selectedIndex.value = -1;
-  emit('image-type-change', val);
-};
-
-/**
- * 获取当前选中的文章ID
- */
-const getCurrentArticleId = () => {
-  if (selectedArticle.value.length === 0) return null;
-  const title = selectedArticle.value[0];
-  const found = articleCache.value.find(item => item.value === title);
-  return found ? found.id : null;
-};
-
-/**
- * 搜索文章
+ * 搜索文章：支持拼音、单词前缀、首字母匹配
  */
 const fetchArticleForImage = async (params) => {
   const query = params.keyword || '';
 
   try {
     let data = [];
-    
+
     if (props.fetchArticlesApi) {
       const result = await props.fetchArticlesApi(query);
       data = result.map(item => ({
@@ -397,7 +305,7 @@ const fetchArticleForImage = async (params) => {
 };
 
 /**
- * 处理文章选择
+ * 处理文章选择：加载该文章关联的图片
  */
 const handleArticleSelect = (data) => {
   console.log('选中的文章:', data.title, 'ID:', data.ids);
@@ -406,29 +314,116 @@ const handleArticleSelect = (data) => {
     const articleId = data.ids[0];
     loadImages(articleId);
     emit('select-article', { id: articleId, title: data.title });
-    emit('update:selected', true);  // 通知父组件：已选中文章
+    emit('update:selected', true);
   } else {
     imageList.value = [];
     emit('select-article', null);
-    emit('update:selected', false); // 通知父组件：未选中文章
+    emit('update:selected', false);
+  }
+};
+
+const handleArticleRemoved = () => {
+  imageList.value = [];
+  selectedIndex.value = -1;
+  currentImageType.value = props.imageType;
+  emit('remove-article');
+  emit('update:selected', false);
+};
+
+// ============================================================
+// 渲染（加载图片）
+// ============================================================
+
+/**
+ * 加载文章关联的图片列表
+ */
+const loadImages = async (articleId) => {
+  if (!articleId) {
+    imageList.value = [];
+    return;
+  }
+
+  loading.value = true;
+  try {
+    if (props.fetchImagesApi) {
+      const result = await props.fetchImagesApi(articleId);
+      imageList.value = Array.isArray(result) ? result : [];
+    } else {
+      const { fileMetaListApi } = await import('@/api/filemeta');
+      const res = await fileMetaListApi(1, 100, {
+        targetIds: articleId,
+        fileType: ''
+      });
+      if (res.code === 200) {
+        const allowedTypes = currentImageType.value === 'all'
+          ? ['cover', 'content']
+          : [currentImageType.value];
+        imageList.value = (res.data.items || []).filter(item =>
+          allowedTypes.includes(item.fileType) && item.img
+        );
+      } else {
+        imageList.value = [];
+      }
+    }
+  } catch (error) {
+    console.error('加载文章图片失败:', error);
+    imageList.value = [];
+    ElMessage.warning('加载图片失败，请重试');
+  } finally {
+    loading.value = false;
   }
 };
 
 /**
- * 处理文章移除
+ * 手动加载指定文章的图片（用于编辑回显）
  */
-const handleArticleRemoved = () => {
-  imageList.value = [];
-  selectedIndex.value = -1;
-  // 重置图片类型
-  currentImageType.value = props.imageType;
-  emit('remove-article');
-  emit('update:selected', false); // 通知父组件：已移除文章
+const loadByArticleId = async (id) => {
+  if (id) {
+    const found = articleCache.value.find(item => item.id === id);
+    if (found) {
+      selectedArticle.value = [props.articleTitle || found.value];
+    } else {
+      selectedArticle.value = [props.articleTitle || `ID: ${id}`];
+    }
+    await loadImages(id);
+  }
+};
+
+const getCurrentArticleId = () => {
+  if (selectedArticle.value.length === 0) return null;
+  const title = selectedArticle.value[0];
+  const found = articleCache.value.find(item => item.value === title);
+  return found ? found.id : null;
+};
+
+const getTypeLabel = (type) => {
+  const map = {
+    'cover': '封面',
+    'content': '内容图',
+    'carousel': '轮播图',
+    'avatar': '头像'
+  };
+  return map[type] || type || '未知';
 };
 
 /**
- * 选择图片
+ * 处理图片类型切换：重新加载并重置选中
  */
+const handleImageTypeChange = (val) => {
+  if (selectedArticle.value.length > 0) {
+    const articleId = props.articleId || getCurrentArticleId();
+    if (articleId) {
+      loadImages(articleId);
+    }
+  }
+  selectedIndex.value = -1;
+  emit('image-type-change', val);
+};
+
+// ============================================================
+// 选择 / 插入 / 清空
+// ============================================================
+
 const selectImage = (index) => {
   if (props.disabled) return;
   selectedIndex.value = index;
@@ -437,11 +432,11 @@ const selectImage = (index) => {
 };
 
 /**
- * 插入图片
+ * 插入图片：生成 Markdown 格式并通过 emit 传出
  */
 const handleInsert = (img) => {
   if (props.disabled) return;
-  
+
   if (!img || !(img.img || img.url)) {
     ElMessage.warning('图片地址无效');
     return;
@@ -449,7 +444,7 @@ const handleInsert = (img) => {
 
   const imageUrl = img.img || img.url;
   const title = img.title || img.fileType || '图片';
-  
+
   emit('insert-image', {
     ...img,
     url: imageUrl,
@@ -457,52 +452,32 @@ const handleInsert = (img) => {
   });
 };
 
-/**
- * 清空
- */
 const handleClear = () => {
   selectedArticle.value = [];
   imageList.value = [];
   selectedIndex.value = -1;
-  // 重置图片类型
   currentImageType.value = props.imageType;
   emit('clear');
-  emit('update:selected', false); // 通知父组件：已清空
+  emit('update:selected', false);
 };
 
-/**
- * 重置选中状态
- */
 const resetSelection = () => {
   selectedIndex.value = -1;
 };
 
-/**
- * 手动加载指定文章的图片
- */
-const loadByArticleId = async (id) => {
-  if (id) {
-    // 注意：编辑文章回显的时候，这里的 found 可能为空
-    const found = articleCache.value.find(item => item.id === id);
-    if (found) {
-      selectedArticle.value = [props.articleTitle || found.value ];
-    } else {
-      selectedArticle.value = [props.articleTitle || `ID: ${id}`];
-    }
-    await loadImages(id);
-  }
-};
+// ============================================================
+// Watch
+// ============================================================
 
-// ==================== Watch ====================
-
-// 监听外部传入的 articleId
 watch(() => props.articleId, (newVal) => {
   if (newVal) {
     loadByArticleId(newVal);
   }
 }, { immediate: true });
 
-// ==================== 暴露方法 ====================
+// ============================================================
+// 暴露方法
+// ============================================================
 
 defineExpose({
   imageList,
@@ -514,7 +489,6 @@ defineExpose({
   getImageList: () => imageList.value,
   getFilteredImageList: () => filteredImageList.value,
   getSelectedImage: () => filteredImageList.value[selectedIndex.value] || null,
-  //  切换图片类型
   setImageType: (type) => {
     if (['all', 'cover', 'content'].includes(type)) {
       currentImageType.value = type;
@@ -573,22 +547,22 @@ defineExpose({
     }
   }
 
-  // ========================================
+  // ============================================================
   // 统一图片容器（横排/竖排共用）
-  // ========================================
+  // ============================================================
   .image-container {
     display: flex;
     gap: 12px;
     padding: 4px;
     max-height: 380px;
 
-    // 竖排模式：flex-direction: column，从上到下排列
+    // 竖排模式
     &.layout-vertical {
       flex-direction: column;
       overflow-x: visible;
       overflow-y: auto;
       align-items: stretch;
-      flex-shrink: 0;          // 防止被父级压缩
+      flex-shrink: 0;
 
       &::-webkit-scrollbar {
         width: 4px;
@@ -612,7 +586,7 @@ defineExpose({
       }
     }
 
-    // 横排模式：flex-direction: row，从左到右滚动
+    // 横排模式
     &.layout-horizontal {
       flex-direction: row;
       flex-wrap: nowrap;
@@ -620,11 +594,9 @@ defineExpose({
       overflow-y: hidden;
       display: flex;
       padding: 20px;
-      flex-shrink: 0;          // 🔶 防止被父级压缩
-      width: 100%;             // 🔶 占满父级宽度
-  
-  // 覆盖父级可能的样式干扰
-  align-items: stretch;    // 🔶 覆盖父级 align-items: center
+      flex-shrink: 0;
+      width: 100%;
+      align-items: stretch;
 
       &::-webkit-scrollbar {
         height: 5px;
@@ -646,10 +618,9 @@ defineExpose({
       }
     }
 
-
-    // ========================================
+    // ============================================================
     // 图片卡片（横排/竖排共用）
-    // ========================================
+    // ============================================================
     .image-item {
       position: relative;
       border-radius: 8px;
@@ -675,7 +646,6 @@ defineExpose({
         opacity: 0.7;
       }
 
-      // 图片
       .el-image {
         width: 100%;
         height: 100%;
@@ -767,10 +737,8 @@ defineExpose({
     }
   }
 
-  // 空状态
   :deep(.el-empty) {
     padding: 20px 0;
   }
-
 }
 </style>

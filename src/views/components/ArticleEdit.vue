@@ -164,7 +164,7 @@ import { ref, reactive, onMounted, nextTick, watch } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
-import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/conarticle';
+import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js';
 import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useColorStore } from '@/store/color';
 const colorStore = useColorStore()

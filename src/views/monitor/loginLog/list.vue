@@ -133,7 +133,7 @@
 
 <script setup>
 import { reactive, ref,computed,watch } from 'vue';
-import { loginLogListApi,loginLogRemoveApi } from '@/api/msglog';
+import { loginLogListApi,loginLogRemoveApi } from '@/api/log';
 import { ElMessage } from 'element-plus';
 
 const searchData = reactive({})

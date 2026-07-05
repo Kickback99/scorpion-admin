@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { fileMetaListApi,getAllBusinessDataApi } from '@/api/resfilemeta';
+import { fileMetaListApi,getAllBusinessDataApi } from '@/api/filemeta';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';

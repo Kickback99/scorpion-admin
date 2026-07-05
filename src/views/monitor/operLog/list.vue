@@ -189,7 +189,7 @@
 </template>
 
 <script setup>
-import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/msglog';
+import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
 import { reactive, ref,computed,watch } from 'vue';
 import { useColorStore } from '@/store/color'
 import { createMarkdownPreview } from '@/utils/markdown-config'

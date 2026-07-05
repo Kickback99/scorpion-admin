@@ -183,7 +183,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { getCommentsApi, getCommentByIdApi } from '@/api/msgcomment'
+import { getCommentsApi, getCommentByIdApi } from '@/api/comment'
 import { Loading } from '@element-plus/icons-vue'
 
 // Props
