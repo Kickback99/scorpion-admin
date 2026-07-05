@@ -1,6 +1,6 @@
 <template>
   <div class="image-management">
-    <!-- 头部：标题 + 搜索 -->
+    <!-- ===== 搜索栏 ===== -->
     <div class="management-header">
       <div class="search-area">
         <SmartAutoComplete
@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <!-- 筛选工具栏 -->
+    <!-- ===== 筛选栏 ===== -->
     <div class="filter-toolbar">
       <!-- 图片类型切换 -->
       <el-radio-group v-model="currentImageType" @change="handleTypeChange" size="small">
@@ -43,7 +43,7 @@
       </el-radio-group>
     </div>
 
-    <!-- 图片列表 -->
+    <!-- ===== 图片网格 ===== -->
     <div class="image-grid" v-loading="loading">
       <div
         v-for="img in imageList"
@@ -90,7 +90,7 @@
     <!-- 空状态 -->
     <el-empty v-if="!loading && imageList.length === 0" description="暂无图片" :image-size="80" />
 
-    <!-- 分页 -->
+    <!-- ===== 分页 ===== -->
     <div class="pagination-container">
       <el-pagination
         :total="total"
@@ -100,52 +100,60 @@
         layout="total, sizes, prev, pager, next"
         background
         small
-        @current-change="onPageChange"
-        @size-change="onSizeChange"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
-import { Picture, CopyDocument } from '@element-plus/icons-vue';
-import { fileMetaListApi, getAllBusinessDataApi } from '@/api/resfilemeta';
-import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
-import PinyinMatch from 'pinyin-match';
+// 1. 框架核心
+import { ref, onMounted } from 'vue'
 
-// ==================== 常量配置 ====================
+// 2. 页面组件
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 
-// 显示字段常量：'id' | 'uuid' | 'title'
-const DISPLAY_FIELD = 'id';
+// 3. UI 库
+import { ElMessage } from 'element-plus'
+import { Picture, CopyDocument } from '@element-plus/icons-vue'
 
-// 复制内容格式：'uuid' | 'markdown'
-const COPY_FORMAT = 'markdown';
+// 4. 第三方插件
+import PinyinMatch from 'pinyin-match'
 
-// 是否默认勾选"仅原始上传"
-const DEFAULT_ORIGINAL_FILTER = false;
+// 5. API
+import { fileMetaListApi, getAllBusinessDataApi } from '@/api/filemeta'
 
-// ==================== 数据 ====================
+// ============================================================
+// 数据
+// ============================================================
 
-const loading = ref(false);
-const imageList = ref([]);
-const total = ref(0);
-const currentPage = ref(1);
-const pageSize = ref(24);
-const hoveredId = ref(null);
+// 常量
+const DISPLAY_FIELD = 'id'
+const COPY_FORMAT = 'markdown'
+const DEFAULT_ORIGINAL_FILTER = false
+
+// 响应式状态
+const loading = ref(false)
+const imageList = ref([])
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(24)
+const hoveredId = ref(null)
 
 // 筛选条件
-const currentImageType = ref('all');
-const filterOriginal = ref(DEFAULT_ORIGINAL_FILTER);
-const displayField = ref(DISPLAY_FIELD);
-const selectedSearch = ref([]);
-const searchIds = ref('');
+const currentImageType = ref('all')
+const filterOriginal = ref(DEFAULT_ORIGINAL_FILTER)
+const displayField = ref(DISPLAY_FIELD)
+const selectedSearch = ref([])
+const searchIds = ref('')
 
 // 缓存业务数据
-const businessDataCache = ref([]);
+const businessDataCache = ref([])
 
-// ==================== 工具函数 ====================
+// ============================================================
+// 工具函数
+// ============================================================
 
 const getFileTypeLabel = (type) => {
   const map = {
@@ -167,8 +175,13 @@ const getFileTypeTag = (type) => {
   return map[type] || '';
 };
 
-// ==================== 数据请求 ====================
+// ============================================================
+// 渲染
+// ============================================================
 
+/**
+ * 分页加载图片列表，根据当前筛选条件请求数据
+ */
 const fetchImages = async () => {
   loading.value = true;
   try {
@@ -204,7 +217,20 @@ const fetchImages = async () => {
   }
 };
 
-// ==================== 联想搜索 ====================
+const handlePageChange = (page) => {
+  currentPage.value = page;
+  fetchImages();
+};
+
+const handleSizeChange = (size) => {
+  pageSize.value = size;
+  currentPage.value = 1;
+  fetchImages();
+};
+
+// ============================================================
+// 搜索和重置
+// ============================================================
 
 const loadBusinessData = async () => {
   try {
@@ -267,7 +293,9 @@ const handleSearchRemoved = () => {
   fetchImages();
 };
 
-// ==================== 事件处理 ====================
+// ============================================================
+// 筛选
+// ============================================================
 
 const handleTypeChange = () => {
   currentPage.value = 1;
@@ -279,18 +307,9 @@ const handleFilterChange = () => {
   fetchImages();
 };
 
-const onPageChange = (page) => {
-  currentPage.value = page;
-  fetchImages();
-};
-
-const onSizeChange = (size) => {
-  pageSize.value = size;
-  currentPage.value = 1;
-  fetchImages();
-};
-
-// ==================== 复制功能 ====================
+// ============================================================
+// 复制功能
+// ============================================================
 
 const handleCopy = async (img) => {
   let copyText = '';
@@ -318,7 +337,9 @@ const handleCopy = async (img) => {
   }
 };
 
-// ==================== 生命周期 ====================
+// ============================================================
+// 生命周期
+// ============================================================
 
 onMounted(() => {
   loadBusinessData();
@@ -327,6 +348,9 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+// ============================================================
+// 根布局
+// ============================================================
 .image-management {
   padding: 16px;
   height: 100%;
@@ -335,6 +359,9 @@ onMounted(() => {
   gap: 16px;
 }
 
+// ============================================================
+// 头部搜索
+// ============================================================
 .management-header {
   display: flex;
   justify-content: space-between;
@@ -349,6 +376,9 @@ onMounted(() => {
   }
 }
 
+// ============================================================
+// 筛选栏
+// ============================================================
 .filter-toolbar {
   display: flex;
   align-items: center;
@@ -359,6 +389,9 @@ onMounted(() => {
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
+// ============================================================
+// 图片网格
+// ============================================================
 .image-grid {
   flex: 1;
   display: grid;
@@ -383,6 +416,9 @@ onMounted(() => {
   }
 }
 
+// ============================================================
+// 图片卡片
+// ============================================================
 .image-card {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -479,6 +515,9 @@ onMounted(() => {
   }
 }
 
+// ============================================================
+// 分页
+// ============================================================
 .pagination-container {
   display: flex;
   justify-content: flex-end;
@@ -487,6 +526,9 @@ onMounted(() => {
   border-top: 1px solid var(--el-border-color-lighter);
 }
 
+// ============================================================
+// Element Plus 覆盖
+// ============================================================
 :deep(.el-radio-group) {
   .el-radio-button__inner {
     padding: 6px 14px;

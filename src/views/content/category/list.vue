@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { addApi, listApi, modifyApi, removeApi } from '@/api/concategory';
+import { addApi, listApi, modifyApi, removeApi } from '@/api/category';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 
