@@ -317,7 +317,8 @@
 import { ref, reactive, onMounted, nextTick, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, QuestionFilled } from '@element-plus/icons-vue'
-import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, listAllArticlesApi, addCarouselApi } from '@/api/article'
+import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, addCarouselApi } from '@/api/article'
+import { getAllArticlesApi } from '@/api/business'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import PinyinMatch from 'pinyin-match'
 import SmartUpload from '@/views/components/SmartUpload.vue'
@@ -348,7 +349,7 @@ const uploadProgressMap = ref(new Map())
 
 // 加载所有文章
 const loadAllArticles = async () => {
-    const res = await listAllArticlesApi()
+    const res = await getAllArticlesApi()
     articleList.value = (res.data || []).map(item => ({
         value: item.title,
         id: item.id
