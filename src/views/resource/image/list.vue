@@ -46,7 +46,7 @@
     <!-- ===== 图片网格 ===== -->
     <div class="image-grid" v-loading="loading">
       <div
-        v-for="img in imageList"
+        v-for="(img, index) in imageList"
         :key="img.id"
         class="image-card"
         @mouseenter="hoveredId = img.id"
@@ -57,6 +57,7 @@
           :fit="'cover'"
           class="image-preview"
           loading="lazy"
+          @click="openPreview(index)"
         >
           <template #error>
             <div class="image-placeholder">
@@ -65,20 +66,22 @@
           </template>
         </el-image>
 
-        <!-- 悬浮操作 -->
-        <div v-show="hoveredId === img.id" class="image-actions">
-          <el-button size="small" type="primary" plain @click="handleCopy(img)">
-            <el-icon><CopyDocument /></el-icon> 复制
-          </el-button>
-        </div>
-
-        <!-- 图片信息 -->
+        <!-- 图片信息（底部信息栏 + 操作按钮） -->
         <div class="image-footer">
-          <span class="image-info-text">
+          <span v-show="hoveredId !== img.id" class="image-info-text">
             {{ displayField === 'id' ? `ID: ${img.id}` : '' }}
             {{ displayField === 'uuid' ? `UUID: ${img.uuid}` : '' }}
             {{ displayField === 'title' ? `标题: ${img.title || '-'}` : '' }}
           </span>
+          <!-- 操作按钮组（悬浮显示，方便以后新增/删改） -->
+          <div v-show="hoveredId === img.id" class="image-footer-actions">
+            <el-button size="small" @click.stop="openPreview(index)">预览</el-button>
+            <el-button size="small" @click.stop="handleCopy(img)">复制</el-button>
+            <!-- 占位：下载 -->
+            <el-button size="small" disabled>下载</el-button>
+            <!-- 占位：删除 -->
+            <el-button size="small" disabled>删除</el-button>
+          </div>
           <el-tag :type="getFileTypeTag(img.fileType)" size="small">
             {{ getFileTypeLabel(img.fileType) }}
             <span v-if="img.isOriginal === 1" class="original-badge">原</span>
@@ -89,6 +92,15 @@
 
     <!-- 空状态 -->
     <el-empty v-if="!loading && imageList.length === 0" description="暂无图片" :image-size="80" />
+
+    <!-- ===== 图片预览器（全局单例，避免网格多实例同步冲突） ===== -->
+    <el-image-viewer
+      v-if="viewerVisible"
+      :url-list="previewSrcList"
+      :initial-index="previewIndex"
+      @close="viewerVisible = false"
+      teleported
+    />
 
     <!-- ===== 分页 ===== -->
     <div class="pagination-container">
@@ -152,6 +164,13 @@ const searchIds = ref('')
 // 缓存业务数据
 const businessDataCache = ref([])
 
+// 预览大图列表（ref：在 fetchImages 中手动赋值，避免 computed 频繁触发重渲染）
+const previewSrcList = ref([])
+
+// 预览器控制（全局单例，避免网格多实例同步冲突）
+const viewerVisible = ref(false)
+const previewIndex = ref(0)
+
 // ============================================================
 // 工具函数
 // ============================================================
@@ -207,6 +226,8 @@ const fetchImages = async () => {
     if (res.code === 200) {
       imageList.value = res.data.items || [];
       total.value = res.data.total || 0;
+      // 同步更新预览列表，过滤无效 URL 防止闪屏
+      previewSrcList.value = imageList.value.map(i => i.img).filter(Boolean);
     } else {
       ElMessage.error(res.msg || '查询失败');
     }
@@ -307,6 +328,15 @@ const handleFilterChange = () => {
   currentPage.value = 1;
   fetchImages();
 };
+
+// ============================================================
+// 图片预览（全局单例 el-image-viewer）
+// ============================================================
+
+const openPreview = (index) => {
+  previewIndex.value = index
+  viewerVisible.value = true
+}
 
 // ============================================================
 // 复制功能
@@ -454,40 +484,17 @@ onMounted(() => {
   font-size: 32px;
 }
 
-.image-actions {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 8px 16px;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-
-  .el-button {
-    border: none;
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-  }
-}
-
 .image-footer {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  gap: 8px;
+  padding: 4px 6px;
+  // 整条 footer 的渐变遮罩
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2) 35%);
+  gap: 6px;
 
   .image-info-text {
     font-size: 11px;
@@ -497,14 +504,56 @@ onMounted(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+    min-width: 0;
+    margin-right: auto;  // 把右侧内容推到最右
+  }
+
+  // 操作按钮组 — 绝对定位，始终水平居中于 footer
+  .image-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);  // ← 真正水平居中，与 tag / info 无关
+    background: rgba(0, 0, 0, 0.25);  // 按钮组暗底（调浅）
+    border-radius: 4px;
+    backdrop-filter: blur(3px);
+
+    .el-button {
+      height: 20px;
+      padding: 0 5px;
+      font-size: 10px;
+      text-align: center;
+      border: none;
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.1);
+      color: #d0d0d0;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      
+
+      &:first-child { border-radius: 3px 0 0 3px; }
+      &:last-child  { border-radius: 0 3px 3px 0; }
+
+      &:hover:not(.is-disabled) {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+
+      // 占位按钮（disabled）
+      &.is-disabled {
+        color: rgba(255, 255, 255, 0.3);
+        cursor: not-allowed;
+      }
+    }
   }
 
   .el-tag {
     flex-shrink: 0;
     font-size: 10px;
-    height: 20px;
-    line-height: 18px;
-    padding: 0 6px;
+    height: 18px;
+    line-height: 16px;
+    padding: 0 5px;
 
     .original-badge {
       background: rgba(255, 255, 255, 0.3);
