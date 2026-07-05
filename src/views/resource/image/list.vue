@@ -122,7 +122,8 @@ import { Picture, CopyDocument } from '@element-plus/icons-vue'
 import PinyinMatch from 'pinyin-match'
 
 // 5. API
-import { fileMetaListApi, getAllBusinessDataApi } from '@/api/filemeta'
+import { fileMetaListApi } from '@/api/filemeta'
+import { getAllBusinessDataApi } from '@/api/business'
 
 // ============================================================
 // 数据
