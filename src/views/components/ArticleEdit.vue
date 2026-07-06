@@ -150,7 +150,7 @@
 
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false; hasSelectedArticle = true">取消</el-button>
+                    <el-button @click="dialogVisible = false; hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">取消</el-button>
                     <el-button type="warning" @click="handlePublish(1)"> 草稿 </el-button>
                     <el-button type="primary" @click="handlePublish(0)"> 发布 </el-button>
                 </span>
@@ -598,11 +598,11 @@ onMounted(() => {
 })
 
 // 编辑回显时展开，新增时收缩
-watch(() => formModel.id, (newVal) => {
+/* watch(() => formModel.id, (newVal) => {
   if (newVal) {
     hasSelectedArticle.value = true;
   }
-}, { immediate: true });
+}, { immediate: true }); */
 </script>
 
 <style scoped lang="scss">
