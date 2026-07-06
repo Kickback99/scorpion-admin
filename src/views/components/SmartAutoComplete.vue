@@ -136,7 +136,7 @@ const props = defineProps({
 
 // ==================== Emits ====================
 // 多ID选择事件
-const emit = defineEmits(['select-multiple-ids', 'tag-removed'])
+const emit = defineEmits(['select-multiple-ids', 'tag-removed', 'dropdown-visible'])
 
 // ==================== Refs ====================
 const containerRef = ref(null)
@@ -773,6 +773,16 @@ const handleCompositionEnd = () => {
     debounceSearch(value)
   }
 }
+
+// ==================== 下拉状态通知 ====================
+
+/**
+ * 监听下拉显隐，通知父组件（用于联动高度调整等场景）
+ * 空格 / 空输入展示所有建议也算在内
+ */
+watch(showDropdown, (visible) => {
+  emit('dropdown-visible', visible)
+})
 
 // ==================== 生命周期 ====================
 

@@ -28,6 +28,7 @@
           :allow-custom="false"
           custom-disabled-message="请输入已存在的文章标题"
           :style="{ width: searchWidth }"
+          @dropdown-visible="handleDropdownVisible"
         />
       </el-form-item>
 
@@ -304,6 +305,22 @@ const fetchArticleForImage = async (params) => {
 };
 
 /**
+ * SmartAutoComplete 下拉显隐 → 通知父组件选中状态
+ * 有搜索建议（含空格/空输入展示全部）时 true
+ * 关闭时：仅当没选中文章才通知 false，避免匹配到数据后高度回缩
+ */
+const handleDropdownVisible = (visible) => {
+  if (visible) {
+    emit('update:selected', true);
+  } else {
+    // 下拉关闭但已选中文章 → 保持展开，不通知父组件收缩
+    if (selectedArticle.value.length === 0) {
+      emit('update:selected', false);
+    }
+  }
+};
+
+/**
  * 监听文章选择：v-model 双向绑定，选中后加载对应文章图片
  */
 watch(selectedArticle, (newVal) => {
@@ -312,7 +329,6 @@ watch(selectedArticle, (newVal) => {
     if (found) {
       loadImages(found.id);
       emit('select-article', { id: found.id, title: found.value });
-      emit('update:selected', true);
     }
   } else {
     imageList.value = [];
