@@ -1,5 +1,5 @@
 <template>
-     <Mask :maskVisible="maskVisible" @closeMask="maskVisible=false" @openDialog="handleOpen">
+     <Mask :maskVisible="maskVisible" @closeMask="handleCloseMask" @openDialog="handleOpenDialog">
 
         <el-form :model="blogData" ref="blogFormRef" :rules="rules">
             <el-form-item prop="title">
@@ -150,7 +150,7 @@
 
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button @click="dialogVisible = false; hasSelectedArticle = true">取消</el-button>
                     <el-button type="warning" @click="handlePublish(1)"> 草稿 </el-button>
                     <el-button type="primary" @click="handlePublish(0)"> 发布 </el-button>
                 </span>
@@ -186,6 +186,18 @@ const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '150px';
 // 处理选中状态变化
 const handleSelectedChange = (selected) => {
   hasSelectedArticle.value = selected;
+};
+
+/**
+ * Mask 关闭 / 确定时，重置选中状态为未展开
+ */
+const handleCloseMask = () => {
+  maskVisible.value = false;
+  hasSelectedArticle.value = false;
+};
+
+const handleOpenDialog = () => {
+  handleOpen();
 };
 
 /**
@@ -487,7 +499,8 @@ const uploadRef = ref()
 const handleOpen = async() => {
   const valid = await blogFormRef.value.validate().catch(() => false)
   if (!valid) return
-  
+
+  hasSelectedArticle.value = false
   dialogVisible.value = true
   
   // 等待对话框打开和内容渲染
@@ -503,6 +516,7 @@ const handleOpen = async() => {
 
 const handlePublish = async(status) => {
 
+    hasSelectedArticle.value = false
     formModel.status = status
 
     // 最后一次确认description值
@@ -577,7 +591,7 @@ onMounted(() => {
     loadAllTags()
 })
 
-// 编辑回显时，如果有 formModel.id，说明已选中文章
+// 编辑回显时展开，新增时收缩
 watch(() => formModel.id, (newVal) => {
   if (newVal) {
     hasSelectedArticle.value = true;
