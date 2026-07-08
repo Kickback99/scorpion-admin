@@ -92,18 +92,18 @@
               <!-- 文章封面：支持文件上传 / 自定义链接 两种模式 -->
               <el-form-item label="文章封面" prop="cover">
                   <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
-                      <el-radio :label="true">文件上传</el-radio>
-                      <el-radio :label="false">自定义链接</el-radio>
+                      <el-radio :label="'upload'">文件上传</el-radio>
+                      <el-radio :label="'custom'">自定义链接</el-radio>
                   </el-radio-group>
               </el-form-item>
 
               <!-- 文件上传模式 -->
-              <el-form-item v-if="formModel.coverOption === true" label=" " prop="cover">
+              <el-form-item v-if="formModel.coverOption === 'upload'" label=" " prop="cover">
                   <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
               </el-form-item>
 
               <!-- 自定义链接模式 -->
-              <el-form-item v-if="formModel.coverOption === false" label=" " prop="customCoverLink">
+              <el-form-item v-if="formModel.coverOption === 'custom'" label=" " prop="customCoverLink">
                   <el-input
                       v-model="formModel.customCoverLink"
                       placeholder="请输入图片链接地址，如：https://example.com/cover.jpg"
@@ -378,11 +378,11 @@ const openMask = () => {
 
 // 封面选项切换时，清空另一个字段的值
 const handleCoverOptionChange = (val) => {
-    if (val === true) {
+    if (val === 'upload') {
         // 切换到文件上传：清空自定义链接
         formModel.customCoverLink = ''
         nextTick(() => uploadRef.value?.handleImage(formModel.cover))
-    } else {
+    } else if(val === 'custom') {
         // 切换到自定义链接：清空文件上传的值
         if(!formModel.id){
           formModel.cover = null
@@ -420,7 +420,7 @@ const handleToggle = async(param) => {
         customDescription: '',   // 自定义摘要内容
         description: null,       // 实际提交给后端的值
         tagNames: [],             // 重置标签
-        coverOption: true,        //默认文件上传
+        coverOption: 'upload',        //默认文件上传
         customCoverLink: '',       // 清空自定义链接
         cover: null
     })
@@ -431,8 +431,6 @@ const handleToggle = async(param) => {
     console.log("回显res.data",res.data)
     const {title,content,...rest} = res.data
     blogData.value = {title,content} 
-    formModel.coverOption = true
-    formModel.customCoverLink = '' 
     Object.assign(formModel,rest)
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
@@ -441,6 +439,14 @@ const handleToggle = async(param) => {
     } else {
           formModel.descriptionType = 'custom'
           formModel.customDescription = res.data.description
+    }
+
+    if(formModel.cover && formModel.cover.startsWith('http')){
+      formModel.coverOption = 'custom'
+      formModel.customCoverLink = formModel.cover
+    }else {
+      formModel.coverOption = 'upload'
+      formModel.customCoverLink = '' 
     }
 
     // 查询轮播信息并回显到 carouselData
@@ -526,7 +532,7 @@ const handlePublish = async(status) => {
   }
 
     let cover;
-    if (formModel.coverOption === false) {
+    if (formModel.coverOption === 'custom') {
         if (!formModel.customCoverLink) {
             ElMessage.warning('请填写自定义图片链接')
             return
@@ -560,7 +566,7 @@ const handlePublish = async(status) => {
         const articleId = res.data
         console.log("==================== articleId ====================", articleId)
         // 如果是文件上传模式，上传封面
-        if (formModel.coverOption === true && formModel.cover instanceof File) {
+        if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
             const coverUrl = await uploadCoverApi(articleId, formModel.cover)
             if (coverUrl) {
                 formModel.cover = coverUrl
@@ -570,7 +576,7 @@ const handlePublish = async(status) => {
         // t_article_request：文章修改请求
         await modifyApi(data)
         // 如果是文件上传模式，上传封面
-        if (formModel.coverOption === true && formModel.cover instanceof File) {
+        if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
             const coverUrl = await uploadCoverApi(articleId, formModel.cover)
             if (coverUrl) {
                 formModel.cover = coverUrl
