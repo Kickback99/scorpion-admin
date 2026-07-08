@@ -222,6 +222,9 @@ const fetchImages = async () => {
       params.targetIds = searchIds.value;
     }
 
+    // 确保只展示未删除的图片
+    params.isDeleted = 0
+
     const res = await fileMetaListApi(currentPage.value, pageSize.value, params);
     if (res.code === 200) {
       imageList.value = res.data.items || [];
