@@ -171,7 +171,9 @@ const filteredSuggestions = computed(() => {
       const key = item.value
       if (map.has(key)) {
         const existing = map.get(key)
-        // 收集所有ID
+        // 原始出现次数 +1（不管 ID 是否重复）
+        existing.count = (existing.count || 1) + 1
+        // 收集所有唯一ID
         if (item.id !== undefined && item.id !== null) {
           if (!Array.isArray(existing.ids)) {
             existing.ids = [existing.id]
@@ -179,8 +181,6 @@ const filteredSuggestions = computed(() => {
           if (!existing.ids.includes(item.id)) {
             existing.ids.push(item.id)
           }
-          // 更新count
-          existing.count = existing.ids.length
         }
       } else {
         // 首次出现
