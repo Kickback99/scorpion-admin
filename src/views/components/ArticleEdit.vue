@@ -94,6 +94,7 @@
                   <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
                       <el-radio :label="'upload'">文件上传</el-radio>
                       <el-radio :label="'custom'">自定义链接</el-radio>
+                       <el-radio :label="'ref'">引用封面</el-radio>
                   </el-radio-group>
               </el-form-item>
 
@@ -114,6 +115,33 @@
                       </template>
                       <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
                   </el-tooltip>
+              </el-form-item>
+
+              <!-- 引用封面模式 -->
+              <el-form-item v-if="formModel.coverOption === 'ref'" label=" " prop="coverReference">
+                <div class="cover-reference-wrapper">
+                  <SmartAutoComplete
+                    v-model="selectedCoverArticle"
+                    :fetch-suggestions-api="fetchArticleForCover"
+                    placeholder="请输入文章标题搜索封面"
+                    :max="1"
+                    :debounce-delay="300"
+                    :min-search-length="1"
+                    :auto-search-on-enter="true"
+                    :allow-custom="false"
+                    custom-disabled-message="请选择已存在的文章"
+                    style="width: 100%"
+                    @tag-removed="handleCoverArticleRemoved"
+                  />
+                  <!-- 封面预览 -->
+                  <div v-if="formModel.refCover" class="cover-preview">
+                    <el-image
+                      :src="formModel.refCover"
+                      fit="contain"
+                      class="cover-image"
+                    />
+                  </div>
+                </div>
               </el-form-item>
 
               <!-- 轮播设置区域（极简版） -->
@@ -173,11 +201,15 @@ import PinyinMatch from 'pinyin-match';
 import { getTagListApi } from '@/api/business';
 import SmartAutoComplete from './SmartAutoComplete.vue';
 import ImageReference from '@/views/components/ImageReference.vue';
+import { getArticleBusinessDataApi } from '@/api/business'; 
+import { fileMetaListApi } from '@/api/filemeta'; //
 
 // ==================== 引用图片相关 ====================
 
 const imageReferenceRef = ref(null);
 const hasSelectedArticle = ref(false);
+const selectedCoverArticle = ref([]);
+const coverArticleCache = ref([]);  // 缓存文章搜索结果
 
 // 引用图片组件容器高度
 const IMAGE_REFERENCE_EXPANDED_HEIGHT = '330px';
@@ -242,6 +274,97 @@ const handleImageClear = () => {
   // 如果需要在特定时机手动触发，可以调用：
   // await imageReferenceRef.value?.loadByArticleId(param.id);
 } */
+
+// ============================================================
+// 引用封面相关
+// ============================================================
+
+/**
+ * 搜索文章（用于引用封面）
+ */
+const fetchArticleForCover = async (params) => {
+  const query = params.keyword || '';
+
+  try {
+    const res = await getArticleBusinessDataApi();
+    if (res.code === 200) {
+      const data = (res.data || []).map(item => ({
+        value: item.title,
+        id: item.id
+      }));
+      coverArticleCache.value = data;
+
+      if (!query) {
+        return data;
+      }
+
+      const lowerQuery = query.toLowerCase();
+      return data.filter(item => {
+        const text = item.value;
+        const lowerText = text.toLowerCase();
+
+        if (lowerText.includes(lowerQuery)) return true;
+        if (PinyinMatch.match(text, query)) return true;
+
+        const words = lowerText.split(/[\s\-_]+/);
+        for (const word of words) {
+          if (word.startsWith(lowerQuery)) return true;
+        }
+
+        if (words.length > 1) {
+          const initials = words.map(w => w[0]).join('');
+          if (initials.includes(lowerQuery)) return true;
+        }
+
+        return false;
+      });
+    }
+    return [];
+  } catch (error) {
+    console.error('搜索文章失败:', error);
+    return [];
+  }
+};
+
+/**
+ * 监听 selectedCoverArticle 变化 → 用标题反查 ID → 加载封面
+ */
+watch(selectedCoverArticle, async (newVal) => {
+  if (newVal.length > 0) {
+    const title = newVal[0];
+    // 从缓存中反查 ID
+    const found = coverArticleCache.value.find(item => item.value === title);
+    if (found) {
+      try {
+        const res = await fileMetaListApi(1, 1, {
+          targetIds: found.id,
+          fileType: 'cover'
+        });
+        if (res.code === 200 && res.data.items && res.data.items.length > 0) {
+          const coverFileMeta = res.data.items[0];
+          formModel.refCover = coverFileMeta.img;        // 用于预览
+          formModel.refCoverUuid = coverFileMeta.uuid;   // 保存 UUID，用于提交
+        } else {
+          formModel.refCover = null;
+          ElMessage.warning('该文章暂无封面');
+        }
+      } catch (error) {
+        console.error('获取封面失败:', error);
+        ElMessage.warning('获取封面失败');
+      }
+    }
+  } else {
+    // 移除标签 → 清空封面
+    formModel.refCover = null;
+  }
+}, { deep: true });
+
+/**
+ * 移除引用文章 → 清空封面
+ */
+const handleCoverArticleRemoved = () => {
+  formModel.cover = null;
+};
 
 // ==================== 标签相关 ====================
 
@@ -334,9 +457,11 @@ const formModel = reactive({
   customDescription: '',   // 自定义摘要内容
   description: null,       // 实际提交给后端的值
   tagNames:[],
-  coverOption: true,       // 默认文件上传
+  coverOption: 'upload',       // 默认文件上传
   customCoverLink: '',      // 封面文件对象（File 或 URL 字符串）
-  cover:null                // / 最终存储的封面URL（用于回显）
+  cover:null,                // / 最终存储的封面URL（用于回显）
+  refCover: null,            // 预览 URL
+  refCoverUuid: null         // 提交用的 UUID
 })
 
 // 独立轮播数据
@@ -381,16 +506,23 @@ const handleCoverOptionChange = (val) => {
     if (val === 'upload') {
         // 切换到文件上传：清空自定义链接
         formModel.customCoverLink = ''
+        formModel.refCover = null
         nextTick(() => uploadRef.value?.handleImage(formModel.cover))
     } else if(val === 'custom') {
         // 切换到自定义链接：清空文件上传的值
         if(!formModel.id){
+          formModel.refCover = null
           formModel.cover = null
         }
         // 如果 uploadRef 有清空方法，可以调用
         /* if (uploadRef.value && uploadRef.value.clear) {
             uploadRef.value.clear()
         } */
+    }else if (val === 'ref') {
+        // 切换到引用封面时，清空自定义链接
+        formModel.customCoverLink = '';
+        // 如果当前 cover 是自定义链接（http开头），清空
+          formModel.cover = null
     }
 }
 
@@ -411,6 +543,8 @@ const handleToggle = async(param) => {
     // 添加重置
     dialogTitle.value = '新增文章'
     blogData.value = {}
+    selectedCoverArticle.value = [],  // 清空引用标题
+
     // 重置数据
     Object.assign(formModel,{
         id:null,
@@ -422,15 +556,20 @@ const handleToggle = async(param) => {
         tagNames: [],             // 重置标签
         coverOption: 'upload',        //默认文件上传
         customCoverLink: '',       // 清空自定义链接
-        cover: null
+        cover: null,
+        refCover: null,            // 预览 URL
+        refCoverUuid: null         // 提交用的 UUID
     })
    }else {
     // 回显
     dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
     console.log("回显res.data",res.data)
+    
     const {title,content,...rest} = res.data
+    
     blogData.value = {title,content} 
+
     Object.assign(formModel,rest)
     if(res.data.isAutoDescription === 0){
           formModel.descriptionType = 'auto'
@@ -441,13 +580,30 @@ const handleToggle = async(param) => {
           formModel.customDescription = res.data.description
     }
 
-    if(formModel.cover && formModel.cover.startsWith('http')){
-      formModel.coverOption = 'custom'
-      formModel.customCoverLink = formModel.cover
-    }else {
+    // 根据后端返回的 coverMode 回显封面
+    if (res.data.coverMode === 'upload') {
       formModel.coverOption = 'upload'
-      formModel.customCoverLink = '' 
+      formModel.cover = res.data.cover  // 完整 URL
+      formModel.customCoverLink = ''
+      formModel.refCover = null
+      formModel.refCoverUuid = null
+    } else if (res.data.coverMode === 'custom') {
+      formModel.coverOption = 'custom'
+      formModel.customCoverLink = res.data.cover
+      formModel.cover = null
+      formModel.refCover = null
+      formModel.refCoverUuid = null
+    } else if (res.data.coverMode === 'ref') {
+      formModel.coverOption = 'ref'
+      formModel.refCover = res.data.cover  // 完整 URL（预览用）
+      formModel.refCoverUuid = rest.cover   // UUID（提交用）
+      // 回显引用的文章标题到 SmartAutoComplete
+      if (res.data.coverSourceTitle) {
+        selectedCoverArticle.value = [res.data.coverSourceTitle]
+      }
+      formModel.cover = null
     }
+    
 
     // 查询轮播信息并回显到 carouselData
     try {
@@ -533,12 +689,27 @@ const handlePublish = async(status) => {
 
     let cover;
     if (formModel.coverOption === 'custom') {
-        if (!formModel.customCoverLink) {
-            ElMessage.warning('请填写自定义图片链接')
-            return
-        }
-        cover = formModel.customCoverLink
+      if (!formModel.customCoverLink) {
+          ElMessage.warning('请填写自定义图片链接')
+          return
+      }
+      cover = formModel.customCoverLink
+    }else if (formModel.coverOption === 'ref') {
+      // 引用封面模式：使用 refCover
+      if (!formModel.refCoverUuid) {
+        ElMessage.warning('请先选择要引用的文章封面');
+        return;
+      }
+      cover = formModel.refCoverUuid;
+    }else if (formModel.coverOption === 'upload') {
+    // 直接传 formModel.cover，不管它是 URL 还是 File
+    // 后端会自己判断格式
+    if (formModel.cover instanceof File) {
+        cover = null; // 新文件等待上传
+    } else {
+        cover = formModel.cover; // 直接传，后端会提取 UUID
     }
+}
 
     const data = {
       article:{
@@ -640,5 +811,32 @@ onMounted(() => {
     flex: none !important;
     align-items: stretch !important;
 } */
+// ============================================================
+// 封面样式
+// ============================================================
+
+.cover-reference-wrapper {
+  width: 100%;
+
+  .cover-preview {
+    position: relative;
+    margin-top: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--el-border-color-lighter);
+    background: var(--el-fill-color-light);
+    transition: all 0.3s ease;
+    aspect-ratio: 16 / 9;
+    max-width: 120px;
+
+    .cover-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+  }
+
+}
 
 </style>
