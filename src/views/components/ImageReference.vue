@@ -420,7 +420,7 @@ const getTypeLabel = (type) => {
  */
 const handleImageTypeChange = (val) => {
   if (selectedArticle.value.length > 0) {
-    const articleId = props.articleId || getCurrentArticleId();
+    const articleId = getCurrentArticleId();
     if (articleId) {
       loadImages(articleId);
     }
@@ -478,11 +478,11 @@ const resetSelection = () => {
 // Watch
 // ============================================================
 
-watch(() => props.articleId, (newVal) => {
+/* watch(() => props.articleId, (newVal) => {
   if (newVal) {
     loadByArticleId(newVal);
   }
-}, { immediate: true });
+}, { immediate: true }); */
 
 // ============================================================
 // 暴露方法
