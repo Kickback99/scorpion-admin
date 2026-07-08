@@ -9,25 +9,31 @@
                     placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
 
-            <ImageReference
-              ref="imageReferenceRef"
-              :article-id="formModel.id"
-              :article-title="blogData.title"
-              layout="horizontal"
-              title="引用图片"
-              search-label="搜索"
-              search-placeholder="请输入文章标题搜索已上传的图片"
-              :show-clear="true"
-              :show-hint="true"
-              :disabled="false"
-              :showImageTypeSwitch="true"
-              image-type="all"
-              empty-text="该文章暂无内容图"
-              display-field="uuid"
-              @select-article="handleImageSelectArticle"
-              @insert-image="handleImageInsert"
-              @clear="handleImageClear"
-            />
+            <div 
+            :style="{ height: hasSelectedArticle ? IMAGE_REFERENCE_EXPANDED_HEIGHT : IMAGE_REFERENCE_COLLAPSED_HEIGHT }"
+            style="transition: height 0.3s ease; overflow: hidden;"
+            >
+              <ImageReference
+                ref="imageReferenceRef"
+                :article-id="formModel.id"
+                :article-title="blogData.title"
+                layout="horizontal"
+                title="引用图片"
+                search-label="搜索"
+                search-placeholder="请输入文章标题搜索已上传的图片"
+                :show-clear="true"
+                :show-hint="true"
+                :disabled="false"
+                :showImageTypeSwitch="true"
+                image-type="all"
+                empty-text="该文章暂无内容图"
+                display-field="uuid"
+                @select-article="handleImageSelectArticle"
+                @insert-image="handleImageInsert"
+                @clear="handleImageClear"
+                @update:selected="handleSelectedChange"
+              />
+            </div>
 
             <el-form-item prop="content">
 
@@ -154,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue';
+import { ref, reactive, onMounted, nextTick, watch } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
@@ -171,6 +177,16 @@ import ImageReference from '@/views/components/ImageReference.vue';
 // ==================== 引用图片相关 ====================
 
 const imageReferenceRef = ref(null);
+const hasSelectedArticle = ref(false);
+
+// 引用图片组件容器高度
+const IMAGE_REFERENCE_EXPANDED_HEIGHT = '330px';
+const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '150px';
+
+// 处理选中状态变化
+const handleSelectedChange = (selected) => {
+  hasSelectedArticle.value = selected;
+};
 
 /**
  * 选择文章时触发
@@ -560,6 +576,13 @@ const handlePublish = async(status) => {
 onMounted(() => {
     loadAllTags()
 })
+
+// 编辑回显时，如果有 formModel.id，说明已选中文章
+watch(() => formModel.id, (newVal) => {
+  if (newVal) {
+    hasSelectedArticle.value = true;
+  }
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">

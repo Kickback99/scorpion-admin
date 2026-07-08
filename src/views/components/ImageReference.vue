@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Check, Plus, Loading, Picture, InfoFilled } from '@element-plus/icons-vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
@@ -230,7 +230,8 @@ const emit = defineEmits([
   'select-image',     // 选择图片时触发
   'insert-image',     // 插入图片时触发
   'clear',            // 清空时触发
-  'image-type-change'  // 图片类型切换事件
+  'image-type-change',  // 图片类型切换事件
+  'update:selected'   // 通知父组件是否选中了文章
 ]);
 
 // ==================== 数据 ====================
@@ -302,7 +303,6 @@ const loadImages = async (articleId) => {
         imageList.value = [];
       }
     }
-    console.log('加载文章图片:', imageList.value.length, '张');
   } catch (error) {
     console.error('加载文章图片失败:', error);
     imageList.value = [];
@@ -406,9 +406,11 @@ const handleArticleSelect = (data) => {
     const articleId = data.ids[0];
     loadImages(articleId);
     emit('select-article', { id: articleId, title: data.title });
+    emit('update:selected', true);  // 通知父组件：已选中文章
   } else {
     imageList.value = [];
     emit('select-article', null);
+    emit('update:selected', false); // 通知父组件：未选中文章
   }
 };
 
@@ -421,6 +423,7 @@ const handleArticleRemoved = () => {
   // 重置图片类型
   currentImageType.value = props.imageType;
   emit('remove-article');
+  emit('update:selected', false); // 通知父组件：已移除文章
 };
 
 /**
@@ -464,6 +467,7 @@ const handleClear = () => {
   // 重置图片类型
   currentImageType.value = props.imageType;
   emit('clear');
+  emit('update:selected', false); // 通知父组件：已清空
 };
 
 /**
@@ -501,6 +505,7 @@ watch(() => props.articleId, (newVal) => {
 // ==================== 暴露方法 ====================
 
 defineExpose({
+  imageList,
   loadImages,
   loadByArticleId,
   resetSelection,
@@ -523,26 +528,6 @@ defineExpose({
   },
   getImageType: () => currentImageType.value
 });
-
-// 在子组件中
-/* onMounted(() => {
-  // 模拟加载多张图片测试横排滚动
-  imageList.value = [
-    { id: 1, img: 'https://picsum.photos/220/124?random=1', fileType: 'content' },
-    { id: 2, img: 'https://picsum.photos/220/124?random=2', fileType: 'cover' },
-    { id: 3, img: 'https://picsum.photos/220/124?random=3', fileType: 'content' },
-    { id: 4, img: 'https://picsum.photos/220/124?random=4', fileType: 'content' },
-    { id: 5, img: 'https://picsum.photos/220/124?random=5', fileType: 'cover' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-    { id: 6, img: 'https://picsum.photos/220/124?random=6', fileType: 'content' },
-  ];
-  // 模拟选中文章
-  selectedArticle.value = ['测试文章'];
-}); */
 
 </script>
 
