@@ -225,10 +225,12 @@ const getFileTypeTag = (type) => {
 
 /**
  * 加载所有业务数据（用于联想搜索）
+ * 注意：这里需要包含已删除的记录
  */
 const loadBusinessData = async () => {
     try {
-        const res = await getAllBusinessDataApi();
+        // 传入 true，包含已删除的文件记录
+        const res = await getAllBusinessDataApi(true);
         if (res.code === 200) {
             businessDataCache.value = (res.data || []).map(item => ({
                 value: item.title,
