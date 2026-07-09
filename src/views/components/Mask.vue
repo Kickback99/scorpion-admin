@@ -61,7 +61,7 @@ const close = () => {
 
 .content {
     height: calc(100vh - 250px);
-    // background-color: honeydew;
+    overflow-y: auto;
     padding: 10px;
 }
 
