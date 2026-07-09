@@ -2,25 +2,24 @@
 <template>
   <!-- ===== 菜单搜索 ===== -->
   <div class="smart-menu-search" ref="containerRef">
-    <!-- 触发器：圆形按钮，和 Refresh/FullScreen/Setting 完全一致 -->
-    <el-button circle @click="handleTriggerClick">
+    <!-- 折叠：圆形按钮，和 Refresh/FullScreen/Setting 完全一致 -->
+    <el-button v-if="!isFocused" circle @click="handleTriggerClick">
       <el-icon><Search /></el-icon>
     </el-button>
 
-    <!-- 展开态：在按钮下方弹出搜索面板 -->
-    <div v-show="isFocused" class="search-panel">
-      <div class="search-input-wrapper">
-        <el-icon class="search-icon"><Search /></el-icon>
+    <!-- 展开：图标 + 输入框 + 下拉结果 -->
+    <div v-else class="search-expanded">
+      <div class="search-input-row">
+        <el-icon class="search-input-icon" @click="handleTriggerClick"><Search /></el-icon>
         <input
           ref="inputRef"
           v-model="query"
-          class="search-input"
-          placeholder="输入关键字搜索菜单..."
+          class="search-input-field"
+          placeholder="搜索菜单..."
           @keydown="handleKeydown"
         />
       </div>
 
-      <!-- 下拉结果 -->
       <div class="search-results" v-if="displayList.length > 0">
         <div v-if="!query.trim()" class="results-header">最近访问</div>
         <div
@@ -275,62 +274,65 @@ onUnmounted(() => {
 }
 
 // ============================================================
-// 展开面板（按钮下方弹出，不覆盖其他按钮）
+// 展开态：图标 + 输入框（内联，图标右侧）
 // ============================================================
-.search-panel {
+.search-expanded {
+  position: relative;
+  display: inline-flex;
+}
+
+.search-input-row {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  width: 200px;
+  border: 1px solid var(--el-color-primary);
+  border-radius: 6px;
+  background: var(--el-bg-color);
+}
+
+.search-input-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--el-text-color-secondary);
+  cursor: pointer;
+}
+
+.search-input-field {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--el-text-color-regular);
+  padding-right: 8px;
+
+  &::placeholder {
+    color: var(--el-text-color-placeholder);
+  }
+}
+
+// ============================================================
+// 下拉结果（输入框下方弹出）
+// ============================================================
+.search-results {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
-  width: 320px;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 3000;
-  overflow: hidden;
-}
-
-// ============================================================
-// 搜索输入行
-// ============================================================
-.search-input-wrapper {
-  display: flex;
-  align-items: center;
-  padding: 0 4px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-
-  .search-icon {
-    flex-shrink: 0;
-    width: 32px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    color: var(--el-text-color-secondary);
-  }
-
-  .search-input {
-    flex: 1;
-    height: 36px;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 13px;
-    color: var(--el-text-color-regular);
-
-    &::placeholder {
-      color: var(--el-text-color-placeholder);
-    }
-  }
-}
-
-// ============================================================
-// 搜索结果列表
-// ============================================================
-.search-results {
-  max-height: 300px;
-  overflow-y: auto;
 }
 
 .results-header {
