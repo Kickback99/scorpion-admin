@@ -109,6 +109,19 @@
                     </el-tag>
                 </template>
             </el-table-column>
+
+            <el-table-column label="操作" width="100" align="center" fixed="right">
+                <template #default="{ row }">
+                    <el-popconfirm
+                        title="确认恢复吗？恢复后正常访问"
+                        @confirm="handleRecover(row)"
+                    >
+                        <template #reference>
+                            <el-button :disabled="row.isDeleted === 0" type="warning" size="small" text>恢复</el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
             
             <el-table-column prop="createTime" label="创建时间" width="200" align="center">
                 <template #default="{ row }">
@@ -141,7 +154,7 @@
 </template>
 
 <script setup>
-import { fileMetaListApi } from '@/api/filemeta'
+import { fileMetaListApi, recoverFileMetaApi } from '@/api/filemeta'
 import { getAllBusinessDataApi } from '@/api/business'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted } from 'vue';
@@ -446,6 +459,26 @@ const onReset = () => {
         isDeleted: null
     });
     renderFileMeta();
+};
+
+
+/**
+ * 恢复文件元数据
+ * @param row filemeta对应的一条记录
+ */
+const handleRecover = async (row) => {
+    try {
+        const res = await recoverFileMetaApi(row.id);
+        if (res.code === 200) {
+            ElMessage.success('恢复成功，缓存已清除');
+            renderFileMeta(); // 刷新列表
+        } else {
+            ElMessage.error(res.msg || '恢复失败');
+        }
+    } catch (error) {
+        console.error('恢复失败:', error);
+        ElMessage.error('恢复失败，请稍后重试');
+    }
 };
 </script>
 
