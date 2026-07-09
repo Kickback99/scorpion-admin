@@ -2,41 +2,42 @@
 <template>
   <!-- ===== 菜单搜索 ===== -->
   <div class="smart-menu-search" ref="containerRef">
-    <!-- 触发器：collapse 态和 Refresh/FullScreen/Setting 完全一致的圆形按钮 -->
+    <!-- 触发器：圆形按钮，和 Refresh/FullScreen/Setting 完全一致 -->
     <el-button circle @click="handleTriggerClick">
       <el-icon><Search /></el-icon>
     </el-button>
 
-    <!-- 展开态：搜索输入框（绝对定位覆盖在按钮上方） -->
-    <div v-show="isFocused" class="search-input-wrapper">
-      <el-icon class="search-icon"><Search /></el-icon>
-      <input
-        ref="inputRef"
-        v-model="query"
-        class="search-input"
-        placeholder="输入关键字搜索菜单..."
-        @keydown="handleKeydown"
-      />
-    </div>
+    <!-- 展开态：在按钮下方弹出搜索面板 -->
+    <div v-show="isFocused" class="search-panel">
+      <div class="search-input-wrapper">
+        <el-icon class="search-icon"><Search /></el-icon>
+        <input
+          ref="inputRef"
+          v-model="query"
+          class="search-input"
+          placeholder="输入关键字搜索菜单..."
+          @keydown="handleKeydown"
+        />
+      </div>
 
-    <!-- ===== 下拉结果 ===== -->
-    <div class="search-dropdown" v-if="isFocused && displayList.length > 0">
-      <div v-if="!query.trim()" class="dropdown-header">最近访问</div>
-
-      <div
-        v-for="(item, index) in displayList"
-        :key="item.path"
-        class="dropdown-item"
-        :class="{ 'is-active': index === activeIndex }"
-        @mousedown.prevent="navigateTo(item)"
-        @mouseenter="activeIndex = index"
-      >
-        <el-icon class="dropdown-item-icon">
-          <SingleIcon :icon="item.icon || 'ep:menu'" />
-        </el-icon>
-        <div class="dropdown-item-text">
-          <span class="dropdown-item-title" v-html="highlight(item.title)"></span>
-          <span class="dropdown-item-breadcrumb">{{ item.breadcrumb.join(' › ') }}</span>
+      <!-- 下拉结果 -->
+      <div class="search-results" v-if="displayList.length > 0">
+        <div v-if="!query.trim()" class="results-header">最近访问</div>
+        <div
+          v-for="(item, index) in displayList"
+          :key="item.path"
+          class="result-item"
+          :class="{ 'is-active': index === activeIndex }"
+          @mousedown.prevent="navigateTo(item)"
+          @mouseenter="activeIndex = index"
+        >
+          <el-icon class="result-item-icon">
+            <SingleIcon :icon="item.icon || 'ep:menu'" />
+          </el-icon>
+          <div class="result-item-text">
+            <span class="result-item-title" v-html="highlight(item.title)"></span>
+            <span class="result-item-breadcrumb">{{ item.breadcrumb.join(' › ') }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -274,41 +275,49 @@ onUnmounted(() => {
 }
 
 // ============================================================
-// 展开态：搜索输入框（绝对定位，向右延伸）
+// 展开面板（按钮下方弹出，不覆盖其他按钮）
+// ============================================================
+.search-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 320px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 3000;
+  overflow: hidden;
+}
+
+// ============================================================
+// 搜索输入行
 // ============================================================
 .search-input-wrapper {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
-  width: 220px;
-  height: 32px;
-  border-radius: 6px;
-  background: var(--el-bg-color);
-  border: 1px solid var(--el-color-primary);
-  z-index: 10;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 
   .search-icon {
     flex-shrink: 0;
     width: 32px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    color: var(--el-text-color-regular);
+    color: var(--el-text-color-secondary);
   }
 
   .search-input {
     flex: 1;
-    height: 100%;
+    height: 36px;
     border: none;
     outline: none;
     background: transparent;
     font-size: 13px;
     color: var(--el-text-color-regular);
-    padding-right: 8px;
 
     &::placeholder {
       color: var(--el-text-color-placeholder);
@@ -317,23 +326,14 @@ onUnmounted(() => {
 }
 
 // ============================================================
-// 下拉结果
+// 搜索结果列表
 // ============================================================
-.search-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  width: 360px;
-  max-height: 360px;
+.search-results {
+  max-height: 300px;
   overflow-y: auto;
-  background: var(--el-bg-color);
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  z-index: 3000;
 }
 
-.dropdown-header {
+.results-header {
   padding: 8px 12px 4px;
   font-size: 11px;
   color: var(--el-text-color-placeholder);
@@ -341,7 +341,7 @@ onUnmounted(() => {
   letter-spacing: 0.5px;
 }
 
-.dropdown-item {
+.result-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -354,20 +354,20 @@ onUnmounted(() => {
     background: var(--el-fill-color-light);
   }
 
-  .dropdown-item-icon {
+  .result-item-icon {
     flex-shrink: 0;
     font-size: 18px;
     color: var(--el-text-color-regular);
   }
 
-  .dropdown-item-text {
+  .result-item-text {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
   }
 
-  .dropdown-item-title {
+  .result-item-title {
     font-size: 14px;
     font-weight: 500;
     color: var(--el-text-color-regular);
@@ -377,7 +377,7 @@ onUnmounted(() => {
     }
   }
 
-  .dropdown-item-breadcrumb {
+  .result-item-breadcrumb {
     font-size: 11px;
     color: var(--el-text-color-secondary);
     margin-top: 2px;
