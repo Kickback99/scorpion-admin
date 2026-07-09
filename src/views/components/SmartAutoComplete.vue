@@ -549,8 +549,16 @@ const handleKeydown = (event) => {
             }
           }
         }
+        // 如果开启了 autoSearchOnEnter（普通模式），自动选择第一个建议项
+        if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
+          addTagFromSuggestion(filteredSuggestions.value[0].value)
+          return
+        }
         // 添加当前输入作为标签
         addCurrentInputAsTag(currentInput.value)
+      } else if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
+        // 输入为空但下拉有建议 + autoSearchOnEnter → 自动选择第一条
+        addTagFromSuggestion(filteredSuggestions.value[0].value)
       }
       break
       
