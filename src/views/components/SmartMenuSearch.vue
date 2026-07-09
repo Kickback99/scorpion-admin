@@ -2,41 +2,34 @@
 <template>
   <!-- ===== 菜单搜索 ===== -->
   <div class="smart-menu-search" ref="containerRef">
-    <!-- 折叠：圆形按钮，和 Refresh/FullScreen/Setting 完全一致 -->
-    <el-button v-if="!isFocused" circle @click="handleTriggerClick">
-      <el-icon><Search /></el-icon>
-    </el-button>
+    <div class="search-input-row" :class="{ 'is-focused': isFocused }">
+      <el-icon class="search-input-icon" @click="handleIconClick"><Search /></el-icon>
+      <input
+        ref="inputRef"
+        v-model="query"
+        class="search-input-field"
+        placeholder="搜索菜单..."
+        @focus="handleFocus"
+        @keydown="handleKeydown"
+      />
+    </div>
 
-    <!-- 展开：图标 + 输入框 + 下拉结果 -->
-    <div v-else class="search-expanded">
-      <div class="search-input-row">
-        <el-icon class="search-input-icon" @click="handleTriggerClick"><Search /></el-icon>
-        <input
-          ref="inputRef"
-          v-model="query"
-          class="search-input-field"
-          placeholder="搜索菜单..."
-          @keydown="handleKeydown"
-        />
-      </div>
-
-      <div class="search-results" v-if="displayList.length > 0">
-        <div v-if="!query.trim()" class="results-header">最近访问</div>
-        <div
-          v-for="(item, index) in displayList"
-          :key="item.path"
-          class="result-item"
-          :class="{ 'is-active': index === activeIndex }"
-          @mousedown.prevent="navigateTo(item)"
-          @mouseenter="activeIndex = index"
-        >
-          <el-icon class="result-item-icon">
-            <SingleIcon :icon="item.icon || 'ep:menu'" />
-          </el-icon>
-          <div class="result-item-text">
-            <span class="result-item-title" v-html="highlight(item.title)"></span>
-            <span class="result-item-breadcrumb">{{ item.breadcrumb.join(' › ') }}</span>
-          </div>
+    <div class="search-results" v-if="isFocused && displayList.length > 0">
+      <div v-if="!query.trim()" class="results-header">最近访问</div>
+      <div
+        v-for="(item, index) in displayList"
+        :key="item.path"
+        class="result-item"
+        :class="{ 'is-active': index === activeIndex }"
+        @mousedown.prevent="navigateTo(item)"
+        @mouseenter="activeIndex = index"
+      >
+        <el-icon class="result-item-icon">
+          <SingleIcon :icon="item.icon || 'ep:menu'" />
+        </el-icon>
+        <div class="result-item-text">
+          <span class="result-item-title" v-html="highlight(item.title)"></span>
+          <span class="result-item-breadcrumb">{{ item.breadcrumb.join(' › ') }}</span>
         </div>
       </div>
     </div>
@@ -47,7 +40,7 @@
 // ============================================================
 // 依赖导入
 // ============================================================
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
@@ -210,15 +203,20 @@ const resetState = () => {
   query.value = ''
   isFocused.value = false
   activeIndex.value = 0
+  inputRef.value?.blur()
 }
 
-const handleTriggerClick = () => {
+const handleFocus = () => {
+  isFocused.value = true
+  activeIndex.value = 0
+}
+
+const handleIconClick = () => {
   if (isFocused.value) {
     query.value = ''
     activeIndex.value = 0
   }
-  isFocused.value = true
-  nextTick(() => inputRef.value?.focus())
+  inputRef.value?.focus()
 }
 
 const handleKeydown = (e) => {
@@ -250,9 +248,7 @@ watch(query, () => { activeIndex.value = 0 })
 
 const handleClickOutside = (e) => {
   if (containerRef.value && !containerRef.value.contains(e.target)) {
-    query.value = ''
-    isFocused.value = false
-    activeIndex.value = 0
+    resetState()
   }
 }
 
@@ -274,21 +270,21 @@ onUnmounted(() => {
 }
 
 // ============================================================
-// 展开态：图标 + 输入框（内联，图标右侧）
+// 搜索输入框（始终显示）
 // ============================================================
-.search-expanded {
-  position: relative;
-  display: inline-flex;
-}
-
 .search-input-row {
   display: flex;
   align-items: center;
   height: 32px;
   width: 200px;
-  border: 1px solid var(--el-color-primary);
+  border: 1px solid var(--el-border-color);
   border-radius: 6px;
   background: var(--el-bg-color);
+  transition: border-color 0.25s;
+
+  &.is-focused {
+    border-color: var(--el-color-primary);
+  }
 }
 
 .search-input-icon {
