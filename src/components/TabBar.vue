@@ -78,6 +78,7 @@
                     </el-form-item>
                 </el-form>
             </el-popover>
+            <SmartMenuSearch />
         </div>
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
@@ -142,6 +143,7 @@ import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { darkMenuThemes,lightMenuThemes } from '@/assets/common/variable'
 import { useRenderIcon } from "./MyIcon/src/hook";
+import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
 import {useWebSocket} from '@/server/useWebSocket'
 
 // 初始化 WebSocket
