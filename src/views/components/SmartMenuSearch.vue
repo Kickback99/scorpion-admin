@@ -15,7 +15,10 @@
     </div>
 
     <div class="search-results" v-if="isFocused && displayList.length > 0">
-      <div v-if="!query.trim()" class="results-header">最近访问</div>
+      <div v-if="!query.trim()" class="results-header">
+        <span>最近访问</span>
+        <span class="results-header-clear" @mousedown.prevent.stop="handleClearRecent">清空</span>
+      </div>
       <div
         v-for="(item, index) in displayList"
         :key="item.path"
@@ -211,6 +214,10 @@ const handleFocus = () => {
   activeIndex.value = 0
 }
 
+const handleClearRecent = () => {
+  recentList.value = []
+}
+
 const handleIconClick = () => {
   if (isFocused.value) {
     query.value = ''
@@ -332,11 +339,24 @@ onUnmounted(() => {
 }
 
 .results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 8px 12px 4px;
   font-size: 11px;
   color: var(--el-text-color-placeholder);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  .results-header-clear {
+    font-size: 11px;
+    color: var(--el-text-color-secondary);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--el-color-primary);
+    }
+  }
 }
 
 .result-item {
