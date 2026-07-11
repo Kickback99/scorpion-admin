@@ -49,7 +49,6 @@
 // 依赖导入
 // ============================================================
 import { ref } from 'vue'
-import { Expand, Fold } from '@element-plus/icons-vue'
 import { useConfigItems } from './configItems'
 import ConfigControl from './ConfigControl.vue'
 
