@@ -11,7 +11,7 @@ const SYSTEM_CONFIG_KEYS = [
   'comment.article_comment_enabled',
   'comment.child_comment_limit',
   'comment.child_page_size',
-  'nav.login_enabled',
+  'user.login_enabled',
   'article_detail.theme',
   'article_detail.anchor_enabled'
 ]
@@ -31,8 +31,10 @@ const CONFIG_DEFINITIONS = {
   'comment.parent_page_size':{ type: 'number', message: '父评论分页大小', min:5, max: 15 },
 
   // 导航相关
-  'nav.login_enabled': { type: 'switch', message: '前端登录' },
   'nav.friend_link_enabled':{ type: 'switch', message: '前端友链' },
+
+  // 前台用户认证相关
+  'user.login_enabled':  { type: 'switch', message: '前端登录' },
 
   // 个人中心相关
   'profile.my_publishes_enabled': {type:'switch', message: '我的发布'},
@@ -101,8 +103,10 @@ export const useConfigStore = defineStore({
       parent_page_size:10
     },
     nav:{
-      login_enabled:true,
       friend_link_enabled: false,
+    },
+    user:{
+      login_enabled: true
     },
     profile:{
       my_publishes_enabled: false,
@@ -314,8 +318,8 @@ export const useConfigStore = defineStore({
       this.updateConfig('icon_enabled', !this.icon_enabled)
     },
 
-    toggleLoginEnabled() {
-      this.updateConfig('nav.login_enabled', !this.nav?.login_enabled)
+    toggleUserLoginEnabled() {
+      this.updateConfig('user.login_enabled', !this.user?.login_enabled)
     },
 
     toggleFriendLinkEnabled() {
@@ -404,8 +408,8 @@ export const useConfigStore = defineStore({
 
     // ========== Getter 方法 ==========
 
-    getLoginEnabled(){
-      return this.nav?.login_enabled === true
+    getUserLoginEnabled(){
+      return this.user?.login_enabled === true
     },
 
     getFriendLinkEnabled(){
@@ -515,7 +519,7 @@ export const useConfigStore = defineStore({
   },
 
   getters: {
-    isLoginEnabled: (state) => state.nav.login_enabled === true,
+    isUserLoginEnabled: (state) => state.user?.login_enabled === true,
     isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
     isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
     isMyPublishesEnabled: (state) => state.profile?.my_publishes_enabled ?? true,
