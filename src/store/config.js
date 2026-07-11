@@ -35,6 +35,7 @@ const CONFIG_DEFINITIONS = {
 
   // 前台用户认证相关
   'user.login_enabled':  { type: 'switch', message: '前端登录' },
+  'user.other_login_enabled': { type: 'switch', message: '其他登录' },
 
   // 个人中心相关
   'profile.my_publishes_enabled': {type:'switch', message: '我的发布'},
@@ -106,7 +107,8 @@ export const useConfigStore = defineStore({
       friend_link_enabled: false,
     },
     user:{
-      login_enabled: true
+      login_enabled: true,
+      other_login_enabled: false
     },
     profile:{
       my_publishes_enabled: false,
@@ -322,6 +324,10 @@ export const useConfigStore = defineStore({
       this.updateConfig('user.login_enabled', !this.user?.login_enabled)
     },
 
+    toggleUserOtherLoginEnabled() {
+      this.updateConfig('user.other_login_enabled', !this.user?.other_login_enabled)
+    },
+
     toggleFriendLinkEnabled() {
       this.updateConfig('nav.friend_link_enabled', !this.nav?.friend_link_enabled)
     },
@@ -410,6 +416,11 @@ export const useConfigStore = defineStore({
 
     getUserLoginEnabled(){
       return this.user?.login_enabled === true
+    },
+
+    
+    getUserOtherLoginEnabled(){
+      return this.user?.other_login_enabled === true
     },
 
     getFriendLinkEnabled(){
@@ -520,6 +531,7 @@ export const useConfigStore = defineStore({
 
   getters: {
     isUserLoginEnabled: (state) => state.user?.login_enabled === true,
+    isUserOtherLoginEnabled: (state) => state.user?.other_login_enabled === true,
     isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
     isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
     isMyPublishesEnabled: (state) => state.profile?.my_publishes_enabled ?? true,
