@@ -10,10 +10,10 @@
             <!-- 前端登录 -->
             <el-form-item label="前端登录">
               <el-switch
-                :model-value="configStore.getLoginEnabled()"
+                :model-value="configStore.getUserLoginEnabled()"
                 :active-value="true"
                 :inactive-value="false"
-                @change="configStore.toggleLoginEnabled"
+                @change="configStore.toggleUserLoginEnabled"
               />
             </el-form-item>
 
