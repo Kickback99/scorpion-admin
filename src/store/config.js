@@ -60,8 +60,11 @@ const CONFIG_DEFINITIONS = {
 
   // 用户配置
   'user_config.collapse_enabled': {type:'switch', message:'菜单折叠'},
-  'user_config.dark_enabled': {type:'switch', message:'深色模式'}
+  'user_config.dark_enabled': {type:'switch', message:'深色模式'},
 
+  // oss配置
+  'oss.data_retention_days': {type: 'number', message: '逻辑删除oss数据保留天数', min:0, max: 100},
+  'oss.file_retention_days': {type: 'number', message: 'oss文件保留天数', min:0, max: 100},
 }
 
 // 提示消息映射
@@ -134,6 +137,10 @@ export const useConfigStore = defineStore({
     user_config:{
       collapse_enabled: false,
       dark_enabled: false
+    },
+    oss: {
+      data_retention_days: 30,
+      file_retention_days: 7
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -412,6 +419,14 @@ export const useConfigStore = defineStore({
       this.updateConfig('user_config.dark_enabled', !this.user_config?.dark_enabled)
     },
 
+    setDataRetentionDays(value){
+      this.updateConfig('oss.data_retention_days',value)
+    },
+
+    setFileRetentionDays(value){
+      this.updateConfig('oss.file_retention_days',value)
+    },
+
     // ========== Getter 方法 ==========
 
     getUserLoginEnabled(){
@@ -517,6 +532,14 @@ export const useConfigStore = defineStore({
 
     getUserDarkEnabled(){
       return this.user_config?.dark_enabled ?? true
+    },
+
+    getOssDataRetentionDays(){
+      return this.oss?.data_retention_days ?? 30
+    },
+
+    getOssFileRetentionDays(){
+      return this.oss?.file_retention_days ?? 7
     },
 
     // 获取数字配置项的最小值限制
