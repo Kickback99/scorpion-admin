@@ -260,6 +260,33 @@
                 @change="configStore.setCarouselLimit"
               />
             </el-form-item>
+
+            <!-- 逻辑删除oss数据保留天数 -->
+            <el-form-item label="oss数据保留天数">
+              <el-input-number
+                :model-value="configStore.getOssDataRetentionDays()"
+                :min="getMin('oss.data_retention_days')"
+                :max="getMax('oss.data_retention_days')"
+                @change="configStore.setDataRetentionDays"
+              />
+              <el-tooltip content="业务表逻辑删除保留的天数" placement="right">
+                <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </el-form-item>
+
+            <!-- 逻辑删除oss保留天数 -->
+            <el-form-item label="oss文件保留天数">
+              <el-input-number
+                :model-value="configStore.getOssFileRetentionDays()"
+                :min="getMin('oss.file_retention_days')"
+                :max="getMax('oss.file_retention_days')"
+                @change="configStore.setFileRetentionDays"
+              />
+              <el-tooltip content="oss文件删除保留的天数" placement="right">
+                <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </el-form-item>
+
           </el-form>
         </div>
       </el-tab-pane>
