@@ -17,6 +17,16 @@
               />
             </el-form-item>
 
+            <!-- 前端登录 -->
+            <el-form-item label="其他登录">
+              <el-switch
+                :model-value="configStore.getUserOtherLoginEnabled()"
+                :active-value="true"
+                :inactive-value="false"
+                @change="configStore.toggleUserOtherLoginEnabled"
+              />
+            </el-form-item>
+
             <!-- 前端友链 -->
             <el-form-item label="前端友链">
               <el-switch
