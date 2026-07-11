@@ -6,10 +6,10 @@
  */
 import { useConfigStore } from '@/store/config'
 import {
-  Monitor, Lock, Key, Link, ChatDotSquare, ChatLineSquare, Brush,
+  Monitor, Key, Link, ChatDotSquare, ChatLineSquare, Brush,
   Aim, Star, ChatDotRound, List, Document, Postcard, Comment, Collection,
-  View, CollectionTag, ChatSquare, Tickets, Bell, Search,
-  Top, PictureFilled, DeleteFilled, FolderDelete, Fold, Moon, Grid
+  View, CollectionTag, ChatSquare, Tickets, Bell,
+  PictureFilled, DeleteFilled, FolderDelete, Grid
 } from '@element-plus/icons-vue'
 
 /**
@@ -31,7 +31,7 @@ export function useConfigItems() {
     {
       key: 'client', label: '前台', icon: Monitor,
       items: [
-        { type: 'switch', key: 'login',           label: '前端登录',       desc: '控制前台登录功能的开启与关闭',         icon: Lock,           get: () => config.getUserLoginEnabled(),         set: (v) => config.updateConfig('user.login_enabled', v) },
+        { type: 'switch', key: 'login',           label: '前端登录',       desc: '控制前台登录功能的开启与关闭',         icon: "Lock",           get: () => config.getUserLoginEnabled(),         set: (v) => config.updateConfig('user.login_enabled', v) },
         { type: 'switch', key: 'other_login',      label: '其他登录',       desc: '允许第三方登录方式',                    icon: Key,            get: () => config.getUserOtherLoginEnabled(),     set: (v) => config.updateConfig('user.other_login_enabled', v) },
         { type: 'switch', key: 'friend_link',      label: '前端友链',       desc: '控制前台友链模块的显示',                icon: Link,           get: () => config.getFriendLinkEnabled(),         set: (v) => config.updateConfig('nav.friend_link_enabled', v) },
         { type: 'switch', key: 'article_comment',  label: '文章评论',       desc: '开启后文章详情页显示评论区',            icon: ChatDotSquare,  get: () => config.getArticleCommentEnabled(),     set: (v) => config.updateConfig('comment.article_comment_enabled', v) },
@@ -58,8 +58,8 @@ export function useConfigItems() {
       items: [
         { type: 'radio',  key: 'config_view_mode',      label: '配置界面样式',   desc: '切换配置列表的展示布局',                icon: Grid,           get: () => config.getConfigViewMode(),            set: (v) => config.setConfigViewMode(v),                                options: [{ value: 'sidebar', label: '分栏面板' }, { value: 'card', label: '折叠面板' }, { value: 'table', label: '折叠行内列表' }] },
         { type: 'switch', key: 'notification_comment', label: '评论通知',       desc: '后台收到新评论时弹出通知提醒',           icon: Bell,           get: () => config.getNotificationCommentEnabled(), set: (v) => config.updateConfig('notification.comment_enabled', v) },
-        { type: 'switch', key: 'icon',                  label: '图标搜索增强',   desc: '增强图标选择器的搜索功能',              icon: Search,         get: () => config.getIconEnabled(),                set: (v) => config.updateConfig('icon_enabled', v) },
-        { type: 'number', key: 'top_limit',             label: '文章置顶数量限制', desc: '允许同时置顶的最大文章数',             icon: Top,            get: () => config.getArticleTopLimit(),            set: (v) => config.updateConfig('article_top_limit', v),                  min: () => getMin('article_top_limit'), max: () => getMax('article_top_limit') },
+        { type: 'switch', key: 'icon',                  label: '图标搜索增强',   desc: '增强图标选择器的搜索功能',              icon: "Search",         get: () => config.getIconEnabled(),                set: (v) => config.updateConfig('icon_enabled', v) },
+        { type: 'number', key: 'top_limit',             label: '文章置顶数量限制', desc: '允许同时置顶的最大文章数',             icon: "Top",            get: () => config.getArticleTopLimit(),            set: (v) => config.updateConfig('article_top_limit', v),                  min: () => getMin('article_top_limit'), max: () => getMax('article_top_limit') },
         { type: 'number', key: 'carousel_limit',        label: '轮播图数量限制', desc: '允许上传的最大轮播图数量',              icon: PictureFilled,  get: () => config.getCarouselLimit(),              set: (v) => config.updateConfig('carousel_limit', v),                     min: () => getMin('carousel_limit'), max: () => getMax('carousel_limit') },
         { type: 'number', key: 'oss_data_days',         label: 'OSS 数据保留天数', desc: '业务表逻辑删除数据的保留天数',         icon: DeleteFilled,   get: () => config.getOssDataRetentionDays(),       set: (v) => config.updateConfig('oss.data_retention_days', v),             min: () => getMin('oss.data_retention_days'), max: () => getMax('oss.data_retention_days') },
         { type: 'number', key: 'oss_file_days',         label: 'OSS 文件保留天数', desc: 'OSS 文件删除后的保留天数',             icon: FolderDelete,   get: () => config.getOssFileRetentionDays(),       set: (v) => config.updateConfig('oss.file_retention_days', v),             min: () => getMin('oss.file_retention_days'), max: () => getMax('oss.file_retention_days') },
@@ -68,8 +68,8 @@ export function useConfigItems() {
     {
       key: 'user', label: '用户配置', icon: Collection,
       items: [
-        { type: 'switch', key: 'collapse_menu', label: '菜单折叠', desc: '侧边栏菜单默认折叠状态', icon: Fold, get: () => config.getUserCollapseEnabled(), set: (v) => config.updateConfig('user_config.collapse_enabled', v) },
-        { type: 'switch', key: 'dark_theme',    label: '深色主题', desc: '切换暗色/亮色显示模式',   icon: Moon, get: () => config.getUserDarkEnabled(),     set: (v) => config.updateConfig('user_config.dark_enabled', v) },
+        { type: 'switch', key: 'collapse_menu', label: '菜单折叠', desc: '侧边栏菜单默认折叠状态', icon: "Fold", get: () => config.getUserCollapseEnabled(), set: (v) => config.updateConfig('user_config.collapse_enabled', v) },
+        { type: 'switch', key: 'dark_theme',    label: '深色主题', desc: '切换暗色/亮色显示模式',   icon: "Moon", get: () => config.getUserDarkEnabled(),     set: (v) => config.updateConfig('user_config.dark_enabled', v) },
       ]
     },
   ]
