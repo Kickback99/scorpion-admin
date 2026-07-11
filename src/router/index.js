@@ -210,10 +210,10 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
     // ================= 2. 权限校验阶段 =================
         // 情况1：前台用户拦截
-        if (userStore.userInfo.type !== 0) {
+        /* if (userStore.userInfo.type !== 0) {
             console.log('情况1拦截')
             return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
-        }
+        } */
 
 
         // 情况2：无菜单权限拦截
@@ -426,7 +426,7 @@ router.beforeEach((to, from, next) => {
     }).catch((error) =>
         {
             // 情况1：前台用户 -> 提示错误，并跳转login
-            if (error.isFrontendUser && to.path !== '/login') {
+            /* if (error.isFrontendUser && to.path !== '/login') {
                       ElMessage.error(error.message)
                       router.replace('/login')
                       tokenStore.removeToken()
@@ -437,9 +437,9 @@ router.beforeEach((to, from, next) => {
                       closeWebSocket()
                     //   userStore.removeUserAuth()
                       
-            } 
+            }  */
             // 情况3：无菜单权限的后台用户 -> 跳转403
-            else if (error.noMenuPermission) {
+            if (error.noMenuPermission) {
                 if(hasRouteByPath(to.path)){
                     next()
                 }else {

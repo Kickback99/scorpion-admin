@@ -113,7 +113,7 @@ const handleLogin = async() => {
     } catch (error) {
         console.log(error)
         loading.value = false
-        throw(error)
+        // throw(error)
     }
 }
 
