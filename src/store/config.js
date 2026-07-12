@@ -68,6 +68,10 @@ const CONFIG_DEFINITIONS = {
   // oss配置
   'oss.data_retention_days': {type: 'number', message: '逻辑删除oss数据保留天数', min:0, max: 100},
   'oss.file_retention_days': {type: 'number', message: 'oss文件保留天数', min:0, max: 100},
+
+  // logo 配置
+  'logo.animation_style': {type:'string', message:'Logo 动画样式'},
+  'logo.hide_image': {type:'switch', message:'隐藏 Logo 图片'},
 }
 
 // 提示消息映射
@@ -98,6 +102,11 @@ const MESSAGE_MAP = {
       'table': '表格',
       'card': '卡片网格',
       'cloud': '标签云'
+    },
+    'logo.animation_style': {
+      'none': '无动画',
+      'border': '边框跑马灯',
+      'fill': '文字渐变填充'
     }
   }
 }
@@ -157,6 +166,10 @@ export const useConfigStore = defineStore({
     oss: {
       data_retention_days: 30,
       file_retention_days: 7
+    },
+    logo: {
+      animation_style: 'border',
+      hide_image: false
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
     numberLimits: {}
@@ -455,6 +468,22 @@ export const useConfigStore = defineStore({
       this.updateConfig('websocket_enabled', !this.websocket_enabled)
     },
 
+    getLogoAnimationStyle(){
+      return this.logo?.animation_style || 'border'
+    },
+
+    setLogoAnimationStyle(value){
+      this.updateConfig('logo.animation_style', value)
+    },
+
+    getLogoHideImage(){
+      return this.logo?.hide_image === true
+    },
+
+    toggleLogoHideImage(){
+      this.updateConfig('logo.hide_image', !this.logo?.hide_image)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -611,7 +640,9 @@ export const useConfigStore = defineStore({
     isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
     configViewMode: (state) => state.config_view_mode || 'card',
     tagViewMode: (state) => state.tag_view_mode || 'card',
-    isWebsocketEnabled: (state) => state.websocket_enabled === true
+    isWebsocketEnabled: (state) => state.websocket_enabled === true,
+    logoAnimationStyle: (state) => state.logo?.animation_style || 'border',
+    isLogoImageHidden: (state) => state.logo?.hide_image === true
   },
 
   // 配置持久化

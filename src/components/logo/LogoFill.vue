@@ -1,39 +1,31 @@
 <template>
-  <!-- ===== Logo：按 logo.animation_style 渲染对应动画 ===== -->
-  <LogoBorder v-if="animStyle === 'border'" :hide-image="hideImage" />
-  <LogoFill v-else-if="animStyle === 'fill'" :hide-image="hideImage" />
-  <div v-else class="logo logo-plain">
-    <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}">
+  <!-- ===== 文字渐变填充：文字颜色从左到右流动 ===== -->
+  <div class="logo logo-fill">
+    <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">
     <p :style="hideImage ? {color:colorStore.logoTitleColor, flex:'1', textAlign:'center', fontSize:'22px'} : {color:colorStore.logoTitleColor}">{{ settingStore.title }}</p>
   </div>
 </template>
 
 <script setup>
 // ============================================================
-// 依赖导入
+// 文字渐变填充 — 背景渐变从左到右流动，clip 到文字
 // ============================================================
-import { computed } from 'vue'
-import { useConfigStore } from '@/store/config'
 import { useSettingStore } from '@/setting'
 import { useColorStore } from '@/store/color'
 import { useUserConfigStore } from '@/store/userConfig'
-import LogoBorder from './LogoBorder.vue'
-import LogoFill from './LogoFill.vue'
 
-// ============================================================
-// 数据
-// ============================================================
-const configStore = useConfigStore()
+defineProps({
+  hideImage: { type: Boolean, default: false }
+})
+
 const settingStore = useSettingStore()
 const colorStore = useColorStore()
 const userConfigStore = useUserConfigStore()
-
-const animStyle = computed(() => configStore.getLogoAnimationStyle())
-const hideImage = computed(() => configStore.getLogoHideImage())
+const collapse = userConfigStore.getCollapseEnabled()
 </script>
 
 <style scoped lang="scss">
-.logo-plain {
+.logo {
   @include flex(center, center, null);
   color: white;
   font-weight: bold;
@@ -51,6 +43,25 @@ const hideImage = computed(() => configStore.getLogoHideImage())
   p {
     font-size: 17px;
     z-index: 1;
+
+    background: linear-gradient(
+      90deg,
+      var(--el-text-color-primary) 0%,
+      var(--el-color-primary) 25%,
+      var(--el-color-primary-light-3) 50%,
+      var(--el-color-primary) 75%,
+      var(--el-text-color-primary) 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: lf-shift 3s linear infinite;
   }
+}
+
+@keyframes lf-shift {
+  0%   { background-position: 100% 0; }
+  100% { background-position: 0% 0; }
 }
 </style>
