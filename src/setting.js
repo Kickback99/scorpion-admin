@@ -9,7 +9,7 @@ export const useSettingStore = defineStore({
         // 项目logo
         logo:logoImage,
         // 项目标题
-        title:'蝎子博客管理',
+        title:'SCORPIONCODE',
         isManualTo403:false,
     }),
     actions:{

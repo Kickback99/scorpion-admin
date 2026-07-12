@@ -65,6 +65,8 @@ export function useConfigItems() {
         { type: 'number', key: 'carousel_limit',        label: '轮播图数量限制', desc: '允许上传的最大轮播图数量',              icon: PictureFilled,  get: () => config.getCarouselLimit(),              set: (v) => config.updateConfig('carousel_limit', v),                     min: () => getMin('carousel_limit'), max: () => getMax('carousel_limit') },
         { type: 'number', key: 'oss_data_days',         label: 'OSS 数据保留天数', desc: '业务表逻辑删除数据的保留天数',         icon: DeleteFilled,   get: () => config.getOssDataRetentionDays(),       set: (v) => config.updateConfig('oss.data_retention_days', v),             min: () => getMin('oss.data_retention_days'), max: () => getMax('oss.data_retention_days') },
         { type: 'number', key: 'oss_file_days',         label: 'OSS 文件保留天数', desc: 'OSS 文件删除后的保留天数',             icon: FolderDelete,   get: () => config.getOssFileRetentionDays(),       set: (v) => config.updateConfig('oss.file_retention_days', v),             min: () => getMin('oss.file_retention_days'), max: () => getMax('oss.file_retention_days') },
+        { type: 'radio',  key: 'logo_animation',         label: 'Logo 动画样式',  desc: '切换侧边栏 Logo 的扫光动画效果',        icon: "Refresh",      get: () => config.getLogoAnimationStyle(),         set: (v) => config.setLogoAnimationStyle(v),                             options: [{ value: 'none', label: '无动画' }, { value: 'border', label: '边框跑马灯' }, { value: 'fill', label: '文字渐变填充' }] },
+        { type: 'switch', key: 'logo_hide_img',          label: '隐藏 Logo 图片', desc: '隐藏侧边栏 Logo 的头像图片',              icon: "Close",        get: () => config.getLogoHideImage(),              set: (v) => config.updateConfig('logo.hide_image', v) },
       ]
     },
     {
