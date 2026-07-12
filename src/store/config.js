@@ -24,6 +24,7 @@ const CONFIG_DEFINITIONS = {
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
   config_view_mode: { type: 'string', message: '配置界面样式' },
   tag_view_mode: { type: 'string', message: '标签管理样式' },
+  websocket_enabled: { type: 'switch', message: 'WebSocket 连接' },
   
   // 评论相关
   'comment.article_comment_enabled': { type: 'switch', message: '文章评论显示' },
@@ -112,6 +113,7 @@ export const useConfigStore = defineStore({
     icon_enabled: true,
     config_view_mode: 'card',
     tag_view_mode: 'card',
+    websocket_enabled: true,
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -445,6 +447,14 @@ export const useConfigStore = defineStore({
       this.updateConfig('tag_view_mode', value)
     },
 
+    getWebsocketEnabled(){
+      return this.websocket_enabled ?? true
+    },
+
+    toggleWebsocketEnabled(){
+      this.updateConfig('websocket_enabled', !this.websocket_enabled)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -600,7 +610,8 @@ export const useConfigStore = defineStore({
     isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
     isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
     configViewMode: (state) => state.config_view_mode || 'card',
-    tagViewMode: (state) => state.tag_view_mode || 'card'
+    tagViewMode: (state) => state.tag_view_mode || 'card',
+    isWebsocketEnabled: (state) => state.websocket_enabled === true
   },
 
   // 配置持久化
