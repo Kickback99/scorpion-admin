@@ -23,6 +23,7 @@ const CONFIG_DEFINITIONS = {
   carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
   config_view_mode: { type: 'string', message: '配置界面样式' },
+  tag_view_mode: { type: 'string', message: '标签管理样式' },
   
   // 评论相关
   'comment.article_comment_enabled': { type: 'switch', message: '文章评论显示' },
@@ -91,6 +92,11 @@ const MESSAGE_MAP = {
       'sidebar': '分栏面板',
       'card': '折叠面板',
       'table': '折叠行内列表'
+    },
+    'tag_view_mode': {
+      'table': '表格',
+      'card': '卡片网格',
+      'cloud': '标签云'
     }
   }
 }
@@ -105,6 +111,7 @@ export const useConfigStore = defineStore({
     carousel_limit: 3,
     icon_enabled: true,
     config_view_mode: 'card',
+    tag_view_mode: 'card',
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -430,6 +437,14 @@ export const useConfigStore = defineStore({
       this.updateConfig('config_view_mode', value)
     },
 
+    getTagViewMode(){
+      return this.tag_view_mode || 'card'
+    },
+
+    setTagViewMode(value){
+      this.updateConfig('tag_view_mode', value)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -584,7 +599,8 @@ export const useConfigStore = defineStore({
     isNotificationCommentEnabled:(state) => state.notification?.comment_enabled ?? true,
     isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
     isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
-    configViewMode: (state) => state.config_view_mode || 'card'
+    configViewMode: (state) => state.config_view_mode || 'card',
+    tagViewMode: (state) => state.tag_view_mode || 'card'
   },
 
   // 配置持久化
