@@ -25,13 +25,13 @@
         </el-form>
         <div class="bottom">
             <div class="file-operate">
-                <el-button :disabled="$hasPerm('btn.file.remove')" color="#EEDD82" @click="deleteSelectRows()">
+                <el-button :disabled="$hasPerm('btn.file.remove')" type="danger" @click="deleteSelectRows()" plain>
                     <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
                 </el-button>
             </div>
 
             <div class="file-operate">
-                <el-button :disabled="$hasPerm('btn.file.remove')" color="#7B68EE"  @click="handleSyncDelete()">
+                <el-button :disabled="$hasPerm('btn.file.remove')" color="#7B68EE"  @click="handleSyncDelete()" plain>
                     <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
                 </el-button>
             </div>

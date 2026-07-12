@@ -61,7 +61,7 @@
 
         <!-- 顶部操作栏：新增「回复」按钮 -->
         <div class="top-action-bar">
-            <el-button type="success" :icon="ChatLineSquare" plain @click="handleTopReply">
+            <el-button size="small" type="primary" plain @click="handleTopReply">
                 回复
             </el-button>
         </div>
@@ -70,9 +70,9 @@
 
     <div class="action-bar">
         <div class="action-buttons">
-            <el-button @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Check"  type="success" plain :dark="isDark" >批量通过</el-button>
-            <el-button @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Close"  type="warning" plain :dark="isDark" >批量驳回</el-button>
-            <el-button @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete"  type="danger"   plain :dark="isDark" >批量删除</el-button>
+            <el-button size="small" @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="primary" plain :dark="isDark" >批量通过</el-button>
+            <el-button size="small" @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="warning" plain :dark="isDark" >批量驳回</el-button>
+            <el-button size="small" @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="danger"   plain :dark="isDark" >批量删除</el-button>
         </div>
 
         <!-- 统计区域：按钮显示状态文字，数字单独显示 -->
@@ -133,9 +133,9 @@
         <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
         <el-table-column prop ="status" label="评论状态">
             <template #default="{row}">
-                <el-text type="primary" v-if="row.status === 0">已通过</el-text>
-                <el-text type="danger" v-if="row.status === 1">已驳回</el-text>
-                <el-text type="warning" v-if="row.status === 2">待审核</el-text>
+                <el-button size="small" plain type="primary" v-if="row.status === 0">已通过</el-button>
+                <el-button size="small" plain type="danger" v-if="row.status === 1">已驳回</el-button>
+                <el-button size="small" plain type="warning" v-if="row.status === 2">待审核</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="username" label="创建者" />
@@ -153,7 +153,7 @@
                     >
                         <template #reference>
                             <el-button 
-                                type="success" 
+                                type="primary" 
                                 size="small" 
                                 plain
                                 :disabled="row.status === 0"
@@ -188,8 +188,8 @@
 
                 <!-- 正常模式/挑拣模式：显示 回复/挑拣/删除/详情 -->
                 <template v-else>
-                    <el-button type="success" size="small" plain @click="handleReply(row)">回复</el-button>
-                    <el-button type="primary" size="small" plain 
+                    <el-button type="primary" size="small" plain @click="handleReply(row)">回复</el-button>
+                    <el-button type="success" size="small" plain 
                         @click="row.rootId === -1 ? handleSelectChildren(row) : handleSelectParent(row)">
                         挑拣
                     </el-button>
@@ -320,7 +320,6 @@ import { useColorStore } from '@/store/color';
 import PinyinMatch from 'pinyin-match'
 import { getAllArticlesApi } from '@/api/business';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
-import {ChatLineSquare} from '@element-plus/icons-vue'
 
 const colorStore = useColorStore()
 const { isDark } = storeToRefs(colorStore)

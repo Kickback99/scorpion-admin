@@ -89,9 +89,9 @@
             
             <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">
-                    <el-tag :type="getFileTypeTag(row.fileType)" size="small">
+                    <el-button :type="getFileTypeTag(row.fileType)" size="small" plain>
                         {{ row.targetId && row.targetId > 0 ? getFileTypeLabel(row.fileType): '孤儿' }}
-                    </el-tag>
+                    </el-button>
                 </template>
             </el-table-column>
             
@@ -104,9 +104,9 @@
 
             <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
                 <template #default="{ row }">
-                    <el-tag :type="row.isDeleted === 0 ? 'success' : 'danger'" size="small">
+                    <el-button :type="row.isDeleted === 0 ? 'success' : 'danger'" size="small" plain>
                         {{ row.isDeleted === 0 ? '正常' : '已删除' }}
-                    </el-tag>
+                    </el-button>
                 </template>
             </el-table-column>
 

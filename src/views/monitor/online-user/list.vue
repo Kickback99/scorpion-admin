@@ -16,12 +16,12 @@
                 </el-form-item>
             </el-form>
             <div>
-                <el-button @click="cleanZombieUsers" type="danger">清理僵尸用户</el-button>
+                <el-button @click="cleanZombieUsers" type="primary" plain >清理僵尸用户</el-button>
             </div>
         </div>
 
         <!-- 表格 -->
-        <el-table :data="filteredTableData" style="width: 100%" stripe>
+        <el-table :data="filteredTableData" style="width: 100%" stripe align="center">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
                     <el-avatar 
@@ -34,9 +34,9 @@
             <el-table-column prop="username" label="用户名" min-width="120" />
             <el-table-column prop="roleName" label="用户类型" min-width="100">
                 <template #default="{row}">
-                    <el-tag :type="row.role === 'admin' ? 'danger' : 'primary'">
-                        {{ row.roleName }}
-                    </el-tag>
+                    <el-button :type="row.role === 'admin' ? 'danger' : 'primary'" plain size="small">
+                        {{row.userId === "1" && row.role === "admin" ? '超级管理员' : row.roleName }}
+                    </el-button>
                 </template>
             </el-table-column>
             <el-table-column prop="ip" label="IP地址" min-width="130" />
@@ -44,13 +44,14 @@
             <el-table-column prop="browser" label="浏览器" min-width="100" />
             <el-table-column prop="location" label="登录地点" min-width="100" />
             <el-table-column prop="loginTime" label="登录时间" min-width="160" />
-            <el-table-column label="操作" width="180" fixed="right">
+            <el-table-column label="操作" fixed="right">
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
                         <el-button 
-                            type="danger" 
+                            type="primary" 
                             size="small"
+                            plain
                             :loading="kickingMap[row.userId + '_' + row.role]"
                             :disabled="kickingMap[row.userId + '_' + row.role]"
                             > 

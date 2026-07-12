@@ -15,7 +15,7 @@
         border stripe
         >
         <el-table-column prop="name" label="菜单名称" width="160"/>
-        <el-table-column label="图标">
+        <el-table-column label="图标" width="60">
           <template #default="{row}">
             <!-- <Icon icon="row.icon == null ? 'ep:user':row.icon" /> -->
              <el-icon><SingleIcon :icon="row.icon"></SingleIcon></el-icon>
@@ -23,7 +23,7 @@
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" width="160"/>
         <el-table-column prop="path" label="路由地址" width="120"/>
-        <el-table-column prop="component" label="组件路径" width="160"/>
+        <el-table-column prop="component" label="组件路径" width="180" show-overflow-tooltip/>
         <el-table-column prop="sortValue" label="排序" width="60"/>
         <el-table-column label="状态" width="80">
             <template #default="{row}">
@@ -35,9 +35,13 @@
         <el-table-column prop="createTime" label="创建时间" width="160"/>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{row}">
-            <el-button v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="success" circle plain  icon="Plus" size="mini"/>
-            <el-button  @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')"  type="primary" circle plain  icon="Edit" size="mini" />
-            <el-button @click="removeMenu(row.id)" :disabled="row.children.length > 0"  type="danger"  circle plain icon="Delete" size="mini" title="删除" />
+            <el-button v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="primary" plain size="small">新增</el-button>
+            <el-button  @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')"  type="warning" plain size="small">编辑</el-button>
+            <el-popconfirm :title="`你确定要删除 ${row.name} 吗`" @confirm="removeMenu(row.id)" width="250px" icon="WarnTriangleFilled">
+              <template #reference>
+                <el-button :disabled="row.children.length > 0"  type="danger"  plain size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
     </el-table>

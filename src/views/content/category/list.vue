@@ -2,7 +2,7 @@
  <!--  <div>
     <p>分类管理</p>
   </div> -->
-   <h4> isEnd.value: {{ isEnd }}</h4> 
+   <!-- <h4> isEnd.value: {{ isEnd }}</h4> 
    <h4> isChildId: {{ isChildId }}</h4> 
    <h4> currentEditID {{ currentEditID }}</h4> 
    <h4> isChild: {{ isChild }}</h4> 
@@ -10,7 +10,7 @@
    <h4> isParentChild: {{ isParentChild }}</h4> 
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
-   <h4> isNative(原生): {{ isNative }}</h4> 
+   <h4> isNative(原生): {{ isNative }}</h4>  -->
   <el-button type="type" @click="addParent" size="small" :disabled="disabledAddParent || $hasPerm('btn.category.add')">新增</el-button>
   <el-button type="type" @click="handleReset" size="small">重置</el-button>
   <!-- table树形展示 -->
@@ -19,7 +19,7 @@
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree style="max-width: 600px" :data="cateData" :props="defaultProps" 
+  <el-tree style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps" 
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
@@ -101,7 +101,7 @@
                即点中哪个编辑项，哪个编辑项隐藏 
          -->
         <el-button :disabled="$hasPerm('btn.category.update')" v-if="!isEdit ? allShow : (isEdit && !data.isEdit)" style="margin-left: 8px"
-          @click="handleEdit(node, data)" icon="Edit" type="primary" circle plain size="small" />
+          @click="handleEdit(node, data)" icon="Edit" type="warning" circle plain size="small" />
         <!-- 删除 -->
         <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow"
           @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" icon="WarnTriangleFilled">
@@ -118,7 +118,7 @@
                     <el-button :disabled="$hasPerm('btn.sysRole.remove')" type="danger" icon="Delete"  circle plain/>
                 </template>
             </el-popconfirm> -->
-          <el-button @click="handleTest(node,data)">test</el-button>
+          <!-- <el-button @click="handleTest(node,data)">test</el-button> -->
       </span>
     </template>
   </el-tree>

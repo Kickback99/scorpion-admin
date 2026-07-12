@@ -9,7 +9,7 @@
                 <el-button icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
             </el-form-item>
             <div>
-                <el-button size="small" type="primary" icon="Plus" @click="handleAdd">新增轮播</el-button>
+                <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
             </div>
         </el-form>
     </div>
