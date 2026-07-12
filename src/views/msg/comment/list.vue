@@ -316,13 +316,13 @@ import { nextTick, reactive, ref, computed } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
-import { useColorStore } from '@/store/color';
+import { useUserConfigStore } from '@/store/userConfig';
 import PinyinMatch from 'pinyin-match'
 import { getAllArticlesApi } from '@/api/business';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 
-const colorStore = useColorStore()
-const { isDark } = storeToRefs(colorStore)
+const userConfigStore = useUserConfigStore()
+const { isDarkEnabled: isDark } = storeToRefs(userConfigStore)
 
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
 const viewMode = ref('normal')

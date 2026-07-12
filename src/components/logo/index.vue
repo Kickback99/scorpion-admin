@@ -4,7 +4,7 @@
   <LogoFill v-else-if="animStyle === 'fill'" :hide-image="hideImage" />
   <div v-else class="logo logo-plain">
     <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}">
-    <p :style="hideImage ? {color:colorStore.logoTitleColor, flex:'1', textAlign:'center', fontSize:'22px'} : {color:colorStore.logoTitleColor}">{{ settingStore.title }}</p>
+    <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
 
@@ -15,7 +15,6 @@
 import { computed } from 'vue'
 import { useConfigStore } from '@/store/config'
 import { useSettingStore } from '@/setting'
-import { useColorStore } from '@/store/color'
 import { useUserConfigStore } from '@/store/userConfig'
 import LogoBorder from './LogoBorder.vue'
 import LogoFill from './LogoFill.vue'
@@ -25,7 +24,6 @@ import LogoFill from './LogoFill.vue'
 // ============================================================
 const configStore = useConfigStore()
 const settingStore = useSettingStore()
-const colorStore = useColorStore()
 const userConfigStore = useUserConfigStore()
 
 const animStyle = computed(() => configStore.getLogoAnimationStyle())

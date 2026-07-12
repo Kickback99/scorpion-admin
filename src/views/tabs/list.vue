@@ -1,12 +1,12 @@
 <template>
   <div v-if="showTags" class="tags-view" 
   :style="{
-        backgroundColor:colorStore.isDark?'#222':'#fff',
+        backgroundColor:userConfigStore.isDarkEnabled?'#222':'#fff',
         marginBottom:10 +'px'
       }"
   >
     <!-- 左滚动按钮 -->
-    <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)" :class="colorStore.isDark?'dark-mode':'light-mode'">
+    <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
       <el-icon><ArrowLeft /></el-icon>
     </span>
     
@@ -47,13 +47,13 @@
     </div>
     
     <!-- 右滚动按钮 -->
-    <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)" :class="colorStore.isDark?'dark-mode':'light-mode'">
+    <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
       <el-icon><ArrowRight /></el-icon>
     </span>
     
     <!-- 下拉菜单 -->
     <el-dropdown trigger="click" @command="handleCommand">
-      <span class="arrow-down" :class="colorStore.isDark?'dark-mode':'light-mode'">
+      <span class="arrow-down" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
         <el-icon><ArrowDown /></el-icon>
       </span>
       <template #dropdown>
@@ -87,7 +87,7 @@
       v-show="contextmenuVisible"
       ref="contextmenuRef"
       class="contextmenu"
-      :class="colorStore.isDark?'dark-mode':'light-mode'"
+      :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'"
       :style="{
         left: contextmenuLeft + 'px',
         top: contextmenuTop + 'px'
@@ -124,8 +124,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
-import { useColorStore } from '@/store/color'
-const colorStore = useColorStore()
+import { useUserConfigStore } from '@/store/userConfig'
+const userConfigStore = useUserConfigStore()
 // 导入图标
 /* import {
   ArrowLeft,
