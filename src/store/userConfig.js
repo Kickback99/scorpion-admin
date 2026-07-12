@@ -2,6 +2,7 @@
 import { defineStore } from "pinia";
 import { getUserConfigApi, updateUserConfigValueApi } from "@/api/userConfig";
 import { useUserStore } from "./user";
+import { applyTheme } from '@/assets/common/theme'
 
 export const useUserConfigStore = defineStore({
   id: 'userConfig',
@@ -10,10 +11,9 @@ export const useUserConfigStore = defineStore({
     // 用户配置数据
     collapse_enabled: false,
     dark_enabled: false,
+    theme: 'default',
     // 以后新增配置项在这里添加 ↓
-    // theme: 'light',
-    // language: 'zh-CN',
-    
+
     // 缓存控制标志
     hasLoadedConfig: false,
   }),
@@ -109,7 +109,11 @@ export const useUserConfigStore = defineStore({
      * 切换深色模式
      */
     async toggleDark() {
-      return this.updateConfig('dark_enabled', !this.dark_enabled);
+      const result = await this.updateConfig('dark_enabled', !this.dark_enabled)
+      if (result) {
+        applyTheme(this.theme, this.dark_enabled)
+      }
+      return result
     },
 
     /**
@@ -127,6 +131,18 @@ export const useUserConfigStore = defineStore({
     },
     
     /**
+     * 设置主题色
+     * @param {string} themeName - 主题名称，如 'default', 'orange'
+     */
+    async setTheme(themeName) {
+      const success = await this.updateConfig('theme', themeName)
+      if (success) {
+        applyTheme(themeName, this.dark_enabled)
+      }
+      return success
+    },
+
+    /**
      * 清除用户配置缓存（登出时调用）
      */
     clearUserConfig() {
@@ -139,6 +155,7 @@ export const useUserConfigStore = defineStore({
   getters: {
     isCollapseEnabled: (state) => state.collapse_enabled,
     isDarkEnabled: (state) => state.dark_enabled,
+    currentTheme: (state) => state.theme,
     hasConfig: (state) => state.hasLoadedConfig,
     allConfig: (state) => {
       const { hasLoadedConfig, ...config } = state;
