@@ -21,7 +21,7 @@
         <div class="buttons">
             <el-button circle icon="Refresh" @click="modifyRefresh"></el-button>
             <el-button circle icon="FullScreen" @click="fullScreen"></el-button>
-            <el-popover placement="bottom" :width="150" trigger="hover">
+            <el-popover placement="bottom" :width="260" trigger="hover">
                 <template #reference>
                     <el-button circle icon="Setting"></el-button>
                 </template>
@@ -29,6 +29,19 @@
                     <el-form-item label="暗黑模式">
                         <el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
                             inactive-icon="Sunny" />
+                    </el-form-item>
+                    <el-form-item label="主题色">
+                        <div class="theme-picker">
+                            <span
+                                v-for="t in themeList"
+                                :key="t.name"
+                                class="theme-dot"
+                                :class="{ active: userConfigStore.currentTheme === t.name }"
+                                :style="{ backgroundColor: themePresets[t.name].colors.primary }"
+                                :title="t.label"
+                                @click="handleThemeChange(t.name)"
+                            ></span>
+                        </div>
                     </el-form-item>
                     <el-form-item label="菜单折叠">
                         <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
@@ -72,6 +85,7 @@ import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
 import { useUserConfigStore } from '@/store/userConfig'
+import { themePresets, themeList } from '@/assets/common/theme/presets'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
@@ -192,6 +206,11 @@ const toggleDark = async () => {
     await userConfigStore.toggleDark()
     html.className = userConfigStore.isDarkEnabled ? 'dark' : ''
 }
+
+// 主题色切换
+const handleThemeChange = async (themeName) => {
+    await userConfigStore.setTheme(themeName)
+}
 </script>
 
 <style scoped lang="scss">
@@ -243,5 +262,29 @@ const toggleDark = async () => {
 // 组件内生效
 :deep(.el-color-dropdown__link-btn) {
     display: none
+}
+
+.theme-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .theme-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, transform 0.2s;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+
+    &.active {
+      border-color: var(--el-color-primary);
+      box-shadow: 0 0 0 2px var(--el-bg-color), 0 0 0 4px var(--el-color-primary);
+    }
+  }
 }
 </style>
