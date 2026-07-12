@@ -8,8 +8,8 @@ class WebSocketManager {
   constructor() {
     this.socket = null
     this.reconnectAttempts = 0
-    this.maxReconnectAttempts = 5
-    this.reconnectInterval = 3000
+    this.maxReconnectAttempts = 10
+    this.reconnectInterval = 5000
     this.isConnecting = false
     this.isManualClose = false  // 是否手动关闭
     this.cachedOnlineUsers = null  // 缓存在线用户
@@ -80,16 +80,18 @@ class WebSocketManager {
 
     // 判断是否应该重连
   shouldReconnectOnClose(code) {
-    // 正常关闭，不重连
+    // 1000：正常关闭，不重连
     if (code === 1000) return false
-    
-    // 1001：页面关闭，不重连
-    if (code === 1001) return false
-    
+
+    // 1001：服务端主动关闭（如 Spring Boot 优雅停机），应重连
+    // 注意：客户端 onclose 收到的 1001 来自服务端，表示"服务端要下线"，
+    // 与浏览器导航离开时客户端发出的 1001 是不同的方向
+    // 不在此处拦截，让其进入重连流程
+
     // 1008：策略违规，可能是权限问题，不重连
     if (code === 1008) return false
-    
-    // 其他错误码，尝试重连
+
+    // 其他错误码（含 1006 连接异常断开），尝试重连
     return true
   }
 
