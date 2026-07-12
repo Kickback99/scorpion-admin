@@ -22,6 +22,7 @@ const CONFIG_DEFINITIONS = {
   article_top_limit: { type: 'number', message: '文章置顶数量限制', min:1, max:99},
   carousel_limit: { type: 'number', message: '轮播图数量限制', min:0, max:99},
   icon_enabled: { type: 'switch', message: '图标搜索增强' },
+  config_view_mode: { type: 'string', message: '配置界面样式' },
   
   // 评论相关
   'comment.article_comment_enabled': { type: 'switch', message: '文章评论显示' },
@@ -85,6 +86,11 @@ const MESSAGE_MAP = {
     'article_list.load_mode': {
       'scroll': '滚动',
       'pagination': '分页'
+    },
+    'config_view_mode': {
+      'sidebar': '分栏面板',
+      'card': '折叠面板',
+      'table': '折叠行内列表'
     }
   }
 }
@@ -98,6 +104,7 @@ export const useConfigStore = defineStore({
     article_top_limit: 3,
     carousel_limit: 3,
     icon_enabled: true,
+    config_view_mode: 'card',
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -419,6 +426,10 @@ export const useConfigStore = defineStore({
       this.updateConfig('user_config.dark_enabled', !this.user_config?.dark_enabled)
     },
 
+    setConfigViewMode(value){
+      this.updateConfig('config_view_mode', value)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -534,6 +545,10 @@ export const useConfigStore = defineStore({
       return this.user_config?.dark_enabled ?? true
     },
 
+    getConfigViewMode(){
+      return this.config_view_mode || 'card'
+    },
+
     getOssDataRetentionDays(){
       return this.oss?.data_retention_days ?? 30
     },
@@ -568,7 +583,8 @@ export const useConfigStore = defineStore({
     isListCommentEnabled: (state) => state.article_list?.comment_enabled ?? true,
     isNotificationCommentEnabled:(state) => state.notification?.comment_enabled ?? true,
     isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
-    isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true
+    isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
+    configViewMode: (state) => state.config_view_mode || 'card'
   },
 
   // 配置持久化
