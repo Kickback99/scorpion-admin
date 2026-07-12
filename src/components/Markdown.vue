@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'dark-mode': colorStore.isDark}" style="width: 100%;">
+    <div :class="{'dark-mode': userConfigStore.isDarkEnabled}" style="width: 100%;">
         <!-- <v-md-editor :modelValue="modelValue"
             :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
             @change="onChange"
@@ -14,7 +14,7 @@
         @change="onChange"
         :config="{mode:'markdown'}"
         @upload-image="handleUploadImage"
-        :key="colorStore.isDark"
+        :key="userConfigStore.isDarkEnabled"
         />  
 
     </div>
@@ -23,14 +23,14 @@
 <script setup>
 import { uploadApi } from '@/api/article'
 import { computed } from 'vue'
-import { useColorStore } from '@/store/color'
-const colorStore = useColorStore()
+import { useUserConfigStore } from '@/store/userConfig'
+const userConfigStore = useUserConfigStore()
 import { createMarkdownPreview } from '@/utils/markdown-config'
 
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
-  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
-  return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
+  console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
+  return createMarkdownPreview(userConfigStore.isDarkEnabled?"vuepress":"github")
 })
 
 // import { uploadImgService } from '@/api/article'

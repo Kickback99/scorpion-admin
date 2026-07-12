@@ -4,8 +4,8 @@
         <el-form :model="blogData" ref="blogFormRef" :rules="rules">
             <el-form-item prop="title">
                     <el-input 
-                    :style="{backgroundColor:colorStore.isDark?'#000':'#fff'}" 
-                    :class="{'dark-mode':colorStore.isDark}"
+                    :style="{backgroundColor:userConfigStore.isDarkEnabled?'#000':'#fff'}"
+                    :class="{'dark-mode':userConfigStore.isDarkEnabled}"
                     placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
 
@@ -194,8 +194,8 @@ import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
 import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js';
 import SmartUpload from '@/views/components/SmartUpload.vue';
-import { useColorStore } from '@/store/color';
-const colorStore = useColorStore()
+import { useUserConfigStore } from '@/store/userConfig';
+const userConfigStore = useUserConfigStore()
 let mdHeight = window.innerHeight - 30 - 70 - 200
 import PinyinMatch from 'pinyin-match';
 import { getTagListApi } from '@/api/business';
