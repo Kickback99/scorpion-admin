@@ -158,7 +158,7 @@
                     :model-value="formatJson(formModel.reqParam)"
                      mode="preview"
                     @copy-code-success="handleCopySuccess"
-                    :key="colorStore.isDark"
+                    :key="userConfigStore.isDarkEnabled"
                       />  
                 </el-tab-pane>
 
@@ -176,7 +176,7 @@
                     :model-value="formatJson(formModel.resData)"
                      mode="preview"
                     @copy-code-success="handleCopySuccess"
-                    :key="colorStore.isDark"
+                    :key="userConfigStore.isDarkEnabled"
                       /> 
                 </el-tab-pane>
             </el-tabs>
@@ -191,13 +191,13 @@
 <script setup>
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
 import { reactive, ref,computed,watch } from 'vue';
-import { useColorStore } from '@/store/color'
+import { useUserConfigStore } from '@/store/userConfig'
 import { createMarkdownPreview } from '@/utils/markdown-config'
-const colorStore = useColorStore()
+const userConfigStore = useUserConfigStore()
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
-  console.log('创建主题:', colorStore.isDark?"vuepress":"github")
-  return createMarkdownPreview(colorStore.isDark?"vuepress":"github")
+  console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
+  return createMarkdownPreview(userConfigStore.isDarkEnabled?"vuepress":"github")
 })
 
 const tableData = ref([])
