@@ -37,15 +37,30 @@
                                 :key="t.name"
                                 class="theme-dot"
                                 :class="{ active: userConfigStore.currentTheme === t.name }"
-                                :style="{ backgroundColor: themePresets[t.name].colors.primary }"
+                                :style="{ backgroundColor: themePresets[t.name].colors.primary.bg }"
                                 :title="t.label"
                                 @click="handleThemeChange(t.name)"
                             ></span>
                         </div>
                     </el-form-item>
+                    <el-form-item label="文字色模式">
+                        <el-radio-group
+                            :model-value="iconStore.textColorMode"
+                            @change="onTextColorModeChange"
+                            size="small"
+                            :disabled="iconStore.buttonStyle !== 'full'"
+                        >
+                            <el-radio-button value="preset">配置文件</el-radio-button>
+                            <el-radio-button value="dynamic">动态计算</el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-form-item label="菜单折叠">
                         <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
                             inactive-icon="Fold" />
+                    </el-form-item>
+                    <el-divider />
+                    <el-form-item label="按钮样式">
+                        <ButtonStyleSettings />
                     </el-form-item>
                 </el-form>
             </el-popover>
@@ -85,11 +100,14 @@ import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
 import { useUserConfigStore } from '@/store/userConfig'
+import { useIconStore } from '@/store/icon'
 import { themePresets, themeList } from '@/assets/common/theme/presets'
+import { applyTheme } from '@/assets/common/theme'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
+import ButtonStyleSettings from '@/components/ButtonStyleSettings.vue'
 import {useWebSocket} from '@/server/useWebSocket'
 
 // 初始化 WebSocket
@@ -100,6 +118,7 @@ import { useTabStore } from "@/store/tabs";
 
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
+const iconStore = useIconStore()
 const handleAvatar = computed(()=>{
     return userStore.userInfo.avatar || avatar
 })
@@ -210,6 +229,12 @@ const toggleDark = async () => {
 // 主题色切换
 const handleThemeChange = async (themeName) => {
     await userConfigStore.setTheme(themeName)
+}
+
+// 实心文字色模式切换
+const onTextColorModeChange = (mode) => {
+    iconStore.setTextColorMode(mode)
+    applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
 </script>
 
