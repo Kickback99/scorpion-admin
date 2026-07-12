@@ -33,19 +33,19 @@
     @selection-change="removeMultiple"
     border stripe>
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="100" />
+        <el-table-column type="index" label="序号" width="50" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="200">
             <template #default="{row,$index}">
-            <el-button :disabled="$hasPerm('btn.sysRole.update')" type="primary" icon="Edit" @click="editDialog(row)" circle plain/>
+            <el-button size="small" :disabled="$hasPerm('btn.sysRole.update')" type="primary" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('btn.sysRole.remove')" type="danger" icon="Delete"  circle plain/>
+                    <el-button size="small" :disabled="$hasPerm('btn.sysRole.remove')" type="danger"plain>删除</el-button>
                 </template>
             </el-popconfirm>
-            <el-button :disabled="$hasPerm('btn.sysRole.assignAuth')" type="warning" icon="Baseball" size="mini" @click="showAssignAuth(row)" title="分配权限" circle plain/>
+            <el-button size="small" :disabled="$hasPerm('btn.sysRole.assignAuth')" type="warning"  @click="showAssignAuth(row)" plain>授权</el-button>
             </template>
         </el-table-column>
     </el-table>
