@@ -1,5 +1,5 @@
 <template>
-  <div class="config-management" :class="colorStore.isDark ? 'dark-mode' : 'light-mode'">
+  <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
     <div class="header-actions">
       <el-button type="primary" @click="handleAddRoot">
         <el-icon><Plus /></el-icon>
@@ -181,11 +181,11 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
 import { useConfigStore } from '@/store/config'
-import { useColorStore } from '@/store/color'
+import { useUserConfigStore } from '@/store/userConfig'
 import { updateAllConfigApi, getConfigApi, updateConfigValueApi, deleteConfigValueApi } from '@/api/config'
 
 const configStore = useConfigStore()
-const colorStore = useColorStore()
+const userConfigStore = useUserConfigStore()
 
 // 表格数据
 const tableData = ref([])

@@ -2,7 +2,7 @@
   <!-- ===== 文字渐变填充：文字颜色从左到右流动 ===== -->
   <div class="logo logo-fill">
     <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">
-    <p :style="hideImage ? {color:colorStore.logoTitleColor, flex:'1', textAlign:'center', fontSize:'22px'} : {color:colorStore.logoTitleColor}">{{ settingStore.title }}</p>
+    <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
 
@@ -11,7 +11,6 @@
 // 文字渐变填充 — 背景渐变从左到右流动，clip 到文字
 // ============================================================
 import { useSettingStore } from '@/setting'
-import { useColorStore } from '@/store/color'
 import { useUserConfigStore } from '@/store/userConfig'
 
 defineProps({
@@ -19,7 +18,6 @@ defineProps({
 })
 
 const settingStore = useSettingStore()
-const colorStore = useColorStore()
 const userConfigStore = useUserConfigStore()
 const collapse = userConfigStore.getCollapseEnabled()
 </script>

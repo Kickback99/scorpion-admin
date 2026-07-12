@@ -27,7 +27,7 @@
                 </template>
                 <el-form>
                     <el-form-item label="暗黑模式">
-                        <el-switch v-model="dark" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
+                        <el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
                             inactive-icon="Sunny" />
                     </el-form-item>
                     <el-form-item label="菜单折叠">
@@ -71,7 +71,7 @@ import { useUserStore } from '@/store/user'
 import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
-import { useColorStore } from '@/store/color'
+import { useUserConfigStore } from '@/store/userConfig'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
@@ -83,7 +83,6 @@ const { initWebSocketListener, closeWebSocket } = useWebSocket()
 
 // 导入全局事件总线对象
 import { useTabStore } from "@/store/tabs";
-import { useUserConfigStore } from "@/store/userConfig";
 
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
@@ -95,7 +94,6 @@ const handleAvatar = computed(()=>{
 
 
 const tokenStore = useTokenStore()
-const colorStore = useColorStore()
 const tabStore = useTabStore()
 
 const route = useRoute()
@@ -189,15 +187,10 @@ const handleCommand = async (key) => {
 }
 
 // 暗黑模式切换
-const dark = ref(colorStore.isDark)
-
-
-const toggleDark = () => {
-    // 获取html根节点
+const toggleDark = async () => {
     const html = document.documentElement
-    // 如果dark为真，给html标签添加dark类
-    colorStore.setDark()
-    dark.value ? html.className = 'dark' : html.className = ''
+    await userConfigStore.toggleDark()
+    html.className = userConfigStore.isDarkEnabled ? 'dark' : ''
 }
 </script>
 

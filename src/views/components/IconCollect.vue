@@ -11,7 +11,7 @@
   <div 
     v-loading="loading" 
     element-loading-text="图标加载中..."
-    :element-loading-background="colorStore.isDark ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'"
+    :element-loading-background="userConfigStore.isDarkEnabled ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'"
     class="icons-container"
   >  
 
@@ -131,14 +131,14 @@ import { analyzeComponent, getComponentImportPath} from '@/utils/hasIconComponen
 import { plainComData } from '@/data/plainComponent'
 import { IconFont } from '@/components/MyIcon'
 import SvgIcon from '@/components/MyIcon/src/SvgIcon.vue'
-import { useColorStore } from '@/store/color'
+import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
 const configStore =  useConfigStore()
 
 const preloadedComponents = ref([])
 const loadStore = useLoadStore()
 const iconStore = useIconStore()
-const colorStore = useColorStore()
+const userConfigStore = useUserConfigStore()
 // 添加 loading 状态
 const loading = ref(false)
 onMounted(async () => {
