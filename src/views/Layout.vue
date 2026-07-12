@@ -5,10 +5,10 @@
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
-          :active-text-color="finalActive" 
-          :background-color="finalBg" 
+          active-text-color="rgba(255, 215, 0, 1)" 
+          background-color="rgba(51, 51, 51, 1)" 
           :default-active="handelUrl"
-          :text-color="finalColor"
+          text-color="rgba(238, 238, 238, 1)"
           mode="vertical"
           :collapse="userConfigStore.collapse_enabled"
           :collapse-transition="false"
@@ -75,7 +75,6 @@ import MenuTree from '@/components/MenuTree.vue';
 import TabBar from '@/components/TabBar.vue';
 import {useUserStore} from '@/store/user'
 import { computed, nextTick, onMounted, ref,watch } from 'vue';
-import {useColorStore} from '@/store/color'
 import {useSettingStore} from '@/setting'
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
@@ -91,16 +90,6 @@ import { useUserConfigStore } from '@/store/userConfig';
   const styles =  getComputedStyle(document.documentElement)
   textColor.value = styles.getPropertyValue('--text')
 }) */
-
-// 方式二：使用颜色选择器和pinia仓库动态设置el-menu的text-color属性值
-const colorStore = useColorStore()
-const finalColor =  computed(()=>colorStore.menuTextColor)
-
-// 菜单背景颜色
-const finalBg = computed(()=>colorStore.menuBg)
-
-// 菜单高亮颜色
-const finalActive = computed(()=>colorStore.menuActive)
 
 // import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
