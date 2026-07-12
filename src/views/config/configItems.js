@@ -6,7 +6,7 @@
  */
 import { useConfigStore } from '@/store/config'
 import {
-  Monitor, Key, Link, ChatDotSquare, ChatLineSquare, Brush,
+  Monitor, Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
   Aim, Star, ChatDotRound, List, Document, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
   PictureFilled, DeleteFilled, FolderDelete, Grid
@@ -51,6 +51,7 @@ export function useConfigItems() {
         { type: 'radio',  key: 'load_mode',        label: '文章加载方式',   desc: '列表页文章的加载方式',                  icon: Tickets,        get: () => config.getListLoadMode(),              set: (v) => config.updateConfig('article_list.load_mode', v),           options: [{ value: 'scroll', label: '滚动加载' }, { value: 'pagination', label: '分页加载' }] },
         { type: 'number', key: 'scroll_page_size', label: '滚动分页大小',   desc: '滚动模式下每次加载的文章数量',          icon: List,           get: () => config.getListScrollPageSize(),         set: (v) => config.updateConfig('article_list.scroll_page_size', v),     min: () => getMin('article_list.scroll_page_size'), max: () => getMax('article_list.scroll_page_size') },
         { type: 'number', key: 'pagination_page_size', label: '分页大小',   desc: '分页模式下每页文章数量',                icon: List,           get: () => config.getListPaginationPageSize(),     set: (v) => config.updateConfig('article_list.pagination_page_size', v), min: () => getMin('article_list.pagination_page_size'), max: () => getMax('article_list.pagination_page_size') },
+        { type: 'switch', key: 'websocket',             label: 'WebSocket 连接', desc: '控制前端 WebSocket 连接的开启与关闭',    icon: Connection,     get: () => config.getWebsocketEnabled(),           set: (v) => config.updateConfig('websocket_enabled', v) },
       ]
     },
     {
