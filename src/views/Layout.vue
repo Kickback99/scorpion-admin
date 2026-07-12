@@ -1,14 +1,14 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside :style="{backgroundColor: 'rgba(51, 51, 51, 1)'}">
+      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}">
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
-          active-text-color="rgba(255, 215, 0, 1)" 
-          background-color="rgba(51, 51, 51, 1)" 
+          active-text-color="var(--el-color-primary)"
+          background-color="var(--sidebar-bg)"
           :default-active="handelUrl"
-          text-color="rgba(238, 238, 238, 1)"
+          text-color="var(--sidebar-text)"
           mode="vertical"
           :collapse="userConfigStore.collapse_enabled"
           :collapse-transition="false"

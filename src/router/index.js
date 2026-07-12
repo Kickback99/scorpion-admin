@@ -14,6 +14,7 @@ import { add404Routes } from '@/utils/404route'
 import { useWebSocket } from '@/server/useWebSocket'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
+import { applyTheme } from '@/assets/common/theme'
 
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
@@ -206,6 +207,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // ================= 1.6 加载用户配置 =================
     await userConfigStore.fetchUserConfig();
     document.documentElement.className = userConfigStore.isDarkEnabled ? 'dark' : '';
+    applyTheme(userConfigStore.theme, userConfigStore.isDarkEnabled);
 
     await configStore.loadConfig()
 
