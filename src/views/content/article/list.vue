@@ -84,13 +84,13 @@
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button :disabled="$hasPerm('btn.article.add')" type="success" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button :disabled="$hasPerm('btn.article.add')" type="primary" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
         </div>
     </div>
 
     <el-table :data="tableData" :style="{ width: '100%' }" >
-        <el-table-column type="index" label="序号" width="60"></el-table-column>
-        <el-table-column prop="title" label="标题" />
+        <el-table-column type="index" label="序号" width="50"></el-table-column>
+        <el-table-column prop="title" label="标题" show-overflow-tooltip/>
         <el-table-column label="封面">
             <template #default="{row}">
                 <el-image style="width: 100px" :src="row.cover" :fit="cover" />
@@ -107,12 +107,16 @@
                     {{ row.status === "0" ? "已发布" : "草稿" }}
               </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建日期" />
-        <el-table-column prop="updateTime" label="修改日期" />
+        <el-table-column prop="createTime" label="创建日期" width="185" />
+        <el-table-column prop="updateTime" label="修改日期" width="185" />
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" type="primary" icon="Edit"   circle plain ></el-button>
-                <el-button :disabled="$hasPerm('btn.article.remove')" @click="handleDelete(row.id)" type="danger" icon="Delete" circle plain ></el-button>
+                <el-button :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" type="primary" plain >编辑</el-button>
+                <el-popconfirm :title="`你确定要删除 ${row.title} 吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+                    <template #reference>
+                        <el-button :disabled="$hasPerm('btn.article.remove')" type="danger" plain >删除</el-button>
+                    </template>
+                </el-popconfirm>
             </template>
         </el-table-column>
     </el-table>
