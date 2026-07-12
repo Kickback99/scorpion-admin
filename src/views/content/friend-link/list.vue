@@ -16,7 +16,7 @@
 
         <div>
             <el-button size="small" type="primary" icon="Plus"  @click="handleAdd">新增友链</el-button>
-            <el-button size="small" icon="Delete" color="#626aef" :dark="isDark" @click="handleBatchDelete()">批量删除</el-button>
+            <el-button size="small" type=danger icon="Delete"  :dark="isDark" @click="handleBatchDelete()">批量删除</el-button>
         </div>
     </div>
 
@@ -33,18 +33,18 @@
         <el-table-column prop="address" label="地址" />
         <el-table-column label="状态">
             <template #default="{row}">
-                <el-button size="small" type="primary" v-if="row.status === '0'">已通过</el-button>
-                <el-button size="small" type="danger"  v-if="row.status === '1'">已驳回</el-button>
-                <el-button size="small" type="warning" v-if="row.status === '2'">待审核</el-button>
+                <el-button size="small" type="primary" plain v-if="row.status === '0'">已通过</el-button>
+                <el-button size="small" type="danger"  plain v-if="row.status === '1'">已驳回</el-button>
+                <el-button size="small" type="warning" plain v-if="row.status === '2'">待审核</el-button>
             </template>
         </el-table-column>
 
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle></el-button>
+                <el-button @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button size="small" type="danger" icon="Delete" circle></el-button>
+                        <el-button size="small" type="danger" icon="Delete" circle plain ></el-button>
                     </template>
                 </el-popconfirm>
             </template>

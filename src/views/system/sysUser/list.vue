@@ -84,19 +84,19 @@
     border
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="100" align="center" />
+        <el-table-column type="index" label="序号" width="50" align="center" />
         <el-table-column label="头像" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px" :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" align="center" />
+        <el-table-column prop="username" label="用户名" align="center" show-overflow-tooltip/>
         <el-table-column prop="nickname" label="呢称" align="center" />
         <el-table-column prop="roleNames" label="用户角色" align="center" show-overflow-tooltip/>
-        <el-table-column prop="phone" label="手机" align="center" />
+        <el-table-column prop="phone" label="手机"  width="130" align="center"/>
         <el-table-column label="类型" align="center ">
             <template #default="{row}">
-                {{ row.type === 0 ? '后台用户':'前台用户' }}
+                {{ row.type === 0 ? '后台':'前台' }}
             </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center">
@@ -104,17 +104,17 @@
                 <el-switch v-model="row.status"  :active-value="0" :inactive-value="1" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" align="center" width="180"/>
-        <el-table-column prop="updateTime" label="修改时间" align="center" width="180" />
-        <el-table-column label="操作" width="150" align="center" >
+        <el-table-column prop="createTime" label="创建时间" align="center" width="185"/>
+        <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
+        <el-table-column label="操作" width="200" align="center" >
             <template #default="{row,$index}">
-            <el-button  :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" type="primary" icon="Edit"  circle plain/>
+            <el-button  size="small" :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" type="primary" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('btn.sysUser.remove')" type="danger" icon="Delete"   circle plain/>
+                    <el-button size="small" :disabled="$hasPerm('btn.sysUser.remove')" type="danger" plain>删除</el-button>
                 </template>
             </el-popconfirm>
-            <el-button :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning" icon="User"   circle plain/>
+            <el-button size="small" :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning"  plain >分配</el-button>
             </template>
         </el-table-column>
     </el-table>

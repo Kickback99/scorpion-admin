@@ -5,7 +5,7 @@
       <el-button @click="openAddDialog" type="primary" icon="Plus">
         新增任务
       </el-button>
-      <el-button @click="refreshAllTasks" type="success" icon="Refresh">
+      <el-button @click="refreshAllTasks" type="info" icon="Refresh">
         刷新所有任务
       </el-button>
     </div>
@@ -41,18 +41,16 @@
       </el-table-column>
       
       <!-- ==================== 操作栏 ==================== -->
-      <el-table-column label="操作" width="280" fixed="right" align="center">
+      <el-table-column label="操作" width="350" fixed="right" align="center">
         <template #default="{ row }">
           <!-- 编辑任务 -->
-          <el-button @click="editTask(row)" type="primary" icon="Edit" circle plain title="编辑任务" />
+          <el-button size="small" @click="editTask(row)" type="primary" plain >编辑</el-button>
           <!-- 立即执行 -->
-          <el-button @click="executeTask(row)" type="warning" :icon="VideoPlay" circle plain title="立即执行" />
+          <el-button size="small" @click="executeTask(row)" type="warning" plain >立即</el-button>
           <!-- 刷新单个任务 -->
-          <el-button @click="refreshSingleTask(row)" type="info" icon="Refresh" circle plain title="刷新任务" />
+          <el-button size="small" @click="refreshSingleTask(row)" type="info" plain >刷新</el-button>
           <!-- 启用/禁用 -->
-          <el-button @click="toggleStatus(row)" :type="row.status === 0 ? 'danger' : 'success'" 
-                     :icon="row.status === 0 ? 'CircleClose' : 'CircleCheck'" circle plain 
-                     :title="row.status === 0 ? '禁用' : '启用'" />
+          <el-button size="small" @click="toggleStatus(row)" :type="row.status === 0 ? 'danger' : 'success'" plain >{{ row.status === 0 ? '禁用' : '启用' }}</el-button>
           <!-- 删除任务(仅禁用状态可删除) -->
           <el-popconfirm
             :title="`确定要删除【${row.taskName}】吗？`"
@@ -62,7 +60,7 @@
             @confirm="deleteTask(row)"
           >
             <template #reference>
-              <el-button :disabled="row.status === 0" type="danger" icon="Delete" circle plain title="删除任务" />
+              <el-button size="small" :disabled="row.status === 0" type="danger" plain >删除</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -148,7 +146,6 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { VideoPlay} from '@element-plus/icons-vue'
 import { listApi, addApi, updateApi, executeApi, refreshAllApi, refreshTaskApi, deleteApi } from '@/api/sysTask'
 import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
