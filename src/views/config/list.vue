@@ -22,8 +22,8 @@
 <script setup>
 import { ref } from 'vue'
 import { Search, Collection } from '@element-plus/icons-vue'
-import ConfigManager from '@/views/components/ConfigManager.vue'
-import ConfigList from '@/views/components/ConfigList.vue'
+import ConfigManager from './ConfigManager.vue'
+import ConfigList from './ConfigList.vue'
 
 const isSearch = ref(true)
 const toggleComponent = () => {
