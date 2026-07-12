@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside :style="{backgroundColor: finalBg}">
+      <el-aside :style="{backgroundColor: 'rgba(51, 51, 51, 1)'}">
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
@@ -83,15 +83,6 @@ import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
 import { useUserConfigStore } from '@/store/userConfig';
 
-// 方式一：使用css变量动态设置el-menu的text-color属性值
-// const textColor = ref('')
-
-/* onMounted(()=>{
-  const styles =  getComputedStyle(document.documentElement)
-  textColor.value = styles.getPropertyValue('--text')
-}) */
-
-// import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 
 const listData = computed(()=>
@@ -114,18 +105,6 @@ watch(()=>settingStore.refresh,()=>{
     isDestroy.value = true
   })
 })
-
-
-// 面包屑
-
-/* const breadList = ref([])
-
-function getBreadList(){
-  breadList.value =  route.matched
-}
-getBreadList()
-
-watch(route, () => getBreadList()); */
 
 // 处理菜单的默认展开
 const handelUrl = ref('/')
@@ -150,7 +129,7 @@ watch(()=>route.path,()=>{
 
 .el-aside {
   width: auto;
-  background-color: $menu-background;
+  // background-color: $menu-background;
   height: 100vh;
   &::-webkit-scrollbar {
     width: 0;
@@ -175,13 +154,4 @@ watch(()=>route.path,()=>{
 .scrollbar {
   height: calc(100vh - $base-menu-logo-height);
 }
-
-/* .content-scrollbar {
-  max-height: calc(100vh - 50px);
-} */
-
- /*  .el-menu-item,.el-sub-menu__title{
-    color:$menu-color
-  } */
-
 </style>
