@@ -56,6 +56,63 @@ export const themePresets = {
       info:    { bg: '#7F8C8D', text: W },
     },
   },
+
+  // ======== UI/UX Pro Max 行业配色 ========
+
+  enterprise: {
+    label: '企业蓝',
+    colors: {
+      primary: { bg: '#2563EB', text: W },
+      success: { bg: '#16A34A', text: W },
+      warning: { bg: '#EA580C', text: W },
+      danger:  { bg: '#DC2626', text: W },
+      info:    { bg: '#64748B', text: W },
+    },
+  },
+
+  cyan: {
+    label: '炫光青',
+    colors: {
+      primary: { bg: '#00FFFF', text: D },
+      success: { bg: '#00C853', text: D },
+      warning: { bg: '#FF6D00', text: W },
+      danger:  { bg: '#D50000', text: W },
+      info:    { bg: '#546E7A', text: W },
+    },
+  },
+
+  sky: {
+    label: '天空蓝',
+    colors: {
+      primary: { bg: '#0EA5E9', text: W },
+      success: { bg: '#10B981', text: W },
+      warning: { bg: '#F59E0B', text: D },
+      danger:  { bg: '#EF4444', text: W },
+      info:    { bg: '#64748B', text: W },
+    },
+  },
+
+  amber: {
+    label: '琥珀金',
+    colors: {
+      primary: { bg: '#A16207', text: W },
+      success: { bg: '#16A34A', text: W },
+      warning: { bg: '#F59E0B', text: D },
+      danger:  { bg: '#DC2626', text: W },
+      info:    { bg: '#78716C', text: W },
+    },
+  },
+
+  indigo: {
+    label: '鸢尾紫',
+    colors: {
+      primary: { bg: '#6366F1', text: W },
+      success: { bg: '#059669', text: W },
+      warning: { bg: '#F59E0B', text: D },
+      danger:  { bg: '#DC2626', text: W },
+      info:    { bg: '#94A3B8', text: D },
+    },
+  },
 }
 
 /** @type {Array<{name: string, label: string}>} */
