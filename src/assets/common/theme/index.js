@@ -116,6 +116,10 @@ export function applyTheme(themeName, _isDark) {
     injectPlainCss(types)
   }
   injectHoverCss(types, hoverLevel)
+
+  // tab 激活态变量
+  root.style.setProperty('--tab-active-bg', 'var(--el-color-primary-solid-bg)')
+  root.style.setProperty('--tab-active-hover-bg', 'var(--el-color-primary-light-' + hoverLevel + ')')
 }
 
 // ============================================================
@@ -160,7 +164,7 @@ function injectSolidCss(types) {
   for (var i = 0; i < types.length; i++) {
     var t = types[i]
     // 默认态：背景 + 文字；hover / active 由 injectHoverCss 控制
-    css += 'html .el-button--' + t + '{' +
+    css += 'html .el-button--' + t + ':not(.is-disabled){' +
       'color:var(--el-color-' + t + '-text)!important;' +
       '--el-button-text-color:var(--el-color-' + t + '-text)!important;' +
       '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +

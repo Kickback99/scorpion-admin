@@ -60,7 +60,7 @@
       justify-content: center;
       width: 18px;
       height: 18px;
-      color: var(--el-color-primary);
+      color: var(--el-color-primary-light-9) !important;
       cursor: pointer;
       border-radius: 4px;
       transition:
@@ -70,7 +70,7 @@
       opacity: 0; // 默认隐藏
 
       &:hover {
-        color: rgb(0 0 0 / 88%) !important;
+        color: var(--el-color-primary) !important;
         background-color: rgb(0 0 0 / 6%);
       }
     }
@@ -173,28 +173,36 @@
     }
   }
 
-  /* full 模式 — 背景填充 + 文字色跟随 preset/dynamic */
+  /* full 模式 — 背景填充 + hover 跟随 uiDepth / hoverFull */
   .ui-full & {
     color: var(--el-color-primary-text);
+    background-color: var(--tab-active-bg);
+    transition: background-color 0.2s;
     .tag-title { color: var(--el-color-primary-text) !important; }
+    &:hover { background-color: var(--tab-active-hover-bg); }
     .el-icon-close {
-      color: var(--el-color-primary-text);
-      &:hover { background-color: var(--el-color-primary-light-3); }
+      color: var(--el-color-primary-text) !important;
+      &:hover { background-color: var(--tab-active-hover-bg); }
     }
   }
-}
 
-/* full 模式 — 背景色填充 */
-.ui-full .scroll-item.is-active {
-  background-color: var(--el-color-primary);
-}
-
-/* plain 模式 — 描边，透明背景 */
-.ui-plain .scroll-item.is-active {
-  background-color: transparent;
-  border: 1px solid var(--el-color-primary);
-  border-radius: 4px;
-  box-shadow: none;
+  /* plain 模式 — 描边 + 极浅底色 + hover 填满主色 */
+  .ui-plain & {
+    color: var(--el-color-primary);
+    background-color: var(--el-color-primary-light-9);
+    border: 1px solid var(--el-color-primary);
+    border-radius: 4px;
+    box-shadow: none;
+    transition: background-color 0.2s, color 0.2s;
+    .tag-title { color: var(--el-color-primary) !important; }
+    .el-icon-close { color: var(--el-color-primary) !important; }
+    &:hover {
+      color: var(--el-color-primary-plain);
+      background-color: var(--el-color-primary);
+      .tag-title { color: var(--el-color-primary-plain) !important; }
+      .el-icon-close { color: var(--el-color-primary-plain); }
+    }
+  }
 }
 
 
