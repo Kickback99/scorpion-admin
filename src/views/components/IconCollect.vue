@@ -133,6 +133,7 @@ import { IconFont } from '@/components/MyIcon'
 import SvgIcon from '@/components/MyIcon/src/SvgIcon.vue'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
+import msg from '@/components/msg'
 const configStore =  useConfigStore()
 
 const preloadedComponents = ref([])
@@ -383,10 +384,10 @@ async function copyIconName(icon) {
   try {
     const iconName = typeof icon === 'string' ? icon : JSON.stringify(icon)
     await navigator.clipboard.writeText(iconName)
-    ElMessage.success('图标已复制')
+    msg.primary('图标已复制')
   } catch (err) {
     console.error('复制失败:', err)
-    ElMessage.error('复制失败')
+    msg.error('复制失败')
   }
 }
 

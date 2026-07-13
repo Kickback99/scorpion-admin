@@ -18,7 +18,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg'
 
 // 定义 props
 const props = defineProps({
@@ -53,10 +53,10 @@ const sizeTip = computed(() => {
 const validateFile = (rawFile) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   if (!allowedTypes.includes(rawFile.type)) {
-    ElMessage.error('必须为 jpg | png | jpeg 格式')
+    msg.error('必须为 jpg | png | jpeg 格式')
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('图片不能超过2MB')
+    msg.error('图片不能超过2MB')
     return false
   }
   return true

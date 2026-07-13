@@ -128,9 +128,9 @@
 // ============================================================
 import { ref, watch, computed } from 'vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
-import { ElMessage } from 'element-plus';
 import { Check, Plus, Loading, Picture, InfoFilled } from '@element-plus/icons-vue';
 import PinyinMatch from 'pinyin-match';
+import msg from '@/components/msg'
 
 // ============================================================
 // Props & Emits
@@ -377,7 +377,7 @@ const loadImages = async (articleId) => {
   } catch (error) {
     console.error('加载文章图片失败:', error);
     imageList.value = [];
-    ElMessage.warning('加载图片失败，请重试');
+    msg.warning('加载图片失败，请重试');
   } finally {
     loading.value = false;
   }
@@ -447,7 +447,7 @@ const handleInsert = (img) => {
   if (props.disabled) return;
 
   if (!img || !(img.img || img.url)) {
-    ElMessage.warning('图片地址无效');
+    msg.warning('图片地址无效');
     return;
   }
 

@@ -143,7 +143,7 @@ import { ref, watch } from 'vue';
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs} from 'element-plus';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 
 //搜索相关
 const searchData = ref({
@@ -196,7 +196,7 @@ const onCurrentChange = (page) => {
 
 const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
-        ElMessage.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
+        msg.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
     params.value.pageNum = 1
     render()
@@ -231,7 +231,7 @@ const handleEdit = (param) => {
 const handleDelete = async(id) => {
     console.log(id)
     await removeApi(id)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render()
 }
 
@@ -239,12 +239,12 @@ const handleDelete = async(id) => {
 const modifySwitch = async(row) =>{
     
    const res = await isTopApi(row.id,row.isTop)
-    // row.isTop === "1" ? ElMessage.success('已置顶'):ElMessage.error('已取消置顶')
+    // row.isTop === "1" ? msg.primary('已置顶'):msg.error('已取消置顶')
     // 根据返回的 message 显示不同的提示
     if (res.message && res.message.includes("自动取消")) {
-        ElMessage.warning(res.message)  // 警告提示
+        msg.warning(res.message)  // 警告提示
     } else {
-        ElMessage.success(res.message)  // 成功提示
+        msg.primary(res.message)  // 成功提示
     }
     render()
 }

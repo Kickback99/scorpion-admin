@@ -193,6 +193,7 @@ import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log
 import { reactive, ref,computed,watch } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
 import { createMarkdownPreview } from '@/utils/markdown-config'
+import msg from '@/components/msg'
 const userConfigStore = useUserConfigStore()
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
@@ -312,7 +313,7 @@ const multipleSelection = ref([])
 // t_log_request：操作日志删除请求
 const removeRow = async(id) => {
     await operLogRemoveApi(id)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render()
 }
 
@@ -325,7 +326,7 @@ const removeMultiple = (raw) =>{
 // t_log_request：操作日志批量删除请求
 const deleteSelectRows = async() => {
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
 	await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {

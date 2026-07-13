@@ -178,7 +178,8 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import msg from '@/components/msg'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
@@ -281,7 +282,7 @@ const loadConfigData = async () => {
     }
   } catch (error) {
     console.error('加载配置失败:', error)
-    ElMessage.error('加载配置失败')
+    msg.error('加载配置失败')
   }
 }
 
@@ -294,7 +295,7 @@ const handleReset = async () => {
       type: 'warning'
     })
     await loadConfigData()
-    ElMessage.success('已重置')
+    msg.primary('已重置')
   } catch {
     // 取消操作
   }
@@ -322,7 +323,7 @@ const handleSave = async (row) => {
     if (row.type === 'number') {
       newValue = Number(newValue)
       if (isNaN(newValue)) {
-        ElMessage.error('请输入有效的数字')
+        msg.error('请输入有效的数字')
         return
       }
 
@@ -330,11 +331,11 @@ const handleSave = async (row) => {
       const currentMin = row.min !== undefined ? row.min : -Infinity
       const currentMax = row.max !== undefined ? row.max : Infinity
       if (newValue < currentMin) {
-        ElMessage.error(`值不能小于 ${currentMin}`)
+        msg.error(`值不能小于 ${currentMin}`)
         return
       }
       if (newValue > currentMax) {
-        ElMessage.error(`值不能大于 ${currentMax}`)
+        msg.error(`值不能大于 ${currentMax}`)
         return
       }
     } else if (row.type === 'boolean') {
@@ -346,15 +347,15 @@ const handleSave = async (row) => {
     if (res.code === 200) {
       row.value = cloneValue(newValue)
       row.isEditing = false
-      ElMessage.success('保存成功')
+      msg.primary('保存成功')
       // 同步更新 store
       await syncStoreValue(row.key, newValue)
     } else {
-      ElMessage.error(res.message || '保存失败')
+      msg.error(res.message || '保存失败')
     }
   } catch (error) {
     console.error('保存失败:', error)
-    ElMessage.error('保存失败')
+    msg.error('保存失败')
   }
 }
 
@@ -390,7 +391,7 @@ const handleDelete = async (row) => {
 
   // 系统预设配置不允许删除（系统预设配置按钮已禁用，此方法不会执行，但保留逻辑）
   if (row.isSystem) {
-    ElMessage.warning('系统预设配置不可删除')
+    msg.warning('系统预设配置不可删除')
     return
   }
 
@@ -424,16 +425,16 @@ const handleDelete = async (row) => {
     
     const res = await deleteConfigValueApi(row.key)
     if (res.code === 200) {
-      ElMessage.success('删除成功')
+      msg.primary('删除成功')
       await configStore.loadConfig()
       await loadConfigData()
     } else {
-      ElMessage.error(res.message || '删除失败')
+      msg.error(res.message || '删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除失败:', error)
-      ElMessage.error('删除失败')
+      msg.error('删除失败')
     }
   }
 }
@@ -478,7 +479,7 @@ const handleConfirmAdd = async () => {
 
         // 检查是否在 CONFIG_DEFINITIONS 中已存在
         if (configStore.getConfigDefinition(fullKey)) {
-          ElMessage.warning(`配置项 "${addForm.key}" 已在 CONFIG_DEFINITIONS 源码中定义，不能重复添加`)
+          msg.warning(`配置项 "${addForm.key}" 已在 CONFIG_DEFINITIONS 源码中定义，不能重复添加`)
           return
         }
         
@@ -489,14 +490,14 @@ const handleConfirmAdd = async () => {
         if (addForm.parentPath) {
           targetObj = getNestedObject(fullConfig, addForm.parentPath.split('.'))
           if (!targetObj) {
-            ElMessage.error('父路径不存在')
+            msg.error('父路径不存在')
             return
           }
         }
         
         // 检查key是否已存在
         if (addForm.key in targetObj) {
-          ElMessage.error(`配置项 "${addForm.key}" 已存在`)
+          msg.error(`配置项 "${addForm.key}" 已存在`)
           return
         }
         
@@ -525,16 +526,16 @@ const handleConfirmAdd = async () => {
         
         const res = await updateAllConfigApi(fullConfig)
         if (res.code === 200) {
-          ElMessage.success('新增成功')
+          msg.primary('新增成功')
           addDialogVisible.value = false
           await configStore.loadConfig()
           await loadConfigData()
         } else {
-          ElMessage.error(res.message || '新增失败')
+          msg.error(res.message || '新增失败')
         }
       } catch (error) {
         console.error('新增失败:', error)
-        ElMessage.error('新增失败')
+        msg.error('新增失败')
       }
     }
   })

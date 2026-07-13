@@ -128,7 +128,7 @@
 <script setup>
 import { addApi, listApi, modifyApi, removeApi } from '@/api/category';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 
 defineOptions({
   name: 'Category'
@@ -295,7 +295,7 @@ const batchRemove = async(node,data,isFlag) => {
   const total = treeRef.value.getCheckedKeys().length
   if(isFlag){
     await removeApi(data.id) 
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
   }else {
     try {
       await ElMessageBox.confirm(total > 1?'你确认要批量删除么':'你确认要删除么','温馨提示', {
@@ -305,7 +305,7 @@ const batchRemove = async(node,data,isFlag) => {
     })
     const getCheckedKeys = treeRef.value.getCheckedKeys()
     await removeApi(getCheckedKeys)
-    ElMessage.success(total > 1?'批量删除成功':'删除成功')
+    msg.primary(total > 1?'批量删除成功':'删除成功')
     } catch (error) {
       disabledAddParent.value = false
       render()
@@ -474,7 +474,7 @@ const handleDrop = async(
 
   // 提交服务器
   await modifyApi(updateNodes.value)
-  ElMessage.success('节点拖拽成功')
+  msg.primary('节点拖拽成功')
   render()
   updateNodes.value = []	
   expandKey.value = [pid]
@@ -654,9 +654,9 @@ const handleParentBlur = (node,data) => {
       }
 
 
-      ElMessage.error('请输入内容')
+      msg.error('请输入内容')
       if(treeList.value.length === 0){
-        ElMessage.error('回到最原始的数据')
+        msg.error('回到最原始的数据')
         disabledAddParent.value = false
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
@@ -728,7 +728,7 @@ const handleParentBlur = (node,data) => {
           isEndParent.value = false
         }
       }
-        ElMessage.error('分类名不能重复')
+        msg.error('分类名不能重复')
         isReturn.value = true
         // isNormal.value = true
     }else {
@@ -832,7 +832,7 @@ const handleBlur = (node, data) => {
         expandKey.value = [...arr]
         // 启用复选框
         enabledCheckboxes()
-        // ElMessage.error('数据恢复成功')
+        // msg.error('数据恢复成功')
       }else {
         differentArr.forEach((item,index) => {
           if(index === differentArr.length -1) {
@@ -845,13 +845,13 @@ const handleBlur = (node, data) => {
           // 禁用复选框
         disabledCheckboxes()
       }
-      ElMessage.error('请输入内容')
+      msg.error('请输入内容')
       isReturn.value = true
       return;
     } else {
       // 新增事件的空值处理
       // console.log('输入为空')
-      ElMessage.error('请输入内容')
+      msg.error('请输入内容')
       if(!isNormal.value){
         removeFilter(data.id)
       }
@@ -898,7 +898,7 @@ const handleBlur = (node, data) => {
         handleDuplicate(data)
         const arr = handleExpand(node)
         expandKey.value = [...arr]
-        // ElMessage.error('数据恢复成功')
+        // msg.error('数据恢复成功')
         // 启用复选框
         enabledCheckboxes()
       } else {
@@ -915,7 +915,7 @@ const handleBlur = (node, data) => {
       }
       // 如果名字和原先名字不同，则不提示任何修改
       if(originName != newName){
-        ElMessage.error('分类名不能重复')
+        msg.error('分类名不能重复')
       }
       isReturn.value = true
       return;
@@ -957,7 +957,7 @@ const handleBlur = (node, data) => {
         }
         console.log('filter-pop后',filterArr)
         afterCount = removeElement(node,data)
-        ElMessage.error('分类名不能重复')
+        msg.error('分类名不能重复')
         isReturn.value = true
         // isNormal.value = true
     }else {
@@ -1485,7 +1485,7 @@ const handleParentDuplicate = (node,res) => {
   })
   expandKey.value = [...arr]
   }
-  ElMessage.success('添加成功')
+  msg.primary('添加成功')
   // console.log("node.store.nodesMap",node.store.nodesMap)
   // console.log("arr",arr)
 }
@@ -1537,7 +1537,7 @@ const handleBatchSave = async(node) => {
   treeList.value = []
   } catch (error) {
     console.log('错误了...',error)
-    ElMessage.error(error)
+    msg.error(error)
     // 根据需要处理错误，例如显示错误消息或回滚操作
   }
 
@@ -1572,7 +1572,7 @@ const handleSave = async (e, node, data) => {
       } else isDuplicate = revertData(false, prop * 1)
 
       if (isDuplicate === category[prop]) {
-        ElMessage.error('有重复的数据，提交失败')
+        msg.error('有重复的数据，提交失败')
         allShow.value = true
         render()
         const arr = handleExpand(node, data)
@@ -1587,15 +1587,15 @@ const handleSave = async (e, node, data) => {
     }
     console.log(cateNames)
     await modifyApi(cateNames)
-    ElMessage.success('修改成功')
+    msg.primary('修改成功')
 
   } //新增事件的提交
   else {
     if (treeList.value.length > 0) {
       await addApi(treeList.value)
-      ElMessage.success('添加成功')
+      msg.primary('添加成功')
       treeList.value = []
-    } else ElMessage.error('添加失败')
+    } else msg.error('添加失败')
   }
   allShow.value = true
   // t_reset：handleSave初始化(新增编辑模式)
@@ -1851,7 +1851,7 @@ const handleParentRevert = (node,data) => {
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (treeList.value.length === 0) {
-    ElMessage.error('回到最原始的数据')
+    msg.error('回到最原始的数据')
     disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增父子模式)
     isDraggable.value = true
@@ -1888,7 +1888,7 @@ const handleRevert = (e,node, data) => {
         category[data.id] = nativeName
         // 点击恢复按钮，禁用确定按钮
         isDisabled.value = true
-        ElMessage.success('数据恢复成功')
+        msg.primary('数据恢复成功')
         differentArr.splice(index, 1)
       }
     })
@@ -1896,7 +1896,7 @@ const handleRevert = (e,node, data) => {
     /* sameArr.forEach((item, index) => {
       console.log('重复数据？')
       if (item === data.id) {
-        ElMessage.success('数据一致，撤销失败')
+        msg.primary('数据一致，撤销失败')
         sameArr.splice(index, 1)
       }
     })
@@ -1907,7 +1907,7 @@ const handleRevert = (e,node, data) => {
     // currentRevertId.value = data.id
 
     /* if (differentArr.length === 0 ) {
-      ElMessage.success('已回到最初始的数据')
+      msg.primary('已回到最初始的数据')
       render()
       currentRevertId.value = null
       allShow.value = true
@@ -1921,10 +1921,10 @@ const handleRevert = (e,node, data) => {
       const nativeName = revertData(node.level, data)
       data.name = nativeName
       category[data.id] = nativeName
-      ElMessage.success('数据恢复成功')
+      msg.primary('数据恢复成功')
       return;
     }else {
-      ElMessage.success('数据一致，撤销失败')
+      msg.primary('数据一致，撤销失败')
       render()
       const arr = handleExpand(node)
       expandKey.value = [...arr]
@@ -1959,7 +1959,7 @@ const handleRevert = (e,node, data) => {
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (beforeCount === afterCount) {
-    ElMessage.error('回到最原始的数据')
+    msg.error('回到最原始的数据')
     disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
@@ -2254,7 +2254,7 @@ const handleReset = () => {
   const arr = handleResetExpand()
   // console.log("arr",arr)
   expandKey.value = arr?[...arr]:[]
-  ElMessage.success('重置成功')
+  msg.primary('重置成功')
 }
 
 const handleComment = () => {

@@ -100,8 +100,9 @@
 <script setup>
 import { nextTick, ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
-import { ElMessage} from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import router from '@/router';
+import msg from '@/components/msg'
 const tableData = ref([])
 
 const searchData = ref({})
@@ -155,7 +156,7 @@ const onCurrentChange = (page) => {
 // t_role_request：删除角色请求
 const removeRole = async(id) =>{
     await removeApi(id)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     //重新渲染
     render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
 
@@ -172,7 +173,7 @@ const removeMultiple = (raw) =>{
 // 批量删除
 const deleteSelectRows = async() => {
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
     await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
@@ -241,7 +242,7 @@ const onReset = () => {
         console.log('增加请求')
         console.log(res)
         dialogVisible.value = false
-        ElMessage.success('添加成功')
+        msg.primary('添加成功')
         render()
 
     }
@@ -252,7 +253,7 @@ const onReset = () => {
         await ruleFormRef.value.validate()
         await modifyApi(dialogData.value)
         dialogVisible.value = false
-        ElMessage.success('修改成功')
+        msg.primary('修改成功')
         render(params.value.pageNum)
 
     }

@@ -24,8 +24,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus';
 import { useTokenStore } from '@/store/token';
+import msg from '@/components/msg'
 const imageUrl = ref('')
 let modelValue = defineModel()
 const tokenStore = useTokenStore()
@@ -83,10 +83,10 @@ const sizeTip = computed(() => {
 const beforeAvatarUpload = (rawFile) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!allowedTypes.includes(rawFile.type)){
-    ElMessage.error('必须为 jpg | png | jpeg 格式')
+    msg.error('必须为 jpg | png | jpeg 格式')
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('图片不能超过2MB')
+    msg.error('图片不能超过2MB')
     return false
   }
    isProgressVisible.value = true

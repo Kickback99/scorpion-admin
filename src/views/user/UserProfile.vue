@@ -193,10 +193,10 @@
 
 <script setup>
 import { ref, reactive, onMounted} from 'vue'
-import { ElMessage} from 'element-plus'
 import { useUserStore } from '@/store/user'
 import avatar from '@/assets/images/avatar-circle.png'
 import { userInfoApi, userStatsApi, userUpdateInfoApi } from '@/api/admin'
+import msg from '@/components/msg'
 // 响应式数据
 const editMode = ref(false)
 const loading = ref(false)
@@ -241,11 +241,11 @@ const validateFile = (file) => {
   const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!allowedTypes.includes(file.type)) {
-    ElMessage.error('必须为 jpg | png | jpeg 格式')
+    msg.error('必须为 jpg | png | jpeg 格式')
     return false
   }
   if (!isLt2M) {
-    ElMessage.error('头像大小不能超过 2MB!')
+    msg.error('头像大小不能超过 2MB!')
     return false
   }
   return true
@@ -299,18 +299,18 @@ const handleSave = async () => {
     Object.assign(userStore.userInfo, res.data.userInfo) 
     editMode.value = false
     loading.value = false
-    ElMessage.success('个人信息更新成功')
+    msg.primary('个人信息更新成功')
   } catch (error) {
     loading.value = false
     
     // 区分错误类型
     if (error?.fields) {
       // 表单验证失败
-      ElMessage.error('请完善表单信息')
+      msg.error('请完善表单信息')
     } else {
       // API请求失败
       console.error('API请求错误:', error)
-      ElMessage.error('保存失败，请重试')
+      msg.error('保存失败，请重试')
     }
   }
 }
@@ -319,7 +319,7 @@ const handleCancel = () => {
   // 恢复原始数据
   Object.assign(userInfo, { ...originalUserInfo.value })
   editMode.value = false
-  ElMessage.info('已取消编辑')
+  msg.info('已取消编辑')
   imgUrl.value = originalUserInfo.value.avatar
 }
 
