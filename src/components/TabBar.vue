@@ -115,6 +115,7 @@ const { initWebSocketListener, closeWebSocket } = useWebSocket()
 
 // 导入全局事件总线对象
 import { useTabStore } from "@/store/tabs";
+import msg from '@/components/msg'
 
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
@@ -201,7 +202,7 @@ const handleCommand = async (key) => {
         // 清空用户名
         // userStore.username = ''
         // 提示信息
-        ElMessage.success(res.message)
+        msg.primary(res.message)
         // 跳转到登录页
         // router.push({ path: '/login', query: { redirect: route.path } })
                 // 构建完整的重定向URL，包含查询参数

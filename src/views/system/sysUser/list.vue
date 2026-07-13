@@ -212,7 +212,7 @@ import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import { nextTick, ref } from 'vue';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
 import { useUserStore } from '@/store/user';
@@ -332,7 +332,7 @@ const toggleSelection = (rows) => {
 // 批量删除
 const deleteSelectRows = () => {
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
     const rowIds = multipleSelection.value.map(row => row.id)
@@ -343,14 +343,14 @@ const deleteSelectRows = () => {
 // t_user_request：用户删除请求
 const removeUsers = async(ids) =>{
     await removeApi(ids)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
 }
 
 //  t_user_request：更改用户状态请求
 const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
-    row.status === 0 ? ElMessage.success('用户已激活'):ElMessage.error('用户已禁用')
+    row.status === 0 ? msg.primary('用户已激活'):msg.error('用户已禁用')
     render()
 }
 
@@ -408,7 +408,7 @@ const addUser = async() =>{
     await ruleFormRef.value.validate()
     await addApi(formData.value)
     dialogVisible.value = false
-    ElMessage.success('添加成功')
+    msg.primary('添加成功')
     render()
 
 }
@@ -418,7 +418,7 @@ const modifyUser = async() => {
     await ruleFormRef.value.validate()
     await modifyApi(formData.value)
     dialogVisible.value = false
-    ElMessage.success('修改成功')
+    msg.primary('修改成功')
     render(params.value.pageNum)
 }
 
@@ -497,7 +497,7 @@ const doAllocRoles = async() => {
     }
 
     await doAllocRolesApi(userRoleData)
-    ElMessage.success("分配角色成功")
+    msg.primary("分配角色成功")
     allocRolesVisible.value = false
     /* if(userStore.userInfo.id != 1){
         // 清空路由
@@ -506,7 +506,7 @@ const doAllocRoles = async() => {
         try {
           await loadMenu(false)
         } catch (error) {
-          ElMessage.error(error)
+          msg.error(error)
           //重新加载菜单方式一
           router.push('/')
           userStore.removeUserAuth()

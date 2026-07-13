@@ -105,7 +105,7 @@
 <script setup>
 import { friendLinkAddApi, friendLinkListApi, friendLinkModifyApi, friendLinkRemoveApi } from '@/api/friendlink';
 import SmartSelector from '@/views/components/SmartSelector.vue';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 import { reactive, ref } from 'vue';
 
 // ============================================================
@@ -289,11 +289,11 @@ const handleConfirm = async() => {
         }else {
             await friendLinkModifyApi(formModel)
         }
-        ElMessage.success('操作成功')
+        msg.primary('操作成功')
         dialogVisible.value = false
         fetchFriendLinks()
     } catch (error) {
-        ElMessage.error('操作失败')
+        msg.error('操作失败')
         dialogVisible.value = false
     }
 }
@@ -307,7 +307,7 @@ const handleConfirm = async() => {
  */
 const handleBatchDelete = async() => {
     if(selectedRows.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
     await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
@@ -325,7 +325,7 @@ const handleBatchDelete = async() => {
  */
 const handleDelete = async(id) =>{
        await friendLinkRemoveApi(id)
-       ElMessage.success('操作成功')
+       msg.primary('操作成功')
        fetchFriendLinks()
 }
 </script>

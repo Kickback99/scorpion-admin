@@ -79,7 +79,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import msg from '@/components/msg'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { cleanZombieApi, getOnlineListApi, kickUserApi } from '@/api/onlineUser'
 import websocketManager from '@/server/websocketManager'
@@ -186,7 +186,7 @@ const handleKick = async (row) => {
 
     // 超级管理员不能踢出自己
     if (row.userId === "1" && row.role === 'admin') {
-        ElMessage.warning('超级管理员不能踢出自己')
+        msg.warning('超级管理员不能踢出自己')
         return
     }
 
@@ -200,9 +200,9 @@ const handleKick = async (row) => {
 
     try {
         await kickUserApi(row.userId, row.role)
-        ElMessage.success(`已向 ${row.username} 发送强退指令`)
+        msg.primary(`已向 ${row.username} 发送强退指令`)
     } catch (error) {
-        ElMessage.error('强退失败')
+        msg.error('强退失败')
         // 失败时才清除 loading，因为行还在
         kickingMap.value[key] = false
     }
@@ -231,11 +231,11 @@ const cleanZombieUsers = async () => {
     cleaning.value = true
     try {
         const res = await cleanZombieApi()
-        ElMessage.success(res.message || `已清理 ${res.data.count} 个僵尸用户`)
+        msg.primary(res.message || `已清理 ${res.data.count} 个僵尸用户`)
         // 刷新列表
         await loadOnlineList()
     } catch (error) {
-        ElMessage.error('清理失败')
+        msg.error('清理失败')
     } finally {
         cleaning.value = false
     }

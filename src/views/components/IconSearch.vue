@@ -60,6 +60,7 @@
 import { IconJson } from "@/components/MyIcon/data";
 import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
 import { ref, computed, watch } from "vue";
+import msg from '@/components/msg'
 
 const search = {
   "width": 1024,
@@ -142,10 +143,10 @@ async function copyIconName(icon) {
     const iconName = typeof icon === 'string' ? icon : JSON.stringify(icon)
     const finalIconName = currentActiveType.value + iconName
     await navigator.clipboard.writeText(finalIconName)
-    ElMessage.success('图标已复制')
+    msg.primary('图标已复制')
   } catch (err) {
     console.error('复制失败:', err)
-    ElMessage.error('复制失败')
+    msg.error('复制失败')
   }
 }
 

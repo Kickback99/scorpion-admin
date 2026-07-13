@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { getConfigApi, updateConfigValueApi } from "@/api/config"
-import { ElMessage } from "element-plus"
 import { useIconStore } from "./icon"
+import msg from '@/components/msg'
 
 // 系统预定义配置项的 key 列表（只有这些才是系统字段，不可删除）
 const SYSTEM_CONFIG_KEYS = [
@@ -258,7 +258,7 @@ export const useConfigStore = defineStore({
         }
       } catch (error) {
         console.error('加载配置失败:', error)
-        ElMessage.error('加载配置失败')
+        msg.error('加载配置失败')
       } finally {
         this.loading = false
       }
@@ -289,12 +289,12 @@ export const useConfigStore = defineStore({
           this.showMessage(def.message, value, def.type, key)
           this.executeInit()
         } else {
-          ElMessage.error(res.message || '更新失败')
+          msg.error(res.message || '更新失败')
           await this.loadConfig()
         }
       } catch (error) {
         console.error('更新配置失败:', error)
-        ElMessage.error('更新失败')
+        msg.error('更新失败')
         await this.loadConfig()
       }
     },
@@ -321,7 +321,7 @@ export const useConfigStore = defineStore({
         message = `${fieldName}已更新`
       }
       
-      ElMessage.success(message)
+      msg.primary(message)
     },
 
     /**

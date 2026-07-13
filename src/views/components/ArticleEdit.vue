@@ -203,6 +203,7 @@ import SmartAutoComplete from './SmartAutoComplete.vue';
 import ImageReference from '@/views/components/ImageReference.vue';
 import { getArticleBusinessDataApi } from '@/api/business'; 
 import { fileMetaListApi } from '@/api/filemeta'; //
+import msg from '@/components/msg'
 
 // ==================== 引用图片相关 ====================
 
@@ -253,7 +254,7 @@ const handleImageInsert = (data) => {
   const currentContent = blogData.value.content || '';
   blogData.value.content = currentContent + '\n' + data.markdown;
   
-  ElMessage.success(`图片 "${data.title || '图片'}" 已插入到内容末尾`);
+  msg.primary(`图片 "${data.title || '图片'}" 已插入到内容末尾`);
   
   // 重置选中状态
   imageReferenceRef.value?.resetSelection();
@@ -346,11 +347,11 @@ watch(selectedCoverArticle, async (newVal) => {
           formModel.refCoverUuid = coverFileMeta.uuid;   // 保存 UUID，用于提交
         } else {
           formModel.refCover = null;
-          ElMessage.warning('该文章暂无封面');
+          msg.warning('该文章暂无封面');
         }
       } catch (error) {
         console.error('获取封面失败:', error);
-        ElMessage.warning('获取封面失败');
+        msg.warning('获取封面失败');
       }
     }
   } else {
@@ -690,14 +691,14 @@ const handlePublish = async(status) => {
     let cover;
     if (formModel.coverOption === 'custom') {
       if (!formModel.customCoverLink) {
-          ElMessage.warning('请填写自定义图片链接')
+          msg.warning('请填写自定义图片链接')
           return
       }
       cover = formModel.customCoverLink
     }else if (formModel.coverOption === 'ref') {
       // 引用封面模式：使用 refCover
       if (!formModel.refCoverUuid) {
-        ElMessage.warning('请先选择要引用的文章封面');
+        msg.warning('请先选择要引用的文章封面');
         return;
       }
       cover = formModel.refCoverUuid;
@@ -754,12 +755,12 @@ const handlePublish = async(status) => {
             }
         }
     }
-    ElMessage.success(formModel.id ? '修改成功' : '添加成功')
+    msg.primary(formModel.id ? '修改成功' : '添加成功')
     dialogVisible.value = false
     openMask()
     emit('reRender')
   }catch(error){
-    ElMessage.error('提交失败，请重试')
+    msg.error('提交失败，请重试')
   }
 }
 
