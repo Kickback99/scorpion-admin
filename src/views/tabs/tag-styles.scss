@@ -45,7 +45,7 @@
     padding-left: 6px;
     line-height: 34px;
     cursor: pointer;
-    transition: all 0.4s;
+    transition: color 0.15s ease-out;
 
     &:not(:first-child) {
       padding-right: 24px;
@@ -107,7 +107,7 @@
       transition: transform 0.3s ease;
 
       .scroll-item {
-        transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        transition: color 0.15s ease-out;
 
         &:nth-child(1) {
           padding: 0 12px;
@@ -177,7 +177,6 @@
   .ui-full & {
     color: var(--el-color-primary-text);
     background-color: var(--tab-active-bg);
-    transition: background-color 0.2s;
     .tag-title { color: var(--el-color-primary-text) !important; }
     &:hover { background-color: var(--tab-active-hover-bg); }
     .el-icon-close {
@@ -193,7 +192,6 @@
     border: 1px solid var(--el-color-primary);
     border-radius: 4px;
     box-shadow: none;
-    transition: background-color 0.2s, color 0.2s;
     .tag-title { color: var(--el-color-primary) !important; }
     .el-icon-close { color: var(--el-color-primary) !important; }
     &:hover {
