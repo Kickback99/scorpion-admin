@@ -18,22 +18,15 @@
   }
 }
 
-:root{
-  --tab-icon-bg:#fff;
-  --tab-icon-hover-bg: #f5f7fa;
-
-}
-
-.light-mode{
-  --tab-icon-bg:#fff;
-  --tab-icon-hover-bg: #f5f7fa;
-
+:root {
+  --tab-icon-bg: var(--el-bg-color);
+  --tab-icon-hover-bg: var(--el-fill-color-light);
+  --tab-icon-hover-text: var(--el-color-primary);
 }
 
 .dark-mode {
-    --tab-icon-bg: #222;
-    --tab-icon-hover-text: var(--el-color-primary);
-    --tab-icon-hover-bg: var(--el-color-primary-light-9);
+  --tab-icon-bg: var(--el-bg-color);
+  --tab-icon-hover-bg: var(--el-color-primary-light-9);
 }
 
 .tags-view {
@@ -163,7 +156,6 @@
 .scroll-item.is-active {
   position: relative;
   color: var(--el-color-primary);
-  background-color: var(--el-color-primary-light-9);
   box-shadow: 0 0 0.7px #888;
 
   .tag-title {
@@ -176,11 +168,33 @@
     &:hover {
       background-color: var(--el-color-primary-light-5);
     }
-      // 首页不显示关闭按钮
     &[data-path="/index"] {
       display: none !important;
     }
   }
+
+  /* full 模式 — 背景填充 + 文字色跟随 preset/dynamic */
+  .ui-full & {
+    color: var(--el-color-primary-text);
+    .tag-title { color: var(--el-color-primary-text) !important; }
+    .el-icon-close {
+      color: var(--el-color-primary-text);
+      &:hover { background-color: var(--el-color-primary-light-3); }
+    }
+  }
+}
+
+/* full 模式 — 背景色填充 */
+.ui-full .scroll-item.is-active {
+  background-color: var(--el-color-primary);
+}
+
+/* plain 模式 — 描边，透明背景 */
+.ui-plain .scroll-item.is-active {
+  background-color: transparent;
+  border: 1px solid var(--el-color-primary);
+  border-radius: 4px;
+  box-shadow: none;
 }
 
 
