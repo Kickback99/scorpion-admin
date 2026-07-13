@@ -221,9 +221,9 @@ const handleCommand = async (key) => {
 
 // 暗黑模式切换
 const toggleDark = async () => {
-    const html = document.documentElement
     await userConfigStore.toggleDark()
-    html.className = userConfigStore.isDarkEnabled ? 'dark' : ''
+    const html = document.documentElement
+    html.classList.toggle('dark', userConfigStore.isDarkEnabled)
 }
 
 // 主题色切换
