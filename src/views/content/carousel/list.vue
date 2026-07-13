@@ -315,7 +315,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, nextTick, onUnmounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import msg from '@/components/msg'
 import { Plus, QuestionFilled } from '@element-plus/icons-vue'
 import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, addCarouselApi } from '@/api/article'
 import { getAllArticlesApi } from '@/api/business'
@@ -723,9 +723,9 @@ const handleRetry = (row) => {
         // 跳转到编辑弹窗，让用户重新上传图片
         handleEdit(row)
         // 在弹窗中，用户可以重新选择图片并提交
-        ElMessage.info('请重新选择图片并提交')
+        msg.info('请重新选择图片并提交')
     } catch (error) {
-        ElMessage.error('打开编辑失败')
+        msg.error('打开编辑失败')
     }
 }
 
@@ -838,14 +838,14 @@ const handleConfirm = async () => {
         if (formModel.id) {
             // 编辑
             const res = await updateCarouselApi(params)
-            ElMessage.success({
+            msg.primary({
                 message: res.message?res.message:'添加成功',
                 customClass: 'message-right-top'
             })
         } else {
             // 新增
             const res = await addCarouselApi(params)
-            ElMessage.success({
+            msg.primary({
                 message: res.message?res.message:'修改成功',
                 customClass: 'message-right-top'
             })
@@ -854,7 +854,7 @@ const handleConfirm = async () => {
         renderCarouselList()
     } catch (error) {
         console.log(error.message)
-        // ElMessage.error(formModel.id ? '修改失败' : '添加失败')
+        // msg.error(formModel.id ? '修改失败' : '添加失败')
     }
 }
 
@@ -863,10 +863,10 @@ const handleConfirm = async () => {
 const handleDelete = async (id) => {
     try {
         await removeCarouselApi(id)
-        ElMessage.success('删除成功')
+        msg.primary('删除成功')
         renderCarouselList()
     } catch (error) {
-        ElMessage.error('删除失败')
+        msg.error('删除失败')
     }
 }
 
@@ -889,7 +889,7 @@ const handleCarouselProgress = (event) => {
 const handleCarouselUploadComplete = (event) => {
     const {message} = event.detail
     renderCarouselList()
-    ElMessage.success({
+    msg.primary({
         message,
         customClass: 'message-right-top'
     })
@@ -900,7 +900,7 @@ const handleCarouselUploadFailed = (event) => {
     const { message,businessId } = event.detail
     // 刷新列表，显示占位图或提示
     renderCarouselList()
-        ElMessage.error({
+        msg.error({
           message,
           customClass: 'message-right-top'
     })

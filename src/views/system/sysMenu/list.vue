@@ -142,6 +142,7 @@ import { computed, nextTick,ref,watch } from 'vue';
 const iconRef = ref()
 import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
+import msg from '@/components/msg'
 
 const userStore = useUserStore()
 
@@ -169,7 +170,7 @@ const removeMenu = async(id) =>{
       cancelButtonText: '取消'
     })
     await removeApi(id)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render()
 }
 
@@ -194,7 +195,7 @@ const treeProps = reactive({
 //批量删除菜单问题
 /* const deleteSelectRows = () => {
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
     const rowIds = multipleSelection.value.map(row => row.id)
@@ -205,7 +206,7 @@ const treeProps = reactive({
 //  t_menu_request：更改菜单状态请求
 /* const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
-    row.status === 1 ? ElMessage.success('菜单已激活'):ElMessage.error('菜单已禁用')
+    row.status === 1 ? msg.primary('菜单已激活'):msg.error('菜单已禁用')
     //t_question：菜单状态被禁用了，强制刷新路由
     window.location.reload()
 } */
@@ -382,7 +383,7 @@ const addOrModify = () =>{
 const addMenu = async() => {
     await addApi(formModel.value)
     dialogVisible.value = false
-    ElMessage.success('添加成功')
+    msg.primary('添加成功')
     loadMenu(false)
     render()
 }
@@ -392,7 +393,7 @@ const addMenu = async() => {
 const modifyMenu = async() => {
     await modifyApi(formModel.value)
     dialogVisible.value = false
-    ElMessage.success('修改成功')
+    msg.primary('修改成功')
     render()
     // 清空路由
     // clearRoute(userStore.userMenu)

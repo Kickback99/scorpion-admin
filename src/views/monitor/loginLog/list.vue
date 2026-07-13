@@ -134,7 +134,7 @@
 <script setup>
 import { reactive, ref,computed,watch } from 'vue';
 import { loginLogListApi,loginLogRemoveApi } from '@/api/log';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 
 const searchData = reactive({})
 
@@ -193,7 +193,7 @@ const multipleSelection = ref([])
 // t_log_request：登录日志删除请求
 const removeRow = async(id) => {
     await loginLogRemoveApi(id)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render()
 }
 
@@ -201,7 +201,7 @@ const removeRow = async(id) => {
 const deleteSelectRows = async() => {
     console.log(multipleSelection.value.length)
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
     
@@ -242,7 +242,7 @@ watch(() => searchData.type, (newType) => {
 /* const copyToClipboard = (text) => {
   try {
     navigator.clipboard.writeText(text)
-    ElMessage.success('复制成功')
+    msg.primary('复制成功')
   } catch (err) {
     // 兼容性处理
     const textarea = document.createElement('textarea')
@@ -251,7 +251,7 @@ watch(() => searchData.type, (newType) => {
     textarea.select()
     document.execCommand('copy')
     document.body.removeChild(textarea)
-    ElMessage.success('复制成功')
+    msg.primary('复制成功')
   }
 } */
 
@@ -262,7 +262,7 @@ const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text)
     copiedId.value = id // 设置当前复制的行ID
 
-    ElMessage.success('复制成功')
+    msg.primary('复制成功')
     
     // 3秒后恢复原图标
     setTimeout(() => {

@@ -6,13 +6,13 @@ import axios from 'axios';
 //t_env：axios_baseURL
 const baseURL = import.meta.env.VITE_API;
 const instance = axios.create({baseURL,timeout:4000})
-import { ElMessage } from 'element-plus'
 import {useTokenStore} from '@/store/token'
 import { useUserStore } from '@/store/user';
 import router from '@/router';
 import { clearRoute } from './remove';
 import { clearUserInfo } from './remove';
 import { useTabStore } from '@/store/tabs';
+import msg from '@/components/msg'
 
 
 
@@ -65,18 +65,18 @@ instance.interceptors.response.use(
                 // 清空用户名
                 // userStore.username = ''
                 // 提示信息
-                ElMessage.error(res.data.message)
+                msg.error(res.data.message)
                 // 跳转到登录页
                 router.replace('/login')
 
-            }else ElMessage.error(res.data.message)
+            }else msg.error(res.data.message)
 
             // return Promise.reject(res.data.message)
             // 关键：返回pending的Promise，阻止错误开始向上传递的后续执行
              return new Promise(() => {})
        }
 
-        ElMessage.error(res.data.message || '业务失败')
+        msg.error(res.data.message || '业务失败')
         return Promise.reject(res.data.message)
     },
     err=>{
