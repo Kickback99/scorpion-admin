@@ -39,17 +39,10 @@ function luminance(hex) {
 // ============================================================
 // 动态注入的 style 元素
 // ============================================================
-let _plainCssEl = null
-
 function ensureEl(id) {
   let el = document.getElementById(id)
   if (!el) { el = document.createElement('style'); el.id = id; document.head.appendChild(el) }
   return el
-}
-
-function clearEl(id) {
-  let el = document.getElementById(id)
-  if (el) el.textContent = ''
 }
 
 // ============================================================
@@ -87,6 +80,8 @@ export function applyTheme(themeName, _isDark) {
     } else {
       // 描边：depth → 文字混黑
       root.style.setProperty('--el-color-' + t + '-plain', mix(c.bg, '#000000', btnDepth / 100))
+      // plain 背景：depth 越大底色越深（0=纯白, 100=50%白混合）
+      root.style.setProperty('--el-color-' + t + '-plain-bg', mix(c.bg, '#FFFFFF', 1 - btnDepth / 200))
     }
   }
 
@@ -106,20 +101,17 @@ export function applyTheme(themeName, _isDark) {
   root.classList.remove('ui-full', 'ui-plain')
   root.classList.add(btnStyle === 'plain' ? 'ui-plain' : 'ui-full')
 
-  // 按钮样式全局 CSS — 互斥：激活一个就清空另一个
   const hoverLevel = (btnStyle === 'full' ? iconStore.hoverFull : iconStore.hoverPlain) || 3
-  if (btnStyle === 'full') {
-    clearEl('theme-plain-fix')
-    injectSolidCss(types)
-  } else {
-    clearEl('theme-solid-fix')
-    injectPlainCss(types)
-  }
+  injectButtonCss(types)
   injectHoverCss(types, hoverLevel)
 
   // tab 激活态变量
   root.style.setProperty('--tab-active-bg', 'var(--el-color-primary-solid-bg)')
   root.style.setProperty('--tab-active-hover-bg', 'var(--el-color-primary-light-' + hoverLevel + ')')
+
+  injectRadioCss()
+  injectDropdownCss()
+  injectInputCss()
 }
 
 // ============================================================
@@ -134,14 +126,23 @@ function setColorSeries(root, type, base) {
 }
 
 // ============================================================
-// plain 按钮文字色注入
+// 按钮全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
 // ============================================================
-function injectPlainCss(types) {
-  _plainCssEl = ensureEl('theme-plain-fix')
+var _buttonCssEl = null
+function injectButtonCss(types) {
+  _buttonCssEl = ensureEl('theme-button-fix')
   var css = ''
   for (var i = 0; i < types.length; i++) {
     var t = types[i]
-    css += '.el-button--' + t + '.is-plain{' +
+    // full — 实心填充
+    css += '.ui-full .el-button--' + t + ':not(.is-disabled){' +
+      'color:var(--el-color-' + t + '-text)!important;' +
+      '--el-button-text-color:var(--el-color-' + t + '-text)!important;' +
+      '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '}' +
+    // plain — 描边
+    '.ui-plain .el-button--' + t + ':not(.is-disabled){' +
       'color:var(--el-color-' + t + '-plain);' +
       '--el-button-text-color:var(--el-color-' + t + '-plain);' +
       '--el-button-border-color:var(--el-color-' + t + '-plain);' +
@@ -151,27 +152,7 @@ function injectPlainCss(types) {
       '--el-button-active-color:var(--el-color-' + t + '-plain);' +
       '}'
   }
-  _plainCssEl.textContent = css
-}
-
-// ============================================================
-// 实心按钮 — 强制覆盖含 is-plain 的所有按钮，背景填充，文字固定
-// ============================================================
-var _solidCssEl = null
-function injectSolidCss(types) {
-  _solidCssEl = ensureEl('theme-solid-fix')
-  var css = ''
-  for (var i = 0; i < types.length; i++) {
-    var t = types[i]
-    // 默认态：背景 + 文字；hover / active 由 injectHoverCss 控制
-    css += 'html .el-button--' + t + ':not(.is-disabled){' +
-      'color:var(--el-color-' + t + '-text)!important;' +
-      '--el-button-text-color:var(--el-color-' + t + '-text)!important;' +
-      '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
-      '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
-      '}'
-  }
-  _solidCssEl.textContent = css
+  _buttonCssEl.textContent = css
 }
 
 // ============================================================
@@ -193,4 +174,92 @@ function injectHoverCss(types, level) {
       '}'
   }
   _hoverCssEl.textContent = css
+}
+
+// ============================================================
+// radio-button 全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
+// ============================================================
+var _radioCssEl = null
+function injectRadioCss() {
+  _radioCssEl = ensureEl('theme-radio-fix')
+  var sel = '.el-radio-button.is-active .el-radio-button__inner,' +
+            '.el-radio-button__original-radio:checked+.el-radio-button__inner'
+  _radioCssEl.textContent =
+    '.ui-full ' + sel + '{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'border-color:var(--el-color-primary-solid-bg)!important;' +
+    'box-shadow:-1px 0 0 0 var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-plain ' + sel + '{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    'box-shadow:-1px 0 0 0 var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.el-radio-button .el-radio-button__inner:hover{' +
+    'color:var(--el-color-primary)!important;' +
+    '}'
+}
+
+// ============================================================
+// dropdown 全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
+// ============================================================
+var _dropdownCssEl = null
+function injectDropdownCss() {
+  _dropdownCssEl = ensureEl('theme-dropdown-fix')
+  var item = '.el-dropdown-menu__item:not(.is-disabled)'
+  _dropdownCssEl.textContent =
+    '.ui-full ' + item + ':focus,' +
+    '.ui-full ' + item + ':hover,' +
+    '.ui-full ' + item + '.is-active{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-plain ' + item + ':focus,' +
+    '.ui-plain ' + item + ':hover,' +
+    '.ui-plain ' + item + '.is-active{' +
+    'color:var(--el-color-primary)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    '}'
+}
+
+// ============================================================
+// input / select 全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
+// ============================================================
+var _inputCssEl = null
+function injectInputCss() {
+  _inputCssEl = ensureEl('theme-input-fix')
+  var focusSel = '.el-input.is-focus .el-input__wrapper,' +
+                 '.el-input .el-input__wrapper.is-focus,' +
+                 '.el-select .el-input.is-focus .el-input__wrapper'
+  _inputCssEl.textContent =
+    // full
+    '.ui-full .el-input .el-input__wrapper:hover,' +
+    '.ui-full .el-select .el-input .el-input__wrapper:hover{' +
+    'box-shadow:0 0 0 1px var(--el-color-primary-solid-bg) inset!important;' +
+    '}' +
+    '.ui-full ' + focusSel + '{' +
+    'box-shadow:0 0 0 1px var(--el-color-primary) inset!important;' +
+    '}' +
+    '.ui-full .el-select-dropdown__item.is-selected{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    // plain
+    '.ui-plain .el-input .el-input__wrapper:hover,' +
+    '.ui-plain .el-select .el-input .el-input__wrapper:hover{' +
+    'box-shadow:0 0 0 1px var(--el-color-primary-plain) inset!important;' +
+    '}' +
+    '.ui-plain ' + focusSel + '{' +
+    'box-shadow:0 0 0 1px var(--el-color-primary-plain) inset!important;' +
+    '}' +
+    '.ui-plain .el-select-dropdown__item.is-selected{' +
+    'color:var(--el-color-primary)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    '}' +
+    // hover (通用)
+    '.el-select-dropdown__item:not(.is-disabled):hover{' +
+    'background-color:var(--el-color-primary-light-9)!important;' +
+    '}'
 }
