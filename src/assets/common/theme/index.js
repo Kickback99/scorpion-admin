@@ -112,6 +112,7 @@ export function applyTheme(themeName, _isDark) {
   injectRadioCss()
   injectDropdownCss()
   injectInputCss()
+  injectMessageCss()
 }
 
 // ============================================================
@@ -262,4 +263,56 @@ function injectInputCss() {
     '.el-select-dropdown__item:not(.is-disabled):hover{' +
     'background-color:var(--el-color-primary-light-9)!important;' +
     '}'
+}
+
+// ============================================================
+// el-message 全局样式 — .ui-full / .ui-plain + 自定义 class
+// ============================================================
+var _messageCssEl = null
+function injectMessageCss() {
+  _messageCssEl = ensureEl('theme-message-fix')
+  // 语义类型 → 主题色变量名（error 映射到 danger）
+  var types = [
+    { cls: 'primary', v: 'primary' },
+    { cls: 'success', v: 'success' },
+    { cls: 'warning', v: 'warning' },
+    { cls: 'error',   v: 'danger' },
+    { cls: 'info',    v: 'info' },
+  ]
+  var css = ''
+  for (var i = 0; i < types.length; i++) {
+    var t = types[i]
+    css += '.ui-full .msg-' + t.cls + '{' +
+      '--el-message-bg-color:var(--el-color-' + t.v + '-solid-bg);' +
+      '--el-message-text-color:var(--el-color-' + t.v + '-text);' +
+      '--el-message-border-color:var(--el-color-' + t.v + '-solid-bg);' +
+      '--el-message-close-icon-color:var(--el-color-' + t.v + '-text);' +
+      '}' +
+      '.ui-plain .msg-' + t.cls + '{' +
+      '--el-message-bg-color:var(--el-color-' + t.v + '-plain-bg);' +
+      '--el-message-text-color:var(--el-color-' + t.v + '-plain);' +
+      '--el-message-border-color:var(--el-color-' + t.v + '-plain);' +
+      '--el-message-close-icon-color:var(--el-color-' + t.v + '-plain);' +
+      '}'
+  }
+  css += '.msg-dark{' +
+    '--el-message-bg-color:#303133;--el-message-text-color:#eee;' +
+    '--el-message-border-color:#606266;' +
+    '}' +
+    '.msg-plain{' +
+    '--el-message-bg-color:var(--el-color-primary-plain-bg);' +
+    '--el-message-text-color:var(--el-color-primary-plain);' +
+    '--el-message-border-color:var(--el-color-primary-plain);' +
+    '}' +
+    '.msg-round{border-radius:20px;}' +
+    '.msg-long-text{max-width:600px;word-break:break-word;}' +
+    '.msg-top-right{' +
+    'position:fixed;top:10px;right:20px;' +
+    'left:auto!important;transform:none!important;' +
+    '}' +
+    '.msg-bottom{' +
+    'position:fixed;top:auto!important;bottom:10px;' +
+    'left:50%!important;transform:translateX(-50%)!important;' +
+    '}'
+  _messageCssEl.textContent = css
 }
