@@ -320,6 +320,7 @@ import { useUserConfigStore } from '@/store/userConfig';
 import PinyinMatch from 'pinyin-match'
 import { getAllArticlesApi } from '@/api/business';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import msg from '@/components/msg'
 
 const userConfigStore = useUserConfigStore()
 const { isDarkEnabled: isDark } = storeToRefs(userConfigStore)
@@ -438,7 +439,7 @@ const onCurrentChange = (page) => {
 
 const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
-        ElMessage.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
+        msg.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
     // 只有切换到正常模式时才清空挑拣上下文
     // 切换到审核模式时，保留 currentPickComment（因为需要它的数据）
@@ -476,7 +477,7 @@ const handleSelectChildren = async (row) => {
     // searchData.rootId = ''
     params.pageNum = 1
     await render()
-    ElMessage.success(`正在查看「${row.content}」的子评论`)
+    msg.primary(`正在查看「${row.content}」的子评论`)
 }
 
 // 挑拣父集
@@ -492,7 +493,7 @@ const handleSelectParent = async (row) => {
     // searchData.rootId = ''
     params.pageNum = 1
     await render()
-    ElMessage.success(`正在查看「${row.content}」的父评论及其所有子评论`)
+    msg.primary(`正在查看「${row.content}」的父评论及其所有子评论`)
 }
 
 // 抽离公共方法
@@ -548,7 +549,7 @@ const handleModeChange = () => {
     // 重新渲染
     render()
     
-    ElMessage.info('已返回根评论列表')
+    msg.info('已返回根评论列表')
 } */
 
 // ==================== 回复相关 ====================
@@ -783,7 +784,7 @@ const submitReply = async () => {
     console.log('提交数据:', requestData)
     
     await addCommentApi(requestData)
-    ElMessage.success('回复成功')
+    msg.primary('回复成功')
     replyDialogVisible.value = false
     
     // 刷新列表
@@ -828,7 +829,7 @@ const onDetailLoaded = (data) => {
 // 详情加载错误回调
 const onDetailError = (error) => {
   console.error('❌ 详情加载失败:', error)
-  ElMessage.error('加载详情失败')
+  msg.error('加载详情失败')
   drawerLoading.value = false
 }
 
@@ -853,7 +854,7 @@ const batchApproveRows = async () => {
     const check = checkApproveValid(multipleSelection.value)
     
     if (!check.valid) {
-        ElMessage.warning(check.message)
+        msg.warning(check.message)
         return
     }
     
@@ -861,7 +862,7 @@ const batchApproveRows = async () => {
     
     const ids = multipleSelection.value.map(row => row.id)
     await auditCommentsApi(ids, 0)
-    ElMessage.success(`成功通过${ids.length}条评论`)
+    msg.primary(`成功通过${ids.length}条评论`)
     render()
 }
 
@@ -870,7 +871,7 @@ const batchRejectRows = async () => {
     const check = checkRejectValid(multipleSelection.value)
     
     if (!check.valid) {
-        ElMessage.warning(check.message)
+        msg.warning(check.message)
         return
     }
     
@@ -878,7 +879,7 @@ const batchRejectRows = async () => {
     
     const ids = multipleSelection.value.map(row => row.id)
     await auditCommentsApi(ids, 1)
-    ElMessage.success(`成功驳回${ids.length}条评论`)
+    msg.primary(`成功驳回${ids.length}条评论`)
     render()
 }
 
@@ -887,7 +888,7 @@ const batchRejectRows = async () => {
 const batchDeleteRows = async() => {
     let title;
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的评论')
+        msg.error('请先勾选要删除的评论')
         return
     }
     const rowIds = multipleSelection.value.map(row => row.id)
@@ -911,19 +912,19 @@ const batchDeleteRows = async() => {
 
 const handleApprove = async (row) => {
     await auditCommentApi(row.id, 0)
-    ElMessage.success('审核通过')
+    msg.primary('审核通过')
     render()
 }
 
 const handleReject = async (row) => {
     await auditCommentApi(row.id, 1)
-    ElMessage.success('已驳回')
+    msg.primary('已驳回')
     render()
 }
 
 const handleDelete = async(ids) => {
     await removeCommentApi(ids)
-    ElMessage.success('删除成功')
+    msg.primary('删除成功')
     render()
 }
 

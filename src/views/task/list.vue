@@ -145,7 +145,8 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import msg from '@/components/msg'
 import { listApi, addApi, updateApi, executeApi, refreshAllApi, refreshTaskApi, deleteApi } from '@/api/sysTask'
 import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
@@ -188,7 +189,7 @@ const loadTaskList = async () => {
     tableData.value = res.data || res
     console.log('任务列表加载成功:', tableData.value)
   } catch (error) {
-    ElMessage.error('加载任务列表失败')
+    msg.error('加载任务列表失败')
     console.error(error)
   }
 }
@@ -240,17 +241,17 @@ const submitTask = async () => {
           status: formData.value.status
         }
         await updateApi(formData.value.id, updateData)
-        ElMessage.success('任务更新成功，定时任务已自动刷新')
+        msg.primary('任务更新成功，定时任务已自动刷新')
       } else {
         // ==================== 新增模式 ====================
         await addApi(formData.value)
-        ElMessage.success('任务新增成功')
+        msg.primary('任务新增成功')
       }
       
       dialogVisible.value = false
       await loadTaskList()
     } catch (error) {
-      ElMessage.error('操作失败：' + (error.message || '未知错误'))
+      msg.error('操作失败：' + (error.message || '未知错误'))
       console.error(error)
     }
   })
@@ -269,11 +270,11 @@ const executeTask = async (row) => {
       }
     )
     
-    ElMessage.success(`【${row.taskName}】已开始执行`)
+    msg.primary(`【${row.taskName}】已开始执行`)
     await executeApi(row.taskCode)
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('执行失败：' + (error.message || '未知错误'))
+      msg.error('执行失败：' + (error.message || '未知错误'))
     }
   }
 }
@@ -292,11 +293,11 @@ const refreshSingleTask = async (row) => {
     )
     
     await refreshTaskApi(row.taskCode)
-    ElMessage.success(`【${row.taskName}】定时配置已刷新`)
+    msg.primary(`【${row.taskName}】定时配置已刷新`)
     await loadTaskList()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('刷新失败：' + (error.message || '未知错误'))
+      msg.error('刷新失败：' + (error.message || '未知错误'))
     }
   }
 }
@@ -315,11 +316,11 @@ const refreshAllTasks = async () => {
     )
     
     await refreshAllApi()
-    ElMessage.success('所有定时任务已刷新')
+    msg.primary('所有定时任务已刷新')
     await loadTaskList()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('刷新失败：' + (error.message || '未知错误'))
+      msg.error('刷新失败：' + (error.message || '未知错误'))
     }
   }
 }
@@ -348,11 +349,11 @@ const toggleStatus = async (row) => {
     }
     await updateApi(row.id, updateData)
     
-    ElMessage.success(`任务已${action}`)
+    msg.primary(`任务已${action}`)
     await loadTaskList()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error(`${action}失败：` + (error.message || '未知错误'))
+      msg.error(`${action}失败：` + (error.message || '未知错误'))
     }
   }
 }
@@ -360,10 +361,10 @@ const toggleStatus = async (row) => {
 const deleteTask = async (row) => {
   try {
     await deleteApi(row.id)
-    ElMessage.success(`已删除任务【${row.taskName}】`)
+    msg.primary(`已删除任务【${row.taskName}】`)
     await loadTaskList()
   } catch (error) {
-    ElMessage.error('删除失败：' + (error.message || '未知错误'))
+    msg.error('删除失败：' + (error.message || '未知错误'))
     console.error(error)
   }
 }
@@ -371,7 +372,7 @@ const deleteTask = async (row) => {
 // ==================== 快速设置Cron表达式 ====================
 const setCron = (cronValue) => {
   formData.value.cronExpression = cronValue
-  ElMessage.success(`已设置为：${cronValue}`)
+  msg.primary(`已设置为：${cronValue}`)
 }
 
 // ==================== Cron表达式翻译 ====================

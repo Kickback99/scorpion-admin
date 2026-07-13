@@ -25,7 +25,7 @@
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue';
-import { ElMessage } from 'element-plus'
+import msg from '@/components/msg'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
 import {useTokenStore} from '@/store/token'
@@ -82,7 +82,7 @@ const handleLogin = async() => {
     // 强制刷新用户信息
     await userStore.getUserInfo()
     if(userStore.userInfo.type === 0){
-        ElMessage.success('登录成功')
+        msg.primary('登录成功')
     }
     // 处理重定向逻辑 - 解码重定向路径
     let redirect = route.query.redirect
@@ -126,7 +126,7 @@ const handleCheckbox = async() => {
     } catch (error) {
         // 校验失败时，阻止复选框状态改变
         formModel.value.checkPwd = !formModel.value.checkPwd
-        ElMessage.warning('请先正确填写用户名和密码')
+        msg.warning('请先正确填写用户名和密码')
     }
 }
 

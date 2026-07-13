@@ -2,7 +2,6 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
-import { ElMessage } from 'element-plus'
 // 引入进度条
 import nprogress from 'nprogress'
 // 引入进度条样式
@@ -23,6 +22,7 @@ const router = useRouter()
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
 const route = useRoute() */
+import msg from '@/components/msg'
 
 
 
@@ -394,7 +394,7 @@ router.beforeEach((to, from, next) => {
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
         console.log('已登录不能输入登录地址回到登录页')
-        ElMessage.warning('请先退出登录')
+        msg.warning('请先退出登录')
         return next(from.fullPath);
     }
 
@@ -406,7 +406,7 @@ router.beforeEach((to, from, next) => {
 
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
-        ElMessage.error('如果没有token跳转到登录页')
+        msg.error('如果没有token跳转到登录页')
     // 重定向到登录页面，使用原始路径避免重复编码
     return next({
         path: '/login',
@@ -430,7 +430,7 @@ router.beforeEach((to, from, next) => {
         {
             // 情况1：前台用户 -> 提示错误，并跳转login
             /* if (error.isFrontendUser && to.path !== '/login') {
-                      ElMessage.error(error.message)
+                      msg.error(error.message)
                       router.replace('/login')
                       tokenStore.removeToken()
                     //   clearUserInfo()
@@ -455,7 +455,7 @@ router.beforeEach((to, from, next) => {
                 settings.isManualTo403 = true;
                 next('/403');   
             }else {
-                ElMessage.error(error|| '加载菜单失败');
+                msg.error(error|| '加载菜单失败');
                 next(false); // 阻止导航
             }
                  

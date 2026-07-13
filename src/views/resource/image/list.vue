@@ -127,7 +127,7 @@ import { ref, onMounted } from 'vue'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 
 // 3. UI 库
-import { ElMessage } from 'element-plus'
+import msg from '@/components/msg'
 import { Picture, CopyDocument } from '@element-plus/icons-vue'
 
 // 4. 第三方插件
@@ -232,11 +232,11 @@ const fetchImages = async () => {
       // 同步更新预览列表，过滤无效 URL 防止闪屏
       previewSrcList.value = imageList.value.map(i => i.img).filter(Boolean);
     } else {
-      ElMessage.error(res.msg || '查询失败');
+      msg.error(res.msg || '查询失败');
     }
   } catch (error) {
     console.error('加载图片失败:', error);
-    ElMessage.error('加载失败，请重试');
+    msg.error('加载失败，请重试');
   } finally {
     loading.value = false;
   }
@@ -358,7 +358,7 @@ const handleCopy = async (img) => {
   
   try {
     await navigator.clipboard.writeText(copyText);
-    ElMessage.success('已复制到剪贴板');
+    msg.primary('已复制到剪贴板');
   } catch (err) {
     // 降级方案
     const textarea = document.createElement('textarea');
@@ -367,7 +367,7 @@ const handleCopy = async (img) => {
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-    ElMessage.success('已复制到剪贴板');
+    msg.primary('已复制到剪贴板');
   }
 };
 

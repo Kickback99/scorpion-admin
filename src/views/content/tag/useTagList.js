@@ -5,7 +5,7 @@
  */
 import { nextTick, onMounted, ref } from 'vue'
 import { addApi, listApi, modifyApi, removeApi } from '@/api/contag'
-import { ElMessage } from 'element-plus'
+import msg from '@/components/msg'
 
 // ============================================================
 // 模块级单例状态
@@ -92,11 +92,11 @@ const confirm = async () => {
   await ruleFormRef.value.validate()
   if (!formModel.value.id) {
     await addApi(formModel.value)
-    ElMessage.success('新增成功')
+    msg.primary('新增成功')
     params.value.pageNum = 1
   } else {
     await modifyApi(formModel.value)
-    ElMessage.success('修改成功')
+    msg.primary('修改成功')
   }
   dialogVisible.value = false
   render()
@@ -107,7 +107,7 @@ const confirm = async () => {
 // ============================================================
 const removeRole = async (id) => {
   await removeApi(id)
-  ElMessage.success('删除成功')
+  msg.primary('删除成功')
   render()
 }
 

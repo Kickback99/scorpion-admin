@@ -98,7 +98,8 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import msg from '@/components/msg'
 import { Lock } from '@element-plus/icons-vue'
 import { userUpdatePwdApi } from '@/api/admin'
 import { useTokenStore } from '@/store/token'
@@ -236,7 +237,7 @@ const handleSubmit = async () => {
 
     await userUpdatePwdApi(formModel)
 
-    ElMessage.success('密码修改成功，请重新登录')
+    msg.primary('密码修改成功，请重新登录')
     
     // 清空表单
     handleReset()
@@ -251,10 +252,10 @@ const handleSubmit = async () => {
   } catch (error) {
     if (error === 'cancel') {
       // 用户取消操作
-      ElMessage.info('已取消修改')
+      msg.info('已取消修改')
     } /* else {
       // 表单验证失败或其他错误
-      ElMessage.error(error.message || '密码修改失败，请检查输入')
+      msg.error(error.message || '密码修改失败，请检查输入')
     } */
   } finally {
     loading.value = false

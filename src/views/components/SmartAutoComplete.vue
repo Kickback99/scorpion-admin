@@ -55,9 +55,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
 import PinyinMatch from 'pinyin-match'
+import msg from '@/components/msg'
 
 // ==================== 双向绑定 ====================
 const modelValue = defineModel({
@@ -641,14 +641,14 @@ const addTagFromSuggestion = (tagValue) => {
   if (!trimmedValue) return
   
   if (modelValue.value.includes(trimmedValue)) {
-    ElMessage.warning(`标签 "${trimmedValue}" 已存在`)
+    msg.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
   
   if (modelValue.value.length >= props.max) {
-    ElMessage.warning(`最多只能添加 ${props.max} 个标签`)
+    msg.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
   
@@ -682,7 +682,7 @@ const addCurrentInputAsTag = (inputValue) => {
     // 检查输入的值是否在联想列表中
     const existsInSuggestions = suggestions.value.some(item => item.value === trimmedValue)
     if (!existsInSuggestions) {
-      ElMessage.warning(props.customDisabledMessage)
+      msg.warning(props.customDisabledMessage)
       clearInput()
       showDropdown.value = false
       return
@@ -691,14 +691,14 @@ const addCurrentInputAsTag = (inputValue) => {
 
   
   if (modelValue.value.includes(trimmedValue)) {
-    ElMessage.warning(`标签 "${trimmedValue}" 已存在`)
+    msg.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
   
   if (modelValue.value.length >= props.max) {
-    ElMessage.warning(`最多只能添加 ${props.max} 个标签`)
+    msg.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
   

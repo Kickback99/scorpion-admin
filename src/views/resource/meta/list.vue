@@ -158,7 +158,7 @@ import { fileMetaListApi, recoverFileMetaApi } from '@/api/filemeta'
 import { getAllBusinessDataApi } from '@/api/business'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import PinyinMatch from 'pinyin-match'
 
@@ -400,11 +400,11 @@ const renderFileMeta = async () => {
             console.log("==================== res ====================",res)
             total.value = res.data.total || 0;
         } else {
-            ElMessage.error(res.msg || '查询失败');
+            msg.error(res.msg || '查询失败');
         }
     } catch (error) {
         console.error('查询文件元数据失败:', error);
-        ElMessage.error('查询失败，请稍后重试');
+        msg.error('查询失败，请稍后重试');
     } finally {
         loading.value = false;
     }
@@ -470,14 +470,14 @@ const handleRecover = async (row) => {
     try {
         const res = await recoverFileMetaApi(row.id);
         if (res.code === 200) {
-            ElMessage.success('恢复成功，缓存已清除');
+            msg.primary('恢复成功，缓存已清除');
             renderFileMeta(); // 刷新列表
         } else {
-            ElMessage.error(res.msg || '恢复失败');
+            msg.error(res.msg || '恢复失败');
         }
     } catch (error) {
         console.error('恢复失败:', error);
-        ElMessage.error('恢复失败，请稍后重试');
+        msg.error('恢复失败，请稍后重试');
     }
 };
 </script>

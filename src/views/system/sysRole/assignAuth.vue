@@ -26,6 +26,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user';
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
+import msg from '@/components/msg'
 const route = useRoute()
 const router = useRouter()
 
@@ -85,7 +86,7 @@ const save = async () => {
         }
     await doAllocMenusApi(assignMenuVo)
     loading.value = true
-    ElMessage.success('分配权限成功')
+    msg.primary('分配权限成功')
     router.push('/system/sysRole')
     /* if(userStore.userInfo.id != 1){
         // 清空路由
@@ -94,7 +95,7 @@ const save = async () => {
         try {
           await loadMenu(false)
         } catch (error) {
-          ElMessage.success(error)
+          msg.primary(error)
           //重新加载菜单方式一
           router.push('/')
           userStore.removeUserAuth()

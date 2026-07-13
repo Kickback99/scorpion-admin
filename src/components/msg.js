@@ -3,7 +3,7 @@
 // 一次封装，到处使用。所有方法支持 options 覆盖。
 // ============================================================
 
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 
 /** 默认配置 */
 const def = {

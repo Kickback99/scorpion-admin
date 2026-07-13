@@ -115,7 +115,7 @@
 <script setup>
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/file';
-import { ElMessage } from 'element-plus';
+import msg from '@/components/msg';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { useTokenStore } from '@/store/token';
 import offlineIcon from '@/components/MyIcon/src/offlineIcon';
@@ -194,7 +194,7 @@ const onCurrentChange = (page) => {
 
 const onSearch = () => {
     /* if(Boolean(searchData.sortField) != Boolean(searchData.sortOrder)){
-        ElMessage.error(searchData.sortField?'请选择排序':'请选择排序字段')
+        msg.error(searchData.sortField?'请选择排序':'请选择排序字段')
     } */
     params.pageNum = 1
     render()
@@ -233,7 +233,7 @@ const beforeUpload = (file) => {
   
   // 检查文件大小
   if (file.size > maxSize) {
-    ElMessage.error(`"${file.name}" 大小 ${(file.size / 1024 / 1024).toFixed(2)}MB，超过 10MB 限制`)
+    msg.error(`"${file.name}" 大小 ${(file.size / 1024 / 1024).toFixed(2)}MB，超过 10MB 限制`)
     return false
   }
 
@@ -243,12 +243,12 @@ const beforeUpload = (file) => {
 const onSuccess = (res,file) => {
     // 文件存在重复上传或者大小超出限制
     if(res.code === 0){
-        ElMessage.error(res.message)
+        msg.error(res.message)
         return;
     }
     
     // 文件上传成功
-    ElMessage.success(res.message)
+    msg.primary(res.message)
     render()
 }
 
@@ -259,9 +259,9 @@ const onError = (error, file, fileList) => {
   if (error.status === 0 || 
       error.message?.includes('CONNECTION') || 
       error.message?.includes('Network Error')) {
-    ElMessage.error('文件太大，请上传 10MB 以内的文件')
+    msg.error('文件太大，请上传 10MB 以内的文件')
   } else {
-    ElMessage.error('上传失败，请重试')
+    msg.error('上传失败，请重试')
   }
 }
 
@@ -272,13 +272,13 @@ const formModel = reactive({})
 // t_file_request：文件同步删除请求
 const handleSyncDelete = async() => {
     const res = await syncDeleteApi()
-    /* ElMessage.success(res.message)
+    /* msg.primary(res.message)
     render() */
 
     
     if (res.code === 200) {
         // 成功消息
-        ElMessage.success({
+        msg.primary({
             message: res.message.replace(/\n/g, '<br><br>'),
             // duration: 6000, // 显示时间长一些，方便阅读
             dangerouslyUseHTMLString: true,
@@ -286,7 +286,7 @@ const handleSyncDelete = async() => {
         })
     }else{
         // 错误消息
-        ElMessage.error({
+        msg.error({
             message: res.message.replace(/\n/g, '<br><br>'),
             // duration: 6000,
             dangerouslyUseHTMLString: true,
@@ -321,7 +321,7 @@ const handleConfirm = async() => {
     await ruleFormRef.value.validate()
     modifyApi(formModel.id,formModel.name)
     dialogVisible.value = false
-    ElMessage.success('修改成功')
+    msg.primary('修改成功')
     render()
 }
 
@@ -336,14 +336,14 @@ const removeMultiple = (raw) =>{
 // t_file_request：文件删除请求
 const handleRemove = async(id) => {
     const res = await removeApi(id)
-    ElMessage.success(res.message)
+    msg.primary(res.message)
     render()
 }
 
 // t_file_request：文件批量删除请求
 const deleteSelectRows = async() => {
     if(multipleSelection.value.length === 0){
-        ElMessage.error('请先勾选要删除的行')
+        msg.error('请先勾选要删除的行')
         return
     }
 	await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
@@ -353,7 +353,7 @@ const deleteSelectRows = async() => {
     })
     const rowIds = multipleSelection.value.map(row => row.id)
     const res = await removeApi(rowIds)
-    ElMessage.success(res.message)
+    msg.primary(res.message)
     render()
 }
 
@@ -362,7 +362,7 @@ const handleUpdateRecords = async() => {
     const res = await updateRecordApi()
     if (res.code === 200) {
         // 成功消息
-        ElMessage.success({
+        msg.primary({
             message: res.message.replace(/\n/g, '<br><br>'),
             // duration: 6000, // 显示时间长一些，方便阅读
             dangerouslyUseHTMLString: true,
@@ -370,7 +370,7 @@ const handleUpdateRecords = async() => {
         })
     }else{
         // 错误消息
-        ElMessage.error({
+        msg.error({
             message: res.message.replace(/\n/g, '<br><br>'),
             // duration: 6000,
             dangerouslyUseHTMLString: true,

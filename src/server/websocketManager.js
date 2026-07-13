@@ -1,8 +1,9 @@
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { useTokenStore } from '@/store/token'
 import { useUserStore } from '@/store/user'
 import router from '@/router';
 import { useConfigStore } from '@/store/config';
+import msg from '@/components/msg'
 
 class WebSocketManager {
   constructor() {
@@ -115,7 +116,7 @@ class WebSocketManager {
       // 1. 处理纯文本消息（定时任务结果等）
       if (typeof messageData === 'string' && !messageData.startsWith('{') && !messageData.startsWith('[')) {
         // sendMessage，直接显示(目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截)
-        ElMessage.success({
+        msg.primary({
           message: messageData.replace(/\n/g, '<br><br>'),
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 消息显示时间长一点
@@ -161,7 +162,7 @@ class WebSocketManager {
         const commentContent = arr[2]  // 评论内容
         // 格式：评论人：\n评论内容
         const commentMessage = `${commentUser} 发来了评论：<br><br>${commentContent}`
-        ElMessage.success({
+        msg.primary({
           message: commentMessage,
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 评论消息显示时间长一点
@@ -173,7 +174,7 @@ class WebSocketManager {
         const taskTitle = arr[1]
         const taskContent = arr[2]
         const taskMessage = `${taskTitle}\n${taskContent}`
-        ElMessage.success({
+        msg.primary({
           message: taskMessage,
           dangerouslyUseHTMLString: true
         })
@@ -181,7 +182,7 @@ class WebSocketManager {
         
       case 'system':  // 系统消息
         const systemMsg = arr[1]
-        ElMessage.success({
+        msg.primary({
           message: systemMsg,
           dangerouslyUseHTMLString: true
         })
@@ -217,7 +218,7 @@ class WebSocketManager {
         // 未知类型的数组消息，尝试显示
         console.warn('未知的数组消息类型:', messageType, arr)
         if (arr.length > 1) {
-          ElMessage.success(String(arr[1]))
+          msg.primary(String(arr[1]))
         }
     }
   }
@@ -249,7 +250,7 @@ class WebSocketManager {
       default:
         // 普通任务结果消息
         if (data.message) {
-          ElMessage.success(data.message)
+          msg.primary(data.message)
           return
         }
         console.warn('未知的消息类型:', data.type)
