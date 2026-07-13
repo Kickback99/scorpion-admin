@@ -29,15 +29,15 @@ export const useIconStore = defineStore({
         // ------------alibaba图标------------
         alibabaIcons:[],
 
-        // ------------按钮样式配置------------
-        // full | plain
-        buttonStyle: 'full',
+        // ------------UI 样式配置------------
+        // full | plain（影响按钮/标签页等所有组件）
+        uiMode: 'full',
         // full 模式: 0~100 light/dark 深度; plain 模式: 混合度百分比（默认35）
-        buttonDepth: 0,
-        // hover 强度 1~9（对应 light-1 ~ light-9），实心/描边独立
-        buttonHoverFull: 3,
-        buttonHoverPlain: 3,
-        // 实心按钮文字色模式: 'preset'（配置文件）| 'dynamic'（动态计算亮度）
+        uiDepth: 0,
+        // hover 强度 1~9（对应 light-1 ~ light-9）
+        hoverFull: 3,
+        hoverPlain: 3,
+        // 文字色模式: 'preset'（配置文件）| 'dynamic'（自动计算亮度）
         textColorMode: 'preset',
 
     }),
@@ -102,18 +102,18 @@ export const useIconStore = defineStore({
             this.$reset()
         },
 
-        // ------------按钮样式------------
-        setButtonStyle(style) {
-            this.buttonStyle = style
+        // ------------UI 样式------------
+        setUiMode(mode) {
+            this.uiMode = mode
         },
-        setButtonDepth(depth) {
-            this.buttonDepth = depth
+        setUiDepth(depth) {
+            this.uiDepth = depth
         },
-        setButtonHoverFull(hover) {
-            this.buttonHoverFull = hover
+        setHoverFull(level) {
+            this.hoverFull = level
         },
-        setButtonHoverPlain(hover) {
-            this.buttonHoverPlain = hover
+        setHoverPlain(level) {
+            this.hoverPlain = level
         },
         setTextColorMode(mode) {
             this.textColorMode = mode
@@ -121,6 +121,6 @@ export const useIconStore = defineStore({
     },
     persist: {
         key: 'icon-store',
-        paths: ['buttonStyle', 'buttonDepth', 'buttonHoverFull', 'buttonHoverPlain', 'textColorMode'],
+        paths: ['uiMode', 'uiDepth', 'hoverFull', 'hoverPlain', 'textColorMode'],
     },
 })

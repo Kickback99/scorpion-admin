@@ -14,7 +14,7 @@ import { useIconStore } from '@/store/icon'
 export function useActionButton() {
   const iconStore = useIconStore()
 
-  const style = computed(() => iconStore.buttonStyle)
+  const style = computed(() => iconStore.uiMode)
   const isPlain = computed(() => style.value === 'plain')
 
   /**

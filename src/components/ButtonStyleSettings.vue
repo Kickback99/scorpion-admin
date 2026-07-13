@@ -2,7 +2,7 @@
   <div class="btn-style-settings">
     <div class="btn-style-label">按钮样式</div>
     <el-radio-group
-      :model-value="iconStore.buttonStyle"
+      :model-value="iconStore.uiMode"
       @change="onStyleChange"
       size="small"
     >
@@ -13,7 +13,7 @@
     <div class="btn-depth-row">
       <span class="btn-depth-label">{{ depthLabel }}</span>
       <el-slider
-        :model-value="iconStore.buttonDepth"
+        :model-value="iconStore.uiDepth"
         @input="onDepthChange"
         :min="0"
         :max="100"
@@ -59,44 +59,44 @@ const userConfigStore = useUserConfigStore()
 // 计算属性
 // ============================================================
 const depthLabel = computed(() => {
-  const style = iconStore.buttonStyle
+  const style = iconStore.uiMode
   if (style === 'full') return '色阶深度'
   return '描边深度'
 })
 
 const hoverValue = computed(() => {
-  return iconStore.buttonStyle === 'full'
-    ? iconStore.buttonHoverFull
-    : iconStore.buttonHoverPlain
+  return iconStore.uiMode === 'full'
+    ? iconStore.hoverFull
+    : iconStore.hoverPlain
 })
 
 // ============================================================
 // 方法
 // ============================================================
 function depthTooltip(val) {
-  if (iconStore.buttonStyle === 'full') {
+  if (iconStore.uiMode === 'full') {
     return `±${val}%`
   }
   return `${val}%`
 }
 
 function onStyleChange(style) {
-  iconStore.setButtonStyle(style)
+  iconStore.setUiMode(style)
   // full 默认 depth=0, plain/circle 默认 depth=35
-  iconStore.setButtonDepth(style === 'full' ? 0 : 35)
+  iconStore.setUiDepth(style === 'full' ? 0 : 35)
   reapplyTheme()
 }
 
 function onDepthChange(depth) {
-  iconStore.setButtonDepth(depth)
+  iconStore.setUiDepth(depth)
   reapplyTheme()
 }
 
 function onHoverChange(hover) {
-  if (iconStore.buttonStyle === 'full') {
-    iconStore.setButtonHoverFull(hover)
+  if (iconStore.uiMode === 'full') {
+    iconStore.setHoverFull(hover)
   } else {
-    iconStore.setButtonHoverPlain(hover)
+    iconStore.setHoverPlain(hover)
   }
   reapplyTheme()
 }

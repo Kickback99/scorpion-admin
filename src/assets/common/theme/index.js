@@ -66,8 +66,8 @@ export function applyTheme(themeName, _isDark) {
   if (!preset) return
 
   const iconStore = useIconStore()
-  const btnStyle = iconStore.buttonStyle || 'full'
-  const btnDepth = iconStore.buttonDepth != null ? iconStore.buttonDepth : (btnStyle === 'full' ? 0 : 35)
+  const btnStyle = iconStore.uiMode || 'full'
+  const btnDepth = iconStore.uiDepth != null ? iconStore.uiDepth : (btnStyle === 'full' ? 0 : 35)
 
   const root = document.documentElement
   const types = ['primary', 'success', 'warning', 'danger', 'info']
@@ -102,8 +102,12 @@ export function applyTheme(themeName, _isDark) {
   root.style.setProperty('--el-menu-active-color', primary)
   root.style.setProperty('--el-menu-hover-bg-color', mix(primary, '#0a0a0f', 0.75))
 
+  // html 类注入 — 供所有组件（tab / button 等）读取 uiMode
+  root.classList.remove('ui-full', 'ui-plain')
+  root.classList.add(btnStyle === 'plain' ? 'ui-plain' : 'ui-full')
+
   // 按钮样式全局 CSS — 互斥：激活一个就清空另一个
-  const hoverLevel = (btnStyle === 'full' ? iconStore.buttonHoverFull : iconStore.buttonHoverPlain) || 3
+  const hoverLevel = (btnStyle === 'full' ? iconStore.hoverFull : iconStore.hoverPlain) || 3
   if (btnStyle === 'full') {
     clearEl('theme-plain-fix')
     injectSolidCss(types)
