@@ -189,7 +189,7 @@
   /* plain 模式 — 描边 + 极浅底色 + hover 填满主色 */
   .ui-plain & {
     color: var(--el-color-primary);
-    background-color: var(--el-color-primary-light-9);
+    background-color: var(--el-color-primary-plain-bg);
     border: 1px solid var(--el-color-primary);
     border-radius: 4px;
     box-shadow: none;
