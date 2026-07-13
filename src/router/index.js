@@ -206,7 +206,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
     // ================= 1.6 加载用户配置 =================
     await userConfigStore.fetchUserConfig();
-    document.documentElement.className = userConfigStore.isDarkEnabled ? 'dark' : '';
+    document.documentElement.classList.toggle('dark', userConfigStore.isDarkEnabled);
     applyTheme(userConfigStore.theme, userConfigStore.isDarkEnabled);
 
     await configStore.loadConfig()
