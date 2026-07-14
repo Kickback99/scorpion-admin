@@ -4,10 +4,12 @@
       <template #header>
         <div class="card-header">
           <span class="title">个人信息</span>
-          <el-button 
+          <el-button
+            size="small" 
             type="primary" 
             icon="Edit" 
             @click="editMode = !editMode"
+            plain
           >
             {{ editMode ? '取消编辑' : '编辑资料' }}
           </el-button>
@@ -32,7 +34,7 @@
               name="avatar"
               :onChange="handleSelectAvatar"
             >
-              <el-button type="primary" icon="Upload" size="small">
+              <el-button type="primary" icon="Upload" size="small" plain>
                 更换头像
               </el-button>
             </el-upload>
@@ -126,8 +128,8 @@
 
         <!-- 操作按钮 -->
         <div class="action-buttons" v-if="editMode">
-          <el-button @click="handleCancel">取消</el-button>
-          <el-button type="primary" @click="handleSave" :loading="loading">
+          <el-button type="info" @click="handleCancel" size="small" plain>取消</el-button>
+          <el-button type="primary" @click="handleSave" :loading="loading" size="small" plain>
             保存修改
           </el-button>
         </div>

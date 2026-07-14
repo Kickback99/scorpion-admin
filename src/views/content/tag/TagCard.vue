@@ -5,9 +5,9 @@
       <el-input v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable size="default" class="tc-search" @keyup.enter="onSearch">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-button type="primary" @click="onSearch">搜索</el-button>
-      <el-button @click="onReset">重置</el-button>
-      <el-button :disabled="$hasPerm('btn.tag.add')" type="success" icon="Plus" @click="handleAdd({})">新增标签</el-button>
+      <el-button size="small" type="primary" @click="onSearch" plain>搜索</el-button>
+      <el-button size="small" type="info" @click="onReset" plain>重置</el-button>
+      <el-button size="small" type="primary" :disabled="$hasPerm('btn.tag.add')" icon="Plus" @click="handleAdd({})" plain>新增标签</el-button>
     </div>
 
     <div class="tc-grid">
@@ -20,10 +20,10 @@
         <div class="tc-card-footer">
           <span class="tc-card-time">{{ tag.createTime }}</span>
           <div class="tc-card-actions">
-            <el-button :disabled="$hasPerm('btn.tag.update')" @click="handleEdit(tag)" type="primary" icon="Edit" circle plain size="small" />
+            <el-button size="small" type="warning" :disabled="$hasPerm('btn.tag.update')" @click="handleEdit(tag)" icon="Edit" circle plain />
             <el-popconfirm :title="`确定删除「${tag.name}」吗？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
               <template #reference>
-                <el-button :disabled="$hasPerm('btn.tag.remove')" type="danger" icon="Delete" circle plain size="small" />
+                <el-button size="small" type="danger" :disabled="$hasPerm('btn.tag.remove')" icon="Delete" circle plain />
               </template>
             </el-popconfirm>
           </div>

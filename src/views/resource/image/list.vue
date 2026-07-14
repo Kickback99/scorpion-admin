@@ -75,12 +75,12 @@
           </span>
           <!-- 操作按钮组（悬浮显示，方便以后新增/删改） -->
           <div v-show="hoveredId === img.id" class="image-footer-actions">
-            <el-button size="small" @click.stop="openPreview(index)">预览</el-button>
-            <el-button size="small" @click.stop="handleCopy(img)">复制</el-button>
+            <el-button size="small" type="info" @click.stop="openPreview(index)" plain>预览</el-button>
+            <el-button size="small" @click.stop="handleCopy(img)" plain>复制</el-button>
             <!-- 占位：下载 -->
-            <el-button size="small" disabled>下载</el-button>
+            <el-button size="small" disabled plain>下载</el-button>
             <!-- 占位：删除 -->
-            <el-button size="small" disabled>删除</el-button>
+            <el-button size="small" disabled plain>删除</el-button>
           </div>
           <el-tag :type="getFileTypeTag(img.fileType)" size="small">
             {{ getFileTypeLabel(img.fileType) }}

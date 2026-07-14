@@ -55,9 +55,9 @@
                 />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
-                <el-button plain color="#626aef" :dark="isDark"  @click="deleteSelectRows()">批量删除</el-button>
+                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+                <el-button size="small" type="danger" @click="deleteSelectRows()" plain>批量删除</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -109,7 +109,7 @@
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button type="danger" icon="Delete"  circle plain/>
+                    <el-button size="small" type="danger" icon="Delete" circle plain/>
                 </template>
                 </el-popconfirm>
             </template>

@@ -11,12 +11,12 @@
                     <SmartSelector v-model="searchModel.role" :data="roleOptions" placeholder="请选择用户类型" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-                    <el-button icon="Refresh" type="warning" @click="onReset" plain>重置</el-button>
+                    <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                    <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
                 </el-form-item>
             </el-form>
             <div>
-                <el-button @click="cleanZombieUsers" type="primary" plain >清理僵尸用户</el-button>
+                <el-button size="small" type="primary" @click="cleanZombieUsers" plain>清理僵尸用户</el-button>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
             <el-table-column prop="username" label="用户名" min-width="120" />
             <el-table-column prop="roleName" label="用户类型" min-width="100">
                 <template #default="{row}">
-                    <el-button :type="row.role === 'admin' ? 'danger' : 'primary'" plain size="small">
+                    <el-button size="small" :type="row.role === 'admin' ? 'danger' : 'primary'" plain>
                         {{row.userId === "1" && row.role === "admin" ? '超级管理员' : row.roleName }}
                     </el-button>
                 </template>
@@ -48,14 +48,14 @@
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
-                        <el-button 
-                            type="primary" 
+                        <el-button
                             size="small"
-                            plain
+                            type="primary"
                             :loading="kickingMap[row.userId + '_' + row.role]"
                             :disabled="kickingMap[row.userId + '_' + row.role]"
-                            > 
-                            {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }} 
+                            plain
+                            >
+                            {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }}
                         </el-button>
                         </template>
                     </el-popconfirm>

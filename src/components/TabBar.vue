@@ -19,11 +19,11 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button circle icon="Refresh" @click="modifyRefresh"></el-button>
-            <el-button circle icon="FullScreen" @click="fullScreen"></el-button>
+            <el-button size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
+            <el-button size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
             <el-popover placement="bottom" :width="260" trigger="hover">
                 <template #reference>
-                    <el-button circle icon="Setting"></el-button>
+                    <el-button size="small" circle icon="Setting" plain></el-button>
                 </template>
                 <el-form>
                     <el-form-item label="暗黑模式">
