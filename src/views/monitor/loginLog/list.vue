@@ -73,9 +73,9 @@
         </el-table-column>
         <el-table-column prop="status" label="登录状态">
             <template #default="{row}">
-                <el-tag type="success" v-if="row.status === 0">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
-                <el-tag type="primary" v-if="row.status === 1">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
-                <el-tag type="danger" v-if="row.status === 2">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="success" size="small" v-if="row.status === 0">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="primary" size="small" v-if="row.status === 1">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="danger" size="small" v-if="row.status === 2">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
         <el-table-column label="token" >

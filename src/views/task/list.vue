@@ -15,14 +15,14 @@
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="taskCode" label="任务编码" width="180" align="center">
         <template #default="{ row }">
-          <el-tag type="info">{{ row.taskCode }}</el-tag>
+          <el-tag type="info" size="small">{{ row.taskCode }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="taskName" label="任务名称" width="150" align="center" />
       <el-table-column prop="description" label="任务描述" min-width="200" show-overflow-tooltip />
       <el-table-column prop="cronExpression" label="Cron表达式" width="180" align="center">
         <template #default="{ row }">
-          <el-tag type="primary">{{ row.cronExpression }}</el-tag>
+          <el-tag type="primary" size="small">{{ row.cronExpression }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="执行周期说明" min-width="200" align="center">
@@ -32,9 +32,9 @@
             </span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="80" align="center">
+      <el-table-column prop="status" label="状态" width="90" align="center">
         <template #default="{ row }">
-          <el-tag :type="row.status === 0 ? 'success' : 'danger'">
+          <el-tag :type="row.status === 0 ? 'success' : 'danger'" size="small">
             {{ row.status === 0 ? '✅ 启用' : '⛔ 禁用' }}
           </el-tag>
         </template>

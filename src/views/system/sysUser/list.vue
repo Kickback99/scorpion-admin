@@ -99,7 +99,7 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center">
             <template #default="{row}">
-                <el-switch v-model="row.status"  :active-value="0" :inactive-value="1" @change="modifySwitch(row)"/>
+                <el-switch v-model="row.status" size="small" :active-value="0" :inactive-value="1" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" align="center" width="185"/>
