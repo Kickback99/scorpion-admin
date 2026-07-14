@@ -104,6 +104,9 @@ export function applyTheme(themeName, _isDark) {
   const hoverLevel = (btnStyle === 'full' ? iconStore.hoverFull : iconStore.hoverPlain) || 3
   injectButtonCss(types)
   injectHoverCss(types, hoverLevel)
+  injectModalCss(types)
+  injectPaginationCss()
+  injectDrawerCss()
 
   // tab 激活态变量
   root.style.setProperty('--tab-active-bg', 'var(--el-color-primary-solid-bg)')
@@ -320,4 +323,89 @@ function injectMessageCss() {
     'left:50%!important;transform:translateX(-50%)!important;' +
     '}'
   _messageCssEl.textContent = css
+}
+
+// ============================================================
+// popconfirm / message-box 按钮 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _modalCssEl = null
+function injectModalCss(types) {
+  _modalCssEl = ensureEl('theme-modal-fix')
+  var css = ''
+  for (var i = 0; i < types.length; i++) {
+    var t = types[i]
+    var btn = '.el-message-box__btns .el-button--' + t + ',' +
+              '.el-popconfirm__action .el-button--' + t
+    css += '.ui-full ' + btn + '{' +
+      'color:var(--el-color-' + t + '-text)!important;' +
+      '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '}' +
+      '.ui-plain ' + btn + '{' +
+      'color:var(--el-color-' + t + '-plain)!important;' +
+      '--el-button-border-color:var(--el-color-' + t + '-plain)!important;' +
+      '--el-button-hover-text-color:var(--el-color-white)!important;' +
+      '--el-button-hover-bg-color:var(--el-color-' + t + ')!important;' +
+      '}'
+  }
+  _modalCssEl.textContent = css
+}
+
+// ============================================================
+// pagination 分页 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _paginationCssEl = null
+function injectPaginationCss() {
+  _paginationCssEl = ensureEl('theme-pagination-fix')
+  _paginationCssEl.textContent =
+    '.ui-full .el-pager li.is-active{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-plain .el-pager li.is-active{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-full .el-pager li:hover,' +
+    '.ui-full .btn-next:hover,' +
+    '.ui-full .btn-prev:hover{' +
+    'color:var(--el-color-primary)!important;' +
+    '}' +
+    '.ui-plain .el-pager li:hover,' +
+    '.ui-plain .btn-next:hover,' +
+    '.ui-plain .btn-prev:hover{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    '}'
+}
+
+// ============================================================
+// drawer 抽屉 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _drawerCssEl = null
+function injectDrawerCss() {
+  _drawerCssEl = ensureEl('theme-drawer-fix')
+  _drawerCssEl.textContent =
+    '.ui-full .el-drawer__header{' +
+    'color:var(--el-color-primary-text)!important;' +
+    '--el-drawer-title-text-color:var(--el-color-primary-text);' +
+    'background-color:var(--el-color-primary-solid-bg);' +
+    'padding-bottom:14px;margin-bottom:6px;' +
+    '}' +
+    '.ui-full .el-drawer__close-btn{' +
+    'color:var(--el-color-primary-text)!important;' +
+    '}' +
+    '.ui-full .el-drawer__close-btn:hover{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-light-5)!important;' +
+    '}' +
+    '.ui-plain .el-drawer__header{' +
+    '--el-drawer-title-text-color:var(--el-color-primary-plain);' +
+    'border-bottom:1.5px solid var(--el-color-primary);' +
+    'padding-bottom:14px;margin-bottom:6px;' +
+    '}' +
+    '.ui-plain .el-drawer__close-btn:hover{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    '}'
 }
