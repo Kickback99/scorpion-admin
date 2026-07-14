@@ -376,11 +376,13 @@ const tagList = ref([])
 const loadAllTags = async () => {
   const res = await getTagListApi(1, 999, {})
   const items = res.data?.items || []
-  tagList.value = items.map(item => ({
-    value: item.name.trim(),
-    id: item.id,
-    remark: item.remark
-  }))
+  tagList.value = items
+    .filter(item => item.name)
+    .map(item => ({
+      value: item.name.trim(),
+      id: item.id,
+      remark: item.remark
+    }))
   console.log('加载所有标签:', tagList.value.length, '条')
 }
 
