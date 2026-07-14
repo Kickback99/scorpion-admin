@@ -190,17 +190,15 @@
 
     <!-- 分页 -->
     <el-pagination
-    size="small"
-    v-model:current-page="params.pageNum"
-    v-model:page-size="params.pageSize"
-    :page-sizes="[2, 5, 7, 10]"
-    :disabled="false"
-    :background="false"
-    layout="prev, pager, next, jumper, ->,sizes,total"
-    :total="total"
-    @size-change="onSizeChange"
-    @current-change="onCurrentChange"
-    style="margin-top: 20px; justify-content: flex-end;"
+        size="small"
+        v-model:current-page="params.pageNum"
+        v-model:page-size="params.pageSize"
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
+        :total="total"
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
     />
 
 </template>

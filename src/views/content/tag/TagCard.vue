@@ -34,10 +34,10 @@
 
     <div class="tc-pagination">
       <el-pagination
+        size="small"
         v-model:current-page="params.pageNum"
         v-model:page-size="params.pageSize"
-        :page-sizes="[2,3,5,7]"
-        :small="false"
+        :page-sizes="[2, 5, 7, 10]"
         layout="total, sizes, prev, pager, next"
         :total="total"
         @size-change="onSizeChange"

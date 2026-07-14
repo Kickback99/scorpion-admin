@@ -117,17 +117,16 @@
     </el-table>
 
     <el-pagination
-		v-model:current-page="params.pageNum"
-		v-model:page-size="params.pageSize"
-		:page-sizes="[2,3,5,7]"
-		:small="false"
-		:disabled="false"
-		:background="false"
-		layout="jumper, total, sizes, prev, pager, next"
-		:total="total"
-		@size-change="onSizeChange"
-		@current-change="onCurrentChange"
-		/>
+        size="small"
+        v-model:current-page="params.pageNum"
+        v-model:page-size="params.pageSize"
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
+        :total="total"
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
+    />
 
 </template>
 
