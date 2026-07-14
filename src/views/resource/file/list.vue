@@ -86,9 +86,17 @@
         </el-table-column>
     </el-table>
 
-    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[2,3,5,7]"
-        :small="false" :disabled="false" :background="false" layout="jumper, total, sizes, prev, pager, next"
-        :total="total" @size-change="onSizeChange" @current-change="onCurrentChange" />
+    <el-pagination
+        size="small"
+        v-model:current-page="params.pageNum"
+        v-model:page-size="params.pageSize"
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
+        :total="total"
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
+    />
 
     <el-dialog v-model="dialogVisible" title="修改文件名" width="30%" :close-on-click-modal="false">
         <el-form ref="ruleFormRef"  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm" :size="formSize"
