@@ -2,7 +2,7 @@
   <!-- ===== 标签云：搜索栏 + 气泡云 + 分页 ===== -->
   <div class="tcl-page">
     <div class="tcl-toolbar">
-      <el-input v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable size="default" class="tcl-search" @keyup.enter="onSearch">
+      <el-input size="small" v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable class="tcl-search" @keyup.enter="onSearch">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
       <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>

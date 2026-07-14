@@ -1,7 +1,7 @@
 <template>
     <!-- ===== 搜索栏 ===== -->
     <div class="flex justify-between items-center">
-        <el-form ref="formRef" :model="searchModel" label-width="auto" inline> 
+        <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small"> 
             <el-form-item >
                 <el-input v-model="searchModel.keyword" placeholder="请输入名字/描述"/>
             </el-form-item>
