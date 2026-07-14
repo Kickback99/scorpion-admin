@@ -1,12 +1,7 @@
 <template>
-  <div v-if="showTags" class="tags-view" 
-  :style="{
-        backgroundColor:userConfigStore.isDarkEnabled?'#222':'#fff',
-        marginBottom:10 +'px'
-      }"
-  >
+  <div v-if="showTags" class="tags-view" style="margin-bottom:10px">
     <!-- 左滚动按钮 -->
-    <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
+    <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
     </span>
     
@@ -47,13 +42,13 @@
     </div>
     
     <!-- 右滚动按钮 -->
-    <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
+    <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)">
       <el-icon><ArrowRight /></el-icon>
     </span>
     
     <!-- 下拉菜单 -->
     <el-dropdown trigger="click" @command="handleCommand">
-      <span class="arrow-down" :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'">
+      <span class="arrow-down">
         <el-icon><ArrowDown /></el-icon>
       </span>
       <template #dropdown>
@@ -87,7 +82,6 @@
       v-show="contextmenuVisible"
       ref="contextmenuRef"
       class="contextmenu"
-      :class="userConfigStore.isDarkEnabled?'dark-mode':'light-mode'"
       :style="{
         left: contextmenuLeft + 'px',
         top: contextmenuTop + 'px'
