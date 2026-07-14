@@ -1,11 +1,11 @@
 <template>
   <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
     <div class="header-actions">
-      <el-button type="primary" @click="handleAddRoot">
+      <el-button type="primary" @click="handleAddRoot" size="small" plain>
         <el-icon><Plus /></el-icon>
         新增配置
       </el-button>
-      <el-button @click="handleReset">
+      <el-button type="info" @click="handleReset" size="small" plain>
         <el-icon><RefreshRight /></el-icon>
         重置
       </el-button>
@@ -78,7 +78,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
           <template v-if="row.isEditing">
             <el-button type="primary" link size="small" @click="handleSave(row)">
@@ -89,14 +89,14 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button type="primary" link size="small" @click="handleEdit(row)" :disabled="row.isObject">
+            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="row.isObject">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
             <!-- 删除按钮：对象有子节点 或 系统预设配置 时禁用 -->
-            <el-button type="danger" link size="small" @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || row.isSystem">
+            <el-button type="danger" link size="small" plain @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || row.isSystem">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
-            <el-button type="success" link size="small" @click="handleAddChild(row)" v-if="row.isObject">
+            <el-button type="primary" link size="small" plain @click="handleAddChild(row)" v-if="row.isObject">
               <el-icon><Plus /></el-icon> 新增子项
             </el-button>
           </template>
@@ -169,8 +169,8 @@
         </template>
       </el-form>
       <template #footer>
-        <el-button @click="addDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirmAdd">确定</el-button>
+        <el-button size="small" type="info" @click="addDialogVisible = false" plain>取消</el-button>
+        <el-button size="small" type="primary" @click="handleConfirmAdd" plain>确定</el-button>
       </template>
     </el-dialog>
   </div>

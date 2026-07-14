@@ -49,7 +49,6 @@ const router = useRouter();
       </p>
       <el-button
         v-motion
-        type="primary"
         :initial="{
           opacity: 0,
           y: 100
@@ -62,6 +61,9 @@ const router = useRouter();
           }
         }"
         @click="router.push('/')"
+        size="small"
+        type="primary"
+        plain
       >
         返回首页
       </el-button>

@@ -5,9 +5,9 @@
       <el-input v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable size="default" class="tcl-search" @keyup.enter="onSearch">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-button type="primary" icon="Search" @click="onSearch">搜索</el-button>
-      <el-button icon="Refresh" @click="onReset">重置</el-button>
-      <el-button :disabled="$hasPerm('btn.tag.add')" type="success" icon="Plus" @click="handleAdd({})">新增</el-button>
+      <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+      <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+      <el-button size="small" type="primary" :disabled="$hasPerm('btn.tag.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
     </div>
 
     <div class="tcl-cloud">
@@ -21,10 +21,10 @@
         </el-tooltip>
         <span class="tcl-bubble-count">{{ tag.articleCount }}</span>
         <div class="tcl-bubble-actions">
-          <el-button :disabled="$hasPerm('btn.tag.update')" @click.stop="handleEdit(tag)" type="primary" icon="Edit" circle size="small" />
+          <el-button size="small" type="warning" :disabled="$hasPerm('btn.tag.update')" @click.stop="handleEdit(tag)" icon="Edit" circle plain />
           <el-popconfirm :title="`确定删除「${tag.name}」？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
             <template #reference>
-              <el-button :disabled="$hasPerm('btn.tag.remove')" type="danger" icon="Delete" circle size="small" @click.stop />
+              <el-button size="small" type="danger" :disabled="$hasPerm('btn.tag.remove')" icon="Delete" @click.stop circle plain />
             </template>
           </el-popconfirm>
         </div>

@@ -1,6 +1,6 @@
 <template>
          <div class="toolbar">
-            <el-button :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" type="success" plain>新增</el-button>
+            <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" plain>新增</el-button>
             <!-- <el-button :disabled="$hasPerm('btn.sysMenu.remove')" @click="deleteSelectRows()" icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button> -->
          </div>
         
@@ -28,18 +28,18 @@
         <el-table-column label="状态" width="80">
             <template #default="{row}">
                 <!-- <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/> -->
-                 <el-button v-if="row.status === 0" type="success" plain size="small">启用</el-button>
-                 <el-button v-else type="danger" plain size="small">禁用</el-button>
+                 <el-button size="small" type="success" v-if="row.status === 0" plain>启用</el-button>
+                 <el-button size="small" type="danger" v-else plain>禁用</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160"/>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{row}">
-            <el-button v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')"  type="primary" plain size="small">新增</el-button>
-            <el-button  @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')"  type="warning" plain size="small">编辑</el-button>
+            <el-button size="small" type="primary" v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')" plain>新增</el-button>
+            <el-button size="small" type="warning" @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除 ${row.name} 吗`" @confirm="removeMenu(row.id)" width="250px" icon="WarnTriangleFilled">
               <template #reference>
-                <el-button :disabled="row.children.length > 0"  type="danger"  plain size="small">删除</el-button>
+                <el-button size="small" type="danger" :disabled="row.children.length > 0" plain>删除</el-button>
               </template>
             </el-popconfirm>
           </template>
@@ -124,8 +124,8 @@
         </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="addOrModify">确认</el-button>
-        <el-button type="primary" @click="onCancel">
+        <el-button size="small" type="primary" @click="addOrModify" plain>确认</el-button>
+        <el-button size="small" type="info" @click="onCancel" plain>
           取消
         </el-button>
       </span>

@@ -4,11 +4,11 @@
     <div class="image-reference-header">
       <span class="image-reference-title">{{ title }}</span>
       <el-button
-        v-if="showClear"
         size="small"
-        type="danger"
-        link
+        type="info"
+        v-if="showClear"
         @click="handleClear"
+        plain
       >
         清空
       </el-button>
@@ -91,14 +91,15 @@
             </div>
 
             <el-button
-              v-if="!disabled"
-              class="image-insert-btn"
-              size="small"
-              type="primary"
-              @click.stop="handleInsert(img)"
-            >
-              <el-icon><Plus /></el-icon> 插入
-            </el-button>
+                v-if="!disabled"
+                class="image-insert-btn"
+                size="small"
+                type="primary"
+                @click.stop="handleInsert(img)"
+                plain
+              >
+                <el-icon><Plus /></el-icon> 插入
+              </el-button>
           </div>
         </div>
       </el-form-item>

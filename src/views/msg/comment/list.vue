@@ -47,21 +47,19 @@
             </el-form-item>
 
             <el-form-item>
-                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
-                    @click="setSortOrder('ASC')" />
-                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
-                    @click="setSortOrder('DESC')" />
+                <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+                <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
 
             <el-form-item>
-                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
+                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>            
         </el-form> 
 
         <!-- 顶部操作栏：新增「回复」按钮 -->
         <div class="top-action-bar">
-            <el-button size="small" type="primary" plain @click="handleTopReply">
+            <el-button size="small" type="primary" @click="handleTopReply" plain>
                 回复
             </el-button>
         </div>
@@ -70,40 +68,40 @@
 
     <div class="action-bar">
         <div class="action-buttons">
-            <el-button size="small" @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="primary" plain :dark="isDark" >批量通过</el-button>
-            <el-button size="small" @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="warning" plain :dark="isDark" >批量驳回</el-button>
-            <el-button size="small" @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" type="danger"   plain :dark="isDark" >批量删除</el-button>
+            <el-button size="small" type="primary" @click="batchApproveRows()" :disabled="$hasPerm('btn.sysUser.remove')" plain>批量通过</el-button>
+            <el-button size="small" type="danger" @click="batchRejectRows()" :disabled="$hasPerm('btn.sysUser.remove')" plain>批量驳回</el-button>
+            <el-button size="small" type="danger" @click="batchDeleteRows()" :disabled="$hasPerm('btn.sysUser.remove')" plain>批量删除</el-button>
         </div>
 
         <!-- 统计区域：按钮显示状态文字，数字单独显示 -->
         <div class="statistics-buttons">
             <!-- 总评论 -->
-            <div class="stat-item" :class="{ 'is-dark': isDark }">
-                <el-button class="stat-btn total-btn">
+            <div class="stat-item">
+                <el-button size="small" type="primary" plain>
                     <span class="stat-label">总评论</span>
                 </el-button>
                 <span class="stat-number">{{ statistics.total }}</span>
             </div>
 
             <!-- 待审核 -->
-            <div class="stat-item" :class="{ 'is-dark': isDark }">
-                <el-button class="stat-btn pending-btn">
+            <div class="stat-item">
+                <el-button size="small" type="warning" plain>
                     <span class="stat-label">待审核</span>
                 </el-button>
                 <span class="stat-number">{{ statistics.pending }}</span>
             </div>
 
             <!-- 已通过 -->
-            <div class="stat-item" :class="{ 'is-dark': isDark }">
-                <el-button class="stat-btn approved-btn">
+            <div class="stat-item">
+                <el-button size="small" type="success" plain>
                     <span class="stat-label">已通过</span>
                 </el-button>
                 <span class="stat-number">{{ statistics.approved }}</span>
             </div>
 
             <!-- 已驳回 -->
-            <div class="stat-item" :class="{ 'is-dark': isDark }">
-                <el-button class="stat-btn rejected-btn">
+            <div class="stat-item">
+                <el-button size="small" type="danger" plain>
                     <span class="stat-label">已驳回</span>
                 </el-button>
                 <span class="stat-number">{{ statistics.rejected }}</span>
@@ -133,9 +131,9 @@
         <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
         <el-table-column prop ="status" label="评论状态">
             <template #default="{row}">
-                <el-button size="small" plain type="primary" v-if="row.status === 0">已通过</el-button>
-                <el-button size="small" plain type="danger" v-if="row.status === 1">已驳回</el-button>
-                <el-button size="small" plain type="warning" v-if="row.status === 2">待审核</el-button>
+                <el-button size="small" type="success" v-if="row.status === 0" plain>已通过</el-button>
+                <el-button size="small" type="danger" v-if="row.status === 1" plain>已驳回</el-button>
+                <el-button size="small" type="warning" v-if="row.status === 2" plain>待审核</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="username" label="创建者" />
@@ -152,11 +150,11 @@
                         :disabled="row.status === 0"
                     >
                         <template #reference>
-                            <el-button 
-                                type="primary" 
-                                size="small" 
-                                plain
+                            <el-button
+                                size="small"
+                                type="primary"
                                 :disabled="row.status === 0"
+                                plain
                             >通过</el-button>
                         </template>
                     </el-popconfirm>
@@ -168,37 +166,36 @@
                         :disabled="row.status === 1"
                     >
                         <template #reference>
-                            <el-button 
-                                type="warning" 
-                                size="small" 
-                                plain
+                            <el-button
+                                size="small"
+                                type="warning"
                                 :disabled="row.status === 1"
+                                plain
                             >驳回</el-button>
                         </template>
                     </el-popconfirm>
                     
                     <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
-                            <el-button type="danger" size="small" plain>删除</el-button>
+                            <el-button size="small" type="danger" plain>删除</el-button>
                         </template>
                     </el-popconfirm>
-                    
-                    <el-button type="info" size="small" plain @click="handleInfo(row)">详情</el-button>
+
+                    <el-button size="small" type="info" @click="handleInfo(row)" plain>详情</el-button>
                 </template>
 
                 <!-- 正常模式/挑拣模式：显示 回复/挑拣/删除/详情 -->
                 <template v-else>
-                    <el-button type="primary" size="small" plain @click="handleReply(row)">回复</el-button>
-                    <el-button type="success" size="small" plain 
-                        @click="row.rootId === -1 ? handleSelectChildren(row) : handleSelectParent(row)">
+                    <el-button size="small" type="primary" @click="handleReply(row)" plain>回复</el-button>
+                    <el-button size="small" type="success" @click="row.rootId === -1 ? handleSelectChildren(row) : handleSelectParent(row)" plain>
                         挑拣
                     </el-button>
                     <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
-                            <el-button type="danger" size="small" plain>删除</el-button>
+                            <el-button size="small" type="danger" plain>删除</el-button>
                         </template>
                     </el-popconfirm>
-                    <el-button type="info" size="small" plain @click="handleInfo(row)">详情</el-button>
+                    <el-button size="small" type="info" @click="handleInfo(row)" plain>详情</el-button>
                 </template>
             </template>
         </el-table-column>
@@ -268,15 +265,15 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <el-button @click="replyDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="submitReply">确定</el-button>
+            <el-button size="small" type="info" @click="replyDialogVisible = false" plain>取消</el-button>
+            <el-button size="small" type="primary" @click="submitReply" plain>确定</el-button>
         </template>
     </el-dialog>
 
     <!-- 右侧抽屉 - 评论详情 -->
     <el-drawer
         v-model="drawerVisible"
-        title="📋 评论详情"
+        title="评论详情"
         direction="rtl"
         size="50%"
         :with-header="true"
@@ -284,10 +281,10 @@
     >
         <template #header>
         <div class="drawer-header">
-            <span class="drawer-title">📋 评论详情</span>
-            <el-tag :type="currentDetailComment?.rootId === -1 ? 'success' : 'info'" size="small">
+            <span class="drawer-title">评论详情</span>
+            <el-button class="me-1" :type="currentDetailComment?.rootId === -1 ? 'primary' : 'info'" size="small" plain>
             {{ currentDetailComment?.rootId === -1 ? '根评论' : '子评论' }}
-            </el-tag>
+            </el-button>
         </div>
         </template>
         
@@ -1024,7 +1021,7 @@ const loadStatistics = async () => {
   
   .drawer-title {
     font-size: 18px;
-    font-weight: bold;
+    // font-weight: bold;
   }
 }
 
@@ -1035,7 +1032,7 @@ const loadStatistics = async () => {
   justify-content: center;
   gap: 12px;
   padding: 60px;
-  color: #909399;
+  color: var(--el-color-primary);
   font-size: 14px;
   
   .el-icon {
@@ -1076,123 +1073,11 @@ const loadStatistics = async () => {
     gap: 8px;
 }
 
-/* 统计按钮样式 */
-.stat-btn {
-    min-width: 70px;
-    height: auto;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: default;
-    
-    &:hover {
-        transform: translateY(-1px);
-    }
-    
-    .stat-label {
-        line-height: 1;
-    }
-}
-
-/* 总评论按钮样式 */
-.total-btn {
-    background-color: #f5f7fa;
-    border-color: #dcdfe6;
-    color: #606266;
-    
-    &:hover {
-        background-color: #e9ecef;
-    }
-}
-
-/* 待审核按钮样式 */
-.pending-btn {
-    background-color: #fdf6ec;
-    border-color: #faecd8;
-    color: #e6a23c;
-    
-    &:hover {
-        background-color: #f9e6d2;
-    }
-}
-
-/* 已通过按钮样式 */
-.approved-btn {
-    background-color: #ecf5ff;
-    border-color: #d9ecff;
-    color: #409eff;
-    
-    &:hover {
-        background-color: #d9ecff;
-    }
-}
-
-/* 已驳回按钮样式 */
-.rejected-btn {
-    background-color: #fef0f0;
-    border-color: #fde2e2;
-    color: #f56c6c;
-    
-    &:hover {
-        background-color: #fde2e2;
-    }
-}
-
 /* 统计数字样式 */
 .stat-number {
     font-size: 15px;
     font-weight: 600;
-    color: #303133;
+    color: var(--el-text-color-primary);
     line-height: 1;
-}
-
-/* 深色模式适配 */
-.stat-item.is-dark {
-    .total-btn {
-        background-color: #2c2c2c;
-        border-color: #3a3a3a;
-        color: #c0c4cc;
-        
-        &:hover {
-            background-color: #3a3a3a;
-        }
-    }
-    
-    .pending-btn {
-        background-color: #2b2b1f;
-        border-color: #3a3620;
-        color: #e6a23c;
-        
-        &:hover {
-            background-color: #3a3620;
-        }
-    }
-    
-    .approved-btn {
-        background-color: #1f2d3d;
-        border-color: #2a3a4a;
-        color: #409eff;
-        
-        &:hover {
-            background-color: #2a3a4a;
-        }
-    }
-    
-    .rejected-btn {
-        background-color: #2d1f1f;
-        border-color: #3a2525;
-        color: #f56c6c;
-        
-        &:hover {
-            background-color: #3a2525;
-        }
-    }
-
-    /* 评论数样式 */
-    .stat-number {
-        color: #e5e7eb;
-    }
 }
 </style>
