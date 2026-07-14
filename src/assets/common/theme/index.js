@@ -69,18 +69,18 @@ export function applyTheme(themeName, _isDark) {
   for (const t of types) {
     var c = preset.colors[t]
     setColorSeries(root, t, c.bg)
+
+    // 文字色 — preset or 动态计算（full / plain 共用）
+    var textColor = c.text
+    if (iconStore.textColorMode === 'dynamic') {
+      textColor = luminance(c.bg) > 0.4 ? '#303133' : '#ffffff'
+    }
+    root.style.setProperty('--el-color-' + t + '-text', textColor)
+
     if (btnStyle === 'full') {
-      // 实心：depth → 背景混白；文字 → preset or 动态计算
       root.style.setProperty('--el-color-' + t + '-solid-bg', mix(c.bg, '#FFFFFF', btnDepth / 100))
-      var textColor = c.text
-      if (iconStore.textColorMode === 'dynamic') {
-        textColor = luminance(c.bg) > 0.4 ? '#303133' : '#ffffff'
-      }
-      root.style.setProperty('--el-color-' + t + '-text', textColor)
     } else {
-      // 描边：depth → 文字混黑
       root.style.setProperty('--el-color-' + t + '-plain', mix(c.bg, '#000000', btnDepth / 100))
-      // plain 背景：depth 越大底色越深（0=纯白, 100=50%白混合）
       root.style.setProperty('--el-color-' + t + '-plain-bg', mix(c.bg, '#FFFFFF', 1 - btnDepth / 200))
     }
   }
@@ -259,9 +259,14 @@ function injectInputCss() {
     'color:var(--el-color-primary)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     '}' +
-    // hover (通用)
-    '.el-select-dropdown__item:not(.is-disabled):hover{' +
-    'background-color:var(--el-color-primary-light-9)!important;' +
+    // hover — full: 深底白字 / plain: 浅底主色字
+    '.ui-full .el-select-dropdown__item:not(.is-disabled):hover{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-info-light-2)!important;' +
+    '}' +
+    '.ui-plain .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
+    'color:var(--el-color-primary)!important;' +
+    'background-color:var(--el-color-primary-text)!important;' +
     '}'
 }
 
