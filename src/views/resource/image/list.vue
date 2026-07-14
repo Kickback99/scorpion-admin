@@ -105,15 +105,15 @@
     <!-- ===== 分页 ===== -->
     <div class="pagination-container">
       <el-pagination
+        size="small"
         :total="total"
         :current-page="currentPage"
         :page-size="pageSize"
-        :page-sizes="[12, 24, 48, 96]"
-        layout="total, sizes, prev, pager, next"
-        background
-        small
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
+        style="margin-top: 20px; justify-content: flex-end;"
       />
     </div>
   </div>

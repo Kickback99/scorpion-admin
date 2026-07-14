@@ -202,17 +202,15 @@
     </el-table>
 
     <el-pagination
-        class="mt-5"
-		v-model:current-page="params.pageNum"
-		v-model:page-size="params.pageSize"
-		:page-sizes="[2,5,7,10]"
-		:small="false"
-		:disabled="false"
-		:background="false"
-		layout="jumper, total, sizes, prev, pager, next"
-		:total="total"
-		@size-change="onSizeChange"
-		@current-change="onCurrentChange"
+        size="small"
+        v-model:current-page="params.pageNum"
+        v-model:page-size="params.pageSize"
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
+        :total="total"
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
     />
 
     <!-- 重构：回复对话框（支持原内容 或 评论类型选择） -->
