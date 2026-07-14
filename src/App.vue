@@ -27,4 +27,8 @@ onMounted(()=>{
  .app-container{
     padding:20px
  }
+
+.el-dialog__title {
+  font-size: 14px !important;
+}
 </style>
