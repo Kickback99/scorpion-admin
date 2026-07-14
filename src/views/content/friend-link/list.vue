@@ -67,8 +67,8 @@
     <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto"
-                status-icon>
-            <el-form-item  prop="name">
+                status-icon size="small">
+            <el-form-item prop="name">
                 <el-input :prefix-icon="User" placeholder="请输入名字" v-model="formModel.name" />
             </el-form-item>
 

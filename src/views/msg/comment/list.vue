@@ -5,7 +5,7 @@
 
             <!-- 模式切换按钮组 - 新增挑拣模式（只读，不可选择） -->
             <el-form-item>
-                <el-radio-group v-model="viewMode" @change="handleModeChange" size="small">
+                <el-radio-group v-model="viewMode" @change="handleModeChange">
                     <el-radio-button label="normal">正常模式</el-radio-button>
                     <!-- 挑拣模式(动态只读)：只有进入挑拣模式时才解除禁用，其他模式时禁用 -->
                     <el-radio-button label="pick" :disabled="viewMode !== 'pick'">挑拣模式</el-radio-button>
@@ -215,7 +215,7 @@
 
     <!-- 重构：回复对话框（支持原内容 或 评论类型选择） -->
     <el-dialog v-model="replyDialogVisible" :title="replyDialogTitle" width="40%">
-        <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef" label-width="auto">
+        <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef" label-width="auto" size="small">
             
             <!-- 如果是父评论（顶部回复），显示类型选择 -->
             <template v-if="replyModel.isTopReply">

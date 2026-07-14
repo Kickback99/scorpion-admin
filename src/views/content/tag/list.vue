@@ -7,12 +7,12 @@
 
     <!-- 共享弹窗 -->
     <el-dialog v-model="dialogVisible" :title="title" width="380px" top="15vh">
-      <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="90px">
+      <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="90px" size="small">
         <el-form-item label="标签名称" prop="name">
-          <el-input placeholder="请输入标签名称" v-model="formModel.name" />
+          <el-input  placeholder="请输入标签名称" v-model="formModel.name" />
         </el-form-item>
         <el-form-item label="标签备注" prop="remark">
-          <el-input placeholder="请输入标签备注" v-model="formModel.remark" />
+          <el-input  placeholder="请输入标签备注" v-model="formModel.remark" />
         </el-form-item>
       </el-form>
       <template #footer>
