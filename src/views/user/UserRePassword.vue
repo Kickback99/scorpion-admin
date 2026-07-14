@@ -15,6 +15,7 @@
         label-width="120px"
         class="password-form"
         status-icon
+        size="small"
       >
         <el-form-item label="原密码" prop="oldPassword">
           <el-input
@@ -86,7 +87,7 @@
     <!-- 安全提示 -->
     <el-card class="tips-card">
       <template #header>
-        <span>安全提示</span>
+        <span style="font-size: 15px;">安全提示</span>
       </template>
       <ul class="security-tips">
         <li>密码应包含大小写字母、数字和特殊字符</li>
@@ -293,7 +294,7 @@ const handleReset = () => {
 }
 
 .card-header .title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
 }
 
