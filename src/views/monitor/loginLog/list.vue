@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar">
-        <el-form label-width="auto" inline> 
+        <el-form label-width="auto" inline size="small"> 
             <el-form-item>
                 <el-input v-model="searchData.username" placeholder="请输入用户名" />
             </el-form-item>

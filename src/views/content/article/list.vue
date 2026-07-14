@@ -1,6 +1,6 @@
 <template>
     <div class="layout">
-        <el-form ref="formRef"  label-width="auto" inline> 
+        <el-form ref="formRef" label-width="auto" inline size="small"> 
             <el-form-item>
                 <el-input v-model="searchData.keyword" placeholder="请输入标题 | 内容" />
             </el-form-item>

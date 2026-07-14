@@ -6,7 +6,7 @@
         :model="formData"
         label-width="120px"
         class="demo-ruleForm"
-        :size="formSize"
+        size="small"
         status-icon
         >
         <el-form-item  prop="roleName">

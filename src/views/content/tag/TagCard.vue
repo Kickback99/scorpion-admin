@@ -2,7 +2,7 @@
   <!-- ===== 卡片网格：搜索栏 + 卡片网格 + 分页 ===== -->
   <div class="tc-page">
     <div class="tc-toolbar">
-      <el-input v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable size="default" class="tc-search" @keyup.enter="onSearch">
+      <el-input size="small" v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable class="tc-search" @keyup.enter="onSearch">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
       <el-button size="small" type="primary" @click="onSearch" plain>搜索</el-button>

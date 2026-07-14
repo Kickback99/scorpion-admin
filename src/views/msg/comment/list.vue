@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
 
-        <el-form ref="formRef" :model="form" label-width="auto" inline> 
+        <el-form ref="formRef" :model="form" label-width="auto" inline size="small"> 
 
             <!-- 模式切换按钮组 - 新增挑拣模式（只读，不可选择） -->
             <el-form-item>
