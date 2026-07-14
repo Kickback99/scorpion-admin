@@ -1,7 +1,7 @@
 <template>
   <!-- ===== 配置控件渲染 ===== -->
   <template v-if="item.type === 'switch'">
-    <el-switch :model-value="item.get()" @change="item.set" />
+    <el-switch size="small" :model-value="item.get()" @change="item.set" />
   </template>
   <template v-else-if="item.type === 'radio'">
     <el-radio-group :model-value="item.get()" @change="item.set" size="small">
