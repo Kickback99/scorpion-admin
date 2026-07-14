@@ -107,14 +107,18 @@ export function applyTheme(themeName, _isDark) {
   injectModalCss(types)
   injectPaginationCss()
   injectDrawerCss()
+  injectSwitchCss()
+  injectBadgeCss()
+  injectCheckCss()
+  injectTagCss(types)
 
   // tab 激活态变量
   root.style.setProperty('--tab-active-bg', 'var(--el-color-primary-solid-bg)')
   root.style.setProperty('--tab-active-hover-bg', 'var(--el-color-primary-light-' + hoverLevel + ')')
 
-  injectRadioCss()
   injectDropdownCss()
   injectInputCss()
+  injectSelectCss()
   injectMessageCss()
 }
 
@@ -181,21 +185,58 @@ function injectHoverCss(types, level) {
 }
 
 // ============================================================
-// radio-button 全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
+// checkbox + radio-button — 跟随 .ui-full / .ui-plain
 // ============================================================
-var _radioCssEl = null
-function injectRadioCss() {
-  _radioCssEl = ensureEl('theme-radio-fix')
-  var sel = '.el-radio-button.is-active .el-radio-button__inner,' +
-            '.el-radio-button__original-radio:checked+.el-radio-button__inner'
-  _radioCssEl.textContent =
-    '.ui-full ' + sel + '{' +
+var _checkCssEl = null
+function injectCheckCss() {
+  var radioSel = '.el-radio-button.is-active .el-radio-button__inner,' +
+                 '.el-radio-button__original-radio:checked+.el-radio-button__inner'
+  _checkCssEl = ensureEl('theme-check-fix')
+  _checkCssEl.textContent =
+    // checkbox
+    '.ui-full .el-checkbox__input.is-checked .el-checkbox__inner{' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'border-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-full .el-checkbox__input.is-checked+.el-checkbox__label{' +
+    'color:var(--el-color-primary-text)!important;' +
+    '}' +
+    '.ui-plain .el-checkbox__input.is-checked .el-checkbox__inner{' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-plain .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-plain .el-checkbox__input.is-checked+.el-checkbox__label{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    // el-radio (圆形单选框)
+    '.ui-full .el-radio__input.is-checked .el-radio__inner{' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'border-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-full .el-radio__input.is-checked+.el-radio__label{' +
+    'color:var(--el-color-primary-text)!important;' +
+    '}' +
+    '.ui-plain .el-radio__input.is-checked .el-radio__inner{' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-plain .el-radio__input.is-checked .el-radio__inner::after{' +
+    'background-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-plain .el-radio__input.is-checked+.el-radio__label{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    // radio-button
+    '.ui-full ' + radioSel + '{' +
     'color:var(--el-color-primary-text)!important;' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     'box-shadow:-1px 0 0 0 var(--el-color-primary-solid-bg)!important;' +
     '}' +
-    '.ui-plain ' + sel + '{' +
+    '.ui-plain ' + radioSel + '{' +
     'color:var(--el-color-primary-plain)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'border-color:var(--el-color-primary-plain)!important;' +
@@ -229,16 +270,17 @@ function injectDropdownCss() {
 }
 
 // ============================================================
-// input / select 全局样式 — 通过 .ui-full / .ui-plain 跟随 uiMode
+// input 输入框 — hover / focus 边框色跟随 .ui-full / .ui-plain
 // ============================================================
 var _inputCssEl = null
 function injectInputCss() {
   _inputCssEl = ensureEl('theme-input-fix')
+  // 覆盖 el-input / el-select 内嵌 input 的 focus 状态
   var focusSel = '.el-input.is-focus .el-input__wrapper,' +
                  '.el-input .el-input__wrapper.is-focus,' +
                  '.el-select .el-input.is-focus .el-input__wrapper'
   _inputCssEl.textContent =
-    // full
+    // full — 实心主色边框
     '.ui-full .el-input .el-input__wrapper:hover,' +
     '.ui-full .el-select .el-input .el-input__wrapper:hover{' +
     'box-shadow:0 0 0 1px var(--el-color-primary-solid-bg) inset!important;' +
@@ -246,26 +288,36 @@ function injectInputCss() {
     '.ui-full ' + focusSel + '{' +
     'box-shadow:0 0 0 1px var(--el-color-primary) inset!important;' +
     '}' +
-    '.ui-full .el-select-dropdown__item.is-selected{' +
-    'color:var(--el-color-primary-text)!important;' +
-    'background-color:var(--el-color-primary-solid-bg)!important;' +
-    '}' +
-    // plain
+    // plain — 描边主色边框
     '.ui-plain .el-input .el-input__wrapper:hover,' +
     '.ui-plain .el-select .el-input .el-input__wrapper:hover{' +
     'box-shadow:0 0 0 1px var(--el-color-primary-plain) inset!important;' +
     '}' +
     '.ui-plain ' + focusSel + '{' +
     'box-shadow:0 0 0 1px var(--el-color-primary-plain) inset!important;' +
+    '}'
+}
+
+// ============================================================
+// select 下拉面板 — 选中项 / hover 跟随 .ui-full / .ui-plain
+// ============================================================
+var _selectCssEl = null
+function injectSelectCss() {
+  _selectCssEl = ensureEl('theme-select-fix')
+  _selectCssEl.textContent =
+    // full — 选中：实心底色+文字色；hover：浅色底+白字
+    '.ui-full .el-select-dropdown__item.is-selected{' +
+    'color:var(--el-color-primary-text)!important;' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
-    '.ui-plain .el-select-dropdown__item.is-selected{' +
-    'color:var(--el-color-primary)!important;' +
-    'background-color:var(--el-color-primary-plain-bg)!important;' +
-    '}' +
-    // hover — full: 深底白字 / plain: 浅底主色字
     '.ui-full .el-select-dropdown__item:not(.is-disabled):hover{' +
     'color:var(--el-color-primary-text)!important;' +
     'background-color:var(--el-color-info-light-2)!important;' +
+    '}' +
+    // plain — 选中：浅底色+主色字；hover：更浅底色+主色字（排除已选中项）
+    '.ui-plain .el-select-dropdown__item.is-selected{' +
+    'color:var(--el-color-primary)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
     '}' +
     '.ui-plain .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
     'color:var(--el-color-primary)!important;' +
@@ -408,4 +460,61 @@ function injectDrawerCss() {
     'color:var(--el-color-primary-plain)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     '}'
+}
+
+// ============================================================
+// switch 开关 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _switchCssEl = null
+function injectSwitchCss() {
+  _switchCssEl = ensureEl('theme-switch-fix')
+  _switchCssEl.textContent =
+    '.ui-full .el-switch.is-checked .el-switch__core{' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'border-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-plain .el-switch.is-checked .el-switch__core{' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}'
+}
+
+// ============================================================
+// badge 徽标 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _badgeCssEl = null
+function injectBadgeCss() {
+  _badgeCssEl = ensureEl('theme-badge-fix')
+  _badgeCssEl.textContent =
+    '.ui-full .el-badge__content{' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-plain .el-badge__content{' +
+    'color:var(--el-color-primary-plain)!important;' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border:1px solid var(--el-color-primary-plain)!important;' +
+    '}'
+}
+
+// ============================================================
+// tag 标签 — 跟随 .ui-full / .ui-plain
+// ============================================================
+var _tagCssEl = null
+function injectTagCss(types) {
+  _tagCssEl = ensureEl('theme-tag-fix')
+  var css = ''
+  for (var i = 0; i < types.length; i++) {
+    var t = types[i]
+    css += '.ui-full .el-tag--' + t + '{' +
+      'color:var(--el-color-' + t + '-text)!important;' +
+      'background-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      'border-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '}' +
+      '.ui-plain .el-tag--' + t + '{' +
+      'color:var(--el-color-' + t + '-plain)!important;' +
+      'background-color:var(--el-color-' + t + '-plain-bg)!important;' +
+      'border-color:var(--el-color-' + t + '-plain)!important;' +
+      '}'
+  }
+  _tagCssEl.textContent = css
 }
