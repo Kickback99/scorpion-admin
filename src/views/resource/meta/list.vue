@@ -2,7 +2,7 @@
     <div class="file-meta-container">
         <!-- 搜索区域 -->
         <div class="flex justify-between items-center mb-4">
-            <el-form ref="formRef" :model="searchModel" label-width="auto" inline>
+            <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
                 <el-form-item label="业务ID">
                     <SmartAutoComplete
                         v-model="selectedTargetId"

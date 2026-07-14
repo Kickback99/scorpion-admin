@@ -5,7 +5,7 @@
             ref="formRef"
             label-width="auto"
             class="demo-ruleForm"
-            :size="formSize"
+            size="small"
             status-icon
             >
             <el-form-item>
