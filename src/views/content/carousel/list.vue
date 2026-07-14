@@ -5,8 +5,8 @@
                 <el-input v-model="searchModel.keyword" placeholder="请输入轮播标题/文章标题" />
             </el-form-item>
             <el-form-item>
-                <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-                <el-button icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
+                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
             <div>
                 <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
@@ -101,19 +101,20 @@
         <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
                 <!-- 失败状态显示重试按钮 -->
-                <el-button 
-                    v-if="row.uploadStatus === 'FAILED'" 
-                    @click="handleRetry(row)" 
-                    size="small" 
-                    type="primary" 
+                <el-button
+                    v-if="row.uploadStatus === 'FAILED'"
+                    @click="handleRetry(row)"
+                    size="small"
+                    type="primary"
                     icon="Refresh"
                     circle
+                    plain
                 >
                 </el-button>
-                <el-button v-else @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle />
+                <el-button v-else @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain />
                 <el-popconfirm :title="`你确定要删除「${row.articleTitle}」的轮播吗？`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button size="small" type="danger" icon="Delete" circle />
+                        <el-button size="small" type="danger" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
             </template>
@@ -306,8 +307,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="handleConfirm">确认</el-button>
+                <el-button size="small" type="info" @click="dialogVisible = false" plain>取消</el-button>
+                <el-button size="small" type="primary" @click="handleConfirm" plain>确认</el-button>
             </span>
         </template>
     </el-dialog>

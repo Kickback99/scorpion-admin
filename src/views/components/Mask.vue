@@ -10,8 +10,8 @@
         </div>
         <div class="footer">
             <el-row justify="center" align="middle">
-                <el-button type="danger" @click="emit('closeMask')">返回</el-button>
-                <el-button type="primary" @click="emit('openDialog')">确定</el-button>
+                <el-button size="small" type="info" @click="emit('closeMask')" plain>返回</el-button>
+                <el-button size="small" type="primary" @click="emit('openDialog')" plain>确定</el-button>
             </el-row>
         </div>
     </div>

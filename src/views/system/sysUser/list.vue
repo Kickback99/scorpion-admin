@@ -24,10 +24,8 @@
 
             <!-- 升序/降序按钮 -->
             <el-form-item>
-                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
-                    @click="setSortOrder('ASC')" />
-                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
-                    @click="setSortOrder('DESC')" />
+                <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+                <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
 
             <br>
@@ -59,13 +57,13 @@
             </el-form-item>
 
             <el-form-item>
-            <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-            <el-button icon="Refresh" type="warning" size="mini" @click="onReset" plain>重置</el-button>
+            <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+            <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" color="#626aef" plain :dark="isDark" >批量删除</el-button>
-            <el-button @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" type="success" plain  :dark="isDark">新增</el-button>
+            <el-button size="small" type="danger" @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" plain>批量删除</el-button>
+            <el-button size="small" type="primary" @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" plain>新增</el-button>
         </div>
     </div>
 
@@ -108,13 +106,13 @@
         <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
         <el-table-column label="操作" width="200" align="center" >
             <template #default="{row,$index}">
-            <el-button  size="small" :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" type="primary" plain>编辑</el-button>
+            <el-button size="small" type="warning" :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button size="small" :disabled="$hasPerm('btn.sysUser.remove')" type="danger" plain>删除</el-button>
+                    <el-button size="small" type="danger" :disabled="$hasPerm('btn.sysUser.remove')" plain>删除</el-button>
                 </template>
             </el-popconfirm>
-            <el-button size="small" :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" type="warning"  plain >分配</el-button>
+            <el-button size="small" type="success" :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" plain>分配</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -146,8 +144,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="title==='新增用户'?addUser():modifyUser()">确认</el-button>
-                <el-button type="primary" @click="dialogVisible = false">
+                <el-button size="small" type="primary" @click="title==='新增用户'?addUser():modifyUser()" plain>确认</el-button>
+                <el-button size="small" type="info" @click="dialogVisible = false" plain>
                     取消
                 </el-button>
             </span>
@@ -182,8 +180,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="doAllocRoles">确认</el-button>
-                <el-button @click="allocRolesVisible = false">
+                <el-button size="small" type="primary" @click="doAllocRoles" plain>确认</el-button>
+                <el-button size="small" type="info" @click="allocRolesVisible = false" plain>
                     取消
                 </el-button>
             </span>
@@ -192,10 +190,10 @@
 
     <!-- 分页 -->
     <el-pagination
+    size="small"
     v-model:current-page="params.pageNum"
     v-model:page-size="params.pageSize"
-    :page-sizes="[2,3,5,10]"
-    :small="false"
+    :page-sizes="[2, 5, 7, 10]"
     :disabled="false"
     :background="false"
     layout="prev, pager, next, jumper, ->,sizes,total"

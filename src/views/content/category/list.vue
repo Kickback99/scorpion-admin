@@ -11,8 +11,8 @@
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
    <h4> isNative(原生): {{ isNative }}</h4>  -->
-  <el-button type="type" @click="addParent" size="small" :disabled="disabledAddParent || $hasPerm('btn.category.add')">新增</el-button>
-  <el-button type="type" @click="handleReset" size="small">重置</el-button>
+  <el-button size="small" type="primary" @click="addParent" :disabled="disabledAddParent || $hasPerm('btn.category.add')" plain>新增</el-button>
+  <el-button size="small" type="info" @click="handleReset" plain>重置</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
@@ -33,8 +33,7 @@
         <span v-else>{{ node.label }}</span>
         <!-- <span else>{{ node.label }}</span> -->
         <!-- 新增 -->
-        <el-button :disabled="$hasPerm('btn.category.add')" style="margin-left: 8px" v-if="node.level <= 1 && allShow" @click="append(node, data)" icon="Plus"
-          type="primary" circle plain size="small" />
+        <el-button size="small" type="primary" :disabled="$hasPerm('btn.category.add')" v-if="node.level <= 1 && allShow" @click="append(node, data)" icon="Plus" style="margin-left: 8px" circle plain />
 
 
         <!-- 批量添加按钮显示 -->
@@ -44,11 +43,7 @@
               确定按钮显示
               最后一个子节点
            -->
-        <el-button v-if="handleAdd(node,data,false)" 
-          style="margin-left: 8px"
-        icon="Plus"
-        type="primary" circle plain size="small"
-        @click="batchAdd(node, data)" />
+        <el-button size="small" type="primary" v-if="handleAdd(node,data,false)" icon="Plus" @click="batchAdd(node, data)" style="margin-left: 8px" circle plain />
 
 
         <!-- 确定按钮：提交服务器 -->
@@ -61,23 +56,18 @@
               data.isSave && isLast === data.id
               确定按钮的显示，是否是当前编辑行
            -->
-        <el-button 
-        style="margin-left: 8px"
-        v-if="!isEdit ? handleAdd(node,data,true) : 
+        <el-button
+        size="small" type="success"
+        v-if="!isEdit ? handleAdd(node,data,true) :
         (data.isSave && currentEditID === data.id) ||(data.isSave && isLast === data.id) "
         :disabled="!isEdit?false:handleDisabled(data)"
         icon="Check"
-        type="success" circle plain size="small"
-          @click="handleSave($event, node, data)" />
+        @click="handleSave($event, node, data)" style="margin-left: 8px" circle plain />
 
 
         <!-- 虚拟按钮：修改 -->
 
-        <el-button v-if="data.isCheck" 
-        icon="Edit"
-        style="margin-left: 8px"
-        type="warning" circle plain size="small"
-        @click="handleCheck(node,data)" />
+        <el-button size="small" type="warning" v-if="data.isCheck" icon="Edit" @click="handleCheck(node,data)" style="margin-left: 8px" circle plain />
 
         <!-- 虚拟按钮：恢复 -->
           <!-- 
@@ -85,12 +75,11 @@
             如果是编辑模式：data.isReset  && handleInclude(data.id)
           -->
 
-        <el-button 
-        v-if="!isEdit?data.isReset:(data.isReset  && handleInclude(data.id))" 
+        <el-button
+        size="small" type="info"
+        v-if="!isEdit?data.isReset:(data.isReset  && handleInclude(data.id))"
         :icon="!isEdit?'Close':'Refresh'"
-        color="#626aef"
-        circle plain size="small"
-        @click="handleRevert($event,node, data)" />
+        @click="handleRevert($event,node, data)" circle plain />
 
         <!-- 编辑 -->
         <!-- 
@@ -100,17 +89,15 @@
                默认data.isEdit为false(这里一定要false，因为属性没有，默认是false)，如果点中的是当前编辑行则为true
                即点中哪个编辑项，哪个编辑项隐藏 
          -->
-        <el-button :disabled="$hasPerm('btn.category.update')" v-if="!isEdit ? allShow : (isEdit && !data.isEdit)" style="margin-left: 8px"
-          @click="handleEdit(node, data)" icon="Edit" type="warning" circle plain size="small" />
+        <el-button size="small" type="warning" :disabled="$hasPerm('btn.category.update')" v-if="!isEdit ? allShow : (isEdit && !data.isEdit)" @click="handleEdit(node, data)" icon="Edit" style="margin-left: 8px" circle plain />
         <!-- 删除 -->
         <el-popconfirm v-if="(data.children === null || data.children.length === 0) && allShow"
           @confirm="batchRemove(node,data,true)" :title="`你确定要删除 ${data.name} 吗`" width="250px" icon="WarnTriangleFilled">
           <template #reference>
-            <el-button :disabled="$hasPerm('btn.category.remove')" @click.stop style="margin-left: 8px" type="danger" circle plain size="small" icon="Delete" />
+            <el-button size="small" type="danger" :disabled="$hasPerm('btn.category.remove')" @click.stop icon="Delete" style="margin-left: 8px" circle plain />
           </template>
         </el-popconfirm>
-        <el-button :disabled="$hasPerm('btn.category.remove')" v-if="checkedIds == data.id" @click.stop="batchRemove(node,data,false)" 
-        type="danger" style="margin-left: 8px;"  circle plain size="small" icon="Delete" />
+        <el-button size="small" type="danger" :disabled="$hasPerm('btn.category.remove')" v-if="checkedIds == data.id" @click.stop="batchRemove(node,data,false)" icon="Delete" style="margin-left: 8px;" circle plain />
 
 
         <!-- <el-popconfirm v-if="data.children === null || data.children.length === 0" :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">

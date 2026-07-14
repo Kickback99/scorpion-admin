@@ -26,10 +26,8 @@
             </el-form-item>
 
             <el-form-item>
-                <el-button icon="Top" circle plain :type="searchData.sortOrder === 'ASC' ? 'primary' : ''"
-                    @click="setSortOrder('ASC')" />
-                <el-button icon="Bottom" circle plain :type="searchData.sortOrder === 'DESC' ? 'primary' : ''"
-                    @click="setSortOrder('DESC')" />
+                <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+                <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
             
             <br>
@@ -45,10 +43,10 @@
             <!-- 快捷选择按钮组 -->
             <el-form-item>
                 <el-button-group>
-                    <el-button size="small" @click="setQuickDate('today')">今天</el-button>
-                    <el-button size="small" @click="setQuickDate('yesterday')">昨天</el-button>
-                    <el-button size="small" @click="setQuickDate('week')">最近一周</el-button>
-                    <el-button size="small" @click="setQuickDate('month')">最近一月</el-button>
+                    <el-button size="small" @click="setQuickDate('today')" plain>今天</el-button>
+                    <el-button size="small" @click="setQuickDate('yesterday')" plain>昨天</el-button>
+                    <el-button size="small" @click="setQuickDate('week')" plain>最近一周</el-button>
+                    <el-button size="small" @click="setQuickDate('month')" plain>最近一月</el-button>
                 </el-button-group>
             </el-form-item>
 
@@ -79,12 +77,12 @@
             </el-form-item>
 
             <el-form-item>
-                <el-button type="primary" icon="Search"  plain @click="onSearch">搜索</el-button>
-                <el-button type="warning" icon="Refresh" plain @click="onReset" >重置</el-button>
+                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
         </el-form>
         <div class="right">
-            <el-button :disabled="$hasPerm('btn.article.add')" type="primary" icon="Plus"  plain @click="handleAdd({})">新增</el-button>
+            <el-button size="small" type="primary" :disabled="$hasPerm('btn.article.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
         </div>
     </div>
 
@@ -104,17 +102,18 @@
         </el-table-column>
         <el-table-column label="状态" >
               <template #default="{row}">
-                    {{ row.status === "0" ? "已发布" : "草稿" }}
+                 <el-button size="small" type="success" v-if="row.status === '0'" plain>已发布</el-button>
+                 <el-button size="small" type="info" v-else plain>草稿</el-button>
               </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建日期" width="185" />
         <el-table-column prop="updateTime" label="修改日期" width="185" />
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" type="primary" plain >编辑</el-button>
+                <el-button size="small" type="warning" :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" plain>编辑</el-button>
                 <el-popconfirm :title="`你确定要删除 ${row.title} 吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button :disabled="$hasPerm('btn.article.remove')" type="danger" plain >删除</el-button>
+                        <el-button size="small" type="danger" :disabled="$hasPerm('btn.article.remove')" plain>删除</el-button>
                     </template>
                 </el-popconfirm>
             </template>
@@ -122,14 +121,16 @@
     </el-table>
 
     <el-pagination
+        size="small"
         v-model:current-page="params.pageNum"
         v-model:page-size="params.pageSize"
         :page-sizes="[2, 5, 7, 10]"
         background
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="prev, pager, next, jumper, ->, total, sizes"
         :total="total"
         @size-change="onSizeChange"
         @current-change="onCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
     />
 
     <ArticleEdit ref="maskRef" @reRender="render"></ArticleEdit>

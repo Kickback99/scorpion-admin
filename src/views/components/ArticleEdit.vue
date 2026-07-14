@@ -178,9 +178,9 @@
 
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false; hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">取消</el-button>
-                    <el-button type="warning" @click="handlePublish(1)"> 草稿 </el-button>
-                    <el-button type="primary" @click="handlePublish(0)"> 发布 </el-button>
+                    <el-button size="small" type="info" @click="dialogVisible = false; hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0" plain>取消</el-button>
+                    <el-button size="small" type="warning" @click="handlePublish(1)" plain>草稿</el-button>
+                    <el-button size="small" type="primary" @click="handlePublish(0)" plain>发布</el-button>
                 </span>
             </template>
         </el-dialog>

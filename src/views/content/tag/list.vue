@@ -16,8 +16,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="confirm" type="primary">确认</el-button>
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button size="small" type="primary" @click="confirm" plain>确认</el-button>
+        <el-button size="small" type="info" @click="dialogVisible = false" plain>取消</el-button>
       </template>
     </el-dialog>
   </div>

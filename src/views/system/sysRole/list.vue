@@ -15,13 +15,13 @@
 
 
         <el-form-item>
-        <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-        <el-button icon="Refresh"  @click="onReset" type="warning" plain >重置</el-button>
+        <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+        <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
         </el-form-item>
         </el-form>
         <div class="right">
-            <el-button  icon="Search" plain color="#626aef" :dark="isDark" @click="deleteSelectRows()">批量删除</el-button>
-            <el-button :disabled="$hasPerm('btn.sysRole.add')" @click="addDialog" icon="Plus" type="success" plain>新增</el-button>
+            <el-button size="small" type="danger" icon="Search" @click="deleteSelectRows()" plain>批量删除</el-button>
+            <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysRole.add')" @click="addDialog" icon="Plus" plain>新增</el-button>
         </div>
     </div>
 
@@ -39,13 +39,13 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column label="操作" width="200">
             <template #default="{row,$index}">
-            <el-button size="small" :disabled="$hasPerm('btn.sysRole.update')" type="primary" @click="editDialog(row)" plain>编辑</el-button>
+            <el-button size="small" type="warning" :disabled="$hasPerm('btn.sysRole.update')" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button size="small" :disabled="$hasPerm('btn.sysRole.remove')" type="danger"plain>删除</el-button>
+                    <el-button size="small" type="danger" :disabled="$hasPerm('btn.sysRole.remove')" plain>删除</el-button>
                 </template>
             </el-popconfirm>
-            <el-button size="small" :disabled="$hasPerm('btn.sysRole.assignAuth')" type="warning"  @click="showAssignAuth(row)" plain>授权</el-button>
+            <el-button size="small" type="success" :disabled="$hasPerm('btn.sysRole.assignAuth')" @click="showAssignAuth(row)" plain>授权</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -72,8 +72,8 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="title === '新增角色'?addRole():modifyRole()">确认</el-button>
-                <el-button type="primary" @click="dialogVisible = false">
+                <el-button size="small" type="primary" @click="title === '新增角色'?addRole():modifyRole()" plain>确认</el-button>
+                <el-button size="small" type="info" @click="dialogVisible = false" plain>
                     取消
                 </el-button>
             </span>
