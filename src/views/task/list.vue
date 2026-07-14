@@ -69,7 +69,7 @@
 
     <!-- ==================== 新增/编辑弹窗 ==================== -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="550px">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" size="small">
         <!-- 任务编码（新增时可编辑，编辑时禁用） -->
         <el-form-item label="任务编码" prop="taskCode">
           <el-input 

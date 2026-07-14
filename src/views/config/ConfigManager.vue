@@ -111,7 +111,7 @@
       width="400px"
       :close-on-click-modal="false"
     >
-      <el-form :model="addForm" :rules="addRules" ref="addFormRef" label-width="100px">
+      <el-form :model="addForm" :rules="addRules" ref="addFormRef" label-width="auto" size="small">
         <el-form-item label="配置项名称" prop="key">
           <el-input
             v-model="addForm.key"

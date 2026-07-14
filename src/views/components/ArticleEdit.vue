@@ -53,7 +53,7 @@
         </el-form>
 
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
-            <el-form ref="formRef" :model="formModel" label-width="auto"> 
+            <el-form ref="formRef" :model="formModel" label-width="auto" size="small"> 
                 <el-form-item label="文章描述" prop="description">
                     <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
                         <el-radio :label="'auto'">自动生成</el-radio>
