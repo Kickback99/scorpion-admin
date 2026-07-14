@@ -97,7 +97,7 @@
         <el-table-column prop="cateName" label="分类" />
         <el-table-column label="置顶">
             <template #default="{row}">
-                <el-switch v-model="row.isTop"  active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
+                <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
         <el-table-column label="状态" >

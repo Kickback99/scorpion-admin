@@ -73,14 +73,14 @@
             </el-table-column>
             <el-table-column label="操作类型">
                 <template #default="{row}">
-                    <el-tag :type="getTagType(row.type)">
+                    <el-tag :type="getTagType(row.type)" size="small">
                          {{ displayMode === 'label' ? row.typeLabel : row.type  }}
                     </el-tag>
                 </template>
             </el-table-column>
             <el-table-column  label="请求方式">
                 <template #default="{row}">
-                       <el-tag :type="getTagType(row.reqMode)">{{ row.reqMode }}</el-tag>
+                       <el-tag :type="getTagType(row.reqMode)" size="small">{{ row.reqMode }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="操作时间" />
