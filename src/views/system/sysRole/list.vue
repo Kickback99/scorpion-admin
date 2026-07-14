@@ -60,7 +60,8 @@
         <el-form 
         :model="dialogData" 
         label-width="120px" 
-        ref="ruleFormRef"  
+        ref="ruleFormRef"
+        size="small"  
         :rules="rules" style="padding-right: 40px;">
             <el-form-item label="角色名称" prop="roleName">
                 <el-input v-model="dialogData.roleName" placeholder="请输入角色名称"/>

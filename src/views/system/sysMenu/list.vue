@@ -93,7 +93,7 @@
                 </template>
             <el-input v-model="formModel.path" placeholder="请输入路由地址" />
           </el-form-item>
-          <el-form-item prop="component" >
+          <el-form-item prop="component">
                 <template #label>
                 组件路径
                   <el-tooltip content="访问的组件路径，如：`system/user/index`，默认在`views`目录下" placement="top">
