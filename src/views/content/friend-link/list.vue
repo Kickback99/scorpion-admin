@@ -53,16 +53,15 @@
 
     <!-- ===== 分页 ===== -->
     <el-pagination
+        size="small"
         v-model:current-page="pagination.pageNum"
         v-model:page-size="pagination.pageSize"
-        :page-sizes="[2,3,5,7]"
-        :small="false"
-        :disabled="false"
-        :background="false"
-        layout="jumper, total, sizes, prev, pager, next"
+        :page-sizes="[2, 5, 7, 10]"
+        layout="jumper, sizes, total, ->, prev, pager, next"
         :total="totalCount"
         @size-change="handleSizeChange"
         @current-change="handlePageChange"
+        style="margin-top: 20px; justify-content: flex-end;"
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->

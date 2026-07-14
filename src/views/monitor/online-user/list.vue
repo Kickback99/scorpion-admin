@@ -65,14 +65,15 @@
 
         <!-- 分页 -->
         <el-pagination
+            size="small"
             v-model:current-page="pagination.pageNum"
             v-model:page-size="pagination.pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="jumper, total, sizes, prev, pager, next"
+            :page-sizes="[2, 5, 7, 10]"
+            layout="jumper, sizes, total, ->, prev, pager, next"
             :total="total"
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
-            class="mt-4"
+            style="margin-top: 20px; justify-content: flex-end;"
         />
     </div>
 </template>
