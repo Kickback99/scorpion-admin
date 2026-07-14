@@ -8,8 +8,8 @@
         </el-form-item>
         <el-form-item>
           <el-button size="small" type="primary" icon="Search" plain @click="onSearch">搜索</el-button>
-          <el-button size="small" type="warning" icon="Refresh" plain @click="onReset">重置</el-button>
-          <el-button size="small" :disabled="$hasPerm('btn.tag.add')" type="success" icon="Plus" plain @click="handleAdd({})">新增</el-button>
+          <el-button size="small" type="info" icon="Refresh" plain @click="onReset">重置</el-button>
+          <el-button size="small" type="primary" :disabled="$hasPerm('btn.tag.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -21,10 +21,10 @@
       <el-table-column prop="remark" label="备注" width="200" />
       <el-table-column label="操作" width="150">
         <template #default="{row}">
-          <el-button size="small" :disabled="$hasPerm('btn.tag.update')" @click="handleEdit(row)" type="primary" icon="Edit" circle plain />
+          <el-button size="small" type="warning" :disabled="$hasPerm('btn.tag.update')" @click="handleEdit(row)" icon="Edit" circle plain />
           <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
             <template #reference>
-              <el-button size="small" :disabled="$hasPerm('btn.tag.remove')" type="danger" icon="Delete" circle plain />
+              <el-button size="small" type="danger" :disabled="$hasPerm('btn.tag.remove')" icon="Delete" circle plain />
             </template>
           </el-popconfirm>
         </template>

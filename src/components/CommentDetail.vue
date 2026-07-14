@@ -344,30 +344,29 @@ defineExpose({
 
 .sub-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #606266;
+  // font-weight: 500;
+  color: var(--el-text-color-regular);
   margin: 16px 0 12px 0;
   padding-left: 8px;
-  border-left: 3px solid #909399;
+  border-left: 3px solid var(--el-color-info);
 }
 
 .comment-card {
-  background-color: #fff;
+  background-color: var(--el-bg-color);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--el-border-color-lighter);
   transition: all 0.2s;
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--el-box-shadow-light);
   }
 }
 
 // 当前高亮评论（绿色边框 + 浅绿色背景）
 .current-card {
-  // background-color: #f0f9ff;
-  border-left-color: #67c23a;
+  border-left-color: var(--el-color-success);
 }
 
 .comment-card-header {
@@ -385,28 +384,28 @@ defineExpose({
 }
 
 .username {
-  font-weight: bold;
-  color: #409eff;
+  // font-weight: bold;
+  color: var(--el-color-primary);
   font-size: 14px;
 }
 
 .time {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .comment-card-content {
   font-size: 14px;
-  color: #303133;
+  color: var(--el-text-color-primary);
   line-height: 1.5;
   word-break: break-all;
   padding-left: 42px;
 }
 
 .reply-tag {
-  color: #f56c6c;
+  color: var(--el-color-danger);
   margin-right: 6px;
-  font-weight: 500;
+  // font-weight: 500;
 }
 
 .children-list {
@@ -418,13 +417,13 @@ defineExpose({
 }
 
 .direct-reply {
-  border-left-color: #67c23a;
+  border-left-color: var(--el-color-success);
 }
 
 .empty-tip {
   text-align: center;
   padding: 32px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 14px;
 }
 
@@ -434,12 +433,12 @@ defineExpose({
   justify-content: center;
   gap: 8px;
   padding: 40px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 // 回复关联容器样式
 .reply-group {
-    background-color: #fafafa;
+    background-color: var(--el-fill-color-lighter);
     border-radius: 8px;
     padding: 12px;
 }

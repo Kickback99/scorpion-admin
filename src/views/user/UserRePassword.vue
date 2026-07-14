@@ -71,10 +71,12 @@
             type="primary" 
             @click="handleSubmit"
             :loading="loading"
+            size="small"
+            plain
           >
             确认修改
           </el-button>
-          <el-button @click="handleReset">
+          <el-button type="info" @click="handleReset" size="small" plain>
             重置
           </el-button>
         </el-form-item>

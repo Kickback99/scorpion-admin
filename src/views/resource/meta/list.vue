@@ -47,8 +47,8 @@
                 </el-form-item>
                 
                 <el-form-item>
-                    <el-button icon="Search" @click="onSearch" type="primary" plain>搜索</el-button>
-                    <el-button icon="Refresh" type="warning" @click="onReset" plain>重置</el-button>
+                    <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                    <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -89,7 +89,7 @@
             
             <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">
-                    <el-button :type="getFileTypeTag(row.fileType)" size="small" plain>
+                    <el-button size="small" :type="getFileTypeTag(row.fileType)" plain>
                         {{ row.targetId && row.targetId > 0 ? getFileTypeLabel(row.fileType): '孤儿' }}
                     </el-button>
                 </template>
@@ -104,7 +104,7 @@
 
             <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
                 <template #default="{ row }">
-                    <el-button :type="row.isDeleted === 0 ? 'success' : 'danger'" size="small" plain>
+                    <el-button size="small" :type="row.isDeleted === 0 ? 'success' : 'danger'" plain>
                         {{ row.isDeleted === 0 ? '正常' : '已删除' }}
                     </el-button>
                 </template>
@@ -117,7 +117,7 @@
                         @confirm="handleRecover(row)"
                     >
                         <template #reference>
-                            <el-button :disabled="row.isDeleted === 0" type="warning" size="small" text>恢复</el-button>
+                            <el-button size="small" type="warning" :disabled="row.isDeleted === 0" plain>恢复</el-button>
                         </template>
                     </el-popconfirm>
                 </template>

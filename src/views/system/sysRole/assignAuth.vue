@@ -13,8 +13,8 @@
         :props="defaultProps"
       />
       <div style="padding: 20px 20px;">
-        <el-button :loading="loading" type="primary"  size="mini" @click="save">保存</el-button>
-        <el-button @click="$router.push('/system/sysRole')" size="mini">返回</el-button>
+        <el-button size="small" type="primary" :loading="loading" @click="save" plain>保存</el-button>
+        <el-button size="small" type="info" @click="$router.push('/system/sysRole')" plain>返回</el-button>
       </div>
     </div>
   </template>

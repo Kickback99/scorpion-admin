@@ -9,14 +9,14 @@
                 <SmartSelector v-model="searchModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>
             </el-form-item>
              <el-form-item >
-                <el-button icon="Search" @click="handleSearch" type="primary" plain>搜索</el-button>
-                <el-button icon="Refresh" type="warning" size="mini" @click="handleReset" plain>重置</el-button>
+                <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
              </el-form-item>
         </el-form>
 
         <div>
-            <el-button size="small" type="primary" icon="Plus"  @click="handleAdd">新增友链</el-button>
-            <el-button size="small" type=danger icon="Delete"  :dark="isDark" @click="handleBatchDelete()">批量删除</el-button>
+            <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增友链</el-button>
+            <el-button size="small" type="danger" icon="Delete" :dark="isDark" @click="handleBatchDelete()" plain>批量删除</el-button>
         </div>
     </div>
 
@@ -93,8 +93,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleConfirm">确认</el-button>
-                <el-button type="primary" @click="dialogVisible = false">
+                <el-button size="small" @click="handleConfirm" plain>确认</el-button>
+                <el-button size="small" type="info" @click="dialogVisible = false" plain>
                     取消
                 </el-button>
             </span>
