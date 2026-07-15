@@ -874,14 +874,14 @@ defineExpose({
 
 /* 键盘事件高亮适配深浅主题 */
 .suggestion-active {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-text-color-primary);
+  background-color: var(--el-bg-color-page);
+  color: var(--el-text-color-regular);
 }
 
 /* 鼠标和键盘高亮适配深浅主题 */
 .suggestion-active.suggestion-hover {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-text-color-primary);
+  background-color: var(--el-bg-color-page);
+  color: var(--el-text-color-regular);
 }
 
 .suggestion-item .el-tag {
@@ -892,7 +892,6 @@ defineExpose({
 /* 高亮样式 */
 .suggestion-item :deep(strong) {
   color: var(--el-color-primary);
-  font-weight: bold;
 }
 
 .suggestion-loading {
@@ -927,5 +926,32 @@ defineExpose({
 
 .suggestions-popover::-webkit-scrollbar-thumb:hover {
   background: var(--el-border-color-hover);
+}
+</style>
+
+<style lang="scss">
+/* ===== SmartAutoComplete ui-mode 适配（非 scoped） ===== */
+
+/* 高亮文字 */
+.ui-full .suggestion-item strong {
+  color: var(--el-color-primary);
+}
+.ui-plain .suggestion-item strong {
+  color: var(--el-color-primary-plain);
+}
+
+/* el-input-tag 内 tag close 图标跟随 uiMode */
+.ui-full .smart-input-tag .el-tag .el-tag__close {
+  color: var(--el-color-primary-text) !important;
+}
+.ui-full .smart-input-tag .el-tag .el-tag__close:hover {
+  background-color: var(--el-color-primary-light-3) !important;
+}
+.ui-plain .smart-input-tag .el-tag .el-tag__close {
+  color: var(--el-color-primary-plain) !important;
+}
+.ui-plain .smart-input-tag .el-tag .el-tag__close:hover {
+  color: var(--el-color-primary-text) !important;
+  background-color: var(--el-color-primary) !important;
 }
 </style>
