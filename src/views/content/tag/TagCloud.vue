@@ -107,7 +107,7 @@ const {
   width: 100px;
   height: 100px;
   background: var(--el-color-primary-light-7);
-  border: 2px solid var(--el-color-primary-light-5);
+  border: 1px solid var(--el-color-primary-light-5);
 
   &:hover {
     transform: scale(1.08);
@@ -115,11 +115,46 @@ const {
 
     .tcl-bubble-actions { opacity: 1; }
   }
+
+  /* full — 实心底色+白字 */
+  .ui-full & {
+    background: var(--el-color-primary-solid-bg);
+    border-color: var(--el-color-primary-solid-bg);
+    .tcl-bubble-name { color: var(--el-color-primary-text); }
+    .tcl-bubble-count {
+      color: var(--el-color-primary-solid-bg);
+      background: var(--el-color-primary-text);
+    }
+    &:hover {
+      background: var(--el-color-primary-light-3);
+      border-color: var(--el-color-primary-light-3);
+    }
+  }
+
+  /* plain — 浅底色+主色描边 */
+  .ui-plain & {
+    background: var(--el-color-primary-plain-bg);
+    border-color: var(--el-color-primary-plain);
+    .tcl-bubble-name { color: var(--el-color-primary); }
+    .tcl-bubble-count {
+      color: var(--el-color-primary-text);
+      background: var(--el-color-primary);
+    }
+    &:hover {
+      background: var(--el-color-primary);
+      border-color: var(--el-color-primary);
+      .tcl-bubble-name { color: var(--el-color-primary-text); }
+      .tcl-bubble-count {
+        color: var(--el-color-primary);
+        background: var(--el-color-primary-text);
+      }
+    }
+  }
 }
 
 .tcl-bubble-name {
   font-size: 14px;
-  font-weight: 600;
+  // font-weight: 600;
   color: var(--el-text-color-primary);
   max-width: 80px;
   overflow: hidden;
