@@ -4,7 +4,7 @@
 // ============================================================
 
 import { themePresets } from './presets'
-import { useIconStore } from '@/store/icon'
+import { useUiStore } from '@/store/ui'
 
 /** hex → RGB */
 function hexToRgb(hex) {
@@ -58,9 +58,9 @@ export function applyTheme(themeName, _isDark) {
   const preset = themePresets[themeName]
   if (!preset) return
 
-  const iconStore = useIconStore()
-  const btnStyle = iconStore.uiMode || 'full'
-  const btnDepth = iconStore.uiDepth != null ? iconStore.uiDepth : (btnStyle === 'full' ? 0 : 35)
+  const uiStore = useUiStore()
+  const btnStyle = uiStore.uiMode || 'full'
+  const btnDepth = uiStore.uiDepth != null ? uiStore.uiDepth : (btnStyle === 'full' ? 0 : 35)
 
   const root = document.documentElement
   const types = ['primary', 'success', 'warning', 'danger', 'info']
@@ -72,7 +72,7 @@ export function applyTheme(themeName, _isDark) {
 
     // 文字色 — preset or 动态计算（full / plain 共用）
     var textColor = c.text
-    if (iconStore.textColorMode === 'dynamic') {
+    if (uiStore.textColorMode === 'dynamic') {
       textColor = luminance(c.bg) > 0.4 ? '#303133' : '#ffffff'
     }
     root.style.setProperty('--el-color-' + t + '-text', textColor)
@@ -101,7 +101,7 @@ export function applyTheme(themeName, _isDark) {
   root.classList.remove('ui-full', 'ui-plain')
   root.classList.add(btnStyle === 'plain' ? 'ui-plain' : 'ui-full')
 
-  const hoverLevel = (btnStyle === 'full' ? iconStore.hoverFull : iconStore.hoverPlain) || 3
+  const hoverLevel = (btnStyle === 'full' ? uiStore.hoverFull : uiStore.hoverPlain) || 3
   injectButtonCss(types)
   injectHoverCss(types, hoverLevel)
   injectModalCss(types)

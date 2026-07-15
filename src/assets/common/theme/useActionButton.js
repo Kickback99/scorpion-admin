@@ -3,7 +3,7 @@
 // ============================================================
 
 import { computed } from 'vue'
-import { useIconStore } from '@/store/icon'
+import { useUiStore } from '@/store/ui'
 
 /**
  * @example
@@ -12,9 +12,9 @@ import { useIconStore } from '@/store/icon'
  * // <el-button v-bind="btnProps('primary', 'Edit')" @click="...">{{ btnLabel('编辑') }}</el-button>
  */
 export function useActionButton() {
-  const iconStore = useIconStore()
+  const uiStore = useUiStore()
 
-  const style = computed(() => iconStore.uiMode)
+  const style = computed(() => uiStore.uiMode)
   const isPlain = computed(() => style.value === 'plain')
 
   /**
