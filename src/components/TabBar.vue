@@ -30,6 +30,41 @@
                         <el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
                             inactive-icon="Sunny" />
                     </el-form-item>
+                    <el-form-item label="菜单折叠">
+                        <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
+                            inactive-icon="Fold" />
+                    </el-form-item>
+                    <el-form-item label="ui模式">
+                        <UiStyleSettings />
+                    </el-form-item>
+                    <el-form-item label="文字色模式">
+                        <el-radio-group
+                            :model-value="uiStore.textColorMode"
+                            @change="onTextColorModeChange"
+                            size="small"
+                        >
+                            <el-radio-button type="primary" value="preset">配置文件</el-radio-button>
+                            <el-radio-button type="primary" value="dynamic">动态计算</el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item>
+                        <div class="slider-group">
+                          <UiSlider
+                            :label="depthLabel"
+                            :model-value="uiStore.uiDepth"
+                            :min="0" :max="100" :step="5"
+                            :format-tooltip="depthTooltip"
+                            @update:model-value="onDepthChange"
+                          />
+                          <UiSlider
+                            label="hover强度"
+                            :model-value="hoverValue"
+                            :min="1" :max="9" :step="1"
+                            :format-tooltip="(v) => 'light-' + v"
+                            @update:model-value="onHoverChange"
+                          />
+                        </div>
+                    </el-form-item>
                     <el-form-item label="主题色">
                         <div class="theme-picker">
                             <span
@@ -42,24 +77,6 @@
                                 @click="handleThemeChange(t.name)"
                             ></span>
                         </div>
-                    </el-form-item>
-                    <el-form-item label="文字色模式">
-                        <el-radio-group
-                            :model-value="uiStore.textColorMode"
-                            @change="onTextColorModeChange"
-                            size="small"
-                        >
-                            <el-radio-button type="primary" value="preset">配置文件</el-radio-button>
-                            <el-radio-button type="primary" value="dynamic">动态计算</el-radio-button>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="菜单折叠">
-                        <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
-                            inactive-icon="Fold" />
-                    </el-form-item>
-                    <el-divider />
-                    <el-form-item label="按钮样式">
-                        <ButtonStyleSettings />
                     </el-form-item>
                 </el-form>
             </el-popover>
@@ -106,7 +123,8 @@ import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
-import ButtonStyleSettings from '@/components/ButtonStyleSettings.vue'
+import UiStyleSettings from '@/components/UiStyleSettings.vue'
+import UiSlider from '@/components/UiSlider.vue'
 import {useWebSocket} from '@/server/useWebSocket'
 
 // 初始化 WebSocket
@@ -119,6 +137,34 @@ import msg from '@/components/msg'
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
+
+// ============================================================
+// UI 滑块
+// ============================================================
+const depthLabel = computed(() => uiStore.uiMode === 'full' ? '色阶深度' : '描边深度')
+
+const hoverValue = computed(() =>
+  uiStore.uiMode === 'full' ? uiStore.hoverFull : uiStore.hoverPlain
+)
+
+function depthTooltip(val) {
+  return uiStore.uiMode === 'full' ? `±${val}%` : `${val}%`
+}
+
+function onDepthChange(depth) {
+  uiStore.setUiDepth(depth)
+  applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
+}
+
+function onHoverChange(hover) {
+  if (uiStore.uiMode === 'full') {
+    uiStore.setHoverFull(hover)
+  } else {
+    uiStore.setHoverPlain(hover)
+  }
+  applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
+}
+
 const handleAvatar = computed(()=>{
     return userStore.userInfo.avatar || avatar
 })
@@ -311,5 +357,15 @@ const onTextColorModeChange = (mode) => {
       box-shadow: 0 0 0 2px var(--el-bg-color), 0 0 0 4px var(--el-color-primary);
     }
   }
+}
+
+// 弹窗内表单 label 与控件垂直居中对齐
+:deep(.el-form-item) {
+  align-items: center;
+}
+
+// 滑块容器撑满 el-form-item__content 宽度，避免右侧留白
+.slider-group {
+  width: 100%;
 }
 </style>
