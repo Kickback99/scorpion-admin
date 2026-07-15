@@ -75,12 +75,12 @@
           </span>
           <!-- 操作按钮组（悬浮显示，方便以后新增/删改） -->
           <div v-show="hoveredId === img.id" class="image-footer-actions">
-            <el-button size="small" type="info" @click.stop="openPreview(index)" plain>预览</el-button>
-            <el-button size="small" @click.stop="handleCopy(img)" plain>复制</el-button>
+            <el-button size="small" type="primary" @click.stop="openPreview(index)" plain>预览</el-button>
+            <el-button size="small" type="warning" @click.stop="handleCopy(img)" plain>复制</el-button>
             <!-- 占位：下载 -->
-            <el-button size="small" disabled plain>下载</el-button>
+            <el-button size="small" type="success" plain>下载</el-button>
             <!-- 占位：删除 -->
-            <el-button size="small" disabled plain>删除</el-button>
+            <el-button size="small" type="danger" plain>删除</el-button>
           </div>
           <el-tag :type="getFileTypeTag(img.fileType)" size="small">
             {{ getFileTypeLabel(img.fileType) }}
@@ -528,24 +528,12 @@ onMounted(() => {
       padding: 0 5px;
       font-size: 10px;
       text-align: center;
-      border: none;
       border-radius: 0;
-      background: rgba(255, 255, 255, 0.1);
-      color: #d0d0d0;
-      border-right: 1px solid rgba(255, 255, 255, 0.15);
-      
 
       &:first-child { border-radius: 3px 0 0 3px; }
       &:last-child  { border-radius: 0 3px 3px 0; }
 
-      &:hover:not(.is-disabled) {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-      }
-
-      // 占位按钮（disabled）
       &.is-disabled {
-        color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
       }
     }
@@ -593,5 +581,49 @@ onMounted(() => {
   .el-checkbox__label {
     font-size: 12px;
   }
+}
+
+/* 悬浮图片卡片时，el-tag 低调化（不和操作按钮抢视觉） */
+.image-card:hover {
+  :deep(.el-tag) {
+    color: var(--el-text-color-regular) !important;
+    background-color: var(--el-fill-color-light) !important;
+    border-color: var(--el-border-color) !important;
+  }
+}
+</style>
+
+<style lang="scss">
+/* ===== image 卡片 footer 按钮组 — uiMode 颜色适配 ===== */
+
+/* full — 各按钮保留语义色文字，hover 填主色 */
+.ui-full .image-footer-actions .el-button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+.ui-full .image-footer-actions .el-button:hover:not(.is-disabled) {
+  color: var(--el-color-primary-text) !important;
+  background: var(--el-color-primary) !important;
+}
+.ui-full .image-footer-actions .el-button.is-disabled {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* plain — 中性半透白（融入暗底），hover 填主色 */
+.ui-plain .image-footer-actions .el-button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+}
+.ui-plain .image-footer-actions .el-button:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+.ui-plain .image-footer-actions .el-button:hover:not(.is-disabled) {
+  border-color: 1px solid var(--el-color-primary-plain)!important;
+  color: var(--el-color-primary-plain) !important;
+  background: var(--el-color-primary-plain-bg) !important;
+}
+.ui-plain .image-footer-actions .el-button.is-disabled {
+  color: rgba(255, 255, 255, 0.3);
 }
 </style>
