@@ -405,3 +405,30 @@ onUnmounted(() => {
   }
 }
 </style>
+
+<style lang="scss">
+/* ===== SmartMenuSearch ui-mode 适配（非 scoped，匹配 html 上的 .ui-full / .ui-plain） ===== */
+
+/* full — 键盘/鼠标 高亮行：实心底色+白字 */
+/*.ui-full .smart-menu-search .result-item:hover,
+.ui-full .smart-menu-search .result-item.is-active {
+  color: var(--el-color-primary-text);
+  background: var(--el-color-primary-solid-bg);
+
+  .result-item-icon,
+  .result-item-title { color: var(--el-color-primary-text); }
+  .result-item-title strong { color: var(--el-color-primary-text); }
+  .result-item-breadcrumb { color: var(--el-color-primary-light-5); }
+}*/
+
+/* plain — 键盘/鼠标 高亮行：浅底色+主色字 */
+/*.ui-plain .smart-menu-search .result-item:hover,
+.ui-plain .smart-menu-search .result-item.is-active {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-plain-bg);
+
+  .result-item-icon,
+  .result-item-title { color: var(--el-color-primary); }
+  .result-item-breadcrumb { color: var(--el-color-primary-light-3); }
+}*/
+</style>
