@@ -72,6 +72,10 @@ const CONFIG_DEFINITIONS = {
   // logo 配置
   'logo.animation_style': {type:'string', message:'Logo 动画样式'},
   'logo.hide_image': {type:'switch', message:'隐藏 Logo 图片'},
+
+  // 主题色布局配置
+  theme_layout_mode: {type:'string', message:'主题色布局'},
+  theme_dot_shape: {type:'string', message:'色块形状'},
 }
 
 // 提示消息映射
@@ -107,6 +111,16 @@ const MESSAGE_MAP = {
       'none': '无动画',
       'border': '边框跑马灯',
       'fill': '文字渐变填充'
+    },
+    'theme_layout_mode': {
+      'float': '底部浮动',
+      'inline': '行内色点',
+      'popover': '全部 Popover'
+    },
+    'theme_dot_shape': {
+      'circle': '圆形',
+      'rect': '矩形',
+      'square': '方形'
     }
   }
 }
@@ -123,6 +137,8 @@ export const useConfigStore = defineStore({
     config_view_mode: 'card',
     tag_view_mode: 'card',
     websocket_enabled: true,
+    theme_layout_mode: 'inline',
+    theme_dot_shape: 'circle',
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -484,6 +500,22 @@ export const useConfigStore = defineStore({
       this.updateConfig('logo.hide_image', !this.logo?.hide_image)
     },
 
+    getThemeLayoutMode(){
+      return this.theme_layout_mode || 'float'
+    },
+
+    setThemeLayoutMode(value){
+      this.updateConfig('theme_layout_mode', value)
+    },
+
+    getThemeDotShape(){
+      return this.theme_dot_shape || 'circle'
+    },
+
+    setThemeDotShape(value){
+      this.updateConfig('theme_dot_shape', value)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -642,7 +674,9 @@ export const useConfigStore = defineStore({
     tagViewMode: (state) => state.tag_view_mode || 'card',
     isWebsocketEnabled: (state) => state.websocket_enabled === true,
     logoAnimationStyle: (state) => state.logo?.animation_style || 'border',
-    isLogoImageHidden: (state) => state.logo?.hide_image === true
+    isLogoImageHidden: (state) => state.logo?.hide_image === true,
+    themeLayoutMode: (state) => state.theme_layout_mode || 'float',
+    themeDotShape: (state) => state.theme_dot_shape || 'circle'
   },
 
   // 配置持久化
