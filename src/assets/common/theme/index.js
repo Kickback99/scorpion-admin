@@ -154,10 +154,14 @@ function injectButtonCss(types) {
       'color:var(--el-color-' + t + '-plain);' +
       '--el-button-text-color:var(--el-color-' + t + '-plain);' +
       '--el-button-border-color:var(--el-color-' + t + '-plain);' +
-      '--el-button-hover-text-color:var(--el-color-white);' +
+      '--el-button-hover-text-color:var(--el-color-' + t + '-text);' +
       '--el-button-hover-bg-color:var(--el-color-' + t + ');' +
       '--el-button-hover-border-color:var(--el-color-' + t + ');' +
       '--el-button-active-color:var(--el-color-' + t + '-plain);' +
+      '}' +
+    // plain — hover 文字色直接写 color，CSS 变量可能被 EP 内部覆盖
+    '.ui-plain .el-button--' + t + ':not(.is-disabled):hover{' +
+      'color:var(--el-color-' + t + '-text)!important;' +
       '}'
   }
   _buttonCssEl.textContent = css
@@ -199,7 +203,7 @@ function injectCheckCss() {
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
     '.ui-full .el-checkbox__input.is-checked+.el-checkbox__label{' +
-    'color:var(--el-color-primary-text)!important;' +
+    'color:var(--el-color-primary)!important;' +
     '}' +
     '.ui-plain .el-checkbox__input.is-checked .el-checkbox__inner{' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
@@ -211,13 +215,13 @@ function injectCheckCss() {
     '.ui-plain .el-checkbox__input.is-checked+.el-checkbox__label{' +
     'color:var(--el-color-primary-plain)!important;' +
     '}' +
-    // el-radio (圆形单选框)
+    // el-radio — full: 圆点实心填充 + 标签用主色（无背景，不能白字）
     '.ui-full .el-radio__input.is-checked .el-radio__inner{' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
     '.ui-full .el-radio__input.is-checked+.el-radio__label{' +
-    'color:var(--el-color-primary-text)!important;' +
+    'color:var(--el-color-primary)!important;' +
     '}' +
     '.ui-plain .el-radio__input.is-checked .el-radio__inner{' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
@@ -305,23 +309,17 @@ var _selectCssEl = null
 function injectSelectCss() {
   _selectCssEl = ensureEl('theme-select-fix')
   _selectCssEl.textContent =
-    // full — 选中：实心底色+文字色；hover：浅色底+白字
+    // full — 选中：实心底色+文字色
     '.ui-full .el-select-dropdown__item.is-selected{' +
     'color:var(--el-color-primary-text)!important;' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'font-weight:400!important;' +
     '}' +
-    '.ui-full .el-select-dropdown__item:not(.is-disabled):hover{' +
-    'color:var(--el-color-primary-text)!important;' +
-    'background-color:var(--el-color-info-light-2)!important;' +
-    '}' +
-    // plain — 选中：浅底色+主色字；hover：更浅底色+主色字（排除已选中项）
+    // plain — 选中：浅底色+主色字
     '.ui-plain .el-select-dropdown__item.is-selected{' +
     'color:var(--el-color-primary)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
-    '}' +
-    '.ui-plain .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
-    'color:var(--el-color-primary)!important;' +
-    'background-color:var(--el-color-primary-text)!important;' +
+    'font-weight:400!important;' +
     '}'
 }
 

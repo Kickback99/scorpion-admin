@@ -48,7 +48,6 @@
                             :model-value="iconStore.textColorMode"
                             @change="onTextColorModeChange"
                             size="small"
-                            :disabled="iconStore.uiMode !== 'full'"
                         >
                             <el-radio-button type="primary" value="preset">配置文件</el-radio-button>
                             <el-radio-button type="primary" value="dynamic">动态计算</el-radio-button>
