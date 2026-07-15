@@ -21,91 +21,41 @@
         <div class="buttons">
             <el-button size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
             <el-button size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
+
+            <!-- 设置 popover -->
             <el-popover placement="bottom" :width="260" trigger="hover">
-                <template #reference>
-                    <el-button size="small" circle icon="Setting" plain></el-button>
-                </template>
-                <el-form>
-                    <el-form-item label="暗黑模式">
-                        <el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon"
-                            inactive-icon="Sunny" />
-                    </el-form-item>
-                    <el-form-item label="菜单折叠">
-                        <el-switch :model-value="userConfigStore.getCollapseEnabled()"  @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand"
-                            inactive-icon="Fold" />
-                    </el-form-item>
-                    <el-form-item label="ui模式">
-                        <UiStyleSettings />
-                    </el-form-item>
-                    <el-form-item label="文字色模式">
-                        <el-radio-group
-                            :model-value="uiStore.textColorMode"
-                            @change="onTextColorModeChange"
-                            size="small"
-                        >
-                            <el-radio-button type="primary" value="preset">配置文件</el-radio-button>
-                            <el-radio-button type="primary" value="dynamic">动态计算</el-radio-button>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item>
-                        <div class="slider-group">
-                          <UiSlider
-                            :label="depthLabel"
-                            :model-value="uiStore.uiDepth"
-                            :min="0" :max="100" :step="5"
-                            :format-tooltip="depthTooltip"
-                            @update:model-value="onDepthChange"
-                          />
-                          <UiSlider
-                            label="hover强度"
-                            :model-value="hoverValue"
-                            :min="1" :max="9" :step="1"
-                            :format-tooltip="(v) => 'light-' + v"
-                            @update:model-value="onHoverChange"
-                          />
-                        </div>
-                    </el-form-item>
-                    <el-form-item label="主题色">
-                        <div class="theme-picker">
-                            <span
-                                v-for="t in themeList"
-                                :key="t.name"
-                                class="theme-dot"
-                                :class="{ active: userConfigStore.currentTheme === t.name }"
-                                :style="{ backgroundColor: themePresets[t.name].colors.primary.bg }"
-                                :title="t.label"
-                                @click="handleThemeChange(t.name)"
-                            ></span>
-                        </div>
-                    </el-form-item>
-                </el-form>
+              <template #reference><el-button size="small" circle icon="Setting" plain></el-button></template>
+              <el-form>
+                <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
+                <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
+                <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
+                <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
+                <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="uiStore.uiDepth" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
+                <el-form-item v-if="configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
+              </el-form>
             </el-popover>
+
             <SmartMenuSearch />
         </div>
+
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
-                <!-- 添加key强制渲染？ -->
-                <!-- <el-avatar :src="handleAvatar" :key="avatarKey"/> -->
                 <el-avatar :src="handleAvatar"/>
-                <!-- {{ tokenStore.roleNames[0] || tokenStore.userInfo.username || tokenStore.userInfo.nickname}} -->
-                <!-- {{ displayName }} -->
-
                 {{ userStore.userInfo.nickname || userStore.userInfo.username }}
-                <el-icon>
-                    <component is="ArrowDown"></component>
-                </el-icon>
+                <el-icon><component is="ArrowDown"></component></el-icon>
             </span>
-            <!-- 折叠的下拉部分 -->
             <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item command="profile" icon="User">基本资料</el-dropdown-item>
-                    <!-- <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item> -->
                     <el-dropdown-item command="rePassword" icon="EditPen">重置密码</el-dropdown-item>
                     <el-dropdown-item command="logout" icon="SwitchButton">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
     </div>
+
+    <!-- 主题布局切换器（float:底部浮动 / inline:行内色点 / popover:Popover 内） -->
+    <ThemeSwitcher />
 </template>
 
 <script setup>
@@ -117,7 +67,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useUiStore } from '@/store/ui'
-import { themePresets, themeList } from '@/assets/common/theme/presets'
 import { applyTheme } from '@/assets/common/theme'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
@@ -125,6 +74,9 @@ import { computed, nextTick, onMounted, ref, watch } from "vue";
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
 import UiStyleSettings from '@/components/UiStyleSettings.vue'
 import UiSlider from '@/components/UiSlider.vue'
+import ThemeSwitcher from '@/components/theme/index.vue'
+import ThemeDots from '@/components/theme/ThemeDots.vue'
+import { useConfigStore } from '@/store/config'
 import {useWebSocket} from '@/server/useWebSocket'
 
 // 初始化 WebSocket
@@ -137,6 +89,7 @@ import msg from '@/components/msg'
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
+const configStore = useConfigStore()
 
 // ============================================================
 // UI 滑块
@@ -272,16 +225,12 @@ const toggleDark = async () => {
     html.classList.toggle('dark', userConfigStore.isDarkEnabled)
 }
 
-// 主题色切换
-const handleThemeChange = async (themeName) => {
-    await userConfigStore.setTheme(themeName)
-}
-
 // 实心文字色模式切换
 const onTextColorModeChange = (mode) => {
     uiStore.setTextColorMode(mode)
     applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -335,30 +284,6 @@ const onTextColorModeChange = (mode) => {
     display: none
 }
 
-.theme-picker {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-
-  .theme-dot {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.2s, transform 0.2s;
-
-    &:hover {
-      transform: scale(1.15);
-    }
-
-    &.active {
-      border-color: var(--el-color-primary);
-      box-shadow: 0 0 0 2px var(--el-bg-color), 0 0 0 4px var(--el-color-primary);
-    }
-  }
-}
-
 // 弹窗内表单 label 与控件垂直居中对齐
 :deep(.el-form-item) {
   align-items: center;
@@ -368,4 +293,5 @@ const onTextColorModeChange = (mode) => {
 .slider-group {
   width: 100%;
 }
+
 </style>
