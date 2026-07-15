@@ -45,7 +45,7 @@
                     </el-form-item>
                     <el-form-item label="文字色模式">
                         <el-radio-group
-                            :model-value="iconStore.textColorMode"
+                            :model-value="uiStore.textColorMode"
                             @change="onTextColorModeChange"
                             size="small"
                         >
@@ -99,7 +99,7 @@ import { useSettingStore } from '@/setting'
 import { useRoute, useRouter } from 'vue-router';
 import { useTokenStore } from '@/store/token'
 import { useUserConfigStore } from '@/store/userConfig'
-import { useIconStore } from '@/store/icon'
+import { useUiStore } from '@/store/ui'
 import { themePresets, themeList } from '@/assets/common/theme/presets'
 import { applyTheme } from '@/assets/common/theme'
 import { adminLogoutApi } from '@/api/admin'
@@ -118,7 +118,7 @@ import msg from '@/components/msg'
 
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
-const iconStore = useIconStore()
+const uiStore = useUiStore()
 const handleAvatar = computed(()=>{
     return userStore.userInfo.avatar || avatar
 })
@@ -233,7 +233,7 @@ const handleThemeChange = async (themeName) => {
 
 // 实心文字色模式切换
 const onTextColorModeChange = (mode) => {
-    iconStore.setTextColorMode(mode)
+    uiStore.setTextColorMode(mode)
     applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
 </script>

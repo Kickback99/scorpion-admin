@@ -2,7 +2,7 @@
   <div class="btn-style-settings">
     <div class="btn-style-label">按钮样式</div>
     <el-radio-group
-      :model-value="iconStore.uiMode"
+      :model-value="uiStore.uiMode"
       @change="onStyleChange"
       size="small"
     >
@@ -13,7 +13,7 @@
     <div class="btn-depth-row">
       <span class="btn-depth-label">{{ depthLabel }}</span>
       <el-slider
-        :model-value="iconStore.uiDepth"
+        :model-value="uiStore.uiDepth"
         @input="onDepthChange"
         :min="0"
         :max="100"
@@ -45,58 +45,58 @@
 // 依赖导入
 // ============================================================
 import { computed } from 'vue'
-import { useIconStore } from '@/store/icon'
+import { useUiStore } from '@/store/ui'
 import { applyTheme } from '@/assets/common/theme'
 import { useUserConfigStore } from '@/store/userConfig'
 
 // ============================================================
 // Store
 // ============================================================
-const iconStore = useIconStore()
+const uiStore = useUiStore()
 const userConfigStore = useUserConfigStore()
 
 // ============================================================
 // 计算属性
 // ============================================================
 const depthLabel = computed(() => {
-  const style = iconStore.uiMode
+  const style = uiStore.uiMode
   if (style === 'full') return '色阶深度'
   return '描边深度'
 })
 
 const hoverValue = computed(() => {
-  return iconStore.uiMode === 'full'
-    ? iconStore.hoverFull
-    : iconStore.hoverPlain
+  return uiStore.uiMode === 'full'
+    ? uiStore.hoverFull
+    : uiStore.hoverPlain
 })
 
 // ============================================================
 // 方法
 // ============================================================
 function depthTooltip(val) {
-  if (iconStore.uiMode === 'full') {
+  if (uiStore.uiMode === 'full') {
     return `±${val}%`
   }
   return `${val}%`
 }
 
 function onStyleChange(style) {
-  iconStore.setUiMode(style)
+  uiStore.setUiMode(style)
   // full 默认 depth=0, plain/circle 默认 depth=35
-  iconStore.setUiDepth(style === 'full' ? 0 : 35)
+  uiStore.setUiDepth(style === 'full' ? 0 : 35)
   reapplyTheme()
 }
 
 function onDepthChange(depth) {
-  iconStore.setUiDepth(depth)
+  uiStore.setUiDepth(depth)
   reapplyTheme()
 }
 
 function onHoverChange(hover) {
-  if (iconStore.uiMode === 'full') {
-    iconStore.setHoverFull(hover)
+  if (uiStore.uiMode === 'full') {
+    uiStore.setHoverFull(hover)
   } else {
-    iconStore.setHoverPlain(hover)
+    uiStore.setHoverPlain(hover)
   }
   reapplyTheme()
 }

@@ -3,7 +3,9 @@ import { defineStore } from "pinia";
 export const useIconStore = defineStore({
     id:'icon',
     state:()=>({
-        // ------------iconify------------
+        // ============================================================
+        // iconify
+        // ============================================================
         // 在线图标收集
         onlineIcons:[],
         // 批量收集
@@ -19,27 +21,20 @@ export const useIconStore = defineStore({
         // 仅显示已使用的离线图标
         showBatchUsedIcons:false,
 
-        // ------------elementplus图标------------
-
+        // ============================================================
+        // elementplus 图标
+        // ============================================================
         elementIcons:[],
 
-        // ------------svg图标------------
+        // ============================================================
+        // svg 图标
+        // ============================================================
         svgIcons:[],
 
-        // ------------alibaba图标------------
+        // ============================================================
+        // alibaba 图标
+        // ============================================================
         alibabaIcons:[],
-
-        // ------------UI 样式配置------------
-        // full | plain（影响按钮/标签页等所有组件）
-        uiMode: 'full',
-        // full 模式: 0~100 light/dark 深度; plain 模式: 混合度百分比（默认35）
-        uiDepth: 0,
-        // hover 强度 1~9（对应 light-1 ~ light-9）
-        hoverFull: 3,
-        hoverPlain: 3,
-        // 文字色模式: 'preset'（配置文件）| 'dynamic'（自动计算亮度）
-        textColorMode: 'preset',
-
     }),
     actions:{
         setOnlineIcons(data){
@@ -102,25 +97,9 @@ export const useIconStore = defineStore({
             this.$reset()
         },
 
-        // ------------UI 样式------------
-        setUiMode(mode) {
-            this.uiMode = mode
-        },
-        setUiDepth(depth) {
-            this.uiDepth = depth
-        },
-        setHoverFull(level) {
-            this.hoverFull = level
-        },
-        setHoverPlain(level) {
-            this.hoverPlain = level
-        },
-        setTextColorMode(mode) {
-            this.textColorMode = mode
-        },
     },
     persist: {
         key: 'icon-store',
-        paths: ['uiMode', 'uiDepth', 'hoverFull', 'hoverPlain', 'textColorMode'],
+        paths: [],
     },
 })
