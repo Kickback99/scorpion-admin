@@ -20,7 +20,7 @@
   </template>
 
 <script setup>
-import { ref} from 'vue';
+import { nextTick, ref } from 'vue';
 import {allocMenusApi,doAllocMenusApi} from '@/api/sysmenu';
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user';
@@ -44,30 +44,35 @@ const defaultProps = {
 
 //t_role_request: 获取角色菜单数据请求
 const render = async () => {
-    if(Reflect.ownKeys(route.query).length === 0){
-      return 
-    }
     const roleId = route.query.id
+    if (!roleId) {
+      return
+    }
     const result = await allocMenusApi(roleId);
     sysMenuList.value = result.data;
+    // 等待 el-tree 根据新数据完成 DOM 渲染后再设置勾选状态
+    await nextTick()
     const checkedIds = getCheckedIds(sysMenuList.value);
     console.log('getPermissions() checkedIds', checkedIds);
-    treeRef.value.setCheckedKeys(checkedIds)
-    // ...省略其他逻辑
+    treeRef.value?.setCheckedKeys(checkedIds)
 };
 
 render()
 
-    //得到所有选中的id列表
-const getCheckedIds = (auths, initArr = []) => {
-    return auths.reduce((pre, item) => {
-          if (item.select && item.children.length === 0) {
-            pre.push(item.id)
-          } else if (item.children) {
-            getCheckedIds(item.children, initArr)
-          }
-          return pre
-        }, initArr)
+// 得到所有选中的id列表（递归收集所有 select 为 true 的叶子节点）
+const getCheckedIds = (auths) => {
+    const ids = []
+    const walk = (nodes) => {
+      nodes.forEach(item => {
+        if (item.select && item.children.length === 0) {
+          ids.push(item.id)
+        } else if (item.children && item.children.length > 0) {
+          walk(item.children)
+        }
+      })
+    }
+    walk(auths)
+    return ids
 };
 
 const userStore = useUserStore()

@@ -160,20 +160,21 @@ const linkIsActive = (tab) => {
 
 // 添加标签页
 const addTab = () => {
-  const { path, meta: { title } } = route
+  const { path, fullPath, meta: { title } } = route
 
     // 确保首页始终存在
   ensureHomeTabExists()
 
   const itemTab = {
     path,
+    fullPath,
     title
   }
   // 如果是首页路径，确保标题正确
   if (path === '/index') {
     itemTab.title = '首页'
   }
-  
+
   tabStore.addTabs(itemTab)
   nextTick(() => {
     adjustScrollPosition()
@@ -187,6 +188,7 @@ const ensureHomeTabExists = () => {
     // 如果首页不存在，添加首页
     tabStore.addTabs({
       path: '/index',
+      fullPath: '/index',
       title: '首页'
     })
   }
@@ -205,31 +207,31 @@ watch(() => route.path, () => {
   addTab()
 })
 
-// 点击标签页
+// 点击标签页（fullPath 保留 query 参数，兼容旧数据无 fullPath 的情况）
 const tagOnClick = (item) => {
-  router.push(item.path)
+  router.push(item.fullPath || item.path)
 }
 
 // 删除单个标签页
 const removeTab = (targetName) => {
   const currentTabs = tabs.value
   let activeName = activeTab.value
-  
+
   if (activeName === targetName) {
     currentTabs.forEach((tab, index) => {
       if (tab.path === targetName) {
         const nextTab = currentTabs[index + 1] || currentTabs[index - 1]
         if (nextTab) {
           activeName = nextTab.path
-          router.push(nextTab.path)
+          router.push(nextTab.fullPath || nextTab.path)
         }
       }
     })
   }
-  
+
   activeTab.value = activeName
   tabStore.tabList = currentTabs.filter((tab) => tab.path !== targetName)
-  
+
   nextTick(() => {
     adjustScrollPosition()
   })
@@ -415,12 +417,12 @@ const closeRightTabs = (currentTab) => {
   if (currentIndex !== -1) {
     const tabsToKeep = tabs.value.slice(0, currentIndex + 1)
     tabStore.tabList = tabsToKeep
-    
+
     // 如果当前激活的标签在关闭的右侧，跳转到当前标签
     if (tabs.value.findIndex(tab => tab.path === route.path) > currentIndex) {
-      router.push(currentTab.path)
+      router.push(currentTab.fullPath || currentTab.path)
     }
-    
+
     nextTick(adjustScrollPosition)
   }
 }
@@ -429,38 +431,39 @@ const closeRightTabs = (currentTab) => {
 const closeOtherTabs = (currentTab) => {
   // 获取首页标签（路径为 '/index'）
   const homeTab = tabs.value.find(tab => tab.path === '/index')
-  
+
   // 确保保留首页和当前标签页
   const tabsToKeep = []
-  
+
   // 添加首页（如果存在）
   if (homeTab) {
     tabsToKeep.push(homeTab)
   }
-  
+
   // 添加当前标签页（如果不是首页）
   if (currentTab.path !== '/index') {
     tabsToKeep.push(currentTab)
   }
-  
+
   // 如果首页不存在，创建首页标签
   if (!homeTab && currentTab.path !== '/index') {
     tabsToKeep.unshift({
       path: '/index',
+      fullPath: '/index',
       title: '首页'
     })
   }
-  
+
   // 更新标签页列表
   tabStore.tabList = tabsToKeep
-  
+
   // 路由跳转
   if (route.path !== currentTab.path && currentTab.path !== '/index') {
-    router.push(currentTab.path)
+    router.push(currentTab.fullPath || currentTab.path)
   } else if (route.path !== '/index' && currentTab.path === '/index') {
     router.push('/index')
   }
-  
+
   nextTick(adjustScrollPosition)
 }
 
@@ -468,21 +471,22 @@ const closeOtherTabs = (currentTab) => {
 const closeAllTabs = () => {
   // 保留首页（路径为 '/index'）
   const homeTab = tabs.value.find(tab => tab.path === '/index')
-  
+
   // 如果首页存在，只保留首页；如果不存在，创建首页
   if (homeTab) {
     tabStore.tabList = [homeTab]
   } else {
     tabStore.tabList = [{
       path: '/index',
+      fullPath: '/index',
       title: '首页'
     }]
   }
-  
+
   if (route.path !== '/index') {
     router.push('/index')
   }
-  
+
   nextTick(adjustScrollPosition)
 }
 

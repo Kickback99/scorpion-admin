@@ -11,7 +11,12 @@ export const useTabStore = defineStore({
   },
   actions: {
     addTabs(tab){
-        if(this.tabList.some(item => item.path === tab.path)) return
+        const existing = this.tabList.find(item => item.path === tab.path)
+        if (existing) {
+          // 同一路径但 query 参数可能不同，更新 fullPath
+          existing.fullPath = tab.fullPath
+          return
+        }
         this.tabList.push(tab)
     },
     clearTabs(){
