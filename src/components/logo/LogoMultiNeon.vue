@@ -1,8 +1,4 @@
-<!--
-  PROTOTYPE — LogoMultiNeon (增强版)
-  多重描边霓虹 — SVG feGaussianBlur + feMerge GPU 加速发光，心跳脉冲节奏
-  评估后请删除或吸收到正式组件
--->
+<!-- LogoMultiNeon — SVG 多重描边霓虹，心跳脉冲 -->
 <template>
   <div class="logo logo-multi-neon">
     <svg class="neon-filters" aria-hidden="true">

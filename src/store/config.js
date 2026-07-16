@@ -109,8 +109,11 @@ const MESSAGE_MAP = {
     },
     'logo.animation_style': {
       'none': '无动画',
-      'border': '边框跑马灯',
-      'fill': '文字渐变填充'
+      'neon': '霓虹灯管',
+      'multi-neon': 'SVG 多重描边霓虹',
+      'energy-pulse': '能量脉冲',
+      'stroke-scan': '镂空扫描描边',
+      'glitch': '故障扫描线'
     },
     'theme_layout_mode': {
       'float': '底部浮动',
@@ -184,7 +187,7 @@ export const useConfigStore = defineStore({
       file_retention_days: 7
     },
     logo: {
-      animation_style: 'border',
+      animation_style: 'neon',
       hide_image: false
     },
     // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
@@ -485,7 +488,7 @@ export const useConfigStore = defineStore({
     },
 
     getLogoAnimationStyle(){
-      return this.logo?.animation_style || 'border'
+      return this.logo?.animation_style || 'neon'
     },
 
     setLogoAnimationStyle(value){
@@ -673,7 +676,7 @@ export const useConfigStore = defineStore({
     configViewMode: (state) => state.config_view_mode || 'card',
     tagViewMode: (state) => state.tag_view_mode || 'card',
     isWebsocketEnabled: (state) => state.websocket_enabled === true,
-    logoAnimationStyle: (state) => state.logo?.animation_style || 'border',
+    logoAnimationStyle: (state) => state.logo?.animation_style || 'neon',
     isLogoImageHidden: (state) => state.logo?.hide_image === true,
     themeLayoutMode: (state) => state.theme_layout_mode || 'float',
     themeDotShape: (state) => state.theme_dot_shape || 'circle'

@@ -1,8 +1,4 @@
-<!--
-  PROTOTYPE — LogoEnergyPulse (修复版)
-  能量脉冲 — 心跳式高光扫过，文字始终微亮不消失
-  评估后请删除或吸收到正式组件
--->
+<!-- LogoEnergyPulse — 能量脉冲，心跳式高光扫过 -->
 <template>
   <div class="logo logo-energy-pulse">
     <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">

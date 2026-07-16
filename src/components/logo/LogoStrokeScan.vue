@@ -1,9 +1,4 @@
-<!--
-  PROTOTYPE — LogoMultiStroke (精简版)
-  全镂空 + 单组主题色描边 — 本体 --el-text-color-regular 镂空描边，
-  外层一组主题色描边通过 mask 从左到右流动，科技感
-  评估后请删除或吸收到正式组件
--->
+<!-- LogoStrokeScan — 镂空扫描描边，mask 从左到右流动 -->
 <template>
   <div class="logo logo-tech-stroke">
     <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">
