@@ -97,7 +97,7 @@
                         v-if="row.token"
                         style="cursor: pointer; transition: all 0.3s" 
                         @click="handleCopy(row.token, row.id)"
-                        :color="copiedId === row.id ? '#67c23a' : '#67c23a'"
+                        :class="copiedId === row.id ? 'copiedStyle' : 'copyStyle'"
                     >
                         <component :is="copiedId === row.id ? 'CircleCheck' : 'CopyDocument'" />
                     </el-icon>
@@ -293,5 +293,13 @@ const handleCopy = (text, id) => {
 <style lang="scss" scoped>
 .toolbar {
     @include flex(space-between,null,null)
+}
+
+:deep(.copyStyle){
+    color: var(--el-color-primary)
+}
+
+:deep(.copiedStyle){
+    color: var(--el-color-success)
 }
 </style>

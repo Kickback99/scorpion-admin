@@ -45,7 +45,7 @@ const close = () => {
     width: 100%;
     height: calc(100vh - 70px);
     // min-height: 100%;
-    z-index: 3;
+    z-index: 20;
 }
 
 .header {

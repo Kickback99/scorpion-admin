@@ -27,7 +27,7 @@
           :auto-search-on-enter="true"
           :allow-custom="false"
           custom-disabled-message="请输入已存在的文章标题"
-          :style="{ width: searchWidth }"
+          :style="{ width: searchWidth, backgroundColor:userConfigStore.isDarkEnabled?'#000':'#fff' }"
           @dropdown-visible="handleDropdownVisible"
         />
       </el-form-item>
@@ -132,6 +132,8 @@ import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { Check, Plus, Loading, Picture, InfoFilled } from '@element-plus/icons-vue';
 import PinyinMatch from 'pinyin-match';
 import msg from '@/components/msg'
+import { useUserConfigStore } from '@/store/userConfig';
+const userConfigStore = useUserConfigStore()
 
 // ============================================================
 // Props & Emits
