@@ -937,7 +937,7 @@ defineExpose({
   color: var(--el-color-primary);
 }
 .ui-plain .suggestion-item strong {
-  color: var(--el-color-primary-plain);
+  color: var(--el-color-primary);
 }
 
 /* el-input-tag 内 tag close 图标跟随 uiMode */
