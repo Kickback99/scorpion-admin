@@ -87,6 +87,20 @@ const handleUploadImage = async (event, insertImage, files) => {
     --toolbar-text: #ccc;
 }
 
+/* 修复全屏时编辑器高度不撑满 → 下半留白 */
+:deep(.v-md-textarea-editor) {
+  min-height: 100%;
+}
+
+/* 修复全屏时暗黑模式下主容器白色背景露出 */
+.dark-mode :deep(.v-md-editor) {
+  background-color: #000 !important;
+}
+/* 暗黑模式下编辑器 wrapper 背景 */
+.dark-mode :deep(.v-md-editor__editor-wrapper) {
+  background-color: #000;
+}
+
  /* v-md-editor-工具栏 */
 :deep(.v-md-editor__right-area .v-md-editor__toolbar){
     background-color: var(--toolbar-bg) !important;
