@@ -1,10 +1,19 @@
 <template>
     <div class="app-container">
-      <div style="padding: 20px 20px 0 20px;">
+      <div style="margin: 10px 0;">
         授权角色：{{ route.query.roleName }}
       </div>
+      <!-- ===== 展开/折叠工具栏 ===== -->
+      <div class="auth-toolbar">
+        <el-button text size="small" @click="handleExpandAll">
+          <el-icon><Expand /></el-icon> 全部展开
+        </el-button>
+        <el-button text size="small" @click="handleCollapseAll">
+          <el-icon><Fold /></el-icon> 全部折叠
+        </el-button>
+      </div>
       <el-tree
-        style="margin: 20px 0"
+        style="margin: 12px 0"
         ref="treeRef"
         :data="sysMenuList"
         node-key="id"
@@ -75,6 +84,22 @@ const getCheckedIds = (auths) => {
     return ids
 };
 
+// ============================================================
+// 展开/折叠
+// ============================================================
+
+/** 全部展开 */
+const handleExpandAll = () => {
+  const nodes = treeRef.value?.store?.nodesMap || {}
+  Object.values(nodes).forEach(node => { node.expanded = true })
+}
+
+/** 全部折叠 */
+const handleCollapseAll = () => {
+  const nodes = treeRef.value?.store?.nodesMap || {}
+  Object.values(nodes).forEach(node => { node.expanded = false })
+}
+
 const userStore = useUserStore()
 
 //t_role_request: 为角色分配菜单请求
@@ -115,3 +140,14 @@ const save = async () => {
 };
 
 </script>
+
+<style lang="scss" scoped>
+// ============================================================
+// 授权菜单树
+// ============================================================
+.auth-toolbar {
+  display: flex;
+  gap: 4px;
+  // padding: 0 20px;
+}
+</style>
