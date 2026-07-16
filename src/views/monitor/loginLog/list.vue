@@ -99,7 +99,7 @@
                         @click="handleCopy(row.token, row.id)"
                         :class="copiedId === row.id ? 'copiedStyle' : 'copyStyle'"
                     >
-                        <component :is="copiedId === row.id ? 'CircleCheck' : 'CopyDocument'" />
+                        <component :is="copiedId === row.id ? 'Check' : 'CopyDocument'" />
                     </el-icon>
                 </div>
             </template>
@@ -296,10 +296,10 @@ const handleCopy = (text, id) => {
 }
 
 :deep(.copyStyle){
-    color: var(--el-color-primary)
+    color: var(--el-text-color-primary)
 }
 
 :deep(.copiedStyle){
-    color: var(--el-color-success)
+    color: var(--el-text-color-primary)
 }
 </style>
