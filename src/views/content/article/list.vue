@@ -108,8 +108,9 @@
         </el-table-column>
         <el-table-column prop="createTime" label="创建日期" width="185" />
         <el-table-column prop="updateTime" label="修改日期" width="185" />
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="280">
             <template #default="{row}">
+                <el-button size="small" type="info" @click="handlePreview(row)" plain>预览</el-button>
                 <el-button size="small" type="warning" :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" plain>编辑</el-button>
                 <el-popconfirm :title="`你确定要删除 ${row.title} 吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
@@ -133,17 +134,28 @@
     />
 
     <ArticleEdit ref="maskRef" @reRender="render"></ArticleEdit>
+
+    <!-- 文章预览弹窗 -->
+    <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" top="2vh" destroy-on-close
+        class="preview-dialog">
+        <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
+            <component :is="MarkdownPreview" :text="previewContent" @click="handleCopyCodeSuccess" />
+        </div>
+    </el-dialog>
    
 </template>
 
 <script setup>
 import { isTopApi, listApi, removeApi } from '@/api/article';
 import CateSelect from '@/views/components/CateSelect.vue';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs} from 'element-plus';
 import msg from '@/components/msg';
+import { createMarkdownPreview } from '@/utils/markdown-config';
+import { useUserConfigStore } from '@/store/userConfig';
+const userConfigStore = useUserConfigStore()
 
 //搜索相关
 const searchData = ref({
@@ -344,10 +356,73 @@ const setQuickDate = (type) => {
     updateEndTime(endTime.value)
 }
 
+// ==================== 预览相关 ====================
+const previewVisible = ref(false)
+const previewTitle = ref('')
+const previewContent = ref('')
+
+const MarkdownPreview = computed(() => {
+  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
+})
+
+const handlePreview = (row) => {
+  previewTitle.value = row.title
+  previewContent.value = row.content || ''
+  previewVisible.value = true
+}
+
+/** copy-code 插件复制成功后显示 ✓ — click 事件委托只标记被点击的按钮 */
+const handleCopyCodeSuccess = (e) => {
+  const btn = e.target.closest('.v-md-copy-code-btn')
+  if (!btn) return
+  btn.classList.add('copied')
+  setTimeout(() => btn.classList.remove('copied'), 1500)
+}
+
 </script>
 
 <style lang="scss" scoped>
 .layout {
     @include flex(space-between,null,null)
+}
+
+/* 预览弹窗暗黑模式 — 参考 Markdown.vue */
+.dark-mode {
+  :deep(.v-md-editor) {
+    background-color: #000 !important;
+  }
+
+  :deep(.v-md-editor__preview-wrapper) {
+    background: black !important;
+  }
+
+  :deep(.vuepress-markdown-body) {
+    color: #fff;
+    background: black !important;
+  }
+}
+</style>
+
+<style lang="scss">
+/* 预览弹窗毛玻璃遮罩 — :has() 精确定位该 dialog 的 overlay */
+.el-overlay:has(.preview-dialog) {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+}
+
+/* 代码块复制成功 ✓ 反馈 */
+.preview-dialog .v-md-copy-code-btn.copied svg {
+  display: none;
+}
+
+.preview-dialog .v-md-copy-code-btn.copied::after {
+  content: "✓";
+  color: var(--el-color-success);
+  font-size: 16px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
