@@ -417,7 +417,7 @@ onMounted(() => {
 
 :deep(.v-md-copy-code-btn.copied::after) {
   content: "✓";
-  color: #67c23a;
+  color: var(--el-color-success);
   font-size: 16px;
   position: absolute;
   left: 50%;
