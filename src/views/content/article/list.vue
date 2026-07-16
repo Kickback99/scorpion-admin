@@ -108,7 +108,7 @@
         </el-table-column>
         <el-table-column prop="createTime" label="创建日期" width="185" />
         <el-table-column prop="updateTime" label="修改日期" width="185" />
-        <el-table-column label="操作" width="280">
+        <el-table-column label="操作" width="270">
             <template #default="{row}">
                 <el-button size="small" type="info" @click="handlePreview(row)" plain>预览</el-button>
                 <el-button size="small" type="warning" :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" plain>编辑</el-button>
@@ -117,6 +117,7 @@
                         <el-button size="small" type="danger" :disabled="$hasPerm('btn.article.remove')" plain>删除</el-button>
                     </template>
                 </el-popconfirm>
+                <el-button size="small" type="success" @click="handleDownload(row)" plain>下载</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -369,6 +370,17 @@ const handlePreview = (row) => {
   previewTitle.value = row.title
   previewContent.value = row.content || ''
   previewVisible.value = true
+}
+
+/** 下载文章为 .md 文件 */
+const handleDownload = (row) => {
+  const blob = new Blob([row.content || ''], { type: 'text/markdown' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${row.title || 'article'}.md`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 /** copy-code 插件复制成功后显示 ✓ — click 事件委托只标记被点击的按钮 */
