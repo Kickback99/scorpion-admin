@@ -5,6 +5,7 @@
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
+          ref="menuRef"
           active-text-color="var(--el-color-primary)"
           background-color="var(--sidebar-bg)"
           :default-active="handelUrl"
@@ -108,9 +109,22 @@ watch(()=>settingStore.refresh,()=>{
 
 // 处理菜单的默认展开
 const handelUrl = ref('/')
-handelUrl.value = route.path 
+handelUrl.value = route.path
 watch(()=>route.path,()=>{
-  handelUrl.value = route.path 
+  handelUrl.value = route.path
+})
+
+// 菜单激活项引用
+const menuRef = ref(null)
+
+// 路由变化时自动滚动侧边栏，使当前激活菜单项可见
+watch(() => route.path, () => {
+  nextTick(() => {
+    const activeEl = menuRef.value?.$el?.querySelector('.is-active')
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
 })
 
 
