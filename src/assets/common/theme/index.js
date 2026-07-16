@@ -205,6 +205,9 @@ function injectCheckCss() {
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
+    '.ui-full .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
+    'border-color:var(--el-color-primary-text)!important;' +
+    '}' +
     '.ui-full .el-checkbox__input.is-checked+.el-checkbox__label{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
@@ -216,12 +219,15 @@ function injectCheckCss() {
     'border-color:var(--el-color-primary-plain)!important;' +
     '}' +
     '.ui-plain .el-checkbox__input.is-checked+.el-checkbox__label{' +
-    'color:var(--el-color-primary-plain)!important;' +
+    'color:var(--el-color-primary)!important;' +
     '}' +
     // el-radio — full: 圆点实心填充 + 标签用主色（无背景，不能白字）
     '.ui-full .el-radio__input.is-checked .el-radio__inner{' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-full .el-radio__input.is-checked .el-radio__inner::after{' +
+    'background-color:var(--el-color-primary-text)!important;' +
     '}' +
     '.ui-full .el-radio__input.is-checked+.el-radio__label{' +
     'color:var(--el-color-primary)!important;' +
@@ -234,7 +240,7 @@ function injectCheckCss() {
     'background-color:var(--el-color-primary-plain)!important;' +
     '}' +
     '.ui-plain .el-radio__input.is-checked+.el-radio__label{' +
-    'color:var(--el-color-primary-plain)!important;' +
+    'color:var(--el-color-primary)!important;' +
     '}' +
     // radio-button
     '.ui-full ' + radioSel + '{' +
@@ -251,6 +257,28 @@ function injectCheckCss() {
     '}' +
     '.el-radio-button .el-radio-button__inner:hover{' +
     'color:var(--el-color-primary)!important;' +
+    '}' +
+    // el-tree 选中文字
+    '.ui-full .el-tree-node.is-checked .el-tree-node__label{' +
+    'color:var(--el-color-primary)!important;' +
+    '}' +
+    '.ui-plain .el-tree-node.is-checked .el-tree-node__label{' +
+    'color:var(--el-color-primary)!important;' +
+    '}' +
+    // indeterminate 半选复选框跟随 uiMode
+    '.ui-full .el-checkbox__input.is-indeterminate .el-checkbox__inner{' +
+    'background-color:var(--el-color-primary-solid-bg)!important;' +
+    'border-color:var(--el-color-primary-solid-bg)!important;' +
+    '}' +
+    '.ui-full .el-checkbox__input.is-indeterminate .el-checkbox__inner::before{' +
+    'background-color:var(--el-color-primary-text)!important;' +
+    '}' +
+    '.ui-plain .el-checkbox__input.is-indeterminate .el-checkbox__inner{' +
+    'background-color:var(--el-color-primary-plain-bg)!important;' +
+    'border-color:var(--el-color-primary-plain)!important;' +
+    '}' +
+    '.ui-plain .el-checkbox__input.is-indeterminate .el-checkbox__inner::before{' +
+    'background-color:var(--el-color-primary-plain)!important;' +
     '}'
 }
 
