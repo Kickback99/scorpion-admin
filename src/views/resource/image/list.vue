@@ -596,10 +596,11 @@ onMounted(() => {
 <style lang="scss">
 /* ===== image 卡片 footer 按钮组 — uiMode 颜色适配 ===== */
 
-/* full — 各按钮保留语义色文字，hover 填主色 */
+/* full — 中性半透白，hover 填主色 */
 .ui-full .image-footer-actions .el-button {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 .ui-full .image-footer-actions .el-button:hover:not(.is-disabled) {
   color: var(--el-color-primary-text) !important;
