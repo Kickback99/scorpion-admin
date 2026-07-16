@@ -416,13 +416,16 @@ onMounted(() => {
 }
 
 :deep(.v-md-copy-code-btn.copied::after) {
-  content: "✓";
-  color: var(--el-color-success);
-  font-size: 16px;
+  content: "";
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 45%;
+  width: 8px;
+  height: 14px;
+  border-right: 2.5px solid var(--el-color-white);
+  border-bottom: 2.5px solid var(--el-color-white);
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 1px;
 }
 
 :deep(.v-md-editor-preview .vuepress-markdown-body){
