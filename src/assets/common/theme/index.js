@@ -71,9 +71,12 @@ export function applyTheme(themeName, _isDark) {
     setColorSeries(root, t, c.bg)
 
     // 文字色 — preset or 动态计算（full / plain 共用）
-    var textColor = c.text
+    var textColor
     if (uiStore.textColorMode === 'dynamic') {
-      textColor = luminance(c.bg) > 0.4 ? '#303133' : '#ffffff'
+      textColor = luminance(c.bg) > 0.4 ? '#1a1a1a' : '#ffffff'
+    } else {
+      // text 为 { light, dark } 对象，兼容旧字符串格式
+      textColor = _isDark ? (c.text.dark || c.text) : (c.text.light || c.text)
     }
     root.style.setProperty('--el-color-' + t + '-text', textColor)
 
