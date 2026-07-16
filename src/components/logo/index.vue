@@ -1,7 +1,10 @@
 <template>
   <!-- ===== Logo：按 logo.animation_style 渲染对应动画 ===== -->
-  <LogoBorder v-if="animStyle === 'border'" :hide-image="hideImage" />
-  <LogoFill v-else-if="animStyle === 'fill'" :hide-image="hideImage" />
+  <LogoNeon v-if="animStyle === 'neon'" :hide-image="hideImage" />
+  <LogoMultiNeon v-else-if="animStyle === 'multi-neon'" :hide-image="hideImage" />
+  <LogoEnergyPulse v-else-if="animStyle === 'energy-pulse'" :hide-image="hideImage" />
+  <LogoStrokeScan v-else-if="animStyle === 'stroke-scan'" :hide-image="hideImage" />
+  <LogoGlitch v-else-if="animStyle === 'glitch'" :hide-image="hideImage" />
   <div v-else class="logo logo-plain">
     <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}">
     <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
@@ -16,8 +19,11 @@ import { computed } from 'vue'
 import { useConfigStore } from '@/store/config'
 import { useSettingStore } from '@/setting'
 import { useUserConfigStore } from '@/store/userConfig'
-import LogoBorder from './LogoBorder.vue'
-import LogoFill from './LogoFill.vue'
+import LogoNeon from './LogoNeon.vue'
+import LogoMultiNeon from './LogoMultiNeon.vue'
+import LogoEnergyPulse from './LogoEnergyPulse.vue'
+import LogoStrokeScan from './LogoStrokeScan.vue'
+import LogoGlitch from './LogoGlitch.vue'
 
 // ============================================================
 // 数据
