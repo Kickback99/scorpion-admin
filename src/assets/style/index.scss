@@ -1,1 +1,45 @@
 @import './reset.scss';
+
+// ============================================================
+// nprogress 进度条 — 跟随主题色
+// ============================================================
+#nprogress .bar {
+  background: var(--el-color-primary) !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--el-color-primary), 0 0 5px var(--el-color-primary) !important;
+}
+
+// ============================================================
+// 全局滚动条 — 跟随主题色
+// ============================================================
+
+// Element Plus el-scrollbar
+.el-scrollbar__bar.is-vertical .el-scrollbar__thumb {
+  width: 4px;
+}
+.el-scrollbar__bar.is-horizontal .el-scrollbar__thumb {
+  height: 4px;
+}
+.el-scrollbar__thumb {
+  background-color: var(--el-color-primary-light-5) !important;
+}
+.el-scrollbar__thumb:hover {
+  background-color: var(--el-color-primary) !important;
+}
+
+// 原生 WebKit 滚动条
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--el-color-primary-light-5);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--el-color-primary);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
