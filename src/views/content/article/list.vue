@@ -411,18 +411,21 @@ const handleCopyCodeSuccess = (e) => {
   -webkit-backdrop-filter: blur(15px) !important;
 }
 
-/* 代码块复制成功 ✓ 反馈 */
+/* 代码块复制成功 ✓ 反馈 — CSS border 画立体对勾 */
 .preview-dialog .v-md-copy-code-btn.copied svg {
   display: none;
 }
 
 .preview-dialog .v-md-copy-code-btn.copied::after {
-  content: "✓";
-  color: var(--el-color-success);
-  font-size: 16px;
+  content: "";
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 45%;
+  width: 8px;
+  height: 14px;
+  border-right: 2.5px solid var(--el-color-white);
+  border-bottom: 2.5px solid var(--el-color-white);
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 1px;
 }
 </style>
