@@ -13,6 +13,7 @@
         </el-button>
       </div>
       <el-tree
+        class="tree-with-line"
         style="margin: 12px 0"
         ref="treeRef"
         :data="sysMenuList"
@@ -149,5 +150,60 @@ const save = async () => {
   display: flex;
   gap: 4px;
   // padding: 0 20px;
+}
+
+// ============================================================
+// 树形连接线
+// 覆盖 el-tree 默认 indent，用统一的 padding 体系保证各层竖线对齐小三角
+// ============================================================
+:deep(.tree-with-line) {
+  .el-tree-node {
+    position: relative;
+    padding-left: 12px;
+
+    // 竖直虚线（各层均对齐展开小三角左侧）
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 100%;
+      border-left: 1px dashed var(--el-color-primary);
+    }
+
+    // 最后一个子节点：竖线截断，只到水平连接处
+    &:last-child::before {
+      height: 12px;
+      top: 0;
+      bottom: auto;
+    }
+  }
+
+  // 叶子节点的展开图标 visibility:hidden 仍占位，改为 display:none 消除空白
+  :deep(.el-tree-node__expand-icon.is-leaf) {
+    display: none;
+  }
+
+  .el-tree-node__content {
+    position: relative;
+    z-index: 1;
+    padding-left: 0 !important;
+
+    // 水平虚线（画在 content 上，渲染在内容背景上方，不被遮挡）
+    &::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 12px;
+      width: 12px;
+      height: 0;
+      border-top: 1px dashed var(--el-color-primary);
+    }
+  }
+
+  .el-tree-node__children {
+    padding-left: 12px;
+  }
 }
 </style>
