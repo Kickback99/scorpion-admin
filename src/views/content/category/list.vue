@@ -2322,10 +2322,17 @@ const handleComment = () => {
 
   // 节点右间距：父节点（展开/折叠一致）与叶子节点分别控制，均作用于 content
   .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+    padding-right: 75px;
+  }
+
+  // 顶层叶子节点（配置管理、任务管理等无父节点包裹）→ 独立右间距
+  > .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
     padding-right: 12px;
   }
-  .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
-    padding-right: 16px;
+
+  // 叶子节点（非顶层，有父节点包裹）→ 充满父容器
+  .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
+    width: 100%;
   }
 
   // 展开图标 padding：父节点（展开/折叠一致）与叶子节点分别控制
