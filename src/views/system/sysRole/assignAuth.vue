@@ -205,12 +205,35 @@ const save = async () => {
     padding-left: 12px;
   }
 
-  // 节点右间距：父节点（展开/折叠一致）与叶子节点分别控制，均作用于 content
+  // 节点右间距：父节点按 __children 嵌套深度递进（每层 +4px），叶子节点固定 16px
+  // depth 0 顶层父节点 → 24px
   .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
-    padding-right: 12px;
+    padding-right: 62px;
   }
-  .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
+  // depth 1 → 20px（specificity 高一阶，覆盖 depth 0）
+  .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+    padding-right: 38px;
+  }
+  // depth 2 → 16px
+  .el-tree-node__children .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+    padding-right: 14px;
+  }
+  // depth 3 → 12px
+  /* .el-tree-node__children .el-tree-node__children .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+    padding-right: 12px;
+  } */
+
+  // 叶子节点（非顶层，有父节点包裹）→ 充满父容器
+  .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
+    width: 100%;
+  }
+  /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
     padding-right: 16px;
+  } */
+   
+  // 顶层叶子节点（配置管理、任务管理等无父节点包裹）→ 独立右间距
+  > .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
+    padding-right: 76px;
   }
 
   // 展开图标 padding：父节点（展开/折叠一致）与叶子节点分别控制
