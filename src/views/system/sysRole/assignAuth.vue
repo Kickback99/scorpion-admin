@@ -1,8 +1,5 @@
 <template>
     <div class="app-container">
-      <div style="margin: 10px 0;">
-        授权角色：{{ route.query.roleName }}
-      </div>
       <!-- ===== 展开/折叠工具栏 ===== -->
       <div class="auth-toolbar">
         <el-button text size="small" @click="handleExpandAll">
@@ -11,6 +8,9 @@
         <el-button text size="small" @click="handleCollapseAll">
           <el-icon><Fold /></el-icon> 全部折叠
         </el-button>
+      </div>
+      <div style="margin: 10px 0;">
+        授权角色：{{ route.query.roleName }}
       </div>
       <el-tree
         class="tree-with-line"
@@ -158,6 +158,7 @@ const save = async () => {
 :deep(.tree-with-line) {
   .el-tree-node {
     position: relative;
+    width: fit-content;
     padding-left: 12px;
 
     // 竖直虚线 — 从节点顶部贯穿到底部
