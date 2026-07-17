@@ -204,5 +204,13 @@ const save = async () => {
   .el-tree-node__children {
     padding-left: 12px;
   }
+
+  // 展开图标 padding：父节点（展开/折叠一致）与叶子节点分别控制
+  .el-tree-node__expand-icon:not(.is-leaf) {
+    padding: 8px;
+  }
+  .el-tree-node__expand-icon.is-leaf {
+    padding: 1px;
+  }
 }
 </style>
