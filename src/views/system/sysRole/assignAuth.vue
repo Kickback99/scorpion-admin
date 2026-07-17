@@ -153,15 +153,14 @@ const save = async () => {
 }
 
 // ============================================================
-// 树形连接线
-// 覆盖 el-tree 默认 indent，用统一的 padding 体系保证各层竖线对齐小三角
+// 树形连接线：竖线+横线均在 .el-tree-node 上，每个节点独立定位
 // ============================================================
 :deep(.tree-with-line) {
   .el-tree-node {
     position: relative;
     padding-left: 12px;
 
-    // 竖直虚线（各层均对齐展开小三角左侧）
+    // 竖直虚线 — 从节点顶部贯穿到底部
     &::before {
       content: '';
       position: absolute;
@@ -172,34 +171,33 @@ const save = async () => {
       border-left: 1px dashed var(--el-color-primary);
     }
 
-    // 最后一个子节点：竖线截断，只到水平连接处
+    // 水平虚线 — width 24px 横跨 padding + icon 区域
+    // 父节点：可见 icon 盖住 content 内部分，视觉上只露 padding 段
+    // 叶子节点：icon 为 visibility:hidden 不渲染，横线穿透直达复选框
+    // hover 时 __content 背景 (z-index:1) 自动盖住越界部分
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      top: 12px;
+      width: 20px;
+      height: 0;
+      border-top: 1px dashed var(--el-color-primary);
+    }
+
+    // 最后一个子节点：竖线截断，只保留顶部水平连接段
     &:last-child::before {
-      height: 12px;
+      height: 14px;
       top: 0;
       bottom: auto;
     }
-  }
-
-  // 叶子节点的展开图标 visibility:hidden 仍占位，改为 display:none 消除空白
-  :deep(.el-tree-node__expand-icon.is-leaf) {
-    display: none;
   }
 
   .el-tree-node__content {
     position: relative;
     z-index: 1;
     padding-left: 0 !important;
-
-    // 水平虚线（画在 content 上，渲染在内容背景上方，不被遮挡）
-    &::before {
-      content: '';
-      position: absolute;
-      left: -12px;
-      top: 12px;
-      width: 12px;
-      height: 0;
-      border-top: 1px dashed var(--el-color-primary);
-    }
   }
 
   .el-tree-node__children {
