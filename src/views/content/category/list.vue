@@ -1,4 +1,5 @@
 <template>
+  <div class="category-container">
  <!--  <div>
     <p>分类管理</p>
   </div> -->
@@ -19,7 +20,7 @@
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps" 
+  <el-tree class="tree-with-line" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
@@ -110,6 +111,7 @@
     </template>
   </el-tree>
   <!-- <el-button>确定</el-button> -->
+  </div>
 </template>
 
 <script setup>
@@ -2267,4 +2269,71 @@ const handleComment = () => {
 
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// ============================================================
+// 树形连接线：竖线+横线均在 .el-tree-node 上，每个节点独立定位
+// ============================================================
+:deep(.tree-with-line) {
+  .el-tree-node {
+    position: relative;
+    width: fit-content;
+    padding-left: 12px;
+
+    // 竖直虚线 — 从节点顶部贯穿到底部
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 100%;
+      border-left: 1px dashed var(--el-color-primary);
+    }
+
+    // 水平虚线 — 横跨 padding + icon 区域
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      top: 12px;
+      width: 20px;
+      height: 0;
+      border-top: 1px dashed var(--el-color-primary);
+    }
+
+    // 最后一个子节点：竖线截断，只保留顶部水平连接段
+    &:last-child::before {
+      height: 14px;
+      top: 0;
+      bottom: auto;
+    }
+  }
+
+  .el-tree-node__content {
+    position: relative;
+    z-index: 1;
+    padding-left: 0 !important;
+  }
+
+  .el-tree-node__children {
+    padding-left: 12px;
+  }
+
+  // 节点右间距：父节点（展开/折叠一致）与叶子节点分别控制，均作用于 content
+  .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+    padding-right: 12px;
+  }
+  .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
+    padding-right: 16px;
+  }
+
+  // 展开图标 padding：父节点（展开/折叠一致）与叶子节点分别控制
+  .el-tree-node__expand-icon:not(.is-leaf) {
+    padding: 8px;
+  }
+  .el-tree-node__expand-icon.is-leaf {
+    padding: 1px;
+  }
+}
+</style>
