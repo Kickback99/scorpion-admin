@@ -76,6 +76,10 @@ const CONFIG_DEFINITIONS = {
   // 主题色布局配置
   theme_layout_mode: {type:'string', message:'主题色布局'},
   theme_dot_shape: {type:'string', message:'色块形状'},
+
+  // 树形控件连接线样式
+  tree_auth_line_style: {type:'string', message:'授权树连接线'},
+  tree_cate_line_style: {type:'string', message:'分类树连接线'},
 }
 
 // 提示消息映射
@@ -124,6 +128,16 @@ const MESSAGE_MAP = {
       'circle': '圆形',
       'rect': '矩形',
       'square': '方形'
+    },
+    'tree_auth_line_style': {
+      'none': '无',
+      'solid': '实线',
+      'dashed': '虚线'
+    },
+    'tree_cate_line_style': {
+      'none': '无',
+      'solid': '实线',
+      'dashed': '虚线'
     }
   }
 }
@@ -142,6 +156,8 @@ export const useConfigStore = defineStore({
     websocket_enabled: true,
     theme_layout_mode: 'inline',
     theme_dot_shape: 'circle',
+    tree_auth_line_style: 'dashed',
+    tree_cate_line_style: 'dashed',
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -519,6 +535,22 @@ export const useConfigStore = defineStore({
       this.updateConfig('theme_dot_shape', value)
     },
 
+    getTreeAuthLineStyle(){
+      return this.tree_auth_line_style || 'dashed'
+    },
+
+    setTreeAuthLineStyle(value){
+      this.updateConfig('tree_auth_line_style', value)
+    },
+
+    getTreeCateLineStyle(){
+      return this.tree_cate_line_style || 'dashed'
+    },
+
+    setTreeCateLineStyle(value){
+      this.updateConfig('tree_cate_line_style', value)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -679,7 +711,9 @@ export const useConfigStore = defineStore({
     logoAnimationStyle: (state) => state.logo?.animation_style || 'neon',
     isLogoImageHidden: (state) => state.logo?.hide_image === true,
     themeLayoutMode: (state) => state.theme_layout_mode || 'float',
-    themeDotShape: (state) => state.theme_dot_shape || 'circle'
+    themeDotShape: (state) => state.theme_dot_shape || 'circle',
+    treeAuthLineStyle: (state) => state.tree_auth_line_style || 'dashed',
+    treeCateLineStyle: (state) => state.tree_cate_line_style || 'dashed'
   },
 
   // 配置持久化

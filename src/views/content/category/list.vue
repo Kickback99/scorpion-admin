@@ -20,7 +20,7 @@
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree class="tree-with-line" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
+  <el-tree class="tree-with-line" :class="lineClass" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
@@ -118,6 +118,10 @@
 import { addApi, listApi, modifyApi, removeApi } from '@/api/category';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import msg from '@/components/msg';
+import { useConfigStore } from '@/store/config';
+
+const configStore = useConfigStore()
+const lineClass = computed(() => `tree-line-${configStore.getTreeCateLineStyle()}`)
 
 defineOptions({
   name: 'Category'
@@ -2287,7 +2291,6 @@ const handleComment = () => {
       bottom: 0;
       width: 0;
       height: 100%;
-      border-left: 1px dashed var(--el-color-primary);
     }
 
     // 水平虚线 — 横跨 padding + icon 区域
@@ -2299,7 +2302,6 @@ const handleComment = () => {
       top: 12px;
       width: 20px;
       height: 0;
-      border-top: 1px dashed var(--el-color-primary);
     }
 
     // 最后一个子节点：竖线截断，只保留顶部水平连接段
@@ -2342,5 +2344,21 @@ const handleComment = () => {
   .el-tree-node__expand-icon.is-leaf {
     padding: 1px;
   }
+}
+
+// ============================================================
+// 连接线样式：none / solid / dashed 由 configStore 动态切换
+// ============================================================
+:deep(.tree-line-none .el-tree-node) {
+  &::before { border-left: none !important; }
+  &::after  { border-top: none !important; }
+}
+:deep(.tree-line-solid .el-tree-node) {
+  &::before { border-left: 1px solid var(--el-color-primary) !important; }
+  &::after  { border-top: 1px solid var(--el-color-primary) !important; }
+}
+:deep(.tree-line-dashed .el-tree-node) {
+  &::before { border-left: 1px dashed var(--el-color-primary) !important; }
+  &::after  { border-top: 1px dashed var(--el-color-primary) !important; }
 }
 </style>
