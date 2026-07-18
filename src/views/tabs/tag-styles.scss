@@ -36,33 +36,31 @@
   .scroll-item {
     position: relative;
     display: inline-block;
-    height: 30px;
+    padding: 4px 0;
     padding-left: 4px;
-    line-height: 30px;
     cursor: pointer;
     transition: color 0.15s ease-out;
     box-shadow: 5px 0 5px -6px #ccc;
 
     &:not(:first-child) {
-      padding-right: 20px;
+      padding-right: 4px;
     }
 
     .el-icon-close {
-      position: absolute;
-      top: 50%;
-      right: 2px;
       display: inline-flex;
+      vertical-align: middle;
       align-items: center;
       justify-content: center;
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
+      margin-left: 2px;
+      margin-top: 2px;
       color: var(--el-color-primary-light-9) !important;
       cursor: pointer;
       border-radius: 4px;
       transition:
         background-color 0.12s,
         color 0.12s;
-      transform: translate(0, -50%);
       opacity: 0; // 默认隐藏
 
       &:hover {
@@ -83,6 +81,8 @@
   }
 
   .tag-title {
+    display: inline-block;
+    vertical-align: middle;
     padding: 0 2px;
     color: var(--el-text-color-primary);
     text-decoration: none;
