@@ -14,7 +14,7 @@
       </div>
       <el-tree
         class="tree-with-line"
-        :class="lineClass"
+        :class="[lineClass, authChildClass]"
         style="margin: 12px 0"
         ref="treeRef"
         :data="sysMenuList"
@@ -37,6 +37,7 @@ import { useConfigStore } from '@/store/config';
 
 const configStore = useConfigStore()
 const lineClass = computed(() => `tree-line-${configStore.getTreeAuthLineStyle()}`)
+const authChildClass = computed(() => `tree-auth-child-${configStore.getTreeAuthChildMode()}`)
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user';
 import { clearRoute } from '@/utils/remove';
@@ -227,9 +228,10 @@ const save = async () => {
   } */
 
   // 叶子节点（非顶层，有父节点包裹）→ 充满父容器
-  .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
+  /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
     width: 100%;
-  }
+  } */
+   
   /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
     padding-right: 16px;
   } */
@@ -262,5 +264,20 @@ const save = async () => {
 :deep(.tree-line-dashed .el-tree-node) {
   &::before { border-left: 1px dashed var(--el-color-primary) !important; }
   &::after  { border-top: 1px dashed var(--el-color-primary) !important; }
+}
+
+// ============================================================
+// 子节点宽度：content / fill 由 configStore 动态切换
+// ============================================================
+
+// 子节点 — 内容宽
+:deep(.tree-auth-child-content .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content){
+  width: fit-content;
+  padding-right: 14px !important;
+}
+
+// 子节点 — 占满（默认，无需覆盖）
+:deep(.tree-auth-child-fill .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf)){
+    width: 100%;
 }
 </style>
