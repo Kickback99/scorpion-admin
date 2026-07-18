@@ -167,6 +167,27 @@ function injectButtonCss(types) {
       'color:var(--el-color-' + t + '-text)!important;' +
       '}'
   }
+  // link 按钮：full 模式下文字保持主色，不变黑白
+  for (var j = 0; j < types.length; j++) {
+    var tt = types[j]
+    css += '.ui-full .el-button--' + tt + '.is-link:not(.is-disabled){' +
+      'color:var(--el-color-' + tt + ')!important;' +
+      'background:transparent!important;' +
+      'border-color:transparent!important;' +
+      '--el-button-text-color:var(--el-color-' + tt + ')!important;' +
+      '}' +
+    // plain — 保持主色
+    '.ui-plain .el-button--' + tt + '.is-link:not(.is-disabled){' +
+      'color:var(--el-color-' + tt + ')!important;' +
+      'background:transparent!important;' +
+      'border-color:transparent!important;' +
+      '--el-button-text-color:var(--el-color-' + tt + ')!important;' +
+      '}' +
+    // link disabled — 恢复原生灰色低调样式
+    '.el-button--' + tt + '.is-link.is-disabled{' +
+      'color:var(--el-text-color-placeholder)!important;' +
+      '}'
+  }
   _buttonCssEl.textContent = css
 }
 
