@@ -41,7 +41,7 @@
     line-height: 30px;
     cursor: pointer;
     transition: color 0.15s ease-out;
-    border-right: 1px solid var(--el-border-color-lighter);
+    box-shadow: 5px 0 5px -6px #ccc;
 
     &:not(:first-child) {
       padding-right: 20px;
@@ -251,7 +251,10 @@
 }
 
 .arrow-right {
-  border-right: 0.5px solid #ccc;
+  box-shadow: -5px 0 5px -6px #ccc;
+}
+
+.arrow-down {
   box-shadow: -5px 0 5px -6px #ccc;
 }
 
