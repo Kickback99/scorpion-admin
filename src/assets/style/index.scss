@@ -67,3 +67,18 @@
   box-shadow: none !important;
   border: 1px dashed var(--el-color-primary);
 }
+
+// ============================================================
+// radio / radio-button — 图标与文字垂直居中
+// ============================================================
+.el-radio-button__inner {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.el-radio .el-radio__label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
