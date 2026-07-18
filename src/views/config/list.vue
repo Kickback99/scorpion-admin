@@ -1,22 +1,26 @@
 <template>
-  <div class="icon-switcher">
-    <el-radio-group 
-      v-model="isSearch" 
-      size="small"
-      @change="toggleComponent"
-    >
-      <el-radio-button :label="true">
-        <el-icon class="mr-1"><Search /></el-icon>
-        配置列表
-      </el-radio-button>
-      <el-radio-button :label="false">
-        <el-icon class="mr-1"><Collection /></el-icon>
-        配置管理
-      </el-radio-button>
-    </el-radio-group>
-  </div>
+  <div class="config-page">
+    <div class="icon-switcher">
+      <el-radio-group
+        v-model="isSearch"
+        size="small"
+        @change="toggleComponent"
+      >
+        <el-radio-button :label="true">
+          <el-icon class="mr-1"><Search /></el-icon>
+          配置列表
+        </el-radio-button>
+        <el-radio-button :label="false">
+          <el-icon class="mr-1"><Collection /></el-icon>
+          配置管理
+        </el-radio-button>
+      </el-radio-group>
+    </div>
 
-  <component :is="isSearch ? ConfigList : ConfigManager" />
+    <div class="config-body">
+      <component :is="isSearch ? ConfigList : ConfigManager" />
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -29,17 +33,29 @@ const isSearch = ref(true)
 const toggleComponent = () => {
   // 无需手动切换，v-model 已绑定
 }
+
 </script>
 
 <style scoped>
-.icon-switcher {
-  position: sticky;
-  top: 0;
-  z-index: 8;
+.config-page {
   display: flex;
-  justify-content: center; /* 居中显示 */
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  /* padding: 0 20px; */
+  overflow: hidden;
+}
+
+.icon-switcher {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
   padding: 10px 0;
-  margin-bottom: 10px;
+}
+
+.config-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* 自定义选中样式 */

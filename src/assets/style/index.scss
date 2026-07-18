@@ -45,6 +45,35 @@
 }
 
 // ============================================================
+// config 模块内部滚动条 — 模拟 el-scrollbar 透明度
+// ============================================================
+.config-body::-webkit-scrollbar,
+.cs-content::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.config-body::-webkit-scrollbar-thumb,
+.cs-content::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+  border-radius: 2px;
+}
+.config-body::-webkit-scrollbar-thumb:hover,
+.cs-content::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+}
+.config-body::-webkit-scrollbar-track,
+.cs-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+// ============================================================
+// config 模块使用内部滚动，隐藏外层 el-scrollbar
+// ============================================================
+.el-scrollbar__wrap:has(.config-page) {
+  overflow: hidden;
+}
+
+// ============================================================
 // el-tree 悬浮边框 — 跟随连接线样式类
 // ============================================================
 .tree-line-solid .el-tree-node__content:not(:has(.el-input)):hover {

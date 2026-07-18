@@ -29,5 +29,6 @@ const mode = computed(() => configStore.getConfigViewMode())
 <style scoped>
 .config-list-root {
   width: 100%;
+  height: 100%;
 }
 </style>
