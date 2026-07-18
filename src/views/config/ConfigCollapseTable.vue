@@ -75,9 +75,14 @@ const handleCollapseAll = () => { activeNames.value = [] }
 // 折叠行内列表
 // ============================================================
 .cct-toolbar {
+  position: sticky;
+  top: 40px; // 避开 list.vue 的 radio-button
+  z-index: 5;
+  background: var(--el-bg-color);
   display: flex;
   gap: 4px;
   margin-bottom: 12px;
+  padding: 8px 0;
 }
 
 .cct-root :deep(.el-collapse) {
@@ -89,14 +94,19 @@ const handleCollapseAll = () => { activeNames.value = [] }
   margin-bottom: 4px;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 8px;
-  overflow: hidden;
+  // 不能 overflow:hidden，会阻断 sticky 定位链
   background: var(--el-bg-color);
 }
 
 .cct-root :deep(.el-collapse-item__header) {
+  position: sticky;
+  top: 80px; // radio-button(~48px) + toolbar(~40px) margin(12px) 余量
+  z-index: 4;
   padding: 0 16px;
   background: var(--el-bg-color-overlay);
   border: none;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px 8px 0 0;
   font-size: 14px;
   font-weight: 600;
   color: var(--el-text-color-primary);

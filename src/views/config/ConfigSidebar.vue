@@ -56,10 +56,10 @@ const activeGroup = ref('client')
   width: max-content;
   min-width: 880px;
   margin: 0 auto;
-  min-height: 480px;
+  height: calc(100vh - 160px); // 固定高度：视口 - header - tabs - footer，确保不触发外层滚动
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: hidden; // 裁剪圆角；滚动由 cs-content 内部处理
   background: var(--el-bg-color);
 }
 
@@ -68,10 +68,12 @@ const activeGroup = ref('client')
   flex-shrink: 0;
   background: var(--el-bg-color-overlay);
   border-right: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px 0 0 12px;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  // 无需 sticky —— cs-split 固定高度 + cs-content 内部滚动，侧边栏自然固定
 }
 
 .cs-nav-item {
@@ -116,6 +118,7 @@ const activeGroup = ref('client')
 .cs-content {
   flex: 1;
   padding: 24px 32px;
+  border-radius: 0 12px 12px 0;
   overflow-y: auto;
 }
 
@@ -172,5 +175,23 @@ const activeGroup = ref('client')
       padding-top: 6px;
     }
   }
+}
+</style>
+
+<style>
+/* .cs-content 内部滚动条 — 必须加元素前缀才生效（全局 ::-webkit-scrollbar 只管文档级） */
+.cs-content::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.cs-content::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+  border-radius: 2px;
+}
+.cs-content::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+}
+.cs-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>

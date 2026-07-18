@@ -18,6 +18,7 @@
       border
       stripe
       class="config-table"
+      max-height="calc(100vh - 320px)"
     >
       <el-table-column prop="key" label="配置项" min-width="250">
         <template #default="{ row }">
@@ -659,16 +660,13 @@ watch(() => addForm.enableThreshold, (enabled) => {
   min-height: 100%;
 }
 
-.config-management.light-mode {
-  background-color: #f5f7fa;
-}
-
-.config-management.dark-mode {
-  background-color: #1a1a1a;
-}
-
 .header-actions {
+  position: sticky;
+  top: 40px;
+  z-index: 5;
+  background: var(--el-bg-color);
   margin-bottom: 20px;
+  /* padding: 8px 0 20px; */
   display: flex;
   gap: 12px;
 }
