@@ -80,6 +80,12 @@ const CONFIG_DEFINITIONS = {
   // 树形控件连接线样式
   tree_auth_line_style: {type:'string', message:'授权树连接线'},
   tree_cate_line_style: {type:'string', message:'分类树连接线'},
+
+  // 树形节点宽度模式
+  tree_cate_parent_mode: {type:'string', message:'分类父节点宽度'},
+  tree_cate_parent_width: {type:'number', message:'分类父节点自定义px', min:12, max:200},
+  tree_cate_child_mode: {type:'string', message:'分类子节点宽度'},
+  tree_auth_child_mode: {type:'string', message:'授权子节点宽度'},
 }
 
 // 提示消息映射
@@ -138,6 +144,18 @@ const MESSAGE_MAP = {
       'none': '无',
       'solid': '实线',
       'dashed': '虚线'
+    },
+    'tree_cate_parent_mode': {
+      'content': '内容宽',
+      'custom': '较大值'
+    },
+    'tree_cate_child_mode': {
+      'content': '内容宽',
+      'fill': '占满'
+    },
+    'tree_auth_child_mode': {
+      'content': '内容宽',
+      'fill': '占满'
     }
   }
 }
@@ -158,6 +176,10 @@ export const useConfigStore = defineStore({
     theme_dot_shape: 'circle',
     tree_auth_line_style: 'dashed',
     tree_cate_line_style: 'dashed',
+    tree_cate_parent_mode: 'custom',
+    tree_cate_parent_width: 75,
+    tree_cate_child_mode: 'fill',
+    tree_auth_child_mode: 'fill',
     // 嵌套配置
     comment: {
       article_comment_enabled: true,
@@ -551,6 +573,38 @@ export const useConfigStore = defineStore({
       this.updateConfig('tree_cate_line_style', value)
     },
 
+    getTreeCateParentMode(){
+      return this.tree_cate_parent_mode || 'custom'
+    },
+
+    setTreeCateParentMode(value){
+      this.updateConfig('tree_cate_parent_mode', value)
+    },
+
+    getTreeCateParentWidth(){
+      return this.tree_cate_parent_width ?? 75
+    },
+
+    setTreeCateParentWidth(value){
+      this.updateConfig('tree_cate_parent_width', value)
+    },
+
+    getTreeCateChildMode(){
+      return this.tree_cate_child_mode || 'fill'
+    },
+
+    setTreeCateChildMode(value){
+      this.updateConfig('tree_cate_child_mode', value)
+    },
+
+    getTreeAuthChildMode(){
+      return this.tree_auth_child_mode || 'fill'
+    },
+
+    setTreeAuthChildMode(value){
+      this.updateConfig('tree_auth_child_mode', value)
+    },
+
     setDataRetentionDays(value){
       this.updateConfig('oss.data_retention_days',value)
     },
@@ -713,7 +767,11 @@ export const useConfigStore = defineStore({
     themeLayoutMode: (state) => state.theme_layout_mode || 'float',
     themeDotShape: (state) => state.theme_dot_shape || 'circle',
     treeAuthLineStyle: (state) => state.tree_auth_line_style || 'dashed',
-    treeCateLineStyle: (state) => state.tree_cate_line_style || 'dashed'
+    treeCateLineStyle: (state) => state.tree_cate_line_style || 'dashed',
+    treeCateParentMode: (state) => state.tree_cate_parent_mode || 'custom',
+    treeCateParentWidth: (state) => state.tree_cate_parent_width ?? 75,
+    treeCateChildMode: (state) => state.tree_cate_child_mode || 'fill',
+    treeAuthChildMode: (state) => state.tree_auth_child_mode || 'fill'
   },
 
   // 配置持久化

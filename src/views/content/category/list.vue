@@ -20,7 +20,7 @@
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree class="tree-with-line" :class="lineClass" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
+  <el-tree class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
@@ -122,6 +122,9 @@ import { useConfigStore } from '@/store/config';
 
 const configStore = useConfigStore()
 const lineClass = computed(() => `tree-line-${configStore.getTreeCateLineStyle()}`)
+const cateParentClass = computed(() => `tree-cate-parent-${configStore.getTreeCateParentMode()}`)
+const cateChildClass = computed(() => `tree-cate-child-${configStore.getTreeCateChildMode()}`)
+const cateParentStyle = computed(() => configStore.getTreeCateParentMode() === 'custom' ? { '--tree-cate-parent-width': configStore.getTreeCateParentWidth() + 'px' } : {})
 
 defineOptions({
   name: 'Category'
@@ -2330,9 +2333,9 @@ const handleComment = () => {
   }
 
   // 节点右间距：父节点（展开/折叠一致）与叶子节点分别控制，均作用于 content
-  .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
+  /* .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
     padding-right: 75px;
-  }
+  } */
 
   // 顶层叶子节点（配置管理、任务管理等无父节点包裹）→ 独立右间距
   > .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
@@ -2340,9 +2343,9 @@ const handleComment = () => {
   }
 
   // 叶子节点（非顶层，有父节点包裹）→ 充满父容器
-  .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
+  /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
     width: 100%;
-  }
+  } */
 
   // 展开图标 padding：父节点（展开/折叠一致）与叶子节点分别控制
   .el-tree-node__expand-icon:not(.is-leaf) {
@@ -2367,5 +2370,30 @@ const handleComment = () => {
 :deep(.tree-line-dashed .el-tree-node) {
   &::before { border-left: 1px dashed var(--el-color-primary) !important; }
   &::after  { border-top: 1px dashed var(--el-color-primary) !important; }
+}
+
+// ============================================================
+// 节点宽度：content / fill / custom 由 configStore 动态切换
+// ============================================================
+
+// 父节点 — 内容宽
+:deep(.tree-cate-parent-content .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content) {
+  padding-right: 12px !important;
+}
+
+// 父节点 — 较大值（CSS 变量控制 px）
+:deep(.tree-cate-parent-custom .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content) {
+  padding-right: var(--tree-cate-parent-width, 75px) !important;
+}
+
+// 子节点 — 内容宽
+:deep(.tree-cate-child-content .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content) {
+  width: fit-content;
+  padding-right: 14px !important;
+}
+
+// 子节点 — 占满
+:deep(.tree-cate-child-fill .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf)){
+  width: 100%;
 }
 </style>
