@@ -53,7 +53,8 @@ const activeGroup = ref('client')
 // ============================================================
 .cs-split {
   display: flex;
-  width: fit-content;
+  width: max-content;
+  min-width: 880px;
   margin: 0 auto;
   min-height: 480px;
   border: 1px solid var(--el-border-color-lighter);
@@ -113,6 +114,7 @@ const activeGroup = ref('client')
 }
 
 .cs-content {
+  flex: 1;
   padding: 24px 32px;
   overflow-y: auto;
 }
