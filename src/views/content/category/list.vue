@@ -2322,6 +2322,13 @@ const handleComment = () => {
     padding-left: 12px;
   }
 
+  // 防止按钮显示/隐藏时高度突变导致 label 文字抖动
+  .custom-tree-node {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
   // 节点右间距：父节点（展开/折叠一致）与叶子节点分别控制，均作用于 content
   .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf)) > .el-tree-node__content {
     padding-right: 75px;
