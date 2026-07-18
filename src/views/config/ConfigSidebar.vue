@@ -17,7 +17,7 @@
       <template v-for="group in groups" :key="group.key">
         <div v-if="activeGroup === group.key" class="cs-panel">
           <h2 class="cs-panel-title">{{ group.label }}</h2>
-          <div v-for="item in group.items" :key="item.key" class="cs-row">
+          <div v-for="item in group.items" :key="item.key" class="cs-row" :class="{ 'cs-row--radio': item.type === 'radio' && item.options?.length > 3 }">
             <div class="cs-row-info">
               <span class="cs-row-label">{{ item.label }}</span>
               <span class="cs-row-desc">{{ item.desc }}</span>
@@ -53,6 +53,8 @@ const activeGroup = ref('client')
 // ============================================================
 .cs-split {
   display: flex;
+  width: fit-content;
+  margin: 0 auto;
   min-height: 480px;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 12px;
@@ -93,11 +95,24 @@ const activeGroup = ref('client')
     background: var(--el-color-primary-light-9);
     border-right-color: var(--el-color-primary);
     font-weight: 600;
+
+    /* full — 实心底色+文字色 */
+    .ui-full & {
+      color: var(--el-color-primary-text);
+      background: var(--el-color-primary-solid-bg);
+      border-right-color: var(--el-color-white);
+    }
+
+    /* plain — 浅底色+主色字（默认） */
+    .ui-plain & {
+      color: var(--el-color-primary);
+      background: var(--el-color-primary-light-9);
+      border-right-color: var(--el-color-primary);
+    }
   }
 }
 
 .cs-content {
-  flex: 1;
   padding: 24px 32px;
   overflow-y: auto;
 }
@@ -143,6 +158,17 @@ const activeGroup = ref('client')
 
   &-ctrl {
     flex-shrink: 0;
+  }
+
+  // radio 型配置项：控件独占一行，避免挤占 label 空间
+  &--radio {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .cs-row-ctrl {
+      width: 100%;
+      padding-top: 6px;
+    }
   }
 }
 </style>
