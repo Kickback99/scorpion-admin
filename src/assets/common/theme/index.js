@@ -258,11 +258,13 @@ function injectCheckCss() {
     '.el-radio-button .el-radio-button__inner:hover{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
-    // el-tree 选中文字
-    '.ui-full .el-tree-node.is-checked .el-tree-node__label{' +
+    // el-tree 选中文字（.el-tree-node__label + 自定义 slot 兜底）
+    '.ui-full .el-tree-node.is-checked .el-tree-node__label,' +
+    '.ui-full .el-tree-node.is-checked .el-tree-node__content{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
-    '.ui-plain .el-tree-node.is-checked .el-tree-node__label{' +
+    '.ui-plain .el-tree-node.is-checked .el-tree-node__label,' +
+    '.ui-plain .el-tree-node.is-checked .el-tree-node__content{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
     // indeterminate 半选复选框跟随 uiMode
@@ -330,6 +332,17 @@ function injectInputCss() {
     '}' +
     '.ui-plain ' + focusSel + '{' +
     'box-shadow:0 0 0 1px var(--el-color-primary-plain) inset!important;' +
+    '}' +
+    // el-tree 内 input 不受全局规则影响（由 tree-line-* 接管）
+    '.el-tree.tree-line-solid .el-input__wrapper,' +
+    '.el-tree.tree-line-dashed .el-input__wrapper,' +
+    '.el-tree.tree-line-none .el-input__wrapper{' +
+    'box-shadow:none!important;' +
+    '}' +
+    '.el-tree.tree-line-solid .el-input__wrapper:hover,' +
+    '.el-tree.tree-line-dashed .el-input__wrapper:hover,' +
+    '.el-tree.tree-line-none .el-input__wrapper:hover{' +
+    'box-shadow:none!important;' +
     '}'
 }
 
