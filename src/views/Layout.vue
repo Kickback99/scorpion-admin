@@ -61,9 +61,12 @@
         </el-header>
         <el-main class="main-container">
           <Tabs></Tabs>
-          <el-scrollbar class="main-scrollbar">
+          <el-scrollbar v-if="!isConfigRoute" class="main-scrollbar">
             <router-view v-if="isDestroy"/>
           </el-scrollbar>
+          <div v-else class="main-scrollbar main-scrollbar--plain">
+            <router-view v-if="isDestroy"/>
+          </div>
         </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
@@ -94,6 +97,9 @@ const listData = computed(()=>
 const userConfigStore = useUserConfigStore()
 
 const route = useRoute()
+
+// config 模块自己管理滚动，不需要外层 el-scrollbar
+const isConfigRoute = computed(() => route.path.startsWith('/config'))
 
 // 处理刷新业务
 
@@ -180,5 +186,9 @@ watch(() => route.path, () => {
 
 .main-scrollbar {
   flex: 1;
+}
+
+.main-scrollbar--plain {
+  overflow: hidden;
 }
 </style>
