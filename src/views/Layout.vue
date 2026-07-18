@@ -59,9 +59,9 @@
         <el-header>
             <TabBar></TabBar>
         </el-header>
-        <el-main>
-            <el-scrollbar>
-              <Tabs></Tabs>
+        <el-main class="main-container">
+          <Tabs></Tabs>
+          <el-scrollbar class="main-scrollbar">
             <router-view v-if="isDestroy"/>
           </el-scrollbar>
         </el-main>
@@ -142,9 +142,11 @@ watch(() => route.path, () => {
 }
 
 .el-aside {
+  display: flex;
+  flex-direction: column;
   width: auto;
-  // background-color: $menu-background;
   height: 100vh;
+  overflow: hidden;
   &::-webkit-scrollbar {
     width: 0;
   }
@@ -163,9 +165,20 @@ watch(() => route.path, () => {
   width: $menu-min-width;
 }
 
-// 滚动条样式
-
+// 侧边栏滚动区：flex:1 自动填充 Logo 下方剩余高度
 .scrollbar {
-  height: calc(100vh - $base-menu-logo-height);
+  flex: 1;
+}
+
+// el-main 改为 flex column，Tabs 固定顶部，scrollbar 占满剩余空间
+.main-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 20px;
+}
+
+.main-scrollbar {
+  flex: 1;
 }
 </style>
