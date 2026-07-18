@@ -77,9 +77,14 @@ const handleCollapseAll = () => { activeNames.value = [] }
 // 折叠面板（卡片式）
 // ============================================================
 .ca-toolbar {
+  position: sticky;
+  top: 35px; // 避开 list.vue 的 radio-button
+  z-index: 5;
+  background: var(--el-bg-color);
   display: flex;
   gap: 4px;
   margin-bottom: 12px;
+  padding: 8px 0;
 }
 
 .ca-root :deep(.el-collapse) {
@@ -91,14 +96,19 @@ const handleCollapseAll = () => { activeNames.value = [] }
   margin-bottom: 8px;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 10px;
-  overflow: hidden;
+  // 不能 overflow:hidden，会阻断 sticky 定位链
   background: var(--el-bg-color-overlay);
 }
 
 .ca-root :deep(.el-collapse-item__header) {
+  position: sticky;
+  top: 75px; // radio-button(~48px) + toolbar(~40px) margin(12px) 余量
+  z-index: 4;
   padding: 0 20px;
   background: var(--el-bg-color-overlay);
   border: none;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px 10px 0 0;
   font-size: 15px;
   font-weight: 600;
   color: var(--el-text-color-primary);

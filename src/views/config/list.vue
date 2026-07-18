@@ -33,9 +33,13 @@ const toggleComponent = () => {
 
 <style scoped>
 .icon-switcher {
-  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 8;
   display: flex;
   justify-content: center; /* 居中显示 */
+  padding: 10px 0;
+  margin-bottom: 10px;
 }
 
 /* 自定义选中样式 */

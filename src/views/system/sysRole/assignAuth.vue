@@ -1,16 +1,18 @@
 <template>
     <div class="app-container">
-      <!-- ===== 展开/折叠工具栏 ===== -->
-      <div class="auth-toolbar">
-        <el-button text size="small" @click="handleExpandAll">
-          <el-icon><Expand /></el-icon> 全部展开
-        </el-button>
-        <el-button text size="small" @click="handleCollapseAll">
-          <el-icon><Fold /></el-icon> 全部折叠
-        </el-button>
-      </div>
-      <div style="margin: 10px 0;">
-        授权角色：{{ route.query.roleName }}
+      <!-- ===== 展开/折叠工具栏 + 授权角色（sticky 固定） ===== -->
+      <div class="auth-header">
+        <div class="auth-toolbar">
+          <el-button text size="small" @click="handleExpandAll">
+            <el-icon><Expand /></el-icon> 全部展开
+          </el-button>
+          <el-button text size="small" @click="handleCollapseAll">
+            <el-icon><Fold /></el-icon> 全部折叠
+          </el-button>
+        </div>
+        <div style="margin: 10px 0;">
+          授权角色：{{ route.query.roleName }}
+        </div>
       </div>
       <el-tree
         class="tree-with-line"
@@ -152,6 +154,14 @@ const save = async () => {
 // ============================================================
 // 授权菜单树
 // ============================================================
+.auth-header {
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  background: var(--el-bg-color);
+  padding: 4px 0;
+}
+
 .auth-toolbar {
   display: flex;
   gap: 4px;
