@@ -78,7 +78,7 @@ const handleCollapseAll = () => { activeNames.value = [] }
 // ============================================================
 .ca-toolbar {
   position: sticky;
-  top: 35px; // 避开 list.vue 的 radio-button
+  top: 0; // 滚动容器已是 .config-body，radio-button 在其外部
   z-index: 5;
   background: var(--el-bg-color);
   display: flex;
@@ -94,28 +94,28 @@ const handleCollapseAll = () => { activeNames.value = [] }
 
 .ca-root :deep(.el-collapse-item) {
   margin-bottom: 8px;
-  border: 1px solid var(--el-border-color-lighter);
+  border: none;
   border-radius: 10px;
-  // 不能 overflow:hidden，会阻断 sticky 定位链
   background: var(--el-bg-color-overlay);
 }
 
 .ca-root :deep(.el-collapse-item__header) {
   position: sticky;
-  top: 75px; // radio-button(~48px) + toolbar(~40px) margin(12px) 余量
+  top: 40px; // 工具栏（top:0，高度 ~40px）
   z-index: 4;
   padding: 0 20px;
   background: var(--el-bg-color-overlay);
-  border: none;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  border-radius: 10px 10px 0 0;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   color: var(--el-text-color-primary);
 }
 
 .ca-root :deep(.el-collapse-item__wrap) {
-  border: none;
+  border: 1px solid var(--el-border-color-lighter);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
   background: var(--el-bg-color);
 }
 
