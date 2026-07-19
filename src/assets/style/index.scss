@@ -111,3 +111,8 @@
   align-items: center;
   line-height: 1;
 }
+
+// 对象模式消息不显示图标
+.msg-no-icon .el-message__icon {
+  display: none !important;
+}
