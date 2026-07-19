@@ -381,11 +381,21 @@ function injectSelectCss() {
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'font-weight:400!important;' +
     '}' +
+    // full - 未选中
+    '.ui-full .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
+    'color:var(--el-text-color-regular)!important;' +
+    'background-color:var(--el-fill-color-light)!important;' +
+    '}' +
     // plain — 选中：浅底色+主色字
     '.ui-plain .el-select-dropdown__item.is-selected{' +
     'color:var(--el-color-primary)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'font-weight:400!important;' +
+    '}' + 
+    // plain - 未选中
+    '.ui-plain .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
+    'color:var(--el-text-color-regular)!important;' +
+    'background-color:var(--el-fill-color-light)!important;' +
     '}'
 }
 
