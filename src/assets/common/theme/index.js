@@ -156,6 +156,7 @@ function injectButtonCss(types) {
     '.ui-plain .el-button--' + t + ':not(.is-disabled){' +
       'color:var(--el-color-' + t + '-plain);' +
       '--el-button-text-color:var(--el-color-' + t + '-plain);' +
+      '--el-button-bg-color:var(--el-color-' + t + '-plain-bg);' +
       '--el-button-border-color:var(--el-color-' + t + '-plain);' +
       '--el-button-hover-text-color:var(--el-color-' + t + '-text);' +
       '--el-button-hover-bg-color:var(--el-color-' + t + ');' +
@@ -449,20 +450,43 @@ function injectModalCss(types) {
   var css = ''
   for (var i = 0; i < types.length; i++) {
     var t = types[i]
-    var btn = '.el-message-box__btns .el-button--' + t + ',' +
-              '.el-popconfirm__action .el-button--' + t
-    css += '.ui-full ' + btn + '{' +
+    var msgBox = '.el-message-box__btns .el-button--' + t
+    var pop = '.el-popconfirm__action .el-button--' + t
+    // full
+    css += '.ui-full ' + msgBox + ',' + '.ui-full ' + pop + '{' +
       'color:var(--el-color-' + t + '-text)!important;' +
       '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
       '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
+      '--el-button-hover-text-color:var(--el-color-white)!important;' +
+      '--el-button-hover-bg-color:var(--el-color-' + t + '-light-3)!important;' +
+      '--el-button-hover-border-color:var(--el-color-' + t + '-light-3)!important;' +
       '}' +
-      '.ui-plain ' + btn + '{' +
+    // plain
+    '.ui-plain ' + msgBox + ',' + '.ui-plain ' + pop + '{' +
       'color:var(--el-color-' + t + '-plain)!important;' +
+      '--el-button-text-color:var(--el-color-' + t + '-plain)!important;' +
+      '--el-button-bg-color:var(--el-color-' + t + '-plain-bg)!important;' +
       '--el-button-border-color:var(--el-color-' + t + '-plain)!important;' +
       '--el-button-hover-text-color:var(--el-color-white)!important;' +
       '--el-button-hover-bg-color:var(--el-color-' + t + ')!important;' +
       '}'
   }
+  // 取消按钮（默认 el-button）hover 保持中性，不跟随主题色
+  var cancel = '.el-message-box__btns .el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info),' +
+               '.el-popconfirm__action .el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info)'
+  css += cancel + '{' +
+    '--el-button-hover-text-color:var(--el-text-color-primary)!important;' +
+    '--el-button-hover-bg-color:var(--el-fill-color-light)!important;' +
+    '--el-button-hover-border-color:var(--el-border-color)!important;' +
+    '--el-button-active-border-color:var(--el-border-color)!important;' +
+    '--el-button-active-bg-color:var(--el-fill-color-light)!important;' +
+    '}' +
+    cancel + ':focus,' + cancel + ':focus-visible{' +
+    'outline:none!important;box-shadow:none!important;' +
+    '}' +
+    cancel + ':active{' +
+    'border-color:var(--el-border-color)!important;' +
+    '}'
   _modalCssEl.textContent = css
 }
 
