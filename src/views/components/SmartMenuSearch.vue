@@ -21,7 +21,7 @@
       </div>
       <div
         v-for="(item, index) in displayList"
-        :key="item.path"
+        :key="index"
         class="result-item"
         :class="{ 'is-active': index === activeIndex }"
         @mousedown.prevent="navigateTo(item)"
@@ -151,12 +151,6 @@ const filteredItems = computed(() => {
 
     if (lowerText.includes(lowerQ)) return true
     if (PinyinMatch.match(text, q)) return true
-    if (item.path.toLowerCase().includes(lowerQ)) return true
-    if (item.breadcrumb.join(' ').toLowerCase().includes(lowerQ)) return true
-    try {
-      const initials = text.split(/[\s\-_]+/).map(w => w[0]).join('').toLowerCase()
-      if (initials.includes(lowerQ)) return true
-    } catch { /* 忽略 */ }
 
     return false
   })
