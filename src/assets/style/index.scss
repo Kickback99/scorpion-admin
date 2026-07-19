@@ -112,7 +112,10 @@
   line-height: 1;
 }
 
-// 对象模式消息不显示图标
-.msg-no-icon .el-message__icon {
-  display: none !important;
+// 对象模式消息图标对齐第一行（适配多行 HTML）
+.msg-icon-top {
+  align-items: flex-start !important;
+  /* .el-message__icon {
+    margin-top: 2px;
+  } */
 }
