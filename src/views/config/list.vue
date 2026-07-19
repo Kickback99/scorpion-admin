@@ -49,7 +49,7 @@ const toggleComponent = () => {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding: 10px 0;
+  /* padding: 10px 0; */
 }
 
 .config-body {
