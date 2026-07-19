@@ -11,10 +11,23 @@ const def = {
   offset: 60,
 }
 
+/** 合并 customClass */
+function mergeClass(a, b) {
+  return [a, b].filter(Boolean).join(' ')
+}
+
 /** 带 options 覆盖的快捷方法 */
 function create(defaults) {
-  return (message, options) =>
-    ElMessage({ ...def, ...defaults, ...options, message })
+  return (message, options) => {
+    // 对象模式: msg.primary({ message: '...', dangerouslyUseHTMLString: true })
+    if (typeof message === 'object' && message !== null) {
+      const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, message.customClass))
+      return ElMessage({ ...def, ...defaults, ...message, customClass })
+    }
+    // 字符串模式: msg.primary('hello')
+    const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, options?.customClass))
+    return ElMessage({ ...def, ...defaults, ...options, customClass, message })
+  }
 }
 
 // ============================================================
