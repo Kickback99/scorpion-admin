@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showTags" class="tags-view" style="margin-bottom:10px">
+  <div v-if="showTags" class="tags-view">
     <!-- 左滚动按钮 -->
     <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
