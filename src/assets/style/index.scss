@@ -119,3 +119,10 @@
     margin-top: 2px;
   } */
 }
+
+// MessageBox 弹窗按钮统一 small 尺寸
+.el-message-box__btns .el-button {
+  height: 24px;
+  font-size: var(--el-font-size-small);
+  padding: 5px 11px;
+}
