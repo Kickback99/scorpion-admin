@@ -48,6 +48,7 @@
           ref="formRef"
           label-width="100px"
           class="info-form"
+          size="small"
         >
           <el-row :gutter="20">
             <el-col :xs="24" :sm="12">
@@ -141,7 +142,7 @@
       <el-col :xs="24" :sm="12">
         <el-card>
           <template #header>
-            <span>账号信息</span>
+              <span style="font-size: 15px;">账号信息</span>
           </template>
           <div class="info-list">
             <div class="info-item">
@@ -173,7 +174,7 @@
       <el-col :xs="24" :sm="12">
         <el-card>
           <template #header>
-            <span>系统信息</span>
+            <span style="font-size: 15px;">系统信息</span>
           </template>
           <div class="info-list">
             <div class="info-item">
@@ -353,7 +354,7 @@ onMounted(async() => {
 }
 
 .card-header .title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--el-text-color-primary);  /* 🔥 新增颜色 */
 }
@@ -392,6 +393,7 @@ onMounted(async() => {
 
 .additional-info {
   margin-top: 20px;
+  font-size: 12px;
 }
 
 .info-list {
