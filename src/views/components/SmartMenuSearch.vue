@@ -14,7 +14,7 @@
       />
     </div>
 
-    <div class="search-results" v-if="isFocused && displayList.length > 0">
+    <div class="search-results" ref="resultsRef" v-if="isFocused && displayList.length > 0">
       <div v-if="!query.trim()" class="results-header">
         <span>最近访问</span>
         <span class="results-header-clear" @mousedown.prevent.stop="handleClearRecent">清空</span>
@@ -43,7 +43,7 @@
 // ============================================================
 // 依赖导入
 // ============================================================
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
@@ -60,6 +60,7 @@ const isFocused = ref(false)
 const activeIndex = ref(0)
 const inputRef = ref(null)
 const containerRef = ref(null)
+const resultsRef = ref(null)
 const recentList = ref([])
 
 const MAX_RECENT = 5
@@ -170,16 +171,99 @@ const displayList = computed(() => {
 
 const highlight = (text) => {
   const q = query.value.trim()
-  if (!q) return text
-  const idx = text.toLowerCase().indexOf(q.toLowerCase())
-  if (idx === -1) return text
-  return (
-    text.substring(0, idx) +
-    '<strong>' +
-    text.substring(idx, idx + q.length) +
-    '</strong>' +
-    text.substring(idx + q.length)
-  )
+  if (!q || !text) return text
+
+  const lowerText = text.toLowerCase()
+  const lowerQuery = q.toLowerCase()
+
+  // 1. 英文/中文直接包含匹配（优先）
+  const idx = lowerText.indexOf(lowerQuery)
+  if (idx !== -1) {
+    const before = text.substring(0, idx)
+    const match = text.substring(idx, idx + q.length)
+    const after = text.substring(idx + q.length)
+    return `${before}<strong>${match}</strong>${after}`
+  }
+
+  // 2. PinyinMatch（中文拼音）
+  const pinyinResult = PinyinMatch.match(text, q)
+  if (pinyinResult) {
+    const indices = Array.isArray(pinyinResult) ? pinyinResult : [pinyinResult]
+    const uniqueIndices = [...new Set(indices)]
+
+    let isContinuous = true
+    for (let i = 1; i < uniqueIndices.length; i++) {
+      if (uniqueIndices[i] !== uniqueIndices[i - 1] + 1) {
+        isContinuous = false
+        break
+      }
+    }
+
+    const highlightIndices = isContinuous ? uniqueIndices : [uniqueIndices[0]]
+    let html = ''
+    let lastIdx = 0
+    for (let i = 0; i < highlightIndices.length; i++) {
+      const hi = highlightIndices[i]
+      if (hi > lastIdx) html += text.substring(lastIdx, hi)
+      html += `<strong>${text[hi]}</strong>`
+      lastIdx = hi + 1
+    }
+    if (lastIdx < text.length) html += text.substring(lastIdx)
+    return html
+  }
+
+  // 3. 复合词首字母匹配
+  const words = text.split(/[\s\-_\.\/]+/)
+  if (words.length > 1) {
+    const initials = words.map(w => w[0]).join('').toLowerCase()
+    if (initials.includes(lowerQuery)) {
+      let html = ''
+      let currentPos = 0
+      const queryChars = lowerQuery.split('')
+      let queryIdx = 0
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i]
+        if (i > 0) {
+          const sepMatch = text.substring(currentPos).match(/[\s\-_\.\/]+/)
+          if (sepMatch) {
+            html += sepMatch[0]
+            currentPos += sepMatch[0].length
+          }
+        }
+        if (queryIdx < queryChars.length && word[0].toLowerCase() === queryChars[queryIdx]) {
+          html += `<strong>${word[0]}</strong>`
+          html += word.substring(1)
+          queryIdx++
+        } else {
+          html += word
+        }
+        currentPos += word.length
+      }
+      return html
+    }
+  }
+
+  // 4. 单词内字符跳位匹配
+  if (lowerQuery.length > 1) {
+    let html = ''
+    let lastIdx = 0
+    let queryIdx = 0
+    for (let i = 0; i < text.length && queryIdx < lowerQuery.length; i++) {
+      if (text[i].toLowerCase() === lowerQuery[queryIdx]) {
+        if (i > lastIdx) html += text.substring(lastIdx, i)
+        html += `<strong>${text[i]}</strong>`
+        lastIdx = i + 1
+        queryIdx++
+      }
+    }
+    if (queryIdx === lowerQuery.length) {
+      if (lastIdx < text.length) html += text.substring(lastIdx)
+      return html
+    }
+  }
+
+  return text
 }
 
 // ============================================================
@@ -226,6 +310,18 @@ const handleIconClick = () => {
   inputRef.value?.focus()
 }
 
+/**
+ * 键盘导航时，将高亮项滚动到可视区域
+ */
+const scrollToHighlighted = (index) => {
+  nextTick(() => {
+    if (!resultsRef.value) return
+    const items = resultsRef.value.querySelectorAll('.result-item')
+    if (!items.length || index < 0 || index >= items.length) return
+    items[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  })
+}
+
 const handleKeydown = (e) => {
   const list = displayList.value
 
@@ -233,10 +329,12 @@ const handleKeydown = (e) => {
     case 'ArrowDown':
       e.preventDefault()
       activeIndex.value = Math.min(activeIndex.value + 1, list.length - 1)
+      scrollToHighlighted(activeIndex.value)
       break
     case 'ArrowUp':
       e.preventDefault()
       activeIndex.value = Math.max(activeIndex.value - 1, 0)
+      scrollToHighlighted(activeIndex.value)
       break
     case 'Enter':
       e.preventDefault()
@@ -336,6 +434,20 @@ onUnmounted(() => {
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 3000;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--el-fill-color);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--el-border-color-hover);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 .results-header {
