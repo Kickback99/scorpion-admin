@@ -81,6 +81,9 @@ const CONFIG_DEFINITIONS = {
   tree_auth_line_style: {type:'string', message:'授权树连接线'},
   tree_cate_line_style: {type:'string', message:'分类树连接线'},
 
+  // 搜索菜单聚焦
+  search_menu_focus: {type:'switch', message:'搜索菜单聚焦'},
+
   // 树形节点宽度模式
   tree_cate_parent_mode: {type:'string', message:'分类父节点宽度'},
   tree_cate_parent_width: {type:'number', message:'分类父节点自定义px', min:12, max:200},
@@ -176,6 +179,7 @@ export const useConfigStore = defineStore({
     theme_dot_shape: 'circle',
     tree_auth_line_style: 'dashed',
     tree_cate_line_style: 'dashed',
+    search_menu_focus: false,
     tree_cate_parent_mode: 'custom',
     tree_cate_parent_width: 75,
     tree_cate_child_mode: 'fill',
@@ -573,6 +577,14 @@ export const useConfigStore = defineStore({
       this.updateConfig('tree_cate_line_style', value)
     },
 
+    getSearchMenuFocus(){
+      return this.search_menu_focus === true
+    },
+
+    toggleSearchMenuFocus(){
+      this.updateConfig('search_menu_focus', !this.search_menu_focus)
+    },
+
     getTreeCateParentMode(){
       return this.tree_cate_parent_mode || 'custom'
     },
@@ -768,6 +780,7 @@ export const useConfigStore = defineStore({
     themeDotShape: (state) => state.theme_dot_shape || 'circle',
     treeAuthLineStyle: (state) => state.tree_auth_line_style || 'dashed',
     treeCateLineStyle: (state) => state.tree_cate_line_style || 'dashed',
+    isSearchMenuFocus: (state) => state.search_menu_focus === true,
     treeCateParentMode: (state) => state.tree_cate_parent_mode || 'custom',
     treeCateParentWidth: (state) => state.tree_cate_parent_width ?? 75,
     treeCateChildMode: (state) => state.tree_cate_child_mode || 'fill',

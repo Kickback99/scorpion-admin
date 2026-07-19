@@ -47,10 +47,12 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
+import { useConfigStore } from '@/store/config'
 import PinyinMatch from 'pinyin-match'
 
 const router = useRouter()
 const userStore = useUserStore()
+const configStore = useConfigStore()
 
 // ============================================================
 // 数据
@@ -271,9 +273,14 @@ const navigateTo = (item) => {
   if (recentList.value.length > MAX_RECENT) recentList.value.pop()
 
   router.push(item.path)
-  // 只清空输入，保持焦点和下拉可见，方便继续搜索
-  query.value = ''
-  activeIndex.value = 0
+  if (!configStore.getSearchMenuFocus()) {
+    // 失焦
+    resetState()
+  } else {
+    // 只清空输入，保持焦点和下拉可见，方便继续搜索
+    query.value = ''
+    activeIndex.value = 0
+  }
 }
 
 // ============================================================
