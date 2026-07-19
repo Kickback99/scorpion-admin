@@ -21,7 +21,9 @@ function create(defaults) {
   return (message, options) => {
     // 对象模式: msg.primary({ message: '...', dangerouslyUseHTMLString: true })
     if (typeof message === 'object' && message !== null) {
-      const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, message.customClass))
+      // 用户未显式传 icon 时，自动标记隐藏图标
+      const noIcon = !('icon' in message) ? 'msg-no-icon' : ''
+      const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, mergeClass(noIcon, message.customClass)))
       return ElMessage({ ...def, ...defaults, ...message, customClass })
     }
     // 字符串模式: msg.primary('hello')
