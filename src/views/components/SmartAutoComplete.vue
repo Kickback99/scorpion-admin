@@ -874,7 +874,8 @@ defineExpose({
 
 /* 键盘事件高亮适配深浅主题 */
 .suggestion-active {
-  background-color: var(--el-bg-color-page);
+  /* background-color: var(--el-bg-color-page); */
+  background: var(--el-fill-color-light);
   color: var(--el-text-color-regular);
 }
 
