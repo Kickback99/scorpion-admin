@@ -35,7 +35,7 @@ const toggleComponent = () => {
 .icon-switcher {
   display: flex;
   justify-content: center; /* 居中显示 */
-  padding: 10px 0;
+  /* padding: 10px 0; */
   margin-bottom: 10px;
 }
 
