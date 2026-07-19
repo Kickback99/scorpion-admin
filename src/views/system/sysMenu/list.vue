@@ -32,8 +32,8 @@
                  <el-button size="small" type="danger" v-else plain>禁用</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160"/>
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="200"/>
+        <el-table-column label="操作" align="center">
           <template #default="{row}">
             <el-button size="small" type="primary" v-if="row.type !== 2 && row.component != 'list'" @click="addMenuButton(row)" :disabled="$hasPerm('btn.sysMenu.add')" plain>新增</el-button>
             <el-button size="small" type="warning" @click="editMenu(row)" :disabled="$hasPerm('btn.sysMenu.update')" plain>编辑</el-button>
