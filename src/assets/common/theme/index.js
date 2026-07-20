@@ -189,6 +189,18 @@ function injectButtonCss(types) {
       'color:var(--el-text-color-placeholder)!important;' +
       '}'
   }
+  // 默认按钮（无 type，如 icon 按钮的 is-plain）跟随 uiMode
+  var defBtn = '.el-button.is-plain:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info)'
+  css += '.ui-full ' + defBtn + '{' +
+    '--el-button-hover-bg-color:var(--el-color-primary)!important;' +
+    '--el-button-hover-border-color:var(--el-color-primary)!important;' +
+    '--el-button-hover-text-color:var(--el-color-primary-text)!important;' +
+    '}' +
+    '.ui-plain ' + defBtn + '{' +
+    '--el-button-hover-bg-color:var(--el-color-primary-plain-bg)!important;' +
+    '--el-button-hover-border-color:var(--el-color-primary-plain)!important;' +
+    '--el-button-hover-text-color:var(--el-color-primary-plain)!important;' +
+    '}'
   _buttonCssEl.textContent = css
 }
 
