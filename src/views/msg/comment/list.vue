@@ -288,8 +288,8 @@
         
         <!-- 加载状态 -->
         <div v-if="drawerLoading" class="drawer-loading">
-        <el-icon class="is-loading"><Loading /></el-icon>
-        <span>加载详情中...</span>
+        <span class="load-spinner"></span>
+        <span>加载中...</span>
         </div>
         
         <!-- 详情内容 -->
@@ -303,6 +303,7 @@
         @error="onDetailError"
         />
     </el-drawer>
+
 </template>
 
 <script setup>
@@ -1077,5 +1078,16 @@ const loadStatistics = async () => {
     font-weight: 600;
     color: var(--el-text-color-primary);
     line-height: 1;
+}
+
+.load-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--el-border-color-light);
+  border-top-color: var(--el-color-primary);
+  border-radius: 50%;
+  animation: load-spin .7s linear infinite;
+}
+@keyframes load-spin {
+  to { transform: rotate(360deg); }
 }
 </style>
