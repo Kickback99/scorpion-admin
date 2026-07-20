@@ -405,6 +405,9 @@ router.beforeEach((to, from, next) => {
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
         msg.error('如果没有token跳转到登录页')
+        // 清除主动退出标记，让 redirect 正常生效
+        const settings = useSettingStore()
+        settings.setLogoutIntent(false)
     // 重定向到登录页面，使用原始路径避免重复编码
     return next({
         path: '/login',

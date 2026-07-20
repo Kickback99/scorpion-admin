@@ -13,10 +13,15 @@ export const useSettingStore = defineStore({
         isManualTo403:false,
         /** 退出/401 时是否清空标签页（默认不清） */
         clearTabsOnLogout: false,
+        /** 退出标记：登录后忽略 redirect，直接进首页 */
+        logoutIntent: false,
     }),
     actions:{
         setMenuTextColor(data){
             this.menuTextColor = data
+        },
+        setLogoutIntent(val) {
+            this.logoutIntent = val
         },
         /** 根据当前登录用户的菜单，移除不存在的标签页 */
         cleanupTabsByMenu() {
@@ -32,7 +37,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['clearTabsOnLogout'],
+        paths: ['clearTabsOnLogout', 'logoutIntent'],
     },
 })
 
