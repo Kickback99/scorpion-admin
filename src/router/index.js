@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import { nextTick } from 'vue'
 import Layout from '@/views/Layout.vue'
 import {useUserStore} from '@/store/user'
 import {useTokenStore} from '@/store/token'
@@ -422,7 +423,13 @@ router.beforeEach((to, from, next) => {
 
     // 已登录，无菜单 => 按需加载菜单
     loadMenu(true,to,from,next).then(
-        ()=>{next({...to,replace:true})
+        ()=>{
+            next({...to,replace:true})
+            // 路由跳转后，下一帧清理不在菜单中的标签页
+            nextTick(() => {
+                const settingStore = useSettingStore()
+                settingStore.cleanupTabsByMenu()
+            })
     }).catch((error) =>
         {
             // 情况1：前台用户 -> 提示错误，并跳转login
