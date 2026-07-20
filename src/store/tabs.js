@@ -19,9 +19,13 @@ export const useTabStore = defineStore({
         }
         this.tabList.push(tab)
     },
+    removeTab(path) {
+      const idx = this.tabList.findIndex(t => t.path === path)
+      if (idx !== -1) this.tabList.splice(idx, 1)
+    },
     clearTabs(){
       this.$reset()
-       localStorage.removeItem('tabs'); 
+       localStorage.removeItem('tabs');
     }
   },
     persist: true,  // 开启当前仓库的持久化
