@@ -195,6 +195,10 @@ const handleCommand = async (key) => {
         userStore.clearUserStore()
         // 清空标签页
         tabStore.clearTabs()
+        // 清除用户配置缓存，恢复默认主题
+        userConfigStore.clearUserConfig()
+        document.documentElement.classList.remove('dark')
+        applyTheme('default', false)
         // 清空菜单
         // userStore.removeUserAuth()
         // 清空用户名

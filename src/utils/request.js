@@ -12,6 +12,8 @@ import router from '@/router';
 import { clearRoute } from './remove';
 import { clearUserInfo } from './remove';
 import { useTabStore } from '@/store/tabs';
+import { useUserConfigStore } from '@/store/userConfig'
+import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 
 
@@ -60,6 +62,11 @@ instance.interceptors.response.use(
                 userStore.clearUserStore()
                 // 清空标签页
                 tabStore.clearTabs()
+                // 清除用户配置缓存，恢复默认主题
+                const userConfigStore = useUserConfigStore()
+                userConfigStore.clearUserConfig()
+                document.documentElement.classList.remove('dark')
+                applyTheme('default', false)
                 // 清空菜单
                 // userStore.removeUserAuth()
                 // 清空用户名

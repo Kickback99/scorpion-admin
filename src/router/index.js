@@ -13,8 +13,6 @@ import { add404Routes } from '@/utils/404route'
 import { useWebSocket } from '@/server/useWebSocket'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
-import { applyTheme } from '@/assets/common/theme'
-
 //路由器对象--跳转路径
 /* import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -206,8 +204,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
     // ================= 1.6 加载用户配置 =================
     await userConfigStore.fetchUserConfig();
-    document.documentElement.classList.toggle('dark', userConfigStore.isDarkEnabled);
-    applyTheme(userConfigStore.theme, userConfigStore.isDarkEnabled);
+    // applyTheme 由 App.vue watch(route) 在路由跳转后触发（避免登录页闪现用户主题）
 
     await configStore.loadConfig()
 

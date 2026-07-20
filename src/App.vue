@@ -9,13 +9,34 @@
 <script setup>
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import {useWebSocket} from '@/server/useWebSocket'
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { useUserConfigStore } from '@/store/userConfig'
+import { applyTheme } from '@/assets/common/theme'
 
-// 初始化 WebSocket
+const route = useRoute()
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
 
-onMounted(()=>{
-    initWebSocketListener()
+/** 根据当前路由和缓存注入主题，登录页强制 default */
+function applyInitialTheme() {
+  const userConfigStore = useUserConfigStore()
+  if (route.path === '/login') {
+    document.documentElement.classList.remove('dark')
+    applyTheme('default', false)
+  } else {
+    document.documentElement.classList.toggle('dark', userConfigStore.isDarkEnabled)
+    applyTheme(userConfigStore.theme || 'default', userConfigStore.isDarkEnabled)
+  }
+}
+
+onMounted(() => {
+  initWebSocketListener()
+  applyInitialTheme()
+})
+
+// 登录成功后路由从 /login 跳走时，watch 触发 → 应用用户主题
+watch(() => route.path, () => {
+  applyInitialTheme()
 })
 
 </script>
