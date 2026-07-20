@@ -107,7 +107,7 @@ export function applyTheme(themeName, _isDark) {
   const hoverLevel = (btnStyle === 'full' ? uiStore.hoverFull : uiStore.hoverPlain) || 3
   injectButtonCss(types)
   injectHoverCss(types, hoverLevel)
-  injectModalCss(types)
+  injectModalCss(types, hoverLevel)
   injectPaginationCss()
   injectDrawerCss()
   injectSwitchCss()
@@ -152,15 +152,13 @@ function injectButtonCss(types) {
       '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
       '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
       '}' +
-    // plain — 描边
+    // plain — 描边（hover bg/border 由 injectHoverCss 控制，避免覆盖 hoverLevel）
     '.ui-plain .el-button--' + t + ':not(.is-disabled){' +
       'color:var(--el-color-' + t + '-plain);' +
       '--el-button-text-color:var(--el-color-' + t + '-plain);' +
       '--el-button-bg-color:var(--el-color-' + t + '-plain-bg);' +
       '--el-button-border-color:var(--el-color-' + t + '-plain);' +
       '--el-button-hover-text-color:var(--el-color-' + t + '-text);' +
-      '--el-button-hover-bg-color:var(--el-color-' + t + ');' +
-      '--el-button-hover-border-color:var(--el-color-' + t + ');' +
       '--el-button-active-color:var(--el-color-' + t + '-plain);' +
       '}' +
     // plain — hover 文字色直接写 color，CSS 变量可能被 EP 内部覆盖
@@ -467,30 +465,30 @@ function injectMessageCss() {
 // popconfirm / message-box 按钮 — 跟随 .ui-full / .ui-plain
 // ============================================================
 var _modalCssEl = null
-function injectModalCss(types) {
+function injectModalCss(types, hoverLevel) {
   _modalCssEl = ensureEl('theme-modal-fix')
   var css = ''
   for (var i = 0; i < types.length; i++) {
     var t = types[i]
     var msgBox = '.el-message-box__btns .el-button--' + t
     var pop = '.el-popconfirm__action .el-button--' + t
-    // full
+    // full — hover 跟随 hoverLevel
     css += '.ui-full ' + msgBox + ',' + '.ui-full ' + pop + '{' +
       'color:var(--el-color-' + t + '-text)!important;' +
       '--el-button-bg-color:var(--el-color-' + t + '-solid-bg)!important;' +
       '--el-button-border-color:var(--el-color-' + t + '-solid-bg)!important;' +
       '--el-button-hover-text-color:var(--el-color-white)!important;' +
-      '--el-button-hover-bg-color:var(--el-color-' + t + '-light-3)!important;' +
-      '--el-button-hover-border-color:var(--el-color-' + t + '-light-3)!important;' +
+      '--el-button-hover-bg-color:var(--el-color-' + t + '-light-' + hoverLevel + ')!important;' +
+      '--el-button-hover-border-color:var(--el-color-' + t + '-light-' + hoverLevel + ')!important;' +
       '}' +
-    // plain
+    // plain — hover 跟随 hoverLevel
     '.ui-plain ' + msgBox + ',' + '.ui-plain ' + pop + '{' +
       'color:var(--el-color-' + t + '-plain)!important;' +
       '--el-button-text-color:var(--el-color-' + t + '-plain)!important;' +
       '--el-button-bg-color:var(--el-color-' + t + '-plain-bg)!important;' +
       '--el-button-border-color:var(--el-color-' + t + '-plain)!important;' +
       '--el-button-hover-text-color:var(--el-color-white)!important;' +
-      '--el-button-hover-bg-color:var(--el-color-' + t + ')!important;' +
+      '--el-button-hover-bg-color:var(--el-color-' + t + '-light-' + hoverLevel + ')!important;' +
       '}'
   }
   // 取消按钮（默认 el-button）hover 保持中性，不跟随主题色
