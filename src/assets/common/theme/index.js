@@ -115,9 +115,10 @@ export function applyTheme(themeName, _isDark) {
   injectCheckCss()
   injectTagCss(types)
 
-  // tab 激活态变量
+  // tab 激活态变量 — full / plain 各一套
   root.style.setProperty('--tab-active-bg', 'var(--el-color-primary-solid-bg)')
   root.style.setProperty('--tab-active-hover-bg', 'var(--el-color-primary-light-' + hoverLevel + ')')
+  root.style.setProperty('--tab-active-hover-plain-bg', 'var(--el-color-primary-light-' + hoverLevel + ')')
 
   injectDropdownCss()
   injectInputCss()
