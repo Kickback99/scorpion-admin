@@ -87,6 +87,15 @@
   border-radius: 4px;
 }
 
+// 精准排它：鼠标离开后清除残留背景（:focus / is-current），悬浮时保留
+// 子节点悬浮时，父节点也清除背景 — 避免鼠标穿过父到子时残留
+.el-tree-node:focus:not(:hover) > .el-tree-node__content,
+.el-tree-node.is-current:not(:hover) > .el-tree-node__content,
+.el-tree-node:has(.el-tree-node__content:hover) > .el-tree-node__content:not(:hover) {
+  background-color: transparent !important;
+  outline: none !important;
+}
+
 // 编辑态 input 边框跟随
 .tree-line-solid .el-tree-node__content .el-input__wrapper {
   box-shadow: 0 0 0 1px var(--el-color-primary) inset;
