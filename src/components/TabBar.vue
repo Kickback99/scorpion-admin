@@ -203,7 +203,8 @@ const handleCommand = async (key) => {
         userStore.clearUserStore()
         // 清空标签页
         tabStore.clearTabs()
-        // 清除用户配置缓存，恢复默认主题
+        // 暂存主题到 uiStore（登录页读取用），再清除用户配置
+        uiStore.setLastTheme(userConfigStore.theme)
         userConfigStore.clearUserConfig()
         document.documentElement.classList.remove('dark')
         applyTheme('default', false)
