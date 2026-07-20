@@ -30,7 +30,7 @@
                 <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
                 <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
-                <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="uiStore.uiDepth" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
+                <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
                 <el-form-item v-if="configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
               </el-form>
             </el-popover>
@@ -96,6 +96,10 @@ const configStore = useConfigStore()
 // ============================================================
 const depthLabel = computed(() => uiStore.uiMode === 'full' ? '色阶深度' : '描边深度')
 
+const depthValue = computed(() =>
+  uiStore.uiMode === 'full' ? uiStore.uiDepthFull : uiStore.uiDepthPlain
+)
+
 const hoverValue = computed(() =>
   uiStore.uiMode === 'full' ? uiStore.hoverFull : uiStore.hoverPlain
 )
@@ -105,7 +109,11 @@ function depthTooltip(val) {
 }
 
 function onDepthChange(depth) {
-  uiStore.setUiDepth(depth)
+  if (uiStore.uiMode === 'full') {
+    uiStore.setUiDepthFull(depth)
+  } else {
+    uiStore.setUiDepthPlain(depth)
+  }
   applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
 
