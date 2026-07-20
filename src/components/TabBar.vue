@@ -25,7 +25,7 @@
             <!-- 设置 popover -->
             <el-popover placement="bottom" :width="260" trigger="hover">
               <template #reference><el-button size="small" circle icon="Setting" plain></el-button></template>
-              <el-form>
+              <el-form size="small">
                 <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
                 <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
