@@ -13,6 +13,7 @@ import { clearRoute } from './remove';
 import { clearUserInfo } from './remove';
 import { useTabStore } from '@/store/tabs';
 import { useUserConfigStore } from '@/store/userConfig'
+import { useUiStore } from '@/store/ui'
 import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 
@@ -62,8 +63,10 @@ instance.interceptors.response.use(
                 userStore.clearUserStore()
                 // 清空标签页
                 tabStore.clearTabs()
-                // 清除用户配置缓存，恢复默认主题
+                // 暂存主题到 uiStore（登录页读取用），再清除用户配置
                 const userConfigStore = useUserConfigStore()
+                const uiStore = useUiStore()
+                uiStore.setLastTheme(userConfigStore.theme)
                 userConfigStore.clearUserConfig()
                 document.documentElement.classList.remove('dark')
                 applyTheme('default', false)

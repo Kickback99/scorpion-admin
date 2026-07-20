@@ -18,6 +18,8 @@ export const useUiStore = defineStore({
     hoverPlain: 3,
     /** 文字色模式: 'preset'（配置文件）| 'dynamic'（自动计算亮度） */
     textColorMode: 'preset',
+    /** 退出时暂存主题名，供登录页读取（避开 userConfig 被清空后丢失） */
+    lastTheme: 'default',
   }),
   actions: {
     setUiMode(mode) {
@@ -38,9 +40,12 @@ export const useUiStore = defineStore({
     setTextColorMode(mode) {
       this.textColorMode = mode
     },
+    setLastTheme(theme) {
+      this.lastTheme = theme
+    },
   },
   persist: {
     key: 'ui-store',
-    paths: ['uiMode', 'uiDepthFull', 'uiDepthPlain', 'hoverFull', 'hoverPlain', 'textColorMode'],
+    paths: ['uiMode', 'uiDepthFull', 'uiDepthPlain', 'hoverFull', 'hoverPlain', 'textColorMode', 'lastTheme'],
   },
 })
