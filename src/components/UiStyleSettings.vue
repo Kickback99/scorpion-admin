@@ -30,7 +30,6 @@ const userConfigStore = useUserConfigStore()
 // ============================================================
 function onStyleChange(style) {
   uiStore.setUiMode(style)
-  uiStore.setUiDepth(style === 'full' ? 0 : 35)
   applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
 </script>
