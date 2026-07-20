@@ -12,17 +12,19 @@ import {useWebSocket} from '@/server/useWebSocket'
 import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUserConfigStore } from '@/store/userConfig'
+import { useUiStore } from '@/store/ui'
 import { applyTheme } from '@/assets/common/theme'
 
 const route = useRoute()
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
 
-/** 根据当前路由和缓存注入主题，登录页强制 default */
+/** 根据当前路由和缓存注入主题，登录页从 uiStore 读取上次主题 */
 function applyInitialTheme() {
   const userConfigStore = useUserConfigStore()
   if (route.path === '/login') {
+    const uiStore = useUiStore()
     document.documentElement.classList.remove('dark')
-    applyTheme('default', false)
+    applyTheme(uiStore.lastTheme || 'default', false)
   } else {
     document.documentElement.classList.toggle('dark', userConfigStore.isDarkEnabled)
     applyTheme(userConfigStore.theme || 'default', userConfigStore.isDarkEnabled)
