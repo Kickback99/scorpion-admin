@@ -582,8 +582,8 @@ function injectSwitchCss() {
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
     '.ui-plain .el-switch.is-checked .el-switch__core{' +
-    'background-color:var(--el-color-primary-plain-bg)!important;' +
-    'border-color:var(--el-color-primary-plain)!important;' +
+    'background-color:var(--el-color-primary-plain)!important;' +
+    'border-color:var(--el-color-white)!important;' +
     '}'
 }
 
