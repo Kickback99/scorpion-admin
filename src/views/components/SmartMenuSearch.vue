@@ -381,7 +381,7 @@ onUnmounted(() => {
 .search-input-row {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: 24px;
   width: 200px;
   border: 1px solid var(--el-border-color);
   border-radius: 6px;
@@ -395,12 +395,12 @@ onUnmounted(() => {
 
 .search-input-icon {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--el-text-color-secondary);
   cursor: pointer;
 }
@@ -411,7 +411,7 @@ onUnmounted(() => {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--el-text-color-regular);
   padding-right: 8px;
 
