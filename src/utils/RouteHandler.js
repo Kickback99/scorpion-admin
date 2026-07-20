@@ -94,15 +94,35 @@ export function getLocalRouteComponents(excludes = []) {
 export function generateNameFromPath(path) {
   // 去掉首尾斜杠
   let cleanedPath = path.replace(/^\/|\/$/g, '')
-  
+
   // 判断是否包含多个斜杠
   if (path.split('/').length > 2) {
     // 多个斜杠的情况：替换中间斜杠为短横线
     return cleanedPath.replace(/\//g, '-')
   }
-  
+
   console.log('cleanedPath',cleanedPath)
 
   // 单个斜杠的情况：直接返回去掉首尾斜杠的结果
   return cleanedPath
+}
+
+// ============================================================
+// 菜单展平 — 递归提取所有路由 path
+// ============================================================
+
+/** 递归展平菜单树，返回所有完整路由 path 的 Set（用于标签页校验） */
+export function flattenMenuPaths(menuData) {
+  const paths = new Set()
+  function walk(nodes, parentPath) {
+    if (!nodes || !nodes.length) return
+    nodes.forEach(node => {
+      // 拼接完整路径：父路径 + '/' + 节点 path/name
+      const fullPath = parentPath ? parentPath + '/' + (node.path || node.name || '') : (node.path || '')
+      if (fullPath) paths.add(fullPath)
+      if (node.children) walk(node.children, fullPath)
+    })
+  }
+  walk(menuData, '')
+  return paths
 }
