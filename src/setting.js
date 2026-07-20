@@ -30,7 +30,13 @@ export const useSettingStore = defineStore({
             const menuPaths = flattenMenuPaths(userStore.userMenu)
             console.log('【cleanupTabsByMenu】menuPaths:', menuPaths)
             console.log('【cleanupTabsByMenu】tabList:', tabStore.tabList.map(t => t.path))
-            const toRemove = tabStore.tabList.filter(t => !menuPaths.has(t.path) && t.path !== '/index')
+            // 公共路由不纳入清理
+            const staticPaths = new Set(['/index', '/user/profile', '/user/rePassword', '/test'])
+            // 模板路由不纳入清理
+            const isTempRoute = (t) => t.path.startsWith('/temp')
+            const toRemove = tabStore.tabList.filter(t =>
+                !menuPaths.has(t.path) && !staticPaths.has(t.path) && !isTempRoute(t)
+            )
             console.log('【cleanupTabsByMenu】toRemove:', toRemove.map(t => t.path))
             toRemove.forEach(t => tabStore.removeTab(t.path))
         },
