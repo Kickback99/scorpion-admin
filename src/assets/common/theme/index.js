@@ -60,7 +60,7 @@ export function applyTheme(themeName, _isDark) {
 
   const uiStore = useUiStore()
   const btnStyle = uiStore.uiMode || 'full'
-  const btnDepth = uiStore.uiDepth != null ? uiStore.uiDepth : (btnStyle === 'full' ? 0 : 35)
+  const btnDepth = btnStyle === 'full' ? (uiStore.uiDepthFull != null ? uiStore.uiDepthFull : 0) : (uiStore.uiDepthPlain != null ? uiStore.uiDepthPlain : 35)
 
   const root = document.documentElement
   const types = ['primary', 'success', 'warning', 'danger', 'info']

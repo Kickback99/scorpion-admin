@@ -9,8 +9,10 @@ export const useUiStore = defineStore({
 
     /** full | plain — 影响按钮 / 标签页等所有组件 */
     uiMode: 'full',
-    /** full 模式: 0~100 light/dark 深度; plain 模式: 混合度百分比（默认 35） */
-    uiDepth: 0,
+    /** full 模式: 0~100 light/dark 深度（默认 0） */
+    uiDepthFull: 0,
+    /** plain 模式: 混合度百分比（默认 35） */
+    uiDepthPlain: 35,
     /** hover 强度 1~9（对应 light-1 ~ light-9） */
     hoverFull: 3,
     hoverPlain: 3,
@@ -21,8 +23,11 @@ export const useUiStore = defineStore({
     setUiMode(mode) {
       this.uiMode = mode
     },
-    setUiDepth(depth) {
-      this.uiDepth = depth
+    setUiDepthFull(depth) {
+      this.uiDepthFull = depth
+    },
+    setUiDepthPlain(depth) {
+      this.uiDepthPlain = depth
     },
     setHoverFull(level) {
       this.hoverFull = level
@@ -36,6 +41,6 @@ export const useUiStore = defineStore({
   },
   persist: {
     key: 'ui-store',
-    paths: ['uiMode', 'uiDepth', 'hoverFull', 'hoverPlain', 'textColorMode'],
+    paths: ['uiMode', 'uiDepthFull', 'uiDepthPlain', 'hoverFull', 'hoverPlain', 'textColorMode'],
   },
 })
