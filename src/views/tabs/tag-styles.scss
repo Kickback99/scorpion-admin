@@ -202,7 +202,7 @@
     .el-icon-close { color: var(--el-color-primary-plain) !important; }
     &:hover {
       color: var(--el-color-primary-text);
-      background-color: var(--el-color-primary);
+      background-color: var(--tab-active-hover-plain-bg);
       .tag-title { color: var(--el-color-primary-text) !important; }
       .el-icon-close { color: var(--el-color-primary-text) !important; }
     }
