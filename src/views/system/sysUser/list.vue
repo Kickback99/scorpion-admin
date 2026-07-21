@@ -326,11 +326,18 @@ const toggleSelection = (rows) => {
 }
 
 // 批量删除
-const deleteSelectRows = () => {
+const deleteSelectRows = async() => {
     if(multipleSelection.value.length === 0){
         msg.error('请先勾选要删除的行')
         return
     }
+
+    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+
     const rowIds = multipleSelection.value.map(row => row.id)
     removeUsers(rowIds)
 
