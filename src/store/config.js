@@ -80,6 +80,7 @@ const CONFIG_DEFINITIONS = {
   // ===== user_config 用户配置 =====
   'user_config.collapse_enabled':       { type:'switch', message:'菜单折叠' },
   'user_config.dark_enabled':           { type:'switch', message:'深色模式' },
+  'user_config.theme':                  { type:'string', message:'主题名称' },
 
   // ===== oss 配置 =====
   'oss.data_retention_days':            { type: 'number', message: '逻辑删除oss数据保留天数', min:0, max:100 },
@@ -156,6 +157,20 @@ const MESSAGE_MAP = {
       'pagination': '分页'
     },
 
+    // ===== user_config =====
+    'user_config.theme': {
+      'default': '默认蓝',
+      'orange': '活力橙',
+      'pink': '柔粉',
+      'green': '翠绿',
+      'purple': '紫韵',
+      'enterprise': '企业蓝',
+      'coral': '柔红',
+      'warm': '柠绿',
+      'aqua': '海碧',
+      'indigo': '鸢尾紫'
+    },
+
     // ===== logo =====
     'logo.animation_style': {
       'none': '无动画',
@@ -230,7 +245,8 @@ export const useConfigStore = defineStore({
     },
     user_config:{
       collapse_enabled: false,
-      dark_enabled: false
+      dark_enabled: false,
+      theme: 'default'
     },
     oss: {
       data_retention_days: 30,
@@ -733,6 +749,14 @@ export const useConfigStore = defineStore({
       return this.user_config?.dark_enabled ?? true
     },
 
+    getUserConfigTheme(){
+      return this.user_config?.theme || 'default'
+    },
+
+    setUserConfigTheme(value){
+      this.updateConfig('user_config.theme', value)
+    },
+
     // ========== oss ==========
 
     setDataRetentionDays(value){
@@ -827,6 +851,7 @@ export const useConfigStore = defineStore({
     // ===== user_config =====
     isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
     isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
+    userConfigTheme: (state) => state.user_config?.theme || 'default',
 
     // ===== logo =====
     logoAnimationStyle: (state) => state.logo?.animation_style || 'neon',
