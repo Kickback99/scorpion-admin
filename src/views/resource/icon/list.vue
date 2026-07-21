@@ -36,7 +36,7 @@ const toggleComponent = () => {
   display: flex;
   justify-content: center; /* 居中显示 */
   /* padding: 10px 0; */
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 /* 自定义选中样式 */
