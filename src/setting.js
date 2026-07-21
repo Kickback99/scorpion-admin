@@ -23,20 +23,12 @@ export const useSettingStore = defineStore({
         setLogoutIntent(val) {
             this.logoutIntent = val
         },
-        /** 根据当前登录用户的菜单，移除不存在的标签页 */
-        cleanupTabsByMenu() {
+        /** 根据已注册路由移除不存在的标签页（由 router/index.js 传入路径集合） */
+        cleanupTabsByMenu(routePaths) {
             const tabStore = useTabStore()
-            const userStore = useUserStore()
-            const menuPaths = flattenMenuPaths(userStore.userMenu)
-            console.log('【cleanupTabsByMenu】menuPaths:', menuPaths)
+            console.log('【cleanupTabsByMenu】routePaths:', routePaths)
             console.log('【cleanupTabsByMenu】tabList:', tabStore.tabList.map(t => t.path))
-            // 公共路由不纳入清理
-            const staticPaths = new Set(['/index', '/user/profile', '/user/rePassword', '/test'])
-            // 模板路由不纳入清理
-            const isTempRoute = (t) => t.path.startsWith('/temp')
-            const toRemove = tabStore.tabList.filter(t =>
-                !menuPaths.has(t.path) && !staticPaths.has(t.path) && !isTempRoute(t)
-            )
+            const toRemove = tabStore.tabList.filter(t => !routePaths.has(t.path))
             console.log('【cleanupTabsByMenu】toRemove:', toRemove.map(t => t.path))
             toRemove.forEach(t => tabStore.removeTab(t.path))
         },
@@ -48,5 +40,3 @@ export const useSettingStore = defineStore({
 })
 
 import { useTabStore } from '@/store/tabs'
-import { useUserStore } from '@/store/user'
-import { flattenMenuPaths } from '@/utils/RouteHandler'
