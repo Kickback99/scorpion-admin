@@ -28,7 +28,15 @@
               <el-form size="small">
                 <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
                 <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
-                <el-form-item label="退出清标签"><el-switch :model-value="stringStore.clearTabsOnLogout" @change="onClearTabsChange" size="small" /></el-form-item>
+                <el-form-item>
+                  <template #label>
+                    保存标签
+                    <el-tooltip content="退出或 401 后是否保留已打开的标签页" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.keepTabs" @change="onClearTabsChange" size="small" />
+                </el-form-item>
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
                 <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
                 <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
@@ -203,7 +211,7 @@ const handleCommand = async (key) => {
         // 清空用户信息和菜单
         userStore.clearUserStore()
         // 根据配置决定是否清空标签页
-        if (stringStore.clearTabsOnLogout) {
+        if (!stringStore.keepTabs) {
           tabStore.clearTabs()
         }
         // 暂存主题到 uiStore（登录页读取用），再清除用户配置
@@ -234,7 +242,7 @@ const toggleDark = async () => {
 
 // 退出清标签切换
 const onClearTabsChange = (val) => {
-    stringStore.clearTabsOnLogout = val
+    stringStore.keepTabs = val
 }
 
 // 实心文字色模式切换
