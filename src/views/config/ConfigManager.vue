@@ -1,17 +1,25 @@
 <template>
   <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
     <div class="header-actions">
-      <el-button type="primary" @click="handleAddRoot" size="small" plain>
-        <el-icon><Plus /></el-icon>
-        新增配置
-      </el-button>
-      <el-button type="info" @click="handleReset" size="small" plain>
-        <el-icon><RefreshRight /></el-icon>
-        重置
-      </el-button>
+      <div class="header-left">
+        <el-button type="primary" @click="handleAddRoot" size="small" plain>
+          <el-icon><Plus /></el-icon>
+          新增配置
+        </el-button>
+        <el-button type="info" @click="handleReset" size="small" plain>
+          <el-icon><RefreshRight /></el-icon>
+          重置
+        </el-button>
+        <el-button v-if="filterKeyword" type="warning" size="small" plain @click="handleClearFilter">
+          <el-icon><Close /></el-icon>
+          清除筛选
+        </el-button>
+      </div>
+      <SmartConfigSearch @select="handleConfigSelect" />
     </div>
 
     <el-table
+      ref="tableRef"
       :data="tableData"
       row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
@@ -20,13 +28,14 @@
       class="config-table"
       max-height="calc(100vh - 260px)"
     >
-      <el-table-column prop="key" label="配置项" min-width="200">
+      <el-table-column prop="key" label="配置项" min-width="220">
         <template #default="{ row }">
           <span class="config-key">
-            <el-icon v-if="row.isObject" class="object-icon"><Folder /></el-icon>
+            <el-icon v-if="row.icon" class="object-icon"><component :is="row.icon" /></el-icon>
+            <el-icon v-else-if="row.isObject" class="object-icon"><Folder /></el-icon>
             <el-icon v-else class="field-icon"><Document /></el-icon>
             {{ row.displayKey }}
-            <el-tag v-if="row.isSystem" type="danger" size="small" effect="plain" style="margin-left: 8px">系统</el-tag>
+            <el-tag v-if="row.isSystem" type="danger" size="small" effect="plain" style="margin-left: 2px">系统</el-tag>
           </span>
         </template>
       </el-table-column>
@@ -195,6 +204,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
+import SmartConfigSearch from '@/views/components/SmartConfigSearch.vue'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
 import { updateAllConfigApi, getConfigApi, updateConfigValueApi, deleteConfigValueApi } from '@/api/config'
@@ -204,6 +214,9 @@ const userConfigStore = useUserConfigStore()
 
 // 表格数据
 const tableData = ref([])
+const tableRef = ref(null)
+const fullTableData = ref([]) // 全量数据备份，搜索过滤时不变
+const filterKeyword = ref('')
 const addDialogVisible = ref(false)
 const addFormRef = ref(null)
 
@@ -261,13 +274,7 @@ const buildDescMap = () => {
   const { groups } = useConfigItems()
   for (const g of groups) {
     for (const it of g.items) {
-      // 从 setter 函数字符串提取 config key
-      const setter = it.set.toString()
-      // 匹配 updateConfig('key', ...) 或 setXxx('key', ...) 中的第一个字符串参数
-      const match = setter.match(/updateConfig\('([^']+)'/) || setter.match(/\('([^']+)'\)/)
-      if (match) {
-        CONFIG_DESC_MAP[match[1]] = { label: it.label, desc: it.desc }
-      }
+      CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc }
     }
   }
 }
@@ -347,6 +354,7 @@ const buildGroupedTreeData = (apiData) => {
       originalKey: group.key,
       label: '',
       desc: '',
+      icon: group.icon,
       value: null,
       type: 'object',
       isObject: true,
@@ -361,32 +369,25 @@ const buildGroupedTreeData = (apiData) => {
 
     // 收集该分组下的配置项
     for (const item of group.items) {
-      // 从 desc map 中获取 config key
-      const matchedKey = Object.keys(CONFIG_DESC_MAP).find(k => {
-        const descItem = CONFIG_DESC_MAP[k]
-        return descItem.label === item.label && descItem.desc === item.desc
-      })
-
-      if (matchedKey) {
-        const parts = matchedKey.split('.')
-        if (parts.length === 1) {
-          // 顶层配置
-          if (matchedKey in apiData) {
-            groupNode.children.push(buildLeafNode(matchedKey, matchedKey, apiData[matchedKey], ''))
+      const cfgKey = item.key
+      if (!cfgKey) continue
+      const parts = cfgKey.split('.')
+      if (parts.length === 1) {
+        // 顶层配置
+        if (cfgKey in apiData) {
+          groupNode.children.push(buildLeafNode(cfgKey, cfgKey, apiData[cfgKey], '', item.icon))
+        }
+      } else {
+        // 嵌套配置
+        const parentKey = parts[0]
+        const childKey = parts[1]
+        if (apiData[parentKey] && childKey in apiData[parentKey]) {
+          let parentNode = groupNode.children.find(c => c.key === parentKey)
+          if (!parentNode) {
+            parentNode = buildObjectNode(parentKey, apiData[parentKey])
+            groupNode.children.push(parentNode)
           }
-        } else {
-          // 嵌套配置
-          const parentKey = parts[0]
-          const childKey = parts[1]
-          if (apiData[parentKey] && childKey in apiData[parentKey]) {
-            // 确保父节点存在
-            let parentNode = groupNode.children.find(c => c.key === parentKey)
-            if (!parentNode) {
-              parentNode = buildObjectNode(parentKey, apiData[parentKey], result.length)
-              groupNode.children.push(parentNode)
-            }
-            parentNode.children.push(buildLeafNode(`${parentKey}.${childKey}`, childKey, apiData[parentKey][childKey], parentKey))
-          }
+          parentNode.children.push(buildLeafNode(cfgKey, childKey, apiData[parentKey][childKey], parentKey, item.icon))
         }
       }
     }
@@ -399,15 +400,15 @@ const buildGroupedTreeData = (apiData) => {
 
 const buildObjectNode = (key, value) => ({
   id: nextId++, key, displayKey: key, originalKey: key,
-  label: getConfigMeta(key).label, desc: '',
+  label: getConfigMeta(key).label, desc: '', icon: null,
   value: null, type: 'object', isObject: true,
   isEditing: false, editValue: null, children: [],
   parentPath: '', min: undefined, max: undefined, isSystem: false
 })
 
-const buildLeafNode = (fullPath, displayKey, value, parentPath) => ({
+const buildLeafNode = (fullPath, displayKey, value, parentPath, icon) => ({
   id: nextId++, key: fullPath, displayKey, originalKey: displayKey,
-  label: getConfigMeta(fullPath).label, desc: CONFIG_DESC_MAP[fullPath]?.desc || '',
+  label: getConfigMeta(fullPath).label, desc: CONFIG_DESC_MAP[fullPath]?.desc || '', icon,
   value, type: typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'string',
   isObject: false, isEditing: false, editValue: value,
   children: [], parentPath,
@@ -422,12 +423,64 @@ const loadConfigData = async () => {
     const res = await getConfigApi()
     if (res.code === 200 && res.data) {
       nextId = 100
-      tableData.value = buildGroupedTreeData(res.data)
+      fullTableData.value = buildGroupedTreeData(res.data)
+      tableData.value = fullTableData.value
+      filterKeyword.value = ''
     }
   } catch (error) {
     console.error('加载配置失败:', error)
     msg.error('加载配置失败')
   }
+}
+
+const handleClearFilter = () => {
+  filterKeyword.value = ''
+  tableData.value = fullTableData.value
+  setTimeout(() => {
+    tableData.value.forEach(row => {
+      tableRef.value?.toggleRowExpansion(row, false)
+    })
+  }, 100)
+}
+
+/** 搜索选中配置项 — 过滤表格数据并滚动到目标行 */
+const handleConfigSelect = (item) => {
+  filterKeyword.value = item.isGroup ? item.groupLabel || item.label : (item.configKey || item.label)
+
+  // 过滤：保留匹配的分组及子节点
+  const keyword = filterKeyword.value.toLowerCase()
+  tableData.value = fullTableData.value
+    .map(group => {
+      if (item.isGroup && group.key === item.groupKey) return group
+      if (keyword && group.children?.length) {
+        const matched = group.children.filter(child =>
+          child.key.toLowerCase().includes(keyword) ||
+          (child.children || []).some(c => c.key.toLowerCase().includes(keyword))
+        )
+        if (matched.length) return { ...group, children: matched }
+      }
+      return null
+    })
+    .filter(Boolean)
+
+  // 展开所有节点 + 滚动到第一个匹配行
+  setTimeout(() => {
+    tableData.value.forEach(row => {
+      tableRef.value?.toggleRowExpansion(row, true)
+      if (row.children) {
+        row.children.forEach(child => {
+          tableRef.value?.toggleRowExpansion(child, true)
+        })
+      }
+    })
+    const rows = document.querySelectorAll('.config-table .el-table__row')
+    for (const row of rows) {
+      if (row.textContent?.includes(item.configKey || item.groupLabel || item.label)) {
+        row.scrollIntoView({ block: 'center', behavior: 'smooth' })
+        break
+      }
+    }
+  }, 200)
 }
 
 // 重置配置
@@ -805,11 +858,16 @@ watch(() => addForm.enableThreshold, (enabled) => {
 
 .header-actions {
   position: sticky;
-  top: 0; /* 滚动容器已是 .config-body */
+  top: 0;
   z-index: 5;
   background: var(--el-bg-color);
   margin-bottom: 20px;
-  /* padding: 8px 0 20px; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
   display: flex;
   gap: 12px;
 }
@@ -821,15 +879,15 @@ watch(() => addForm.enableThreshold, (enabled) => {
 .config-key {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .object-icon {
-  color: #e6a23c;
+  color: var(--el-color-primary);
 }
 
 .field-icon {
-  color: #409eff;
+   color: var(--el-color-primary);
 }
 
 .object-value {
