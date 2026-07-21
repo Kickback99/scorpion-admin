@@ -93,6 +93,7 @@ export function useConfigItems() {
       items: [
         { key: 'user_config.collapse_enabled',       type: 'switch', label: '菜单折叠', desc: '侧边栏菜单默认折叠状态', icon: "Fold", get: () => config.getUserCollapseEnabled(), set: (v) => config.updateConfig('user_config.collapse_enabled', v) },
         { key: 'user_config.dark_enabled',           type: 'switch', label: '深色主题', desc: '切换暗色/亮色显示模式',   icon: "Moon", get: () => config.getUserDarkEnabled(),     set: (v) => config.updateConfig('user_config.dark_enabled', v) },
+        { key: 'user_config.theme',                  type: 'radio',  label: '主题名称', desc: '切换全局主题色方案',         icon: "Sunny",get: () => config.getUserConfigTheme(),       set: (v) => config.setUserConfigTheme(v),                              options: [ { value: 'default', label: '默认蓝' },{ value: 'orange', label: '活力橙' },{ value: 'pink', label: '柔粉' },{ value: 'green', label: '翠绿' },{ value: 'purple', label: '紫韵' },{ value: 'enterprise', label: '企业蓝' },{ value: 'coral', label: '柔红' },{ value: 'warm', label: '柠绿' },{ value: 'aqua', label: '海碧' },{ value: 'indigo', label: '鸢尾紫' } ] },
       ]
     },
   ]
