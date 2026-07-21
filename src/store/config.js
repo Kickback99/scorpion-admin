@@ -341,12 +341,14 @@ export const useConfigStore = defineStore({
           this.showMessage(def.message, value, def.type, key)
           this.executeInit()
         } else {
-          msg.error(res.message || '更新失败')
+          // 响应拦截器已统一弹出具体错误信息（如"配置项不存在"），此处不再重复弹
+          // msg.error(res.message || '更新失败')
           await this.loadConfig()
         }
       } catch (error) {
         console.error('更新配置失败:', error)
-        msg.error('更新失败')
+        // 响应拦截器已统一弹出具体错误信息（如"配置项不存在"），此处不再重复弹
+        // msg.error('更新失败')
         await this.loadConfig()
       }
     },
