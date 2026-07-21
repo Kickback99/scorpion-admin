@@ -67,9 +67,9 @@ instance.interceptors.response.use(
                 clearRoute(userStore.userMenu)    
                 // 清空用户信息和菜单
                 userStore.clearUserStore()
-                // 根据配置决定是否清空标签页
+                // 未开启保留标签时清空
                 const settingStore = useSettingStore()
-                if (settingStore.clearTabsOnLogout) {
+                if (!settingStore.keepTabs) {
                   tabStore.clearTabs()
                 }
                 // 暂存主题到 uiStore（登录页读取用），再清除用户配置
