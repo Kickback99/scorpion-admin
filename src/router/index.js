@@ -428,10 +428,11 @@ router.beforeEach((to, from, next) => {
     loadMenu(true,to,from,next).then(
         ()=>{
             next({...to,replace:true})
-            // 路由跳转后，下一帧清理不在菜单中的标签页
+            // 路由注册后，清理不在路由表中的标签页
             nextTick(() => {
+                const allPaths = new Set(router.getRoutes().map(r => r.path))
                 const settingStore = useSettingStore()
-                settingStore.cleanupTabsByMenu()
+                settingStore.cleanupTabsByMenu(allPaths)
             })
     }).catch((error) =>
         {
