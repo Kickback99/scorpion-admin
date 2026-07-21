@@ -20,15 +20,28 @@
       class="config-table"
       max-height="calc(100vh - 260px)"
     >
-      <el-table-column prop="key" label="配置项" min-width="250">
+      <el-table-column prop="key" label="配置项" min-width="200">
         <template #default="{ row }">
           <span class="config-key">
             <el-icon v-if="row.isObject" class="object-icon"><Folder /></el-icon>
             <el-icon v-else class="field-icon"><Document /></el-icon>
             {{ row.displayKey }}
-            <!-- 系统预设配置标识 -->
             <el-tag v-if="row.isSystem" type="danger" size="small" effect="plain" style="margin-left: 8px">系统</el-tag>
           </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="label" label="标签" width="160">
+        <template #default="{ row }">
+          <span v-if="row.label" :class="{ 'text-muted': row.isObject }">{{ row.label }}</span>
+          <span v-else class="text-muted">—</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="desc" label="说明" min-width="180">
+        <template #default="{ row }">
+          <span v-if="row.desc" class="text-muted">{{ row.desc }}</span>
+          <span v-else class="text-muted">—</span>
         </template>
       </el-table-column>
 
@@ -233,23 +246,71 @@ const getFieldMax = (key) => {
   return limit !== undefined ? limit : Infinity
 }
 
-// 将配置对象转换为树形表格数据
+// 顶层嵌套对象排序 — 与 configItems.js 前台分组顺序对齐
+const TOP_LEVEL_ORDER = [
+  'comment', 'nav', 'user', 'profile',
+  'article_detail', 'article_list', 'notification',
+  'user_config', 'oss', 'person', 'logo',
+]
+
+// 从 configItems.js 提取 desc 映射
+import { useConfigItems } from './configItems'
+const CONFIG_DESC_MAP = {}
+const buildDescMap = () => {
+  if (Object.keys(CONFIG_DESC_MAP).length) return
+  const { groups } = useConfigItems()
+  for (const g of groups) {
+    for (const it of g.items) {
+      // 从 setter 函数字符串提取 config key
+      const setter = it.set.toString()
+      // 匹配 updateConfig('key', ...) 或 setXxx('key', ...) 中的第一个字符串参数
+      const match = setter.match(/updateConfig\('([^']+)'/) || setter.match(/\('([^']+)'\)/)
+      if (match) {
+        CONFIG_DESC_MAP[match[1]] = { label: it.label, desc: it.desc }
+      }
+    }
+  }
+}
+
+/** 获取配置项标签和说明 */
+const getConfigMeta = (fullPath) => {
+  buildDescMap()
+  if (CONFIG_DESC_MAP[fullPath]) return CONFIG_DESC_MAP[fullPath]
+  const def = configStore.getConfigDefinition(fullPath)
+  return { label: def?.message || '', desc: '' }
+}
+
+// 将配置对象转换为树形表格数据（按 configItems.js 顺序排列）
 const convertToTreeData = (obj, parentPath = '') => {
   const result = []
-  
-  for (const [key, value] of Object.entries(obj)) {
+  const entries = Object.entries(obj)
+
+  if (!parentPath) {
+    // 顶层排序：嵌套对象按 TOP_LEVEL_ORDER，标量值排最后
+    const getOrder = (key) => {
+      const isObj = obj[key] !== null && typeof obj[key] === 'object' && !Array.isArray(obj[key])
+      if (isObj) {
+        const idx = TOP_LEVEL_ORDER.indexOf(key)
+        return idx === -1 ? 999 : idx
+      }
+      return 1000 // 标量值排最后
+    }
+    entries.sort((a, b) => getOrder(a[0]) - getOrder(b[0]))
+  }
+
+  for (const [key, value] of entries) {
     const fullPath = parentPath ? `${parentPath}.${key}` : key
     const isObject = value !== null && typeof value === 'object' && !Array.isArray(value)
-
-    // 获取该字段的限制（统一从 numberLimits 读取）
     const min = getFieldMin(fullPath)
     const max = getFieldMax(fullPath)
-    
+
     const node = {
       id: nextId++,
       key: fullPath,
       displayKey: key,
       originalKey: key,
+      label: getConfigMeta(fullPath).label,
+      desc: getConfigMeta(fullPath).desc,
       value: isObject ? null : value,
       type: isObject ? 'object' : typeof value,
       isObject: isObject,
@@ -259,19 +320,101 @@ const convertToTreeData = (obj, parentPath = '') => {
       parentPath: parentPath,
       min: isFinite(min) ? min : undefined,
       max: isFinite(max) ? max : undefined,
-      // 动态判断是否为系统预设配置
       isSystem: isSystemField(fullPath)
     }
-    
+
     if (isObject && value !== null) {
       node.children = convertToTreeData(value, fullPath)
     }
-    
+
     result.push(node)
   }
-  
+
   return result
 }
+
+// 将配置数据按 configItems.js 分组包装为树形表格数据
+const buildGroupedTreeData = (apiData) => {
+  const { groups } = useConfigItems()
+  buildDescMap()
+  const result = []
+
+  for (const group of groups) {
+    const groupNode = {
+      id: nextId++,
+      key: group.key,
+      displayKey: group.label,
+      originalKey: group.key,
+      label: '',
+      desc: '',
+      value: null,
+      type: 'object',
+      isObject: true,
+      isEditing: false,
+      editValue: null,
+      children: [],
+      parentPath: '',
+      min: undefined,
+      max: undefined,
+      isSystem: false
+    }
+
+    // 收集该分组下的配置项
+    for (const item of group.items) {
+      // 从 desc map 中获取 config key
+      const matchedKey = Object.keys(CONFIG_DESC_MAP).find(k => {
+        const descItem = CONFIG_DESC_MAP[k]
+        return descItem.label === item.label && descItem.desc === item.desc
+      })
+
+      if (matchedKey) {
+        const parts = matchedKey.split('.')
+        if (parts.length === 1) {
+          // 顶层配置
+          if (matchedKey in apiData) {
+            groupNode.children.push(buildLeafNode(matchedKey, matchedKey, apiData[matchedKey], ''))
+          }
+        } else {
+          // 嵌套配置
+          const parentKey = parts[0]
+          const childKey = parts[1]
+          if (apiData[parentKey] && childKey in apiData[parentKey]) {
+            // 确保父节点存在
+            let parentNode = groupNode.children.find(c => c.key === parentKey)
+            if (!parentNode) {
+              parentNode = buildObjectNode(parentKey, apiData[parentKey], result.length)
+              groupNode.children.push(parentNode)
+            }
+            parentNode.children.push(buildLeafNode(`${parentKey}.${childKey}`, childKey, apiData[parentKey][childKey], parentKey))
+          }
+        }
+      }
+    }
+
+    result.push(groupNode)
+  }
+
+  return result
+}
+
+const buildObjectNode = (key, value) => ({
+  id: nextId++, key, displayKey: key, originalKey: key,
+  label: getConfigMeta(key).label, desc: '',
+  value: null, type: 'object', isObject: true,
+  isEditing: false, editValue: null, children: [],
+  parentPath: '', min: undefined, max: undefined, isSystem: false
+})
+
+const buildLeafNode = (fullPath, displayKey, value, parentPath) => ({
+  id: nextId++, key: fullPath, displayKey, originalKey: displayKey,
+  label: getConfigMeta(fullPath).label, desc: CONFIG_DESC_MAP[fullPath]?.desc || '',
+  value, type: typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'string',
+  isObject: false, isEditing: false, editValue: value,
+  children: [], parentPath,
+  min: isFinite(getFieldMin(fullPath)) ? getFieldMin(fullPath) : undefined,
+  max: isFinite(getFieldMax(fullPath)) ? getFieldMax(fullPath) : undefined,
+  isSystem: isSystemField(fullPath)
+})
 
 // 加载配置数据
 const loadConfigData = async () => {
@@ -279,7 +422,7 @@ const loadConfigData = async () => {
     const res = await getConfigApi()
     if (res.code === 200 && res.data) {
       nextId = 100
-      tableData.value = convertToTreeData(res.data)
+      tableData.value = buildGroupedTreeData(res.data)
     }
   } catch (error) {
     console.error('加载配置失败:', error)
@@ -715,6 +858,11 @@ watch(() => addForm.enableThreshold, (enabled) => {
   --el-table-row-hover-bg-color: #2d2d2d;
   --el-table-border-color: #3a3a3a;
   color: #e0e0e0;
+}
+
+.text-muted {
+  color: var(--el-text-color-placeholder);
+  font-size: 13px;
 }
 
 .dark-mode :deep(.el-tag--info) {
