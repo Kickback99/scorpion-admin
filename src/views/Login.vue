@@ -33,6 +33,7 @@ import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
+import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
 
@@ -84,22 +85,21 @@ const handleLogin = async() => {
     if(userStore.userInfo.type === 0){
         msg.primary('登录成功')
     }
-    // 处理重定向逻辑 - 解码重定向路径
-    let redirect = route.query.redirect
-    if (redirect) {
-        // 如果redirect是字符串且被编码过，进行解码
-        if (typeof redirect === 'string') {
-            // 尝试解码，如果已经是解码状态则不会报错
-            try {
-                redirect = decodeURIComponent(redirect)
-            } catch (e) {
-                // 如果解码失败，说明可能已经是解码状态，使用原值
-                console.log('Redirect path is already decoded or invalid')
-            }
-        }
-        router.push(redirect || '/')
-    } else {
+    // 处理重定向：主动退出 → 首页；越权拦截 → 跟随 redirect
+    const settingStore = useSettingStore()
+    if (settingStore.logoutIntent) {
+        settingStore.setLogoutIntent(false)
         router.push('/')
+    } else {
+        let redirect = route.query.redirect
+        if (redirect) {
+            try { redirect = decodeURIComponent(redirect) } catch (e) {}
+        }
+        if (redirect && redirect !== '/' && redirect !== '/index') {
+            router.push(redirect)
+        } else {
+            router.push('/')
+        }
     }
 
       await nextTick()

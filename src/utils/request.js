@@ -24,6 +24,8 @@ import msg from '@/components/msg'
 instance.interceptors.request.use(
     config => {
         const tokenStore =  useTokenStore()
+        // 请求发出时保存浏览器地址栏路径，401 响应中用于 redirect
+        config._currentPath = window.location.href.replace(window.location.origin, '')
         if(tokenStore.token){
             config.headers.authorization = tokenStore.token
         }
@@ -50,6 +52,9 @@ instance.interceptors.response.use(
 
             if(res.data.code === 401){
                 console.log('响应拦截器执行...')
+                // 请求时已保存的路径（避免 401 到达前路由已被篡改）
+                console.log(res.config)
+                const currentPath = res.config._currentPath || router.currentRoute.value.fullPath
                 // 处理token过期或者篡改
                 const tokenStore = useTokenStore()
                 const userStore = useUserStore()
@@ -80,8 +85,9 @@ instance.interceptors.response.use(
                 // userStore.username = ''
                 // 提示信息
                 msg.error(res.data.message)
-                // 跳转到登录页
-                router.replace('/login')
+                // 清除主动退出标记，携带当前页面路径以便重登后恢复
+                settingStore.setLogoutIntent(false)
+                router.replace({ path: '/login', query: { redirect: currentPath } })
 
             }else msg.error(res.data.message)
 
