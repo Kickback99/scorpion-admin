@@ -11,8 +11,8 @@ export const useSettingStore = defineStore({
         // 项目标题
         title:'SCORPIONCODE',
         isManualTo403:false,
-        /** 退出/401 时是否清空标签页（默认不清） */
-        clearTabsOnLogout: false,
+        /** 退出/401 时是否保留标签页（默认保留） */
+        keepTabs: true,
         /** 退出标记：登录后忽略 redirect，直接进首页 */
         logoutIntent: false,
     }),
@@ -35,7 +35,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['clearTabsOnLogout', 'logoutIntent'],
+        paths: ['keepTabs', 'logoutIntent'],
     },
 })
 
