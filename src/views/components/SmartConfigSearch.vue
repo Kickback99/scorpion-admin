@@ -147,20 +147,11 @@ const doHighlight = (text) => {
     return text.substring(0, idx) + '<strong>' + text.substring(idx, idx + q.length) + '</strong>' + text.substring(idx + q.length)
   }
 
-  // 2. 拼音匹配
+  // 2. 拼音匹配 — PinyinMatch 返回 [startIndex, endIndex]
   const pinyinResult = PinyinMatch.match(text, q)
-  if (pinyinResult) {
-    const indices = [...new Set(Array.isArray(pinyinResult) ? pinyinResult : [pinyinResult])]
-    const continuous = indices.every((v, i) => i === 0 || v === indices[i - 1] + 1)
-    const highlightIndices = continuous ? indices : [indices[0]]
-    let html = '', last = 0
-    for (const hi of highlightIndices) {
-      if (hi > last) html += text.substring(last, hi)
-      html += '<strong>' + text[hi] + '</strong>'
-      last = hi + 1
-    }
-    if (last < text.length) html += text.substring(last)
-    return html
+  if (pinyinResult && pinyinResult.length >= 2) {
+    const from = pinyinResult[0], to = pinyinResult[1] + 1
+    return text.substring(0, from) + '<strong>' + text.substring(from, to) + '</strong>' + text.substring(to)
   }
 
   return text

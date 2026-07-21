@@ -181,31 +181,11 @@ const highlight = (text) => {
     return `${before}<strong>${match}</strong>${after}`
   }
 
-  // 2. PinyinMatch（中文拼音）
+  // 2. PinyinMatch（中文拼音）— 返回 [startIndex, endIndex]
   const pinyinResult = PinyinMatch.match(text, q)
-  if (pinyinResult) {
-    const indices = Array.isArray(pinyinResult) ? pinyinResult : [pinyinResult]
-    const uniqueIndices = [...new Set(indices)]
-
-    let isContinuous = true
-    for (let i = 1; i < uniqueIndices.length; i++) {
-      if (uniqueIndices[i] !== uniqueIndices[i - 1] + 1) {
-        isContinuous = false
-        break
-      }
-    }
-
-    const highlightIndices = isContinuous ? uniqueIndices : [uniqueIndices[0]]
-    let html = ''
-    let lastIdx = 0
-    for (let i = 0; i < highlightIndices.length; i++) {
-      const hi = highlightIndices[i]
-      if (hi > lastIdx) html += text.substring(lastIdx, hi)
-      html += `<strong>${text[hi]}</strong>`
-      lastIdx = hi + 1
-    }
-    if (lastIdx < text.length) html += text.substring(lastIdx)
-    return html
+  if (pinyinResult && pinyinResult.length >= 2) {
+    const from = pinyinResult[0], to = pinyinResult[1] + 1
+    return text.substring(0, from) + '<strong>' + text.substring(from, to) + '</strong>' + text.substring(to)
   }
 
   // 3. 复合词首字母匹配
