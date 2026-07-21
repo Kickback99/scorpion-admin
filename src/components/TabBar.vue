@@ -217,18 +217,9 @@ const handleCommand = async (key) => {
         // userStore.username = ''
         // 提示信息
         msg.primary(res.message)
-        // 跳转到登录页
-        // router.push({ path: '/login', query: { redirect: route.path } })
-                // 构建完整的重定向URL，包含查询参数
-        const redirectUrl = route.path + (route.query && Object.keys(route.query).length ? `?${new URLSearchParams(route.query).toString()}` : '')
-        
-        // 跳转到登录页，携带完整的重定向信息
-        router.push({
-            path: '/login',
-            query: {
-                redirect: redirectUrl
-            }
-        })
+        // 标记主动退出 → 登录后进首页
+        stringStore.setLogoutIntent(true)
+        router.push('/login')
     }else {
         router.push(`/user/${key}`)
     }
