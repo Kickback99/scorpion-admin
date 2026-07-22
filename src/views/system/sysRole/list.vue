@@ -33,7 +33,7 @@
     @selection-change="removeMultiple"
     border stripe>
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="50" />
+        <el-table-column type="index" label="序号" width="55" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
         <el-table-column prop="createTime" label="创建时间" />
