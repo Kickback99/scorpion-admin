@@ -79,7 +79,7 @@
 
             <el-table-column label="业务名称" width="200" show-overflow-tooltip >
                   <template #default="{ row }">
-                     {{  row.title ? row.title : '改业务已删除'  }}
+                     {{  row.title ? row.title : '该业务不存在'  }}
                   </template>
             </el-table-column>
             
@@ -117,7 +117,7 @@
                         @confirm="handleRecover(row)"
                     >
                         <template #reference>
-                            <el-button size="small" type="warning" :disabled="row.isDeleted === 0" plain>恢复</el-button>
+                            <el-button size="small" type="danger" :disabled="row.isDeleted === 0" plain>恢复</el-button>
                         </template>
                     </el-popconfirm>
                 </template>
