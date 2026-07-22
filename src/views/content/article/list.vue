@@ -87,14 +87,14 @@
     </div>
 
     <el-table :data="tableData" :style="{ width: '100%' }" >
-        <el-table-column type="index" label="序号" width="50"></el-table-column>
+        <el-table-column type="index" label="序号" width="55"></el-table-column>
         <el-table-column prop="title" label="标题" show-overflow-tooltip/>
-        <el-table-column label="封面">
+        <el-table-column label="封面" width="100px">
             <template #default="{row}">
-                <el-image style="width: 100px" :src="row.cover" :fit="cover" />
+                <el-image style="width: 100px; height: 56px"  :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
-        <el-table-column prop="cateName" label="分类" />
+        <el-table-column prop="cateName" label="分类" align="center"/>
         <el-table-column label="置顶">
             <template #default="{row}">
                 <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
@@ -157,6 +157,12 @@ import msg from '@/components/msg';
 import { createMarkdownPreview } from '@/utils/markdown-config';
 import { useUserConfigStore } from '@/store/userConfig';
 const userConfigStore = useUserConfigStore()
+import cover from '@/assets/images/cover-rect.png'
+
+const handleImage = (row) => {
+    if(row.cover) return row.cover
+    else return cover
+}
 
 //搜索相关
 const searchData = ref({
