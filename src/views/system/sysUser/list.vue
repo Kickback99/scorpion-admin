@@ -82,7 +82,7 @@
     border
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="50" align="center" />
+        <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column label="头像" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px" :src="handleImage(row)" :fit="fit" />
