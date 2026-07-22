@@ -147,3 +147,21 @@ const handleUploadImage = async (event, insertImage, files) => {
 }
 
 </style>
+
+<style lang="scss">
+/* v-md-editor 自定义滚动条同步全局样式 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--el-color-primary-light-5) 30%, transparent) !important;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--el-color-primary) 45%, transparent) !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+</style>
