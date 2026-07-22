@@ -308,10 +308,10 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   overflow-y: auto;
   z-index: 2000;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: var(--el-fill-color); border-radius: 2px; }
-  &::-webkit-scrollbar-thumb:hover { background: var(--el-border-color-hover); }
-  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar { width: 4px !important; }
+  &::-webkit-scrollbar-thumb { background: var(--el-fill-color) !important; border-radius: 2px !important; }
+  &::-webkit-scrollbar-thumb:hover { background: var(--el-border-color-hover) !important; }
+  &::-webkit-scrollbar-track { background: transparent !important; }
 }
 
 .scs-results-header {

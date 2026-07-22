@@ -417,17 +417,17 @@ onUnmounted(() => {
   z-index: 3000;
 
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 4px !important;
   }
   &::-webkit-scrollbar-thumb {
-    background: var(--el-fill-color);
+    background: var(--el-fill-color) !important;
     border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background: var(--el-border-color-hover);
+    background: var(--el-border-color-hover) !important;
   }
   &::-webkit-scrollbar-track {
-    background: transparent;
+    background: transparent !important;
   }
 }
 
