@@ -144,11 +144,37 @@ const handleUploadImage = async (event, insertImage, files) => {
 // vuepress主题下的v-md-editor-右边的预览区 代码块颜色
 :deep(.v-md-editor__preview-wrapper .vuepress-markdown-body code){
     color: $code-color !important;
+    .token .operator{
+        background-color: transparent !important;
+    }
+
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string{
+        background-color: transparent !important;
+    }
 }
 
+:deep(.vuepress-markdown-body tr:nth-child(2n)){
+    color: black;
+}
+
+// 目录导航条设置
+:deep(.v-md-editor__left-area) {
+  .v-md-editor__left-area-title {
+    color: var(--el-text-color-primary);
+  }
+  .v-md-editor__left-area-body .v-md-editor__toc-nav li.v-md-editor__toc-nav-item {
+    color: var(--el-text-color-primary);
+  }
+}
 </style>
 
 <style lang="scss">
+/* v-md-editor 全屏时压低 tags-view 层叠上下文 */
+body:has(.v-md-editor--fullscreen) .tags-view {
+  z-index: 0 !important;
+  backdrop-filter: none !important;
+}
+
 /* v-md-editor 自定义滚动条同步全局样式 */
 ::-webkit-scrollbar {
   width: 4px;

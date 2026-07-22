@@ -431,4 +431,16 @@ onMounted(() => {
 :deep(.v-md-editor-preview .vuepress-markdown-body){
   background: black !important;
 }
+
+// vuepress主题下的v-md-editor-右边的预览区 代码块颜色
+:deep(.v-md-editor__preview-wrapper .vuepress-markdown-body code){
+    color: $code-color !important;
+    .token .operator{
+        background-color: transparent !important;
+    }
+
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string{
+        background-color: transparent !important;
+    }
+}
 </style>
