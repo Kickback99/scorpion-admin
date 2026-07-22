@@ -26,7 +26,7 @@
         <el-table-column prop="name" label="名字" />
         <el-table-column label="logo">
             <template #default="{row}">
-                <el-image style="width: 100px" :src="row.logo" :fit="fit" />
+                <el-image style="width: 100px; height: 100px" :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
         <el-table-column prop="description" label="描述" show-overflow-tooltip />
@@ -85,7 +85,7 @@
             </el-form-item>
 
             <el-form-item style="width: 200px">
-                <SmartSelector v-model="formModel.status" :data="fields" placeholder="请选择审核状态"></SmartSelector>
+                <SmartSelector v-model="formModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>
             </el-form-item>
             
 
@@ -106,6 +106,7 @@ import { friendLinkAddApi, friendLinkListApi, friendLinkModifyApi, friendLinkRem
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import msg from '@/components/msg';
 import { reactive, ref } from 'vue';
+import avatar from '@/assets/images/avatar-square.png'
 
 // ============================================================
 // 数据
@@ -136,6 +137,12 @@ const statusOptions = [
 ]
 
 const selectedRows = ref([])
+
+// 处理图片
+const handleImage = (row) => {
+    if(row.logo) return row.logo
+    else return avatar
+}
 
 // ============================================================
 // 友链渲染
