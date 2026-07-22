@@ -887,21 +887,21 @@ defineExpose({
 
 /* 滚动条样式 - 适配深浅主题 */
 .suggestions-popover::-webkit-scrollbar {
-  width: 6px;
+  width: 6px !important;
 }
 
 .suggestions-popover::-webkit-scrollbar-track {
-  background: var(--el-fill-color);
-  border-radius: 3px;
+  background: var(--el-fill-color) !important;
+  border-radius: 3px !important;
 }
 
 .suggestions-popover::-webkit-scrollbar-thumb {
-  background: var(--el-border-color);
-  border-radius: 3px;
+  background: var(--el-border-color) !important;
+  border-radius: 3px !important;
 }
 
 .suggestions-popover::-webkit-scrollbar-thumb:hover {
-  background: var(--el-border-color-hover);
+  background: var(--el-border-color-hover) !important;
 }
 </style>
 
