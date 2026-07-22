@@ -2,7 +2,7 @@
 <template>
   <div class="image-reference">
     <div class="image-reference-header">
-      <span class="image-reference-title">{{ title }}</span>
+      <!-- <span class="image-reference-title">{{ title }}</span> -->
       <el-button
         size="small"
         type="info"
@@ -16,7 +16,7 @@
 
     <el-form label-width="auto">
       <!-- ===== 搜索栏 ===== -->
-      <el-form-item :label="searchLabel">
+      <el-form-item >
         <SmartAutoComplete
           v-model="selectedArticle"
           :fetch-suggestions-api="fetchArticleForImage"
@@ -525,7 +525,7 @@ defineExpose({
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    /*margin-bottom: 12px;*/
 
     .image-reference-title {
       font-size: 14px;

@@ -21,8 +21,8 @@
                 title="引用图片"
                 search-label="搜索"
                 search-placeholder="请输入文章标题搜索已上传的图片"
-                :show-clear="true"
-                :show-hint="true"
+                :show-clear="false"
+                :show-hint="false"
                 :disabled="false"
                 :showImageTypeSwitch="true"
                 image-type="all"
@@ -52,7 +52,7 @@
             </el-form-item>
         </el-form>
 
-        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
+        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%" @close="hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">
             <el-form ref="formRef" :model="formModel" label-width="auto" size="small"> 
                 <el-form-item label="文章描述" prop="description">
                     <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
@@ -213,8 +213,8 @@ const selectedCoverArticle = ref([]);
 const coverArticleCache = ref([]);  // 缓存文章搜索结果
 
 // 引用图片组件容器高度
-const IMAGE_REFERENCE_EXPANDED_HEIGHT = '330px';
-const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '150px';
+const IMAGE_REFERENCE_EXPANDED_HEIGHT = '300px';
+const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '80px';
 
 // 处理选中状态变化
 const handleSelectedChange = (selected) => {
