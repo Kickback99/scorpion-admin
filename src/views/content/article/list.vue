@@ -459,4 +459,21 @@ const handleCopyCodeSuccess = (e) => {
 .el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* 预览弹窗代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
+.preview-dialog {
+  .vuepress-markdown-body code {
+    color: $code-color !important;
+    .token .operator {
+      background-color: transparent !important;
+    }
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+      background-color: transparent !important;
+    }
+  }
+
+  .vuepress-markdown-body tr:nth-child(2n) {
+    color: black;
+  }
+}
 </style>
