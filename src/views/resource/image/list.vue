@@ -78,7 +78,7 @@
             <el-button size="small" type="primary" @click.stop="openPreview(index)" plain>预览</el-button>
             <el-button size="small" type="warning" @click.stop="handleCopy(img)" plain>复制</el-button>
             <!-- 占位：下载 -->
-            <el-button size="small" type="success" plain>下载</el-button>
+            <el-button size="small" type="success" @click.stop="handleDownload(img)" plain>下载</el-button>
             <!-- 占位：删除 -->
             <el-button size="small" type="danger" plain>删除</el-button>
           </div>
@@ -339,6 +339,26 @@ const handleFilterChange = () => {
 const openPreview = (index) => {
   previewIndex.value = index
   viewerVisible.value = true
+}
+
+// ============================================================
+// 下载功能
+// ============================================================
+
+const handleDownload = async (img) => {
+  try {
+    const res = await fetch(img.img)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const ext = (img.img.split('.').pop() || 'png').split('?')[0]
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${img.uuid || 'image'}.${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    window.open(img.img, '_blank')
+  }
 }
 
 // ============================================================
