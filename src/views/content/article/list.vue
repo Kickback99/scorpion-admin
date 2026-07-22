@@ -440,4 +440,23 @@ const handleCopyCodeSuccess = (e) => {
   transform: translate(-50%, -50%) rotate(45deg);
   border-radius: 1px;
 }
+
+/* 预览弹窗滚动条 — 半透明模拟 config 模块风格 */
+.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 45%, transparent);
+  border-radius: 2px;
+}
+
+.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 60%, transparent);
+}
+
+.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
+  background: transparent;
+}
 </style>
