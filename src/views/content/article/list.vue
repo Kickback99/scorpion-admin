@@ -236,7 +236,6 @@ const onReset = () => {
 const maskRef = ref()
 
 const handleAdd = (param) => {
-    console.log('hello')
     maskRef.value.openMask()
     maskRef.value.handleToggle(param)
 }
