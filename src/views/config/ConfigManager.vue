@@ -47,9 +47,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="desc" label="说明" min-width="180">
+      <el-table-column prop="desc" label="说明" min-width="160">
         <template #default="{ row }">
           <span v-if="row.desc" class="text-muted">{{ row.desc }}</span>
+          <span v-else class="text-muted">—</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column v-if="false" prop="options" label="可选值" width="160">
+        <template #default="{ row }">
+          <span v-if="getOptionsHint(row.key)" class="text-muted">{{ getOptionsHint(row.key) }}</span>
           <span v-else class="text-muted">—</span>
         </template>
       </el-table-column>
@@ -61,6 +68,7 @@
             <el-input
               v-if="row.type === 'string'"
               v-model="row.editValue"
+              :placeholder="getPlaceholder(row.key)"
               size="small"
               style="width: 100%"
             />
@@ -278,6 +286,26 @@ const buildDescMap = () => {
     }
   }
 }
+
+// configKey → options value 列表（radio 型配置项的 placeholder）
+const OPTION_HINTS = {}
+const buildOptionHints = () => {
+  if (Object.keys(OPTION_HINTS).length) return
+  const { groups } = useConfigItems()
+  for (const g of groups) {
+    for (const it of g.items) {
+      if (it.type === 'radio' && it.options?.length) {
+        OPTION_HINTS[it.key] = it.options.map(o => o.value).join(', ')
+      }
+    }
+  }
+}
+const getOptionsHint = (configKey) => {
+  buildOptionHints()
+  return OPTION_HINTS[configKey] || ''
+}
+
+const getPlaceholder = (configKey) => getOptionsHint(configKey)
 
 /** 获取配置项标签和说明 */
 const getConfigMeta = (fullPath) => {
