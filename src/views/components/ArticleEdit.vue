@@ -144,20 +144,30 @@
                 </div>
               </el-form-item>
 
-              <!-- 轮播设置区域（极简版） -->
-              <el-form-item label="轮播设置">
-                  <el-radio-group v-model="carouselData.isCarousel" @change="handleCarouselChange">
-                      <el-radio :label="true">开启</el-radio>
-                      <el-radio :label="false">关闭</el-radio>
-                  </el-radio-group>
+              <!-- 文章开关设置：置顶 / 轮播 / 评论 -->
+              <el-form-item label="文章设置">
+                  <div class="article-switches">
+                      <div class="switch-item">
+                          <span class="switch-label">是否置顶</span>
+                          <el-switch v-model="formModel.isTop" active-value="1" inactive-value="0" />
+                      </div>
+                      <div class="switch-item">
+                          <span class="switch-label">是否轮播</span>
+                          <el-switch v-model="carouselData.isCarousel" @change="handleCarouselChange" />
+                      </div>
+                      <div class="switch-item">
+                          <span class="switch-label">是否评论</span>
+                          <el-switch v-model="formModel.isComment" active-value="1" inactive-value="0" />
+                      </div>
+                  </div>
               </el-form-item>
-            
-              <!-- 排序输入框（条件渲染） -->
+
+              <!-- 轮播排序输入框（条件渲染） -->
               <el-form-item v-if="carouselData.isCarousel" label="轮播排序">
-                  <el-input-number 
-                      v-model="carouselData.sort" 
-                      :min="0" 
-                      :max="999" 
+                  <el-input-number
+                      v-model="carouselData.sort"
+                      :min="0"
+                      :max="999"
                       controls-position="right"
                       placeholder="自动"
                       style="width:150px;"
@@ -464,7 +474,9 @@ const formModel = reactive({
   customCoverLink: '',      // 封面文件对象（File 或 URL 字符串）
   cover:null,                // / 最终存储的封面URL（用于回显）
   refCover: null,            // 预览 URL
-  refCoverUuid: null         // 提交用的 UUID
+  refCoverUuid: null,        // 提交用的 UUID
+  isTop: '0',                // 是否置顶（0否，1是）
+  isComment: '1'             // 是否允许评论（0否，1是）
 })
 
 // 独立轮播数据
@@ -561,7 +573,9 @@ const handleToggle = async(param) => {
         customCoverLink: '',       // 清空自定义链接
         cover: null,
         refCover: null,            // 预览 URL
-        refCoverUuid: null         // 提交用的 UUID
+        refCoverUuid: null,        // 提交用的 UUID
+        isTop: '0',                // 默认不置顶
+        isComment: '1'             // 默认允许评论
     })
    }else {
     // 回显
@@ -814,6 +828,27 @@ onMounted(() => {
     flex: none !important;
     align-items: stretch !important;
 } */
+// ============================================================
+// 文章开关样式（置顶 / 轮播 / 评论）
+// ============================================================
+
+.article-switches {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+
+  .switch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .switch-label {
+      color: var(--el-text-color-regular);
+      white-space: nowrap;
+    }
+  }
+}
+
 // ============================================================
 // 封面样式
 // ============================================================
