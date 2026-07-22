@@ -81,7 +81,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: 'default'
+    default: 'small'
   },
   readonly: {
     type: Boolean,

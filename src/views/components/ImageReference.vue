@@ -18,6 +18,7 @@
       <!-- ===== 搜索栏 ===== -->
       <el-form-item >
         <SmartAutoComplete
+          size="default"
           v-model="selectedArticle"
           :fetch-suggestions-api="fetchArticleForImage"
           :placeholder="searchPlaceholder"
