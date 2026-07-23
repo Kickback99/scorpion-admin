@@ -531,6 +531,41 @@ const safeFormModel = () => {
   return copy
 }
 
+/** base64 转回 File 对象 — 用于草稿恢复 */
+const base64ToFile = (base64, filename, mimeType) => {
+  const arr = base64.split(',')
+  const mime = mimeType || (arr[0].match(/:(.*?);/) || [])[1] || 'image/png'
+  const bstr = atob(arr[1])
+  const n = bstr.length
+  const u8arr = new Uint8Array(n)
+  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i)
+  return new File([u8arr], filename, { type: mime })
+}
+
+/** 文件上传预览 — File → base64 data URL（File 对象无法序列化到 sessionStorage） */
+const coverFileBase64 = ref(null)
+const coverFileMeta = ref(null)
+
+// 监听 cover 变化 — 当用户选择新文件时，异步读取 base64
+watch(() => formModel.cover, (cover) => {
+  if (cover instanceof File) {
+    const reader = new FileReader()
+    reader.onload = () => {
+      coverFileBase64.value = reader.result
+      coverFileMeta.value = {
+        name: cover.name,
+        size: cover.size,
+        type: cover.type,
+        lastModified: cover.lastModified,
+      }
+    }
+    reader.readAsDataURL(cover)
+  } else {
+    coverFileBase64.value = null
+    coverFileMeta.value = null
+  }
+})
+
 /** 防抖保存草稿 — 800ms 无变化后自动写入 sessionStorage（编辑模式受 config 控制，新增永远保存） */
 let saveTimer = null
 const autoSaveDraft = () => {
@@ -543,12 +578,15 @@ const autoSaveDraft = () => {
       blogData: blogData.value,
       formModel: safeFormModel(),
       carouselData: { ...carouselData.value },
+      selectedCoverArticle: [...selectedCoverArticle.value],
+      coverFileBase64: coverFileBase64.value,
+      coverFileMeta: coverFileMeta.value,
     })
   }, 800)
 }
 
 // 深度监听表单数据变化 → 自动保存
-watch([blogData, () => formModel, carouselData], autoSaveDraft, { deep: true })
+watch([blogData, () => formModel, carouselData, selectedCoverArticle], autoSaveDraft, { deep: true })
 
 // 组件卸载时兜底保存
 onBeforeUnmount(() => {
@@ -558,6 +596,9 @@ onBeforeUnmount(() => {
       blogData: blogData.value,
       formModel: safeFormModel(),
       carouselData: { ...carouselData.value },
+      selectedCoverArticle: [...selectedCoverArticle.value],
+      coverFileBase64: coverFileBase64.value,
+      coverFileMeta: coverFileMeta.value,
     })
   }
 })
@@ -604,7 +645,6 @@ const handleToggle = async(param) => {
     // 添加
     isEditMode.value = false
     dialogTitle.value = '新增文章'
-    selectedCoverArticle.value = []  // 清空引用标题
 
     // 尝试恢复草稿
     const draft = draftStore.restoreDraft()
@@ -612,8 +652,20 @@ const handleToggle = async(param) => {
       blogData.value = draft.blogData
       Object.assign(formModel, draft.formModel)
       carouselData.value = draft.carouselData
+      selectedCoverArticle.value = draft.selectedCoverArticle || []
+      // 文件上传封面：base64 还原为 File 对象
+      if (draft.coverFileBase64 && draft.coverFileMeta) {
+        coverFileBase64.value = draft.coverFileBase64
+        coverFileMeta.value = draft.coverFileMeta
+        formModel.cover = base64ToFile(
+          draft.coverFileBase64,
+          draft.coverFileMeta.name,
+          draft.coverFileMeta.type
+        )
+      }
     } else {
       blogData.value = {}
+      selectedCoverArticle.value = []
       // 重置数据
       Object.assign(formModel, {
         id: null,
@@ -744,7 +796,9 @@ const handleOpen = async() => {
   
   // 现在 SmartUpload 组件已经创建
   if (uploadRef.value && uploadRef.value.handleImage) {
-    const imageUrl = !formModel.id ? '' : formModel.cover
+    const imageUrl = formModel.cover instanceof File
+      ? formModel.cover
+      : (!formModel.id ? '' : formModel.cover)
     console.log('对话框打开后调用 handleImage:', imageUrl)
     uploadRef.value.handleImage(imageUrl)
   }
