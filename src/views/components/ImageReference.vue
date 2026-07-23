@@ -34,7 +34,7 @@
       </el-form-item>
 
       <!-- 图片类型选择器 -->
-      <el-form-item v-if="selectedArticle.length > 0 && !loading && props.showImageTypeSwitch" label="图片类型">
+      <el-form-item v-if="!loading && imageList.length > 0 && props.showImageTypeSwitch" label="图片类型">
         <el-radio-group v-model="currentImageType" @change="handleImageTypeChange" size="small">
           <el-radio-button value="all">全部图片</el-radio-button>
           <el-radio-button value="cover">仅封面</el-radio-button>
@@ -106,7 +106,7 @@
       </el-form-item>
 
       <!-- 空状态 -->
-      <el-form-item v-else-if="selectedArticle.length > 0" label=" ">
+      <el-form-item v-else-if="selectedArticle.length > 0 && articleCache.some(a => a.value === selectedArticle[0]) && filteredImageList.length === 0" label=" ">
         <el-empty
           :description="emptyText"
           :image-size="60"
