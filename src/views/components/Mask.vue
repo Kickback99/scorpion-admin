@@ -10,7 +10,7 @@
         </div>
         <div class="footer">
             <el-row justify="center" align="middle">
-                <el-button size="small" type="info" @click="emit('closeMask')" plain>返回</el-button>
+                <el-button size="small" type="info" @click="emit('closeMask')" plain>{{ backLabel }}</el-button>
                 <el-button size="small" type="primary" @click="emit('openDialog')" plain>确定</el-button>
             </el-row>
         </div>
@@ -26,6 +26,11 @@ defineProps({
     maskVisible: {
         type: Boolean,
         default: false
+    },
+    /** 返回按钮文案 — 写博客入口传 '清空'，文章管理传 '返回' */
+    backLabel: {
+        type: String,
+        default: '返回'
     },
 })
 

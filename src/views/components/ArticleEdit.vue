@@ -1,5 +1,5 @@
 <template>
-     <Mask :maskVisible="maskVisible" @closeMask="handleCloseMask" @openDialog="handleOpenDialog">
+     <Mask :maskVisible="maskVisible" :backLabel="isWriteEntry ? '清空' : '返回'" @closeMask="handleCloseMask" @openDialog="handleOpenDialog">
 
         <el-form :model="blogData" ref="blogFormRef" :rules="rules">
             <el-form-item prop="title">
@@ -198,7 +198,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
@@ -210,6 +211,11 @@ import { useConfigStore } from '@/store/config';
 const userConfigStore = useUserConfigStore()
 const draftStore = useArticleDraftStore()
 const configStore = useConfigStore()
+const route = useRoute()
+
+/** 是否从「写博客」顶层菜单进入（区别于文章管理页的编辑入口） */
+const isWriteEntry = computed(() => route.path === '/write')
+
 let mdHeight = window.innerHeight - 30 - 70 - 200
 import PinyinMatch from 'pinyin-match';
 import { getTagListApi } from '@/api/business';
@@ -236,10 +242,36 @@ const handleSelectedChange = (selected) => {
 };
 
 /**
- * Mask 关闭 / 确定时，重置选中状态为未展开
+ * Mask 关闭 / 清空
+ * 写博客入口：清空草稿 + 重置表单 + mask 保持打开（立刻可写下一篇）
+ * 文章管理入口：仅关闭 mask（草稿保留，下次可恢复）
  */
 const handleCloseMask = () => {
-  maskVisible.value = false;
+  if (isWriteEntry.value) {
+    draftStore.clearDraft()
+    blogData.value = {}
+    selectedCoverArticle.value = []
+    imageReferenceRef.value?.clear()
+    Object.assign(formModel, {
+      id: null,
+      categoryId: null,
+      status: null,
+      descriptionType: 'auto',
+      customDescription: '',
+      description: null,
+      tagNames: [],
+      coverOption: 'upload',
+      customCoverLink: '',
+      cover: null,
+      refCover: null,
+      refCoverUuid: null,
+      isTop: '0',
+      isComment: '1'
+    })
+    resetCarouselData()
+  } else {
+    maskVisible.value = false
+  }
   hasSelectedArticle.value = false;
 };
 
@@ -886,7 +918,15 @@ const handlePublish = async(status) => {
     draftStore.clearDraft()
     dialogVisible.value = false
     openMask()
-    emit('reRender')
+    if (isWriteEntry.value) {
+      // 写博客入口：发布后自动打开空白表单，继续写下一篇
+      nextTick(() => {
+        openMask()
+        handleToggle({})
+      })
+    } else {
+      emit('reRender')
+    }
   }catch(error){
     msg.error('提交失败，请重试')
   }
