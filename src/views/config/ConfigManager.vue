@@ -282,7 +282,7 @@ const buildDescMap = () => {
   const { groups } = useConfigItems()
   for (const g of groups) {
     for (const it of g.items) {
-      CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc }
+      CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc, icon: it.icon }
     }
   }
 }
@@ -307,16 +307,26 @@ const getOptionsHint = (configKey) => {
 
 const getPlaceholder = (configKey) => getOptionsHint(configKey)
 
+/**
+ * 拼接完整 API key（携带 client/admin/user 父路径前缀）
+ * row.key 是相对路径（如 'comment.article_comment_enabled'），
+ * 通过节点 _groupKey 或 _itemMap 查到所属 group 后拼接为 'client.comment.article_comment_enabled'
+ */
+const buildApiKey = (row) => {
+  const gk = row._groupKey || configStore.getConfigDefinition(row.key)?.group
+  return gk ? `${gk}.${row.key}` : row.key
+}
+
 /** 获取配置项标签和说明 */
 const getConfigMeta = (fullPath) => {
   buildDescMap()
   if (CONFIG_DESC_MAP[fullPath]) return CONFIG_DESC_MAP[fullPath]
   const def = configStore.getConfigDefinition(fullPath)
-  return { label: def?.message || '', desc: '' }
+  return { label: def?.label || '', desc: '' }
 }
 
 // 将配置对象转换为树形表格数据（按 configItems.js 顺序排列）
-const convertToTreeData = (obj, parentPath = '') => {
+const convertToTreeData = (obj, parentPath = '', _groupKey = '') => {
   const result = []
   const entries = Object.entries(obj)
 
@@ -339,13 +349,15 @@ const convertToTreeData = (obj, parentPath = '') => {
     const min = getFieldMin(fullPath)
     const max = getFieldMax(fullPath)
 
+    const meta = CONFIG_DESC_MAP[fullPath]
     const node = {
       id: nextId++,
       key: fullPath,
       displayKey: key,
       originalKey: key,
-      label: getConfigMeta(fullPath).label,
-      desc: getConfigMeta(fullPath).desc,
+      label: meta?.label || getConfigMeta(fullPath).label,
+      desc: meta?.desc || getConfigMeta(fullPath).desc,
+      icon: meta?.icon || null,
       value: isObject ? null : value,
       type: isObject ? 'object' : typeof value,
       isObject: isObject,
@@ -355,11 +367,12 @@ const convertToTreeData = (obj, parentPath = '') => {
       parentPath: parentPath,
       min: isFinite(min) ? min : undefined,
       max: isFinite(max) ? max : undefined,
-      isSystem: isSystemField(fullPath)
+      isSystem: isSystemField(fullPath),
+      _groupKey,
     }
 
     if (isObject && value !== null) {
-      node.children = convertToTreeData(value, fullPath)
+      node.children = convertToTreeData(value, fullPath, _groupKey)
     }
 
     result.push(node)
@@ -368,82 +381,29 @@ const convertToTreeData = (obj, parentPath = '') => {
   return result
 }
 
-// 将配置数据按 configItems.js 分组包装为树形表格数据
+// 按 configItems 分组包装树形表格数据（API 数据已按 group.key 分组）
 const buildGroupedTreeData = (apiData) => {
   const { groups } = useConfigItems()
   buildDescMap()
   const result = []
 
   for (const group of groups) {
-    const groupNode = {
+    const groupData = apiData[group.key]
+    if (!groupData || typeof groupData !== 'object') continue
+
+    result.push({
       id: nextId++,
-      key: group.key,
-      displayKey: group.label,
-      originalKey: group.key,
-      label: '',
-      desc: '',
-      icon: group.icon,
-      value: null,
-      type: 'object',
-      isObject: true,
-      isEditing: false,
-      editValue: null,
-      children: [],
-      parentPath: '',
-      min: undefined,
-      max: undefined,
-      isSystem: false
-    }
-
-    // 收集该分组下的配置项
-    for (const item of group.items) {
-      const cfgKey = item.key
-      if (!cfgKey) continue
-      const parts = cfgKey.split('.')
-      if (parts.length === 1) {
-        // 顶层配置
-        if (cfgKey in apiData) {
-          groupNode.children.push(buildLeafNode(cfgKey, cfgKey, apiData[cfgKey], '', item.icon))
-        }
-      } else {
-        // 嵌套配置
-        const parentKey = parts[0]
-        const childKey = parts[1]
-        if (apiData[parentKey] && childKey in apiData[parentKey]) {
-          let parentNode = groupNode.children.find(c => c.key === parentKey)
-          if (!parentNode) {
-            parentNode = buildObjectNode(parentKey, apiData[parentKey])
-            groupNode.children.push(parentNode)
-          }
-          parentNode.children.push(buildLeafNode(cfgKey, childKey, apiData[parentKey][childKey], parentKey, item.icon))
-        }
-      }
-    }
-
-    result.push(groupNode)
+      key: group.key, displayKey: group.label, originalKey: group.key,
+      label: '', desc: '', icon: group.icon,
+      value: null, type: 'object', isObject: true,
+      isEditing: false, editValue: null,
+      children: convertToTreeData(groupData, '', group.key),
+      parentPath: '', min: undefined, max: undefined, isSystem: false
+    })
   }
 
   return result
 }
-
-const buildObjectNode = (key, value) => ({
-  id: nextId++, key, displayKey: key, originalKey: key,
-  label: getConfigMeta(key).label, desc: '', icon: null,
-  value: null, type: 'object', isObject: true,
-  isEditing: false, editValue: null, children: [],
-  parentPath: '', min: undefined, max: undefined, isSystem: false
-})
-
-const buildLeafNode = (fullPath, displayKey, value, parentPath, icon) => ({
-  id: nextId++, key: fullPath, displayKey, originalKey: displayKey,
-  label: getConfigMeta(fullPath).label, desc: CONFIG_DESC_MAP[fullPath]?.desc || '', icon,
-  value, type: typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'string',
-  isObject: false, isEditing: false, editValue: value,
-  children: [], parentPath,
-  min: isFinite(getFieldMin(fullPath)) ? getFieldMin(fullPath) : undefined,
-  max: isFinite(getFieldMax(fullPath)) ? getFieldMax(fullPath) : undefined,
-  isSystem: isSystemField(fullPath)
-})
 
 // 加载配置数据
 const loadConfigData = async () => {
@@ -475,15 +435,17 @@ const handleClearFilter = () => {
 const handleConfigSelect = (item) => {
   filterKeyword.value = item.isGroup ? item.groupLabel || item.label : (item.configKey || item.label)
 
-  // 过滤：保留匹配的分组及子节点
-  const keyword = filterKeyword.value.toLowerCase()
+  // 过滤：保留匹配的分组及子节点（支持相对路径和 group 前缀路径）
+  let keyword = filterKeyword.value.toLowerCase()
   tableData.value = fullTableData.value
     .map(group => {
       if (item.isGroup && group.key === item.groupKey) return group
       if (keyword && group.children?.length) {
+        // 如果 keyword 以 group.key 开头，去掉前缀做相对匹配
+        const rel = keyword.startsWith(group.key + '.') ? keyword.slice(group.key.length + 1) : keyword
         const matched = group.children.filter(child =>
-          child.key.toLowerCase().includes(keyword) ||
-          (child.children || []).some(c => c.key.toLowerCase().includes(keyword))
+          child.key.toLowerCase().includes(keyword) || child.key.toLowerCase().includes(rel) ||
+          (child.children || []).some(c => c.key.toLowerCase().includes(keyword) || c.key.toLowerCase().includes(rel))
         )
         if (matched.length) return { ...group, children: matched }
       }
@@ -568,7 +530,7 @@ const handleSave = async (row) => {
     }
     
     // 调用单个配置更新接口
-    const res = await updateConfigValueApi(row.key, newValue)
+    const res = await updateConfigValueApi(buildApiKey(row), newValue)
     if (res.code === 200) {
       row.value = cloneValue(newValue)
       row.isEditing = false
@@ -585,16 +547,8 @@ const handleSave = async (row) => {
 }
 
 // 同步 store 中的值
-const syncStoreValue = async (key, value) => {
-  if (key.includes('.')) {
-    const parts = key.split('.')
-    if (parts.length === 2 && configStore[parts[0]]) {
-      configStore[parts[0]][parts[1]] = value
-    }
-  } else if (key in configStore) {
-    configStore[key] = value
-  }
-  // 触发配置变更后的回调
+const syncStoreValue = (key, value) => {
+  configStore.setValue(key, value)
   configStore.executeInit()
 }
 
@@ -648,7 +602,7 @@ const handleDelete = async (row) => {
       configStore.removeNumberLimit(row.key)
     }
     
-    const res = await deleteConfigValueApi(row.key)
+    const res = await deleteConfigValueApi(buildApiKey(row))
     if (res.code === 200) {
       msg.primary('删除成功')
       await configStore.loadConfig()
@@ -713,11 +667,24 @@ const handleConfirmAdd = async () => {
         let targetObj = fullConfig
         
         if (addForm.parentPath) {
-          targetObj = getNestedObject(fullConfig, addForm.parentPath.split('.'))
+          let pathParts = addForm.parentPath.split('.')
+          targetObj = getNestedObject(fullConfig, pathParts)
           if (!targetObj) {
-            msg.error('父路径不存在')
-            return
+            // 父路径可能是相对路径（如仅 'address'），尝试在各 group 下查找
+            const { groups } = useConfigItems()
+            for (const g of groups) {
+              const tryParts = [g.key, ...pathParts]
+              const found = getNestedObject(fullConfig, tryParts)
+              if (found) { targetObj = found; pathParts = tryParts; break }
+            }
           }
+          if (!targetObj) {
+            // 仍不存在则用原始 pathParts 创建
+            ensureNestedPath(fullConfig, pathParts)
+            targetObj = getNestedObject(fullConfig, pathParts)
+          }
+          // 更新 addForm.parentPath 为完整路径
+          addForm.parentPath = pathParts.join('.')
         }
         
         // 检查key是否已存在
@@ -749,6 +716,10 @@ const handleConfirmAdd = async () => {
         
         targetObj[addForm.key] = value
         
+        console.log('=== handleConfirmAdd BEFORE ===', JSON.stringify(fullConfig))
+        console.log('parentPath:', addForm.parentPath, 'key:', addForm.key, 'value:', value)
+        console.log('targetObj keys:', Object.keys(targetObj))
+        console.log('=== handleConfirmAdd AFTER ===', JSON.stringify(fullConfig))
         const res = await updateAllConfigApi(fullConfig)
         if (res.code === 200) {
           msg.primary('新增成功')
@@ -769,7 +740,8 @@ const handleConfirmAdd = async () => {
 // 构建完整的配置对象（从当前表格数据）
 const buildFullConfig = () => {
   const config = {}
-  for (const node of tableData.value) {
+  const data = fullTableData.value.length ? fullTableData.value : tableData.value
+  for (const node of data) {
     buildConfigFromNode(config, node)
   }
   return config
@@ -799,6 +771,17 @@ const getNestedObject = (obj, pathParts) => {
     current = current[part]
   }
   return current
+}
+
+// 确保嵌套路径存在（不覆盖已有值）
+const ensureNestedPath = (obj, pathParts) => {
+  let current = obj
+  for (const part of pathParts) {
+    if (current[part] === undefined || current[part] === null) {
+      current[part] = {}
+    }
+    current = current[part]
+  }
 }
 
 // 更新嵌套值

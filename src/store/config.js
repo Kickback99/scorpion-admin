@@ -7,308 +7,187 @@ import { useIconStore } from "./icon"
 import msg from '@/components/msg'
 
 // ============================================================
-// 系统预定义配置项 key 列表（不可删除）
+// 配置项元数据 — 由 configItems.js 调用 registerItems() 注入
+// configStore 自身不定义任何 key，全部从 configItems 读取
+// _itemMap[key] = { type, label, options, sys, group }
 // ============================================================
-const SYSTEM_CONFIG_KEYS = [
-  'article.top_limit',
-  'article.carousel_limit',
-  'icon_enabled',
-  'comment.article_comment_enabled',
-  'comment.child_comment_limit',
-  'comment.child_page_size',
-  'user.login_enabled',
-  'article_detail.theme',
-  'article_detail.anchor_enabled'
-]
+const _itemMap = {}
 
-// ============================================================
-// 配置定义 — 顶层配置优先，嵌套配置按 state 顺序排列
-// ============================================================
-const CONFIG_DEFINITIONS = {
-  // ===== 顶层配置 =====
-  icon_enabled:                 { type: 'switch', message: '图标搜索增强' },
-  config_view_mode:             { type: 'string', message: '配置界面样式' },
-  tag_view_mode:                { type: 'string', message: '标签管理样式' },
-  websocket_enabled:            { type: 'switch', message: 'WebSocket 连接' },
-  search_menu_focus:            { type: 'switch', message: '搜索菜单聚焦' },
-  theme_layout_mode:            { type: 'string', message: '主题色布局' },
-  theme_dot_shape:              { type: 'string', message: '色块形状' },
-  tree_auth_line_style:         { type: 'string', message: '授权树连接线' },
-  tree_cate_line_style:         { type: 'string', message: '分类树连接线' },
-  tree_cate_parent_mode:        { type: 'string', message: '分类父节点宽度' },
-  tree_cate_parent_width:       { type: 'number', message: '分类父节点自定义px', min:12, max:200 },
-  tree_cate_child_mode:         { type: 'string', message: '分类子节点宽度' },
-  tree_auth_child_mode:         { type: 'string', message: '授权子节点宽度' },
-
-  // ===== article 文章配置 =====
-  'article.top_limit':          { type: 'number', message: '文章置顶数量限制', min:1, max:99 },
-  'article.carousel_limit':     { type: 'number', message: '轮播图数量限制', min:0, max:99 },
-  'article.save_edit':          { type: 'switch', message: '文章编辑保存方式' },
-
-  // ===== comment 评论相关 =====
-  'comment.article_comment_enabled':    { type: 'switch', message: '文章评论显示' },
-  'comment.friend_link_comment_enabled':{ type: 'switch', message: '友链评论显示' },
-  'comment.child_comment_limit':        { type: 'number', message: '子评论默认显示数量', min:0, max:20 },
-  'comment.child_page_size':            { type: 'number', message: '子评论分页大小', min:5, max:50 },
-  'comment.parent_page_size':           { type: 'number', message: '父评论分页大小', min:5, max:15 },
-
-  // ===== nav 导航相关 =====
-  'nav.friend_link_enabled':            { type: 'switch', message: '前端友链' },
-
-  // ===== user 前台用户认证相关 =====
-  'user.login_enabled':                 { type: 'switch', message: '前端登录' },
-  'user.other_login_enabled':           { type: 'switch', message: '其他登录' },
-
-  // ===== profile 个人中心相关 =====
-  'profile.my_publishes_enabled':       { type:'switch', message: '我的发布' },
-  'profile.my_comments_enabled':        { type:'switch', message:'我的评论' },
-  'profile.my_favorites_enabled':       { type:'switch', message:'我的收藏' },
-
-  // ===== article_detail 文章详情相关 =====
-  'article_detail.theme':               { type: 'radio', message: '文章主题' },
-  'article_detail.anchor_enabled':      { type: 'switch', message: '文章锚点' },
-  'article_detail.favorite_count_enabled':{ type: 'switch', message: '文章收藏数' },
-
-  // ===== article_list 文章列表相关 =====
-  'article_list.view_enabled':          { type: 'switch', message: '文章浏览' },
-  'article_list.favorite_enabled':      { type: 'switch', message: '文章收藏' },
-  'article_list.comment_enabled':       { type: 'switch', message: '文章评论' },
-  'article_list.load_mode':             { type: 'string', message: '文章加载方式' },
-  'article_list.scroll_page_size':      { type: 'number', message: '滚动模式分页大小', min:5, max:15 },
-  'article_list.pagination_page_size':  { type: 'number', message: '分页模式分页大小', min:5, max:15 },
-
-  // ===== notification 通知配置 =====
-  'notification.comment_enabled':       { type:'switch', message: '评论通知' },
-
-  // ===== user_config 用户配置 =====
-  'user_config.collapse_enabled':       { type:'switch', message:'菜单折叠' },
-  'user_config.dark_enabled':           { type:'switch', message:'深色模式' },
-  'user_config.theme':                  { type:'string', message:'主题名称' },
-
-  // ===== oss 配置 =====
-  'oss.data_retention_days':            { type: 'number', message: '逻辑删除oss数据保留天数', min:0, max:100 },
-  'oss.file_retention_days':            { type: 'number', message: 'oss文件保留天数', min:0, max:100 },
-
-  // ===== logo 配置 =====
-  'logo.animation_style':               { type:'string', message:'Logo 动画样式' },
-  'logo.hide_image':                    { type:'switch', message:'隐藏 Logo 图片' },
-}
-
-// ============================================================
-// 提示消息映射 — type/value → 中文消息
-// ============================================================
-const MESSAGE_MAP = {
-  switch: {
-    true: (fieldName) => `${fieldName}已开启`,
-    false: (fieldName) => `${fieldName}已禁用`
-  },
-  'article_detail.theme': {
-    0: '主题已切换为 Github',
-    1: '主题已切换为 Vuepress'
-  },
-  number: {
-    default: (fieldName, value) => `${fieldName}已设为 ${value}`
-  },
-  string: {
-    // ===== 顶层配置 =====
-    'config_view_mode': {
-      'sidebar': '分栏面板',
-      'card': '折叠面板',
-      'table': '折叠行内列表'
-    },
-    'tag_view_mode': {
-      'table': '表格',
-      'card': '卡片网格',
-      'cloud': '标签云'
-    },
-    'theme_layout_mode': {
-      'float': '底部浮动',
-      'inline': '行内色点',
-      'popover': '全部 Popover'
-    },
-    'theme_dot_shape': {
-      'circle': '圆形',
-      'rect': '矩形',
-      'square': '方形'
-    },
-    'tree_auth_line_style': {
-      'none': '无',
-      'solid': '实线',
-      'dashed': '虚线'
-    },
-    'tree_cate_line_style': {
-      'none': '无',
-      'solid': '实线',
-      'dashed': '虚线'
-    },
-    'tree_cate_parent_mode': {
-      'content': '内容宽',
-      'custom': '较大值'
-    },
-    'tree_cate_child_mode': {
-      'content': '内容宽',
-      'fill': '占满'
-    },
-    'tree_auth_child_mode': {
-      'content': '内容宽',
-      'fill': '占满'
-    },
-
-    // ===== 文章列表 =====
-    'article_list.load_mode': {
-      'scroll': '滚动',
-      'pagination': '分页'
-    },
-
-    // ===== user_config =====
-    'user_config.theme': {
-      'default': '默认蓝',
-      'orange': '活力橙',
-      'pink': '柔粉',
-      'green': '翠绿',
-      'purple': '紫韵',
-      'enterprise': '企业蓝',
-      'coral': '柔红',
-      'warm': '柠绿',
-      'aqua': '海碧',
-      'indigo': '鸢尾紫'
-    },
-
-    // ===== logo =====
-    'logo.animation_style': {
-      'none': '无动画',
-      'neon': '霓虹灯管',
-      'multi-neon': 'SVG 多重描边霓虹',
-      'energy-pulse': '能量脉冲',
-      'stroke-scan': '镂空扫描描边',
-      'glitch': '故障扫描线'
-    },
+/**
+ * 注册配置项元数据。configItems.js 在模块初始化时调用。
+ * @param {Array<{key:string, type:string, label:string, options?:Array, sys?:boolean}>} items
+ * @param {string} groupKey — 所属分组 key（client / admin / user）
+ */
+export function registerItems(items, groupKey) {
+  for (const it of items) {
+    _itemMap[it.key] = { type: it.type, label: it.label, options: it.options, sys: it.sys, group: groupKey }
   }
 }
 
+function _item(key) { return _itemMap[key] || {} }
+
+// ============================================================
+// number 型配置项的默认 min/max
+// ============================================================
+const DEFAULT_NUMBER_LIMITS = {
+  'comment.child_comment_limit':              { min: 0, max: 20 },
+  'comment.child_page_size':                  { min: 5, max: 50 },
+  'comment.parent_page_size':                 { min: 5, max: 15 },
+  'article.top_limit':                        { min: 1, max: 99 },
+  'article.carousel_limit':                   { min: 0, max: 99 },
+  'article_list.scroll_page_size':            { min: 5, max: 15 },
+  'article_list.pagination_page_size':        { min: 5, max: 15 },
+  'oss.data_retention_days':                  { min: 0, max: 100 },
+  'oss.file_retention_days':                  { min: 0, max: 100 },
+  'tree_cate_parent_width':                   { min: 12, max: 200 },
+}
+
+// ============================================================
+// 工具函数 — 深层读写
+// ============================================================
+
+/** 深层读取 obj 中 path 路径的值 */
+function deepGet(obj, path) {
+  let cur = obj
+  for (const k of path) {
+    if (cur == null) return undefined
+    cur = cur[k]
+  }
+  return cur
+}
+
+/** 深层写入 obj 中 path 路径的值，自动创建中间对象 */
+function deepSet(obj, path, value) {
+  let cur = obj
+  for (let i = 0; i < path.length - 1; i++) {
+    if (!(path[i] in cur) || typeof cur[path[i]] !== 'object' || cur[path[i]] === null) {
+      cur[path[i]] = {}
+    }
+    cur = cur[path[i]]
+  }
+  cur[path[path.length - 1]] = value
+}
+
+// ============================================================
+// Pinia Store
+// ============================================================
 export const useConfigStore = defineStore({
   id: 'config',
 
   // ============================================================
-  // 数据
+  // 数据 — 以 group（client / admin / user）为顶层 key，与后端结构对齐
   // ============================================================
   state: () => ({
     loading: false,
-    // ===== 顶层配置 =====
-    icon_enabled: true,
-    config_view_mode: 'card',
-    tag_view_mode: 'card',
-    websocket_enabled: true,
-    search_menu_focus: false,
-    theme_layout_mode: 'inline',
-    theme_dot_shape: 'circle',
-    tree_auth_line_style: 'dashed',
-    tree_cate_line_style: 'dashed',
-    tree_cate_parent_mode: 'custom',
-    tree_cate_parent_width: 75,
-    tree_cate_child_mode: 'fill',
-    tree_auth_child_mode: 'fill',
-    // ===== 嵌套配置 =====
-    article: {
-      top_limit: 3,
-      carousel_limit: 3,
-      save_edit: false
+    numberLimits: {},
+
+    // ===== client 前台 =====
+    client: {
+      comment: {
+        article_comment_enabled: true,
+        friend_link_comment_enabled: false,
+        child_comment_limit: 3,
+        child_page_size: 10,
+        parent_page_size: 10,
+      },
+      nav: {
+        friend_link_enabled: false,
+      },
+      user: {
+        login_enabled: true,
+        other_login_enabled: false,
+      },
+      profile: {
+        my_publishes_enabled: false,
+        my_comments_enabled: true,
+        my_favorites_enabled: true,
+      },
+      article_detail: {
+        theme: 0,
+        anchor_enabled: true,
+        favorite_count_enabled: true,
+      },
+      article_list: {
+        view_enabled: true,
+        favorite_enabled: true,
+        comment_enabled: true,
+        load_mode: 'scroll',
+        scroll_page_size: 10,
+        pagination_page_size: 7,
+      },
+      websocket_enabled: true,
     },
-    comment: {
-      article_comment_enabled: true,
-      friend_link_comment_enabled: false,
-      child_comment_limit: 3,
-      child_page_size: 10,
-      parent_page_size:10
+
+    // ===== admin 后台 =====
+    admin: {
+      article: {
+        top_limit: 3,
+        carousel_limit: 3,
+        save_edit: false,
+      },
+      icon_enabled: true,
+      config_view_mode: 'card',
+      tag_view_mode: 'card',
+      search_menu_focus: false,
+      theme_layout_mode: 'inline',
+      theme_dot_shape: 'circle',
+      tree_auth_line_style: 'dashed',
+      tree_cate_line_style: 'dashed',
+      tree_cate_parent_mode: 'custom',
+      tree_cate_parent_width: 75,
+      tree_cate_child_mode: 'fill',
+      tree_auth_child_mode: 'fill',
+      notification: {
+        comment_enabled: true,
+      },
+      oss: {
+        data_retention_days: 30,
+        file_retention_days: 7,
+      },
+      logo: {
+        animation_style: 'neon',
+        hide_image: false,
+      },
     },
-    nav:{
-      friend_link_enabled: false,
+
+    // ===== user 用户配置 =====
+    user: {
+        collapse_enabled: false,
+        dark_enabled: false,
+        theme: 'default',
     },
-    user:{
-      login_enabled: true,
-      other_login_enabled: false
-    },
-    profile:{
-      my_publishes_enabled: false,
-      my_comments_enabled: true,
-      my_favorites_enabled: true
-    },
-    article_detail:{
-      theme: 0,
-      anchor_enabled: true,
-      favorite_count_enabled: true
-    },
-    article_list:{
-      view_enabled: true,
-      favorite_enabled: true,
-      comment_enabled: true,
-      load_mode: 'scroll',
-      scroll_page_size: 10,
-      pagination_page_size: 7
-    },
-    notification: {
-      comment_enabled: true
-    },
-    user_config:{
-      collapse_enabled: false,
-      dark_enabled: false,
-      theme: 'default'
-    },
-    oss: {
-      data_retention_days: 30,
-      file_retention_days: 7
-    },
-    logo: {
-      animation_style: 'neon',
-      hide_image: false
-    },
-    // 存储数字类型的 min/max 限制，结构如：{ "vote": { min: 1, max: 7 } }
-    numberLimits: {}
   }),
 
   // ============================================================
-  // 渲染
+  // 方法
   // ============================================================
   actions: {
 
+    // ==================== 元数据 & 工具 ====================
+
     /** 判断是否为系统字段 */
     isSystemConfig(key) {
-      return SYSTEM_CONFIG_KEYS.includes(key)
+      return _item(key).sys === true
     },
 
-    /** 获取配置项的定义 */
+    /** 获取配置项的元数据 */
     getConfigDefinition(key) {
-      return CONFIG_DEFINITIONS[key]
+      const it = _item(key)
+      return it.type ? it : undefined
     },
 
-    /** 初始化数字限制（从 CONFIG_DEFINITIONS 加载） */
+    /** 初始化数字限制 */
     initNumberLimits() {
-      for (const [key, def] of Object.entries(CONFIG_DEFINITIONS)) {
-        if (def.type === 'number' && (def.min !== undefined || def.max !== undefined)) {
-          if (!this.numberLimits[key]) {
-            this.numberLimits[key] = {}
-          }
-          if (def.min !== undefined) {
-            this.numberLimits[key].min = def.min
-          }
-          if (def.max !== undefined) {
-            this.numberLimits[key].max = def.max
-          }
-        }
+      for (const [key, lim] of Object.entries(DEFAULT_NUMBER_LIMITS)) {
+        this.numberLimits[key] = { ...lim }
       }
     },
 
     /** 设置数字配置项的限制范围 */
     setNumberLimit(key, min, max) {
-      if (!this.numberLimits[key]) {
-        this.numberLimits[key] = {}
-      }
-      if (min !== undefined && min !== null) {
-        this.numberLimits[key].min = min
-      }
-      if (max !== undefined && max !== null) {
-        this.numberLimits[key].max = max
-      }
+      if (!this.numberLimits[key]) this.numberLimits[key] = {}
+      if (min !== undefined && min !== null) this.numberLimits[key].min = min
+      if (max !== undefined && max !== null) this.numberLimits[key].max = max
     },
 
     /** 获取数字配置项的限制范围 */
@@ -321,13 +200,72 @@ export const useConfigStore = defineStore({
       delete this.numberLimits[key]
     },
 
+    /** 获取限制最小值 */
+    getLimitMin(key) {
+      return this.numberLimits[key]?.min
+    },
+
+    /** 获取限制最大值 */
+    getLimitMax(key) {
+      return this.numberLimits[key]?.max
+    },
+
+    // ==================== 核心：通用读写 ====================
+
+    /**
+     * 按 configItems 中的 key 读取配置值
+     * 通过 _itemMap 定位所属 group，拼接完整 state 路径
+     * @param {string} key — configItems 中定义的 key（如 'comment.article_comment_enabled'）
+     * @returns {any}
+     */
+    getValue(key) {
+      const item = _itemMap[key]
+      if (item?.group) {
+        return deepGet(this, [item.group, ...key.split('.')])
+      }
+      // _itemMap 未填充时（非配置页面直接访问），回退到遍历 group 查找
+      for (const gk of ['client', 'admin', 'user']) {
+        const val = deepGet(this, [gk, ...key.split('.')])
+        if (val !== undefined) return val
+      }
+      return undefined
+    },
+
+    /**
+     * 本地设置配置值（不调 API，仅更新 store state）
+     * @param {string} key — configItems 中定义的 key
+     * @param {any} value — 新值
+     */
+    setValue(key, value) {
+      const item = _itemMap[key]
+      if (item?.group) {
+        deepSet(this, [item.group, ...key.split('.')], value)
+        return
+      }
+      // _itemMap 未填充时，回退到遍历 group 查找已有 key
+      for (const gk of ['client', 'admin', 'user']) {
+        const path = [gk, ...key.split('.')]
+        if (deepGet(this, path) !== undefined) {
+          deepSet(this, path, value)
+          return
+        }
+      }
+    },
+
+    // ==================== 核心：加载 & 更新 ====================
+
     /** 加载所有配置 */
     async loadConfig() {
       this.loading = true
       try {
         const res = await getConfigApi()
         if (res.code === 200 && res.data) {
-          Object.assign(this.$state, res.data)
+          // res.data = { client: {...}, admin: {...}, user: {...} }
+          for (const gk of Object.keys(res.data)) {
+            if (gk in this.$state) {
+              this.$state[gk] = res.data[gk]
+            }
+          }
           this.executeInit()
         }
       } catch (error) {
@@ -340,63 +278,56 @@ export const useConfigStore = defineStore({
 
     /**
      * 更新单个配置项
-     * @param {string} key 配置key（如 'comment.commentEnabled'）
+     * @param {string} key 配置 key（configItems 中定义的 key，如 'comment.article_comment_enabled'）
      * @param {any} value 新值
      */
     async updateConfig(key, value) {
-      const def = CONFIG_DEFINITIONS[key]
-      if (!def) {
+      const item = _itemMap[key]
+      if (!item.type) {
         console.error(`未找到配置项: ${key}`)
         return
       }
 
+      // 拼接完整 API key：group.key（如 client.comment.article_comment_enabled）
+      const apiKey = item.group ? `${item.group}.${key}` : key
+
       try {
-        const res = await updateConfigValueApi(key, value)
+        const res = await updateConfigValueApi(apiKey, value)
         if (res.code === 200) {
-          // 直接更新 store 中的值
-          if (key.includes('.')) {
-            const parts = key.split('.')
-            this[parts[0]][parts[1]] = value
-          } else {
-            this[key] = value
-          }
-          this.showMessage(def.message, value, def.type, key)
+          // 本地更新
+          deepSet(this, [item.group, ...key.split('.')], value)
+          this.showMessage(key, value)
           this.executeInit()
         } else {
-          // 响应拦截器已统一弹出具体错误信息（如"配置项不存在"），此处不再重复弹
-          // msg.error(res.message || '更新失败')
           await this.loadConfig()
         }
       } catch (error) {
         console.error('更新配置失败:', error)
-        // 响应拦截器已统一弹出具体错误信息（如"配置项不存在"），此处不再重复弹
-        // msg.error('更新失败')
         await this.loadConfig()
       }
     },
 
     /**
      * 显示提示消息
+     * @param {string} key — configItems key
+     * @param {any} value — 新值
      */
-    showMessage(fieldName, value, type, key) {
+    showMessage(key, value) {
+      const item = _itemMap[key]
+      if (!item) return
+
       let message = ''
-      
-      if (type === 'switch') {
-        message = MESSAGE_MAP.switch[value]?.(fieldName) || `${fieldName}已更新`
-      } else if (type === 'radio' && MESSAGE_MAP[key]) {
-      // 下面这个写法也可以的
-      // else if (type === 'radio' && key === 'article_detail.theme') {
-        message = MESSAGE_MAP[key][value] || `${fieldName}已切换`
-      } else if (type === 'number') {
-        message = MESSAGE_MAP.number.default(fieldName, value)
-      } else if (type === 'string') {
-        const stringMap = MESSAGE_MAP.string?.[key]
-        const displayValue = stringMap?.[value] || value
-        message = `${fieldName}已切换为 ${displayValue}`
+      if (item.type === 'switch') {
+        message = value ? `${item.label}已开启` : `${item.label}已禁用`
+      } else if (item.type === 'radio' || item.type === 'string') {
+        const opt = item.options?.find(o => o.value === value)
+        message = opt ? `${item.label}已切换为 ${opt.label}` : `${item.label}已切换`
+      } else if (item.type === 'number') {
+        message = `${item.label}已设为 ${value}`
       } else {
-        message = `${fieldName}已更新`
+        message = `${item.label}已更新`
       }
-      
+
       msg.primary(message)
     },
 
@@ -404,7 +335,11 @@ export const useConfigStore = defineStore({
      * 批量更新配置
      */
     async batchUpdateConfig(configData) {
-      Object.assign(this.$state, configData)
+      for (const gk of Object.keys(configData)) {
+        if (gk in this.$state) {
+          this.$state[gk] = configData[gk]
+        }
+      }
       this.executeInit()
     },
 
@@ -412,470 +347,239 @@ export const useConfigStore = defineStore({
      * 执行初始化逻辑
      */
     executeInit() {
-      if (this.iconEnabled === true) {
+      if (this.getValue('icon_enabled') === true) {
         const iconStore = useIconStore()
         iconStore.resetIconConditions()
       }
     },
 
-    // ========== 顶层配置 ==========
-
-
-    // icon_enabled
-    toggleIconEnabled() {
-      this.updateConfig('icon_enabled', !this.icon_enabled)
-    },
-
-    getIconEnabled() {
-      return this.icon_enabled === true
-    },
-
-    // config_view_mode
-    getConfigViewMode(){
-      return this.config_view_mode || 'card'
-    },
-
-    setConfigViewMode(value){
-      this.updateConfig('config_view_mode', value)
-    },
-
-    // tag_view_mode
-    getTagViewMode(){
-      return this.tag_view_mode || 'card'
-    },
-
-    setTagViewMode(value){
-      this.updateConfig('tag_view_mode', value)
-    },
-
-    // websocket_enabled
-    getWebsocketEnabled(){
-      return this.websocket_enabled ?? true
-    },
-
-    toggleWebsocketEnabled(){
-      this.updateConfig('websocket_enabled', !this.websocket_enabled)
-    },
-
-    // search_menu_focus
-    getSearchMenuFocus(){
-      return this.search_menu_focus === true
-    },
-
-    toggleSearchMenuFocus(){
-      this.updateConfig('search_menu_focus', !this.search_menu_focus)
-    },
-
-    // theme_layout_mode
-    getThemeLayoutMode(){
-      return this.theme_layout_mode || 'float'
-    },
-
-    setThemeLayoutMode(value){
-      this.updateConfig('theme_layout_mode', value)
-    },
-
-    // theme_dot_shape
-    getThemeDotShape(){
-      return this.theme_dot_shape || 'circle'
-    },
-
-    setThemeDotShape(value){
-      this.updateConfig('theme_dot_shape', value)
-    },
-
-    // tree_auth_line_style
-    getTreeAuthLineStyle(){
-      return this.tree_auth_line_style || 'dashed'
-    },
-
-    setTreeAuthLineStyle(value){
-      this.updateConfig('tree_auth_line_style', value)
-    },
-
-    // tree_cate_line_style
-    getTreeCateLineStyle(){
-      return this.tree_cate_line_style || 'dashed'
-    },
-
-    setTreeCateLineStyle(value){
-      this.updateConfig('tree_cate_line_style', value)
-    },
-
-    // tree_cate_parent_mode
-    getTreeCateParentMode(){
-      return this.tree_cate_parent_mode || 'custom'
-    },
-
-    setTreeCateParentMode(value){
-      this.updateConfig('tree_cate_parent_mode', value)
-    },
-
-    // tree_cate_parent_width
-    getTreeCateParentWidth(){
-      return this.tree_cate_parent_width ?? 75
-    },
-
-    setTreeCateParentWidth(value){
-      this.updateConfig('tree_cate_parent_width', value)
-    },
+    // ==================== 专用 getter / setter / toggle（thin wrapper） ====================
 
-    // tree_cate_child_mode
-    getTreeCateChildMode(){
-      return this.tree_cate_child_mode || 'fill'
-    },
+    // -- icon_enabled --
+    getIconEnabled()               { return this.getValue('icon_enabled') === true },
+    toggleIconEnabled()            { this.updateConfig('icon_enabled', !this.getValue('icon_enabled')) },
 
-    setTreeCateChildMode(value){
-      this.updateConfig('tree_cate_child_mode', value)
-    },
+    // -- config_view_mode --
+    getConfigViewMode()            { return this.getValue('config_view_mode') || 'card' },
+    setConfigViewMode(v)           { this.updateConfig('config_view_mode', v) },
 
-    // tree_auth_child_mode
-    getTreeAuthChildMode(){
-      return this.tree_auth_child_mode || 'fill'
-    },
+    // -- tag_view_mode --
+    getTagViewMode()               { return this.getValue('tag_view_mode') || 'card' },
+    setTagViewMode(v)              { this.updateConfig('tag_view_mode', v) },
 
-    setTreeAuthChildMode(value){
-      this.updateConfig('tree_auth_child_mode', value)
-    },
+    // -- websocket_enabled --
+    getWebsocketEnabled()          { return this.getValue('websocket_enabled') ?? true },
+    toggleWebsocketEnabled()       { this.updateConfig('websocket_enabled', !this.getValue('websocket_enabled')) },
 
-    // ========== article ==========
+    // -- search_menu_focus --
+    getSearchMenuFocus()           { return this.getValue('search_menu_focus') === true },
+    toggleSearchMenuFocus()        { this.updateConfig('search_menu_focus', !this.getValue('search_menu_focus')) },
 
-    setArticleTopLimit(value) {
-      this.updateConfig('article.top_limit', value)
-    },
+    // -- theme_layout_mode --
+    getThemeLayoutMode()           { return this.getValue('theme_layout_mode') || 'float' },
+    setThemeLayoutMode(v)          { this.updateConfig('theme_layout_mode', v) },
 
-    getArticleTopLimit(){
-      return this.article?.top_limit ?? 3
-    },
+    // -- theme_dot_shape --
+    getThemeDotShape()             { return this.getValue('theme_dot_shape') || 'circle' },
+    setThemeDotShape(v)            { this.updateConfig('theme_dot_shape', v) },
 
-    setArticleCarouselLimit(value) {
-      this.updateConfig('article.carousel_limit', value)
-    },
+    // -- tree_auth_line_style --
+    getTreeAuthLineStyle()         { return this.getValue('tree_auth_line_style') || 'dashed' },
+    setTreeAuthLineStyle(v)        { this.updateConfig('tree_auth_line_style', v) },
 
-    getArticleCarouselLimit(){
-      return this.article?.carousel_limit ?? 3
-    },
+    // -- tree_cate_line_style --
+    getTreeCateLineStyle()         { return this.getValue('tree_cate_line_style') || 'dashed' },
+    setTreeCateLineStyle(v)        { this.updateConfig('tree_cate_line_style', v) },
 
-    toggleArticleSaveEdit(){
-      this.updateConfig('article.save_edit', !this.article?.save_edit)
-    },
+    // -- tree_cate_parent_mode --
+    getTreeCateParentMode()        { return this.getValue('tree_cate_parent_mode') || 'custom' },
+    setTreeCateParentMode(v)       { this.updateConfig('tree_cate_parent_mode', v) },
 
-    getArticleSaveEdit(){
-      return this.article?.save_edit === true
-    },
+    // -- tree_cate_parent_width --
+    getTreeCateParentWidth()       { return this.getValue('tree_cate_parent_width') ?? 75 },
+    setTreeCateParentWidth(v)      { this.updateConfig('tree_cate_parent_width', v) },
 
-    // ========== comment ==========
+    // -- tree_cate_child_mode --
+    getTreeCateChildMode()         { return this.getValue('tree_cate_child_mode') || 'fill' },
+    setTreeCateChildMode(v)        { this.updateConfig('tree_cate_child_mode', v) },
 
-    toggleArticleCommentEnabled() {
-      this.updateConfig('comment.article_comment_enabled', !this.comment?.article_comment_enabled)
-    },
+    // -- tree_auth_child_mode --
+    getTreeAuthChildMode()         { return this.getValue('tree_auth_child_mode') || 'fill' },
+    setTreeAuthChildMode(v)        { this.updateConfig('tree_auth_child_mode', v) },
 
-    getArticleCommentEnabled() {
-      return this.comment?.article_comment_enabled ?? true
-    },
+    // ==================== article ====================
 
-    toggleFriendLinkCommentEnabled() {
-      this.updateConfig('comment.friend_link_comment_enabled', !this.comment?.friend_link_comment_enabled)
-    },
+    getArticleTopLimit()           { return this.getValue('article.top_limit') ?? 3 },
+    setArticleTopLimit(v)          { this.updateConfig('article.top_limit', v) },
 
-    getFriendLinkCommentEnabled() {
-      return this.comment?.friend_link_comment_enabled ?? true
-    },
+    getArticleCarouselLimit()      { return this.getValue('article.carousel_limit') ?? 3 },
+    setArticleCarouselLimit(v)     { this.updateConfig('article.carousel_limit', v) },
 
-    setChildCommentLimit(value) {
-      this.updateConfig('comment.child_comment_limit', value)
-    },
+    getArticleSaveEdit()           { return this.getValue('article.save_edit') === true },
+    toggleArticleSaveEdit()        { this.updateConfig('article.save_edit', !this.getValue('article.save_edit')) },
 
-    getChildCommentLimit() {
-      return this.comment?.child_comment_limit ?? 3
-    },
+    // ==================== comment ====================
 
-    setChildPageSize(value) {
-      this.updateConfig('comment.child_page_size', value)
-    },
+    getArticleCommentEnabled()     { return this.getValue('comment.article_comment_enabled') ?? true },
+    toggleArticleCommentEnabled()  { this.updateConfig('comment.article_comment_enabled', !this.getValue('comment.article_comment_enabled')) },
 
-    getChildPageSize() {
-      return this.comment?.child_page_size ?? 7
-    },
+    getFriendLinkCommentEnabled()  { return this.getValue('comment.friend_link_comment_enabled') ?? true },
+    toggleFriendLinkCommentEnabled() { this.updateConfig('comment.friend_link_comment_enabled', !this.getValue('comment.friend_link_comment_enabled')) },
 
-    setParentPageSize(value) {
-      this.updateConfig('comment.parent_page_size', value)
-    },
+    getChildCommentLimit()         { return this.getValue('comment.child_comment_limit') ?? 3 },
+    setChildCommentLimit(v)        { this.updateConfig('comment.child_comment_limit', v) },
 
-    getParentPageSize() {
-      return this.comment?.parent_page_size ?? 10
-    },
+    getChildPageSize()             { return this.getValue('comment.child_page_size') ?? 7 },
+    setChildPageSize(v)            { this.updateConfig('comment.child_page_size', v) },
 
-    // ========== nav ==========
+    getParentPageSize()            { return this.getValue('comment.parent_page_size') ?? 10 },
+    setParentPageSize(v)           { this.updateConfig('comment.parent_page_size', v) },
 
-    toggleFriendLinkEnabled() {
-      this.updateConfig('nav.friend_link_enabled', !this.nav?.friend_link_enabled)
-    },
+    // ==================== nav ====================
 
-    getFriendLinkEnabled(){
-      return this.nav?.friend_link_enabled === true
-    },
+    getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
+    toggleFriendLinkEnabled()      { this.updateConfig('nav.friend_link_enabled', !this.getValue('nav.friend_link_enabled')) },
 
-    // ========== user ==========
+    // ==================== user（前台认证） ====================
 
-    toggleUserLoginEnabled() {
-      this.updateConfig('user.login_enabled', !this.user?.login_enabled)
-    },
+    getUserLoginEnabled()          { return this.getValue('user.login_enabled') === true },
+    toggleUserLoginEnabled()       { this.updateConfig('user.login_enabled', !this.getValue('user.login_enabled')) },
 
-    getUserLoginEnabled(){
-      return this.user?.login_enabled === true
-    },
+    getUserOtherLoginEnabled()     { return this.getValue('user.other_login_enabled') === true },
+    toggleUserOtherLoginEnabled()  { this.updateConfig('user.other_login_enabled', !this.getValue('user.other_login_enabled')) },
 
-    toggleUserOtherLoginEnabled() {
-      this.updateConfig('user.other_login_enabled', !this.user?.other_login_enabled)
-    },
+    // ==================== profile ====================
 
-    getUserOtherLoginEnabled(){
-      return this.user?.other_login_enabled === true
-    },
+    getMyPublishesEnabled()        { return this.getValue('profile.my_publishes_enabled') ?? true },
+    toggleMyPublishesEnabled()     { this.updateConfig('profile.my_publishes_enabled', !this.getValue('profile.my_publishes_enabled')) },
 
-    // ========== profile ==========
+    getMyCommentsEnabled()         { return this.getValue('profile.my_comments_enabled') ?? true },
+    toggleMyCommentsEnabled()      { this.updateConfig('profile.my_comments_enabled', !this.getValue('profile.my_comments_enabled')) },
 
-    toggleMyPublishesEnabled(){
-      this.updateConfig('profile.my_publishes_enabled',!this.profile.my_publishes_enabled)
-    },
+    getMyFavoritesEnabled()        { return this.getValue('profile.my_favorites_enabled') ?? true },
+    toggleMyFavoritesEnabled()     { this.updateConfig('profile.my_favorites_enabled', !this.getValue('profile.my_favorites_enabled')) },
 
-    getMyPublishesEnabled() {
-      return this.profile?.my_publishes_enabled ?? true
-    },
+    // ==================== article_detail ====================
 
-    toggleMyCommentsEnabled(){
-      this.updateConfig('profile.my_comments_enabled',!this.profile.my_comments_enabled)
-    },
+    getArticleTheme()              { return this.getValue('article_detail.theme') },
+    setArticleTheme(v)             { this.updateConfig('article_detail.theme', v) },
 
-    getMyCommentsEnabled() {
-      return this.profile?.my_comments_enabled ?? true
-    },
+    getAnchorEnabled()             { return this.getValue('article_detail.anchor_enabled') ?? true },
+    toggleAnchorEnabled()          { this.updateConfig('article_detail.anchor_enabled', !this.getValue('article_detail.anchor_enabled')) },
 
-    toggleMyFavoritesEnabled(){
-      this.updateConfig('profile.my_favorites_enabled',!this.profile.my_favorites_enabled)
-    },
+    getFavoriteCountEnabled()      { return this.getValue('article_detail.favorite_count_enabled') ?? true },
+    toggleFavoriteCountEnabled()   { this.updateConfig('article_detail.favorite_count_enabled', !this.getValue('article_detail.favorite_count_enabled')) },
 
-    getMyFavoritesEnabled() {
-      return this.profile?.my_favorites_enabled ?? true
-    },
+    // ==================== article_list ====================
 
-    // ========== article_detail ==========
+    getListViewEnabled()           { return this.getValue('article_list.view_enabled') ?? true },
+    toggleListViewEnabled()        { this.updateConfig('article_list.view_enabled', !this.getValue('article_list.view_enabled')) },
 
-    setArticleTheme(value) {
-      this.updateConfig('article_detail.theme', value)
-    },
+    getListFavoriteEnabled()       { return this.getValue('article_list.favorite_enabled') ?? true },
+    toggleListFavoriteEnabled()    { this.updateConfig('article_list.favorite_enabled', !this.getValue('article_list.favorite_enabled')) },
 
-    getArticleTheme(){
-      return this.article_detail?.theme
-    },
+    getListCommentEnabled()        { return this.getValue('article_list.comment_enabled') ?? true },
+    toggleListCommentEnabled()     { this.updateConfig('article_list.comment_enabled', !this.getValue('article_list.comment_enabled')) },
 
-    toggleAnchorEnabled() {
-      this.updateConfig('article_detail.anchor_enabled', !this.article_detail?.anchor_enabled)
-    },
+    getListLoadMode()              { return this.getValue('article_list.load_mode') },
+    setListLoadMode(v)             { this.updateConfig('article_list.load_mode', v) },
 
-    getAnchorEnabled(){
-      return this.article_detail?.anchor_enabled ?? true
-    },
+    getListScrollPageSize()        { return this.getValue('article_list.scroll_page_size') ?? 10 },
+    setListScrollPageSize(v)       { this.updateConfig('article_list.scroll_page_size', v) },
 
-    toggleFavoriteCountEnabled(){
-      this.updateConfig('article_detail.favorite_count_enabled', !this.article_detail?.favorite_count_enabled)
-    },
+    getListPaginationPageSize()    { return this.getValue('article_list.pagination_page_size') ?? 7 },
+    setListPaginationPageSize(v)   { this.updateConfig('article_list.pagination_page_size', v) },
 
-    getFavoriteCountEnabled(){
-      return this.article_detail?.favorite_count_enabled ?? true
-    },
+    // ==================== notification ====================
 
-    // ========== article_list ==========
+    getNotificationCommentEnabled()   { return this.getValue('notification.comment_enabled') ?? true },
+    toggleNotificationCommentEnabled(){ this.updateConfig('notification.comment_enabled', !this.getValue('notification.comment_enabled')) },
 
-    toggleListViewEnabled(){
-      this.updateConfig('article_list.view_enabled', !this.article_list?.view_enabled)
-    },
+    // ==================== user_config ====================
 
-    getListViewEnabled(){
-      return this.article_list?.view_enabled ?? true
-    },
+    getUserCollapseEnabled()       { return this.getValue('collapse_enabled') ?? true },
+    toggleUserCollapseEnabled()    { this.updateConfig('collapse_enabled', !this.getValue('collapse_enabled')) },
 
-    toggleListFavoriteEnabled(){
-      this.updateConfig('article_list.favorite_enabled', !this.article_list?.favorite_enabled)
-    },
+    getUserDarkEnabled()           { return this.getValue('dark_enabled') ?? true },
+    toggleUserDarkEnabled()        { this.updateConfig('dark_enabled', !this.getValue('dark_enabled')) },
 
-    getListFavoriteEnabled(){
-      return this.article_list?.favorite_enabled ?? true
-    },
+    getUserConfigTheme()           { return this.getValue('theme') || 'default' },
+    setUserConfigTheme(v)          { this.updateConfig('theme', v) },
 
-    toggleListCommentEnabled(){
-      this.updateConfig('article_list.comment_enabled', !this.article_list?.comment_enabled)
-    },
+    // ==================== oss ====================
 
-    getListCommentEnabled(){
-      return this.article_list?.comment_enabled ?? true
-    },
+    getOssDataRetentionDays()      { return this.getValue('oss.data_retention_days') ?? 30 },
+    setDataRetentionDays(v)        { this.updateConfig('oss.data_retention_days', v) },
 
-    setListLoadMode(value){
-      this.updateConfig('article_list.load_mode', value)
-    },
+    getOssFileRetentionDays()      { return this.getValue('oss.file_retention_days') ?? 7 },
+    setFileRetentionDays(v)        { this.updateConfig('oss.file_retention_days', v) },
 
-    getListLoadMode(){
-      return this.article_list?.load_mode
-    },
+    // ==================== logo ====================
 
-    setListScrollPageSize(value){
-      this.updateConfig('article_list.scroll_page_size', value)
-    },
+    getLogoAnimationStyle()        { return this.getValue('logo.animation_style') || 'neon' },
+    setLogoAnimationStyle(v)       { this.updateConfig('logo.animation_style', v) },
 
-    getListScrollPageSize(){
-      return this.article_list?.scroll_page_size ?? 10
-    },
-
-    setListPaginationPageSize(value){
-      this.updateConfig('article_list.pagination_page_size', value)
-    },
-
-    getListPaginationPageSize(){
-      return this.article_list?.pagination_page_size ?? 7
-    },
-
-    // ========== notification ==========
-
-    toggleNotificationCommentEnabled(){
-      this.updateConfig('notification.comment_enabled', !this.notification?.comment_enabled)
-    },
-
-    getNotificationCommentEnabled(){
-      return this.notification?.comment_enabled ?? true
-    },
-
-    // ========== user_config ==========
-
-    toggleUserCollapseEnabled(){
-      this.updateConfig('user_config.collapse_enabled', !this.user_config?.collapse_enabled)
-    },
-
-    getUserCollapseEnabled() {
-      return this.user_config?.collapse_enabled ?? true
-    },
-
-    toggleUserDarkEnabled(){
-      this.updateConfig('user_config.dark_enabled', !this.user_config?.dark_enabled)
-    },
-
-    getUserDarkEnabled(){
-      return this.user_config?.dark_enabled ?? true
-    },
-
-    getUserConfigTheme(){
-      return this.user_config?.theme || 'default'
-    },
-
-    setUserConfigTheme(value){
-      this.updateConfig('user_config.theme', value)
-    },
-
-    // ========== oss ==========
-
-    setDataRetentionDays(value){
-      this.updateConfig('oss.data_retention_days',value)
-    },
-
-    getOssDataRetentionDays(){
-      return this.oss?.data_retention_days ?? 30
-    },
-
-    setFileRetentionDays(value){
-      this.updateConfig('oss.file_retention_days',value)
-    },
-
-    getOssFileRetentionDays(){
-      return this.oss?.file_retention_days ?? 7
-    },
-
-    // ========== logo ==========
-
-    getLogoAnimationStyle(){
-      return this.logo?.animation_style || 'neon'
-    },
-
-    setLogoAnimationStyle(value){
-      this.updateConfig('logo.animation_style', value)
-    },
-
-    getLogoHideImage(){
-      return this.logo?.hide_image === true
-    },
-
-    toggleLogoHideImage(){
-      this.updateConfig('logo.hide_image', !this.logo?.hide_image)
-    },
-
-    // ========== numberLimits ==========
-
-    getLimitMin(key) {
-      return this.numberLimits[key]?.min
-    },
-
-    getLimitMax(key) {
-      return this.numberLimits[key]?.max
-    }
+    getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
+    toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },
   },
 
   // ============================================================
-  // 计算属性
+  // 计算属性 — 使用 this.getValue() 动态解析
   // ============================================================
   getters: {
-    // ===== 顶层配置 =====
-    configViewMode: (state) => state.config_view_mode || 'card',
-    tagViewMode: (state) => state.tag_view_mode || 'card',
-    isWebsocketEnabled: (state) => state.websocket_enabled === true,
-    isSearchMenuFocus: (state) => state.search_menu_focus === true,
-    themeLayoutMode: (state) => state.theme_layout_mode || 'float',
-    themeDotShape: (state) => state.theme_dot_shape || 'circle',
-    treeAuthLineStyle: (state) => state.tree_auth_line_style || 'dashed',
-    treeCateLineStyle: (state) => state.tree_cate_line_style || 'dashed',
-    treeCateParentMode: (state) => state.tree_cate_parent_mode || 'custom',
-    treeCateParentWidth: (state) => state.tree_cate_parent_width ?? 75,
-    treeCateChildMode: (state) => state.tree_cate_child_mode || 'fill',
-    treeAuthChildMode: (state) => state.tree_auth_child_mode || 'fill',
+    // ===== 顶层（admin 组） =====
+    configViewMode()          { return this.getValue('config_view_mode') || 'card' },
+    tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
+    isWebsocketEnabled()      { return this.getValue('websocket_enabled') === true },
+    isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
+    themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
+    themeDotShape()           { return this.getValue('theme_dot_shape') || 'circle' },
+    treeAuthLineStyle()       { return this.getValue('tree_auth_line_style') || 'dashed' },
+    treeCateLineStyle()       { return this.getValue('tree_cate_line_style') || 'dashed' },
+    treeCateParentMode()      { return this.getValue('tree_cate_parent_mode') || 'custom' },
+    treeCateParentWidth()     { return this.getValue('tree_cate_parent_width') ?? 75 },
+    treeCateChildMode()       { return this.getValue('tree_cate_child_mode') || 'fill' },
+    treeAuthChildMode()       { return this.getValue('tree_auth_child_mode') || 'fill' },
 
-    // ===== article =====
-    articleTopLimit: (state) => state.article?.top_limit ?? 3,
-    articleCarouselLimit: (state) => state.article?.carousel_limit ?? 3,
-    isArticleSaveEdit: (state) => state.article?.save_edit === true,
+    // ===== article (admin 组) =====
+    articleTopLimit()         { return this.getValue('article.top_limit') ?? 3 },
+    articleCarouselLimit()    { return this.getValue('article.carousel_limit') ?? 3 },
+    isArticleSaveEdit()       { return this.getValue('article.save_edit') === true },
 
-    // ===== comment =====
-    isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
-    isFriendLinkCommentEnabled: (state) => state.comment?.friend_link_comment_enabled === true,
+    // ===== comment (client 组) =====
+    isArticleCommentEnabled()    { return this.getValue('comment.article_comment_enabled') === true },
+    isFriendLinkCommentEnabled() { return this.getValue('comment.friend_link_comment_enabled') === true },
 
-    // ===== user =====
-    isUserLoginEnabled: (state) => state.user?.login_enabled === true,
-    isUserOtherLoginEnabled: (state) => state.user?.other_login_enabled === true,
+    // ===== user 前台认证 (client 组) =====
+    isUserLoginEnabled()      { return this.getValue('user.login_enabled') === true },
+    isUserOtherLoginEnabled() { return this.getValue('user.other_login_enabled') === true },
 
-    // ===== profile =====
-    isMyPublishesEnabled: (state) => state.profile?.my_publishes_enabled ?? true,
-    isMyCommentsEnabled: (state) => state.profile?.my_comments_enabled ?? true,
-    isMyFavoritesEnabled: (state) => state.profile?.my_favorites_enabled ?? true,
+    // ===== profile (client 组) =====
+    isMyPublishesEnabled()    { return this.getValue('profile.my_publishes_enabled') ?? true },
+    isMyCommentsEnabled()     { return this.getValue('profile.my_comments_enabled') ?? true },
+    isMyFavoritesEnabled()    { return this.getValue('profile.my_favorites_enabled') ?? true },
 
-    // ===== article_detail =====
-    currentArticleTheme: (state) => state.article_detail?.theme === 0 ? 'github' : 'vuepress',
-    isAnchorEnabled: (state) => state.article_detail?.anchor_enabled ?? true,
-    isFavoriteCountEnabled: (state) => state.article_detail?.favorite_count_enabled ?? true,
+    // ===== article_detail (client 组) =====
+    currentArticleTheme()     { const v = this.getValue('article_detail.theme'); return v === 0 ? 'github' : 'vuepress' },
+    isAnchorEnabled()         { return this.getValue('article_detail.anchor_enabled') ?? true },
+    isFavoriteCountEnabled()  { return this.getValue('article_detail.favorite_count_enabled') ?? true },
 
-    // ===== article_list =====
-    isListViewEnabled: (state) => state.article_list?.view_enabled ?? true,
-    isListFavoriteEnabled: (state) => state.article_list?.favorite_enabled ?? true,
-    isListCommentEnabled: (state) => state.article_list?.comment_enabled ?? true,
+    // ===== article_list (client 组) =====
+    isListViewEnabled()       { return this.getValue('article_list.view_enabled') ?? true },
+    isListFavoriteEnabled()   { return this.getValue('article_list.favorite_enabled') ?? true },
+    isListCommentEnabled()    { return this.getValue('article_list.comment_enabled') ?? true },
 
-    // ===== notification =====
-    isNotificationCommentEnabled:(state) => state.notification?.comment_enabled ?? true,
+    // ===== notification (admin 组) =====
+    isNotificationCommentEnabled() { return this.getValue('notification.comment_enabled') ?? true },
 
-    // ===== user_config =====
-    isUserCollapseEnabled: (state) => state.user_config?.collapse_enabled ?? true,
-    isUserDarkEnabled: (state) => state.user_config?.dark_enabled ?? true,
-    userConfigTheme: (state) => state.user_config?.theme || 'default',
+    // ===== user_config (user 组) =====
+    isUserCollapseEnabled()   { return this.getValue('collapse_enabled') ?? true },
+    isUserDarkEnabled()       { return this.getValue('dark_enabled') ?? true },
+    userConfigTheme()         { return this.getValue('theme') || 'default' },
 
-    // ===== logo =====
-    logoAnimationStyle: (state) => state.logo?.animation_style || 'neon',
-    isLogoImageHidden: (state) => state.logo?.hide_image === true,
+    // ===== logo (admin 组) =====
+    logoAnimationStyle()      { return this.getValue('logo.animation_style') || 'neon' },
+    isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
   },
 
   // ============================================================
@@ -883,6 +587,6 @@ export const useConfigStore = defineStore({
   // ============================================================
   persist: {
     key: 'scorpion-config',
-    paths: ['numberLimits']  // 只持久化 numberLimits
+    paths: ['numberLimits']
   },
 })
