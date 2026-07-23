@@ -10,8 +10,8 @@ import msg from '@/components/msg'
 // 系统预定义配置项 key 列表（不可删除）
 // ============================================================
 const SYSTEM_CONFIG_KEYS = [
-  'article_top_limit',
-  'carousel_limit',
+  'article.top_limit',
+  'article.carousel_limit',
   'icon_enabled',
   'comment.article_comment_enabled',
   'comment.child_comment_limit',
@@ -26,8 +26,6 @@ const SYSTEM_CONFIG_KEYS = [
 // ============================================================
 const CONFIG_DEFINITIONS = {
   // ===== 顶层配置 =====
-  article_top_limit:            { type: 'number', message: '文章置顶数量限制', min:1, max:99 },
-  carousel_limit:               { type: 'number', message: '轮播图数量限制', min:0, max:99 },
   icon_enabled:                 { type: 'switch', message: '图标搜索增强' },
   config_view_mode:             { type: 'string', message: '配置界面样式' },
   tag_view_mode:                { type: 'string', message: '标签管理样式' },
@@ -41,6 +39,11 @@ const CONFIG_DEFINITIONS = {
   tree_cate_parent_width:       { type: 'number', message: '分类父节点自定义px', min:12, max:200 },
   tree_cate_child_mode:         { type: 'string', message: '分类子节点宽度' },
   tree_auth_child_mode:         { type: 'string', message: '授权子节点宽度' },
+
+  // ===== article 文章配置 =====
+  'article.top_limit':          { type: 'number', message: '文章置顶数量限制', min:1, max:99 },
+  'article.carousel_limit':     { type: 'number', message: '轮播图数量限制', min:0, max:99 },
+  'article.save_edit':          { type: 'switch', message: '文章编辑保存方式' },
 
   // ===== comment 评论相关 =====
   'comment.article_comment_enabled':    { type: 'switch', message: '文章评论显示' },
@@ -192,8 +195,6 @@ export const useConfigStore = defineStore({
   state: () => ({
     loading: false,
     // ===== 顶层配置 =====
-    article_top_limit: 3,
-    carousel_limit: 3,
     icon_enabled: true,
     config_view_mode: 'card',
     tag_view_mode: 'card',
@@ -208,6 +209,11 @@ export const useConfigStore = defineStore({
     tree_cate_child_mode: 'fill',
     tree_auth_child_mode: 'fill',
     // ===== 嵌套配置 =====
+    article: {
+      top_limit: 3,
+      carousel_limit: 3,
+      save_edit: false
+    },
     comment: {
       article_comment_enabled: true,
       friend_link_comment_enabled: false,
@@ -414,23 +420,6 @@ export const useConfigStore = defineStore({
 
     // ========== 顶层配置 ==========
 
-    // article_top_limit
-    setArticleTopLimit(value) {
-      this.updateConfig('article_top_limit', value)
-    },
-
-    getArticleTopLimit(){
-      return this.article_top_limit ?? 3
-    },
-
-    // carousel_limit
-    setCarouselLimit(value) {
-      this.updateConfig('carousel_limit', value)
-    },
-
-    getCarouselLimit(){
-      return this.carousel_limit ?? 3
-    },
 
     // icon_enabled
     toggleIconEnabled() {
@@ -547,6 +536,32 @@ export const useConfigStore = defineStore({
 
     setTreeAuthChildMode(value){
       this.updateConfig('tree_auth_child_mode', value)
+    },
+
+    // ========== article ==========
+
+    setArticleTopLimit(value) {
+      this.updateConfig('article.top_limit', value)
+    },
+
+    getArticleTopLimit(){
+      return this.article?.top_limit ?? 3
+    },
+
+    setArticleCarouselLimit(value) {
+      this.updateConfig('article.carousel_limit', value)
+    },
+
+    getArticleCarouselLimit(){
+      return this.article?.carousel_limit ?? 3
+    },
+
+    toggleArticleSaveEdit(){
+      this.updateConfig('article.save_edit', !this.article?.save_edit)
+    },
+
+    getArticleSaveEdit(){
+      return this.article?.save_edit === true
     },
 
     // ========== comment ==========
@@ -821,6 +836,11 @@ export const useConfigStore = defineStore({
     treeCateParentWidth: (state) => state.tree_cate_parent_width ?? 75,
     treeCateChildMode: (state) => state.tree_cate_child_mode || 'fill',
     treeAuthChildMode: (state) => state.tree_auth_child_mode || 'fill',
+
+    // ===== article =====
+    articleTopLimit: (state) => state.article?.top_limit ?? 3,
+    articleCarouselLimit: (state) => state.article?.carousel_limit ?? 3,
+    isArticleSaveEdit: (state) => state.article?.save_edit === true,
 
     // ===== comment =====
     isArticleCommentEnabled: (state) => state.comment?.article_comment_enabled === true,
