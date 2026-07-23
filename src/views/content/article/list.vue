@@ -152,11 +152,13 @@ import CateSelect from '@/views/components/CateSelect.vue';
 import { ref, watch, computed } from 'vue';
 import ArticleEdit from '@/views/components/ArticleEdit.vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
-import { dayjs} from 'element-plus';
+import { dayjs, ElMessageBox } from 'element-plus';
 import msg from '@/components/msg';
 import { createMarkdownPreview } from '@/utils/markdown-config';
 import { useUserConfigStore } from '@/store/userConfig';
+import { useArticleDraftStore } from '@/store/articleDraft';
 const userConfigStore = useUserConfigStore()
+const draftStore = useArticleDraftStore()
 import cover from '@/assets/images/cover-rect.png'
 
 const handleImage = (row) => {
@@ -235,7 +237,19 @@ const onReset = () => {
 
 const maskRef = ref()
 
-const handleAdd = (param) => {
+const handleAdd = async (param) => {
+    if (draftStore.hasDraft) {
+      try {
+        await ElMessageBox.confirm(
+          '检测到未完成的草稿，是否继续编辑？',
+          '提示',
+          { confirmButtonText: '继续编辑', cancelButtonText: '新建文章', type: 'info' }
+        )
+      } catch {
+        // 用户选择"新建文章" — 清除草稿
+        draftStore.clearDraft()
+      }
+    }
     maskRef.value.openMask()
     maskRef.value.handleToggle(param)
 }
