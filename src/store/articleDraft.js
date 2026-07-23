@@ -9,6 +9,9 @@ export const useArticleDraftStore = defineStore({
     blogData: null,                // { title, content }
     formModel: null,               // 弹窗表单数据（分类、标签、封面等）
     carouselData: null,            // { isCarousel, sort, carouselId, articleId }
+    selectedCoverArticle: null,    // 引用封面 — SmartAutoComplete 选中的文章标题数组
+    coverFileBase64: null,         // 文件上传封面 — base64 data URL（File 无法直接序列化）
+    coverFileMeta: null,           // 文件上传封面 — { name, size, type, lastModified }
     updatedAt: null,               // 最后更新时间戳
   }),
   getters: {
@@ -29,6 +32,9 @@ export const useArticleDraftStore = defineStore({
       this.blogData = JSON.parse(JSON.stringify(data.blogData))
       this.formModel = JSON.parse(JSON.stringify(data.formModel))
       this.carouselData = JSON.parse(JSON.stringify(data.carouselData))
+      this.selectedCoverArticle = JSON.parse(JSON.stringify(data.selectedCoverArticle || []))
+      this.coverFileBase64 = data.coverFileBase64 || null
+      this.coverFileMeta = data.coverFileMeta ? JSON.parse(JSON.stringify(data.coverFileMeta)) : null
       this.updatedAt = Date.now()
     },
 
@@ -42,6 +48,9 @@ export const useArticleDraftStore = defineStore({
         blogData: JSON.parse(JSON.stringify(this.blogData)),
         formModel: JSON.parse(JSON.stringify(this.formModel)),
         carouselData: JSON.parse(JSON.stringify(this.carouselData)),
+        selectedCoverArticle: JSON.parse(JSON.stringify(this.selectedCoverArticle || [])),
+        coverFileBase64: this.coverFileBase64 || null,
+        coverFileMeta: this.coverFileMeta ? JSON.parse(JSON.stringify(this.coverFileMeta)) : null,
       }
     },
 
@@ -50,6 +59,9 @@ export const useArticleDraftStore = defineStore({
       this.blogData = null
       this.formModel = null
       this.carouselData = null
+      this.selectedCoverArticle = null
+      this.coverFileBase64 = null
+      this.coverFileMeta = null
       this.updatedAt = null
     },
   },
