@@ -45,6 +45,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { Search, Setting } from '@element-plus/icons-vue'
 import { useConfigItems } from '@/views/config/configItems'
+import { useConfigStore } from '@/store/config'
 import PinyinMatch from 'pinyin-match'
 
 // ============================================================
@@ -101,6 +102,46 @@ const searchIndex = groups.flatMap(group => {
   return result
 })
 
+// 补充 configStore 中存在但 configItems 中未声明的额外 key
+const configStore = useConfigStore()
+const existingKeys = new Set(searchIndex.map(s => s.configKey))
+
+const flattenState = (obj, prefix = '') => {
+  const result = []
+  for (const [key, value] of Object.entries(obj || {})) {
+    if (key.startsWith('$') || key === 'loading' || key === 'numberLimits') continue
+    const full = prefix ? `${prefix}.${key}` : key
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      result.push(...flattenState(value, full))
+    }
+    if (!existingKeys.has(full)) {
+      result.push({ configKey: full, value, prefix })
+    }
+  }
+  return result
+}
+
+const extraKeys = computed(() => {
+  const extras = []
+  const state = configStore.$state
+  for (const group of groups) {
+    const groupData = state[group.key]
+    if (!groupData || typeof groupData !== 'object') continue
+    const flat = flattenState(groupData, group.key)
+    for (const { configKey, value } of flat) {
+      extras.push({
+        groupKey: group.key, groupLabel: group.label, configKey,
+        label: '', desc: typeof value === 'object' ? '对象' : String(value),
+        breadcrumb: configKey.split('.'), icon: null, isGroup: false,
+      })
+    }
+  }
+  if (extras.length) console.log('SmartConfigSearch extraKeys:', extras.map(e => e.configKey))
+  return extras
+})
+
+const fullSearchIndex = computed(() => [...searchIndex, ...extraKeys.value])
+
 // ============================================================
 // 搜索
 // ============================================================
@@ -116,7 +157,7 @@ const filteredItems = computed(() => {
     return false
   }
 
-  return searchIndex.filter(item => {
+  return fullSearchIndex.value.filter(item => {
     if (matchText(item.label)) return true
     if (matchText(item.desc)) return true
     if (matchText(item.configKey)) return true
@@ -128,7 +169,7 @@ const filteredItems = computed(() => {
 const displayList = computed(() => {
   if (query.value.trim()) return filteredItems.value
   return recentList.value.filter(r =>
-    searchIndex.some(s => s.configKey === r.configKey && s.groupKey === r.groupKey)
+    fullSearchIndex.value.some(s => s.configKey === r.configKey && s.groupKey === r.groupKey)
   )
 })
 
