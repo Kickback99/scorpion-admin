@@ -3,7 +3,8 @@
 
         <el-form :model="blogData" ref="blogFormRef" :rules="rules">
             <el-form-item prop="title">
-                    <el-input 
+                    <el-input
+                    ref="titleInputRef"
                     :style="{backgroundColor:userConfigStore.isDarkEnabled?'#000':'#fff'}"
                     :class="{'dark-mode':userConfigStore.isDarkEnabled}"
                     placeholder="请输入标题" v-model="blogData.title" />
@@ -229,7 +230,15 @@ import msg from '@/components/msg'
 // ==================== 引用图片相关 ====================
 
 const imageReferenceRef = ref(null);
+const titleInputRef = ref(null);
 const hasSelectedArticle = ref(false);
+
+/** 聚焦标题输入框 */
+const focusTitle = () => {
+  nextTick(() => {
+    titleInputRef.value?.focus()
+  })
+}
 const selectedCoverArticle = ref([]);
 /** ImageReference 当前选中状态 — 由 @select-article / @clear 事件驱动，auto-save 直接读取 */
 const imageRefSelectedArticle = ref([]);
@@ -275,6 +284,7 @@ const handleCloseMask = () => {
       isComment: '1'
     })
     resetCarouselData()
+    focusTitle()
   } else {
     maskVisible.value = false
   }
@@ -748,6 +758,7 @@ const handleToggle = async(param) => {
       })
       resetCarouselData()
     }
+    focusTitle()
    }else {
     // 回显
     isEditMode.value = true
