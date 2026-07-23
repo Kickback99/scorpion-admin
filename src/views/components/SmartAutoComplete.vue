@@ -424,6 +424,9 @@ const handleFocus = () => {
 
 // 处理失焦事件
 const handleBlur = (event) => {
+  // 保存 blur 前标签快照，用于后续对比 el-input-tag 是否自动添加了标签
+  const tagsBeforeBlur = [...modelValue.value]
+
   // 延迟执行，让点击建议项先处理
   setTimeout(() => {
     // 检查是否点击了下拉框
@@ -434,9 +437,17 @@ const handleBlur = (event) => {
       if (value) {
         addCurrentInputAsTag(value)
       } else {
-         // 没有内容或只有空白，清空输入框
+        // el-input-tag 可能在 blur 时自动加标签 — 只校验本次新增的标签
+        if (!props.allowCustom) {
+          const newTags = modelValue.value.filter(t => !tagsBeforeBlur.includes(t))
+          for (const tag of newTags) {
+            if (!suggestions.value.some(item => item.value === tag)) {
+              modelValue.value = modelValue.value.filter(t => t !== tag)
+              msg.warning(props.customDisabledMessage)
+            }
+          }
+        }
         immediateClearInput()
-        // 没有输入内容，关闭下拉
         showDropdown.value = false
       }
     }
@@ -538,9 +549,15 @@ const handleKeydown = (event) => {
         break
       }
 
-      // ③ 兜底：把原始输入当自定义标签
+      // ③ 兜底：allowCustom 为 false 时拒绝自定义输入
       if (currentInput.value.trim()) {
-        addCurrentInputAsTag(currentInput.value)
+        if (!props.allowCustom) {
+          ElMessage.warning(props.customDisabledMessage)
+          clearInput()
+          showDropdown.value = false
+        } else {
+          addCurrentInputAsTag(currentInput.value)
+        }
       }
       break
       
@@ -589,8 +606,8 @@ const handleKeydown = (event) => {
       if (showDropdown.value) {
         event.preventDefault()
         showDropdown.value = false
-        suggestions.value = []
         activeIndex.value = -1
+        immediateClearInput()
       }
       break
       
