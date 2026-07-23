@@ -29,6 +29,7 @@
                 empty-text="该文章暂无内容图"
                 display-field="uuid"
                 @select-article="handleImageSelectArticle"
+                @remove-article="handleImageRemoveArticle"
                 @insert-image="handleImageInsert"
                 @clear="handleImageClear"
                 @update:selected="handleSelectedChange"
@@ -230,6 +231,9 @@ import msg from '@/components/msg'
 const imageReferenceRef = ref(null);
 const hasSelectedArticle = ref(false);
 const selectedCoverArticle = ref([]);
+/** ImageReference 当前选中状态 — 由 @select-article / @clear 事件驱动，auto-save 直接读取 */
+const imageRefSelectedArticle = ref([]);
+const imageRefSelectedArticleId = ref(null);
 const coverArticleCache = ref([]);  // 缓存文章搜索结果
 
 // 引用图片组件容器高度
@@ -251,6 +255,8 @@ const handleCloseMask = () => {
     draftStore.clearDraft()
     blogData.value = {}
     selectedCoverArticle.value = []
+    imageRefSelectedArticle.value = []
+    imageRefSelectedArticleId.value = null
     imageReferenceRef.value?.clear()
     Object.assign(formModel, {
       id: null,
@@ -280,15 +286,26 @@ const handleOpenDialog = () => {
 };
 
 /**
- * 选择文章时触发
+ * 选择文章时触发 — 实时同步到草稿 ref，auto-save 直接读取无需
+通过 ref 轮询 ImageReference
  */
 const handleImageSelectArticle = (data) => {
   if (data) {
-    console.log('已选择文章:', data.id, data.title);
+    imageRefSelectedArticle.value = [data.title]
+    imageRefSelectedArticleId.value = data.id
   } else {
-    console.log('已取消选择');
+    imageRefSelectedArticle.value = []
+    imageRefSelectedArticleId.value = null
   }
 };
+
+/**
+ * 移除文章标签时触发 — 同步清空草稿引用图片数据
+ */
+const handleImageRemoveArticle = () => {
+  imageRefSelectedArticle.value = []
+  imageRefSelectedArticleId.value = null
+}
 
 /**
  * 插入图片时触发
@@ -310,7 +327,8 @@ const handleImageInsert = (data) => {
  * 清空时触发
  */
 const handleImageClear = () => {
-  console.log('已清空');
+  imageRefSelectedArticle.value = []
+  imageRefSelectedArticleId.value = null
 };
 
 // 在编辑文章回显时，自动加载图片
@@ -613,12 +631,14 @@ const autoSaveDraft = () => {
       selectedCoverArticle: [...selectedCoverArticle.value],
       coverFileBase64: coverFileBase64.value,
       coverFileMeta: coverFileMeta.value,
+      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
+      imageRefSelectedArticleId: imageRefSelectedArticleId.value,
     })
   }, 800)
 }
 
 // 深度监听表单数据变化 → 自动保存
-watch([blogData, () => formModel, carouselData, selectedCoverArticle], autoSaveDraft, { deep: true })
+watch([blogData, () => formModel, carouselData, selectedCoverArticle, imageRefSelectedArticle, imageRefSelectedArticleId], autoSaveDraft, { deep: true })
 
 // 组件卸载时兜底保存
 onBeforeUnmount(() => {
@@ -631,6 +651,8 @@ onBeforeUnmount(() => {
       selectedCoverArticle: [...selectedCoverArticle.value],
       coverFileBase64: coverFileBase64.value,
       coverFileMeta: coverFileMeta.value,
+      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
+      imageRefSelectedArticleId: imageRefSelectedArticleId.value,
     })
   }
 })
@@ -694,6 +716,15 @@ const handleToggle = async(param) => {
           draft.coverFileMeta.name,
           draft.coverFileMeta.type
         )
+      }
+      // ImageReference：恢复选中的文章 + 容器高度
+      if (draft.imageRefSelectedArticleId) {
+        imageRefSelectedArticle.value = draft.imageRefSelectedArticle || []
+        imageRefSelectedArticleId.value = draft.imageRefSelectedArticleId
+        nextTick(async () => {
+          await imageReferenceRef.value?.loadByArticleId(draft.imageRefSelectedArticleId, draft.imageRefSelectedArticle?.[0])
+          hasSelectedArticle.value = (imageReferenceRef.value?.getImageList()?.length || 0) > 0
+        })
       }
     } else {
       blogData.value = {}
