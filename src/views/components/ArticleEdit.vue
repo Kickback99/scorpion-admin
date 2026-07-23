@@ -198,14 +198,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick, watch } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import Mask from './Mask.vue';
 import Markdown from '@/components/Markdown.vue';
 import CateSelect from './CateSelect.vue';
 import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js';
 import SmartUpload from '@/views/components/SmartUpload.vue';
 import { useUserConfigStore } from '@/store/userConfig';
+import { useArticleDraftStore } from '@/store/articleDraft';
+import { useConfigStore } from '@/store/config';
 const userConfigStore = useUserConfigStore()
+const draftStore = useArticleDraftStore()
+const configStore = useConfigStore()
 let mdHeight = window.innerHeight - 30 - 70 - 200
 import PinyinMatch from 'pinyin-match';
 import { getTagListApi } from '@/api/business';
@@ -510,11 +514,53 @@ const dialogTitle = ref('')
 // mask弹窗
 const maskVisible = ref(false)
 
+/** 当前是否为编辑模式（区分新增/编辑，用于草稿保存控制） */
+const isEditMode = ref(false)
+
 // 暴露打开遮罩层方法
 // 无论是添加文章还是编辑文章，都需要打开mask弹窗
 const openMask = () => {
     maskVisible.value = !maskVisible.value
 }
+
+// ==================== 草稿自动保存 ====================
+/** 获取安全的 formModel 副本 — File 对象无法 JSON 序列化，保存时置 null */
+const safeFormModel = () => {
+  const copy = { ...formModel }
+  if (copy.cover instanceof File) copy.cover = null
+  return copy
+}
+
+/** 防抖保存草稿 — 800ms 无变化后自动写入 sessionStorage（编辑模式受 config 控制，新增永远保存） */
+let saveTimer = null
+const autoSaveDraft = () => {
+  clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    if (isEditMode.value && !configStore.getArticleSaveEdit()) return
+    if (!maskVisible.value) return
+    if (!blogData.value.title && !blogData.value.content) return
+    draftStore.saveDraft({
+      blogData: blogData.value,
+      formModel: safeFormModel(),
+      carouselData: { ...carouselData.value },
+    })
+  }, 800)
+}
+
+// 深度监听表单数据变化 → 自动保存
+watch([blogData, () => formModel, carouselData], autoSaveDraft, { deep: true })
+
+// 组件卸载时兜底保存
+onBeforeUnmount(() => {
+  if (isEditMode.value && !configStore.getArticleSaveEdit()) return
+  if (maskVisible.value && (blogData.value.title || blogData.value.content)) {
+    draftStore.saveDraft({
+      blogData: blogData.value,
+      formModel: safeFormModel(),
+      carouselData: { ...carouselData.value },
+    })
+  }
+})
 
 // 封面选项切换时，清空另一个字段的值
 const handleCoverOptionChange = (val) => {
@@ -555,16 +601,24 @@ const handleCarouselChange = (val) => {
  */
 const handleToggle = async(param) => {
    if(!param.id){
-    // 添加重置
+    // 添加
+    isEditMode.value = false
     dialogTitle.value = '新增文章'
-    blogData.value = {}
-    selectedCoverArticle.value = [],  // 清空引用标题
+    selectedCoverArticle.value = []  // 清空引用标题
 
-    // 重置数据
-    Object.assign(formModel,{
-        id:null,
+    // 尝试恢复草稿
+    const draft = draftStore.restoreDraft()
+    if (draft) {
+      blogData.value = draft.blogData
+      Object.assign(formModel, draft.formModel)
+      carouselData.value = draft.carouselData
+    } else {
+      blogData.value = {}
+      // 重置数据
+      Object.assign(formModel, {
+        id: null,
         categoryId: null,
-        status:null,
+        status: null,
         descriptionType: 'auto', // 默认自动生成
         customDescription: '',   // 自定义摘要内容
         description: null,       // 实际提交给后端的值
@@ -576,9 +630,12 @@ const handleToggle = async(param) => {
         refCoverUuid: null,        // 提交用的 UUID
         isTop: '0',                // 默认不置顶
         isComment: '1'             // 默认允许评论
-    })
+      })
+      resetCarouselData()
+    }
    }else {
     // 回显
+    isEditMode.value = true
     dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
     console.log("回显res.data",res.data)
@@ -772,6 +829,7 @@ const handlePublish = async(status) => {
         }
     }
     msg.primary(formModel.id ? '修改成功' : '添加成功')
+    draftStore.clearDraft()
     dialogVisible.value = false
     openMask()
     emit('reRender')
