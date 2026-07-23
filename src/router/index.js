@@ -67,6 +67,7 @@ const monitorModules = import.meta.glob("../views/monitor/**/*.vue")
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
 const configModules = import.meta.glob('../views/config/*.vue')
 const taskModules = import.meta.glob('../views/task/*.vue')
+const writeModules = import.meta.glob('../views/write/*.vue')
 
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
@@ -95,6 +96,9 @@ function routesHandler(router,parentType=null){
                     break
                 case 'task':
                     modules = taskModules
+                    break
+                case 'write':
+                    modules = writeModules
                     break
                 default:
                     modules = null

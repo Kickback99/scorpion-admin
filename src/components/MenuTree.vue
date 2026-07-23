@@ -51,6 +51,9 @@ const handleChildren = (menu) => {
         case 'task':
             prefix = 'task'
             break
+        case 'write':
+            prefix = 'write'
+            break
     }
     // 判断是否是配置管理类菜单（component为list且通过parentNode添加的）
     if(menu._addToParentNode){
