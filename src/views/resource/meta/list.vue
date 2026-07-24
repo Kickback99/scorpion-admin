@@ -45,7 +45,59 @@
                         style="width: 160px"
                     />
                 </el-form-item>
-                
+
+                <el-form-item>
+                    <SmartSelector v-model="searchModel.sortField" :data="fields" style="width: 255px;" placeholder="请选择排序">
+                    </SmartSelector>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button size="small" :type="searchModel.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+                    <el-button size="small" :type="searchModel.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
+                </el-form-item>
+
+                <br>
+
+                <el-form-item>
+                    <el-select v-model="searchModel.timeField" placeholder="请选择时间" style="width: 120px">
+                        <el-option label="请选择时间" value="" :disabled="true"/>
+                        <el-option label="创建时间" value="create_time" />
+                        <el-option label="修改时间" value="update_time" />
+                    </el-select>
+                </el-form-item>
+
+                <!-- 快捷日期下拉选择 -->
+                <el-form-item>
+                    <SmartSelector v-model="quickDate" :data="quickDateOptions" style="width: 150px;" placeholder="快捷日期">
+                    </SmartSelector>
+                </el-form-item>
+
+                <!-- 开始时间选择器（单边） -->
+                <el-form-item label="开始时间">
+                    <el-date-picker
+                        v-model="startTime"
+                        type="datetime"
+                        placeholder="选择开始时间"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        :clearable="true"
+                        @change="updateStartTime"
+                    />
+                </el-form-item>
+
+                <!-- 结束时间选择器（单边） -->
+                <el-form-item label="结束时间">
+                    <el-date-picker
+                        v-model="endTime"
+                        type="datetime"
+                        placeholder="选择结束时间"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        :clearable="true"
+                        @change="updateEndTime"
+                    />
+                </el-form-item>
+
                 <el-form-item>
                     <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
                     <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
@@ -155,10 +207,11 @@
 import { fileMetaListApi, recoverFileMetaApi } from '@/api/filemeta'
 import { getAllBusinessDataApi } from '@/api/business'
 import SmartSelector from '@/views/components/SmartSelector.vue';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, watch } from 'vue';
 import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import PinyinMatch from 'pinyin-match'
+import { dayjs } from 'element-plus'
 
 // ==================== 数据定义 ====================
 
@@ -171,6 +224,28 @@ const selectedTargetId = ref([]);
 // 存储选中的多个ID
 const selectedIds = ref('');
 
+// 排序字段选项
+const fields = ref([
+    { label: '请选择排序', value: '', disabled: true },
+    { label: '业务主键ID', value: 'target_id' },
+    { label: '创建时间', value: 'create_time' },
+    { label: '修改时间', value: 'update_time' }
+]);
+
+// 独立的开始和结束时间
+const startTime = ref('');
+const endTime = ref('');
+
+// 快捷日期下拉
+const quickDate = ref('');
+const quickDateOptions = [
+    { label: '快捷日期', value: '', disabled: true },
+    { label: '今天', value: 'today' },
+    { label: '昨天', value: 'yesterday' },
+    { label: '最近一周', value: 'week' },
+    { label: '最近一月', value: 'month' }
+];
+
 // 分页参数
 const pagination = reactive({
     pageNum: 1,
@@ -182,7 +257,14 @@ const searchModel = reactive({
     uuid: '',
     fileType: '',
     targetIds: '',
-    isDeleted: null
+    isDeleted: null,
+    sortField: 'create_time',
+    sortOrder: 'DESC',
+    timeField: 'create_time',
+    createTimeBegin: null,
+    createTimeEnd: null,
+    updateTimeBegin: null,
+    updateTimeEnd: null
 });
 
 // ==================== 下拉选项配置 ====================
@@ -370,6 +452,98 @@ watch(selectedTargetId, (newVal) => {
     }
 }, { deep: true });
 
+// ==================== 排序 & 时间筛选 ====================
+
+// 设置排序方向
+const setSortOrder = (order) => {
+    searchModel.sortOrder = order
+}
+
+// 监听 timeField 变化，重新映射时间参数
+watch(() => searchModel.timeField, () => {
+    remapTimeParams()
+})
+
+// 重新映射时间参数
+const remapTimeParams = () => {
+    searchModel.createTimeBegin = null
+    searchModel.createTimeEnd = null
+    searchModel.updateTimeBegin = null
+    searchModel.updateTimeEnd = null
+
+    if (searchModel.timeField === 'create_time') {
+        searchModel.createTimeBegin = startTime.value || null
+        searchModel.createTimeEnd = endTime.value || null
+    } else {
+        searchModel.updateTimeBegin = startTime.value || null
+        searchModel.updateTimeEnd = endTime.value || null
+    }
+}
+
+// 开始时间变化
+const updateStartTime = (value) => {
+    startTime.value = value || ''
+
+    if (searchModel.timeField === 'create_time') {
+        searchModel.createTimeBegin = value || null
+    } else {
+        searchModel.updateTimeBegin = value || null
+    }
+}
+
+// 结束时间变化
+const updateEndTime = (value) => {
+    endTime.value = value || ''
+
+    if (searchModel.timeField === 'create_time') {
+        searchModel.createTimeEnd = value || null
+    } else {
+        searchModel.updateTimeEnd = value || null
+    }
+}
+
+// 快捷日期设置
+const setQuickDate = (type) => {
+    const now = new Date()
+    let start = null
+    let end = now
+
+    switch (type) {
+        case 'today':
+            start = new Date(now)
+            start.setHours(0, 0, 0, 0)
+            break
+        case 'yesterday':
+            start = new Date(now)
+            start.setDate(start.getDate() - 1)
+            start.setHours(0, 0, 0, 0)
+            end = new Date(now)
+            end.setHours(0, 0, 0, 0)
+            break
+        case 'week':
+            start = new Date(now)
+            start.setDate(start.getDate() - 7)
+            break
+        case 'month':
+            start = new Date(now)
+            start.setMonth(start.getMonth() - 1)
+            break
+    }
+
+    startTime.value = start ? dayjs(start).format('YYYY-MM-DD HH:mm:ss') : ''
+    endTime.value = end ? dayjs(end).format('YYYY-MM-DD HH:mm:ss') : ''
+
+    updateStartTime(startTime.value)
+    updateEndTime(endTime.value)
+}
+
+// 监听快捷日期变化
+watch(quickDate, (val) => {
+    if (val) {
+        setQuickDate(val)
+    }
+})
+
 // ==================== 数据请求 ====================
 
 /**
@@ -386,6 +560,16 @@ const renderFileMeta = async () => {
         if (searchModel.isDeleted !== null && searchModel.isDeleted !== '') {
             params.isDeleted = searchModel.isDeleted;
         }
+        // 排序参数
+        if (searchModel.sortField) {
+            params.sortField = searchModel.sortField;
+            params.sortOrder = searchModel.sortOrder;
+        }
+        // 时间筛选参数
+        if (searchModel.createTimeBegin) params.createTimeBegin = searchModel.createTimeBegin;
+        if (searchModel.createTimeEnd) params.createTimeEnd = searchModel.createTimeEnd;
+        if (searchModel.updateTimeBegin) params.updateTimeBegin = searchModel.updateTimeBegin;
+        if (searchModel.updateTimeEnd) params.updateTimeEnd = searchModel.updateTimeEnd;
 
         const res = await fileMetaListApi(
             pagination.pageNum, 
@@ -454,8 +638,18 @@ const onReset = () => {
         uuid: '',
         fileType: '',
         targetIds: '',
-        isDeleted: null
+        isDeleted: null,
+        sortField: 'create_time',
+        sortOrder: 'DESC',
+        timeField: 'create_time',
+        createTimeBegin: null,
+        createTimeEnd: null,
+        updateTimeBegin: null,
+        updateTimeEnd: null
     });
+    startTime.value = '';
+    endTime.value = '';
+    quickDate.value = '';
     renderFileMeta();
 };
 
