@@ -41,6 +41,12 @@
         <el-radio-button value="uuid">UUID</el-radio-button>
         <el-radio-button value="title">标题</el-radio-button>
       </el-radio-group>
+
+      <!-- 排序 -->
+      <SmartSelector v-model="sortField" :data="fields" style="width: 200px; margin-left: 16px;" placeholder="请选择排序">
+      </SmartSelector>
+      <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+      <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
     </div>
 
     <!-- ===== 图片网格 ===== -->
@@ -121,10 +127,11 @@
 
 <script setup>
 // 1. 框架核心
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 // 2. 页面组件
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
+import SmartSelector from '@/views/components/SmartSelector.vue'
 
 // 3. UI 库
 import msg from '@/components/msg'
@@ -160,6 +167,16 @@ const filterOriginal = ref(DEFAULT_ORIGINAL_FILTER)
 const displayField = ref(DISPLAY_FIELD)
 const selectedSearch = ref([])
 const searchIds = ref('')
+
+// 排序
+const sortField = ref('create_time')
+const sortOrder = ref('DESC')
+const fields = ref([
+    { label: '请选择排序', value: '', disabled: true },
+    { label: '业务主键ID', value: 'target_id' },
+    { label: '创建时间', value: 'create_time' },
+    { label: '修改时间', value: 'update_time' }
+])
 
 // 缓存业务数据
 const businessDataCache = ref([])
@@ -224,6 +241,12 @@ const fetchImages = async () => {
 
     // 确保只展示未删除的图片
     params.isDeleted = 0
+
+    // 排序参数
+    if (sortField.value) {
+      params.sortField = sortField.value;
+      params.sortOrder = sortOrder.value;
+    }
 
     const res = await fileMetaListApi(currentPage.value, pageSize.value, params);
     if (res.code === 200) {
@@ -331,6 +354,17 @@ const handleFilterChange = () => {
   currentPage.value = 1;
   fetchImages();
 };
+
+// 设置排序方向（自动触发查询）
+const setSortOrder = (order) => {
+  sortOrder.value = order
+}
+
+// 排序变化自动查询
+watch([sortField, sortOrder], () => {
+  currentPage.value = 1;
+  fetchImages();
+})
 
 // ============================================================
 // 图片预览（全局单例 el-image-viewer）
