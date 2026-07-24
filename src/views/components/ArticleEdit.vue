@@ -267,22 +267,7 @@ const handleCloseMask = () => {
     imageRefSelectedArticle.value = []
     imageRefSelectedArticleId.value = null
     imageReferenceRef.value?.clear()
-    Object.assign(formModel, {
-      id: null,
-      categoryId: null,
-      status: null,
-      descriptionType: 'auto',
-      customDescription: '',
-      description: null,
-      tagNames: [],
-      coverOption: 'upload',
-      customCoverLink: '',
-      cover: null,
-      refCover: null,
-      refCoverUuid: null,
-      isTop: '0',
-      isComment: '1'
-    })
+    Object.assign(formModel, defaultModel)
     resetCarouselData()
     focusTitle()
   } else {
@@ -527,21 +512,24 @@ const blogData = ref({
 // 封面上传状态
 const isCoverUploading = ref(false)
 
-const formModel = reactive({
+const defaultModel = {
+  id: null,
   categoryId: null,
-  status:null,
+  status: null,
   descriptionType: 'auto', // 默认自动生成
   customDescription: '',   // 自定义摘要内容
   description: null,       // 实际提交给后端的值
-  tagNames:[],
-  coverOption: 'upload',       // 默认文件上传
-  customCoverLink: '',      // 封面文件对象（File 或 URL 字符串）
-  cover:null,                // / 最终存储的封面URL（用于回显）
-  refCover: null,            // 预览 URL
-  refCoverUuid: null,        // 提交用的 UUID
-  isTop: '0',                // 是否置顶（0否，1是）
-  isComment: '1'             // 是否允许评论（0否，1是）
-})
+  tagNames: [],
+  coverOption: 'upload',   // 默认文件上传
+  customCoverLink: '',     // 封面文件对象（File 或 URL 字符串）
+  cover: null,             // 最终存储的封面URL（用于回显）
+  refCover: null,          // 预览 URL
+  refCoverUuid: null,      // 提交用的 UUID
+  isTop: '0',              // 是否置顶（0否，1是）
+  isComment: '1'           // 是否允许评论（0否，1是）
+}
+
+const formModel = reactive({ ...defaultModel })
 
 // 独立轮播数据
 const carouselData = ref({
@@ -740,22 +728,7 @@ const handleToggle = async(param) => {
       blogData.value = {}
       selectedCoverArticle.value = []
       // 重置数据
-      Object.assign(formModel, {
-        id: null,
-        categoryId: null,
-        status: null,
-        descriptionType: 'auto', // 默认自动生成
-        customDescription: '',   // 自定义摘要内容
-        description: null,       // 实际提交给后端的值
-        tagNames: [],             // 重置标签
-        coverOption: 'upload',        //默认文件上传
-        customCoverLink: '',       // 清空自定义链接
-        cover: null,
-        refCover: null,            // 预览 URL
-        refCoverUuid: null,        // 提交用的 UUID
-        isTop: '0',                // 默认不置顶
-        isComment: '1'             // 默认允许评论
-      })
+      Object.assign(formModel, defaultModel)
       resetCarouselData()
     }
     focusTitle()
