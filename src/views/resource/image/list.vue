@@ -39,6 +39,7 @@
       <el-radio-group v-model="displayField" size="small" style="margin-left: 16px;">
         <el-radio-button value="id">ID</el-radio-button>
         <el-radio-button value="uuid">UUID</el-radio-button>
+        <el-radio-button value="businessId">BusinessID</el-radio-button>
         <el-radio-button value="title">标题</el-radio-button>
       </el-radio-group>
 
@@ -77,6 +78,7 @@
           <span v-show="hoveredId !== img.id" class="image-info-text">
             {{ displayField === 'id' ? `ID: ${img.id}` : '' }}
             {{ displayField === 'uuid' ? `UUID: ${img.uuid}` : '' }}
+            {{ displayField === 'businessId' ? `BusinessID: ${img.targetId || '-'}` : '' }}
             {{ displayField === 'title' ? `标题: ${img.title || '-'}` : '' }}
           </span>
           <!-- 操作按钮组（悬浮显示，方便以后新增/删改） -->
