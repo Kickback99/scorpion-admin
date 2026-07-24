@@ -66,6 +66,12 @@
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="name" label="文件名称" />
+        <el-table-column label="图片">
+            <template #default="{ row }">
+                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="row.url" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[row.url]" />
+                <span v-else>-</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="ext" label="扩展名" />
         <el-table-column prop="size" label="文件大小" />
         <!-- <el-table-column prop="url" label="文件链接" /> -->
@@ -157,6 +163,8 @@ const fields = ref([
 const setSortOrder = (order) => {
   searchData.sortOrder = order
 }
+
+const IMAGE_EXTS = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"]
 
 const exts = ref([])
 
