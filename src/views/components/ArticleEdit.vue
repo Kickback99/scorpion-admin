@@ -10,7 +10,7 @@
                     placeholder="请输入标题" v-model="blogData.title" />
             </el-form-item>
 
-            <div 
+            <div
             :style="{ height: hasSelectedArticle ? IMAGE_REFERENCE_EXPANDED_HEIGHT : IMAGE_REFERENCE_COLLAPSED_HEIGHT }"
             style="transition: height 0.3s ease; overflow: hidden;"
             >
@@ -45,7 +45,7 @@
                 2. content字段是 html 格式(监听事件：htmlContent，用于展示端显示)
                 3. markdownContent字段是 md 格式(监听事件：update:modelValue，用于编辑数据时，v-md-editor回显) -->
                 <!-- <EditorMarkdown :height="mdHeight" v-model="blogData.MarkdownContent"></EditorMarkdown> -->
-                
+
                 <!-- 我使用的是 -->
                 <!-- md格式到数据库content -->
                 <!-- 后期如何将md格式展示到前端，可以看 obsidian笔记 ➟ 12、富文本编辑器 -->
@@ -55,7 +55,7 @@
         </el-form>
 
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%" @close="hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">
-            <el-form ref="formRef" :model="formModel" label-width="auto" size="small"> 
+            <el-form ref="formRef" :model="formModel" label-width="auto" size="small">
                 <el-form-item label="文章描述" prop="description">
                     <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
                         <el-radio :label="'auto'">自动生成</el-radio>
@@ -91,7 +91,7 @@
                 />
               </el-form-item>
 
-              <!-- 文章封面：支持文件上传 / 自定义链接 两种模式 -->
+              <!-- 文章封面：支持文件上传 / 自定义链接 / 引用封面 三种模式 -->
               <el-form-item label="文章封面" prop="cover">
                   <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
                       <el-radio :label="'upload'">文件上传</el-radio>
@@ -200,38 +200,121 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import Mask from './Mask.vue';
-import Markdown from '@/components/Markdown.vue';
-import CateSelect from './CateSelect.vue';
-import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js';
-import SmartUpload from '@/views/components/SmartUpload.vue';
-import { useUserConfigStore } from '@/store/userConfig';
-import { useArticleDraftStore } from '@/store/articleDraft';
-import { useConfigStore } from '@/store/config';
+// 框架核心
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+// 组件
+import Mask from './Mask.vue'
+import Markdown from '@/components/Markdown.vue'
+import CateSelect from './CateSelect.vue'
+import SmartUpload from '@/views/components/SmartUpload.vue'
+import SmartAutoComplete from './SmartAutoComplete.vue'
+import ImageReference from '@/views/components/ImageReference.vue'
+
+// Store
+import { useUserConfigStore } from '@/store/userConfig'
+import { useArticleDraftStore } from '@/store/articleDraft'
+import { useConfigStore } from '@/store/config'
+
+// 第三方
+import PinyinMatch from 'pinyin-match'
+
+// API / 工具
+import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js'
+import { getTagListApi, getArticleBusinessDataApi } from '@/api/business'
+import { fileMetaListApi } from '@/api/filemeta'
+import msg from '@/components/msg'
+
+// ============================================================
+// 数据
+// ============================================================
+
+const route = useRoute()
 const userConfigStore = useUserConfigStore()
 const draftStore = useArticleDraftStore()
 const configStore = useConfigStore()
-const route = useRoute()
+
+const emit = defineEmits(['reRender'])
 
 /** 是否从「写博客」顶层菜单进入（区别于文章管理页的编辑入口） */
 const isWriteEntry = computed(() => route.path === '/write')
 
 let mdHeight = window.innerHeight - 30 - 70 - 200
-import PinyinMatch from 'pinyin-match';
-import { getTagListApi } from '@/api/business';
-import SmartAutoComplete from './SmartAutoComplete.vue';
-import ImageReference from '@/views/components/ImageReference.vue';
-import { getArticleBusinessDataApi } from '@/api/business'; 
-import { fileMetaListApi } from '@/api/filemeta'; //
-import msg from '@/components/msg'
 
-// ==================== 引用图片相关 ====================
+// 引用图片
+const imageReferenceRef = ref(null)
+const titleInputRef = ref(null)
+const hasSelectedArticle = ref(false)
+/** ImageReference 当前选中状态 — 由 @select-article / @clear 事件驱动，auto-save 直接读取 */
+const imageRefSelectedArticle = ref([])
+const imageRefSelectedArticleId = ref(null)
+// 引用图片组件容器高度
+const IMAGE_REFERENCE_EXPANDED_HEIGHT = '300px'
+const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '80px'
 
-const imageReferenceRef = ref(null);
-const titleInputRef = ref(null);
-const hasSelectedArticle = ref(false);
+// 引用封面
+const selectedCoverArticle = ref([])
+const coverArticleCache = ref([])  // 缓存文章搜索结果
+
+// 标签
+const tagList = ref([])
+
+// 文章
+const blogData = ref({
+  title: '',
+  content: ''
+})
+
+const isCoverUploading = ref(false)
+
+const defaultModel = {
+  id: null,
+  categoryId: null,
+  status: null,
+  descriptionType: 'auto',
+  customDescription: '',
+  description: null,
+  tagNames: [],
+  coverOption: 'upload',
+  customCoverLink: '',
+  cover: null,
+  refCover: null,
+  refCoverUuid: null,
+  isTop: '0',
+  isComment: '1'
+}
+
+const formModel = reactive({ ...defaultModel })
+
+const carouselData = ref({
+  isCarousel: false,
+  sort: null,
+  carouselId: null,
+  articleId: null
+})
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const maskVisible = ref(false)
+const isEditMode = ref(false)
+const blogFormRef = ref(null)
+
+const rules = {
+  title: [{ required: true, message: '请输入标题' }],
+  content: [{ required: true, message: '请输入内容' }]
+}
+
+const uploadRef = ref()
+
+// 草稿
+let saveTimer = null
+const coverFileBase64 = ref(null)
+const coverFileMeta = ref(null)
+
+// ============================================================
+// 渲染
+// ============================================================
 
 /** 聚焦标题输入框 */
 const focusTitle = () => {
@@ -239,20 +322,6 @@ const focusTitle = () => {
     titleInputRef.value?.focus()
   })
 }
-const selectedCoverArticle = ref([]);
-/** ImageReference 当前选中状态 — 由 @select-article / @clear 事件驱动，auto-save 直接读取 */
-const imageRefSelectedArticle = ref([]);
-const imageRefSelectedArticleId = ref(null);
-const coverArticleCache = ref([]);  // 缓存文章搜索结果
-
-// 引用图片组件容器高度
-const IMAGE_REFERENCE_EXPANDED_HEIGHT = '300px';
-const IMAGE_REFERENCE_COLLAPSED_HEIGHT = '80px';
-
-// 处理选中状态变化
-const handleSelectedChange = (selected) => {
-  hasSelectedArticle.value = selected;
-};
 
 /**
  * Mask 关闭 / 清空
@@ -273,427 +342,43 @@ const handleCloseMask = () => {
   } else {
     maskVisible.value = false
   }
-  hasSelectedArticle.value = false;
-};
+  hasSelectedArticle.value = false
+}
 
 const handleOpenDialog = () => {
-  handleOpen();
-};
-
-/**
- * 选择文章时触发 — 实时同步到草稿 ref，auto-save 直接读取无需
-通过 ref 轮询 ImageReference
- */
-const handleImageSelectArticle = (data) => {
-  if (data) {
-    imageRefSelectedArticle.value = [data.title]
-    imageRefSelectedArticleId.value = data.id
-  } else {
-    imageRefSelectedArticle.value = []
-    imageRefSelectedArticleId.value = null
-  }
-};
-
-/**
- * 移除文章标签时触发 — 同步清空草稿引用图片数据
- */
-const handleImageRemoveArticle = () => {
-  imageRefSelectedArticle.value = []
-  imageRefSelectedArticleId.value = null
+  handleOpen()
 }
 
-/**
- * 插入图片时触发
- */
-const handleImageInsert = (data) => {
-  console.log('插入图片:', data);
-  
-  // 将图片插入到 Markdown 内容中
-  const currentContent = blogData.value.content || '';
-  blogData.value.content = currentContent + '\n' + data.markdown;
-  
-  msg.primary(`图片 "${data.title || '图片'}" 已插入到内容末尾`);
-  
-  // 重置选中状态
-  imageReferenceRef.value?.resetSelection();
-};
-
-/**
- * 清空时触发
- */
-const handleImageClear = () => {
-  imageRefSelectedArticle.value = []
-  imageRefSelectedArticleId.value = null
-};
-
-// 在编辑文章回显时，自动加载图片
-/* const handleToggle = async(param) => {
-  // ... 原有回显逻辑 ...
-  
-  // 编辑文章时，ImageReference 组件会自动通过 articleId 加载图片
-  // 如果需要在特定时机手动触发，可以调用：
-  // await imageReferenceRef.value?.loadByArticleId(param.id);
-} */
-
-// ============================================================
-// 引用封面相关
-// ============================================================
-
-/**
- * 搜索文章（用于引用封面）
- */
-const fetchArticleForCover = async (params) => {
-  const query = params.keyword || '';
-
-  try {
-    const res = await getArticleBusinessDataApi();
-    if (res.code === 200) {
-      const data = (res.data || []).map(item => ({
-        value: item.title,
-        id: item.id
-      }));
-      coverArticleCache.value = data;
-
-      if (!query) {
-        return data;
-      }
-
-      const lowerQuery = query.toLowerCase();
-      return data.filter(item => {
-        const text = item.value;
-        const lowerText = text.toLowerCase();
-
-        if (lowerText.includes(lowerQuery)) return true;
-        if (PinyinMatch.match(text, query)) return true;
-
-        const words = lowerText.split(/[\s\-_]+/);
-        for (const word of words) {
-          if (word.startsWith(lowerQuery)) return true;
-        }
-
-        if (words.length > 1) {
-          const initials = words.map(w => w[0]).join('');
-          if (initials.includes(lowerQuery)) return true;
-        }
-
-        return false;
-      });
-    }
-    return [];
-  } catch (error) {
-    console.error('搜索文章失败:', error);
-    return [];
-  }
-};
-
-/**
- * 监听 selectedCoverArticle 变化 → 用标题反查 ID → 加载封面
- */
-watch(selectedCoverArticle, async (newVal) => {
-  if (newVal.length > 0) {
-    const title = newVal[0];
-    // 从缓存中反查 ID
-    const found = coverArticleCache.value.find(item => item.value === title);
-    if (found) {
-      try {
-        const res = await fileMetaListApi(1, 1, {
-          targetIds: found.id,
-          fileType: 'cover'
-        });
-        if (res.code === 200 && res.data.items && res.data.items.length > 0) {
-          const coverFileMeta = res.data.items[0];
-          formModel.refCover = coverFileMeta.img;        // 用于预览
-          formModel.refCoverUuid = coverFileMeta.uuid;   // 保存 UUID，用于提交
-        } else {
-          formModel.refCover = null;
-          msg.warning('该文章暂无封面');
-        }
-      } catch (error) {
-        console.error('获取封面失败:', error);
-        msg.warning('获取封面失败');
-      }
-    }
-  } else {
-    // 移除标签 → 清空封面
-    formModel.refCover = null;
-  }
-}, { deep: true });
-
-/**
- * 移除引用文章 → 清空封面
- */
-const handleCoverArticleRemoved = () => {
-  formModel.cover = null;
-};
-
-// ==================== 标签相关 ====================
-
-// 标签数据
-const tagList = ref([])
-
-// 加载所有标签数据
-const loadAllTags = async () => {
-  const res = await getTagListApi(1, 999, {})
-  const items = res.data?.items || []
-  tagList.value = items
-    .filter(item => item.name)
-    .map(item => ({
-      value: item.name.trim(),
-      id: item.id,
-      remark: item.remark
-    }))
-  console.log('加载所有标签:', tagList.value.length, '条')
-}
-
-// 前端搜索函数
-const fetchTags = async (params) => {
-  const query = params.keyword || ''
-  
-  if (!query) {
-    return tagList.value
-  }
-  
-  const lowerQuery = query.toLowerCase()
-  
-  const matched = tagList.value.filter(item => {
-    const text = item.value
-    const lowerText = text.toLowerCase()
-    
-    // 1. 英文直接包含匹配
-    if (lowerText.includes(lowerQuery)) {
-      return true
-    }
-    
-    // 2. PinyinMatch（中文拼音）
-    if (PinyinMatch.match(text, query)) {
-      return true
-    }
-    
-    // 3. 单词前缀匹配
-    const words = lowerText.split(/[\s\-_]+/)
-    for (const word of words) {
-      if (word.startsWith(lowerQuery)) {
-        return true
-      }
-    }
-    
-    // 4. 复合词首字母匹配
-    if (words.length > 1) {
-      const initials = words.map(word => word[0]).join('')
-      if (initials.includes(lowerQuery)) {
-        return true
-      }
-    }
-    
-    // 5. 单词内字符匹配
-    let charIndex = 0
-    for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
-      if (lowerText[i] === lowerQuery[charIndex]) {
-        charIndex++
-      }
-    }
-    if (charIndex === lowerQuery.length) {
-      return true
-    }
-    
-    return false
-  })
-  
-  return matched
-}
-
-// ==================== 文章相关 ====================
-
-const blogData = ref({
-    title: '',
-    content: ''
-})
-
-// 封面上传状态
-const isCoverUploading = ref(false)
-
-const defaultModel = {
-  id: null,
-  categoryId: null,
-  status: null,
-  descriptionType: 'auto', // 默认自动生成
-  customDescription: '',   // 自定义摘要内容
-  description: null,       // 实际提交给后端的值
-  tagNames: [],
-  coverOption: 'upload',   // 默认文件上传
-  customCoverLink: '',     // 封面文件对象（File 或 URL 字符串）
-  cover: null,             // 最终存储的封面URL（用于回显）
-  refCover: null,          // 预览 URL
-  refCoverUuid: null,      // 提交用的 UUID
-  isTop: '0',              // 是否置顶（0否，1是）
-  isComment: '1'           // 是否允许评论（0否，1是）
-}
-
-const formModel = reactive({ ...defaultModel })
-
-// 独立轮播数据
-const carouselData = ref({
-    isCarousel: false,    // 是否在轮播中
-    sort: null,           // 排序号
-    carouselId: null,     // 轮播记录ID（用于更新/删除）
-    articleId: null       // 关联的文章ID
-})
-
-// 重置轮播数据
-const resetCarouselData = () => {
-    carouselData.value = {
-        isCarousel: false,
-        sort: null,
-        carouselId: null,
-        articleId: null
-    }
-}
-
-// 处理排序变化：0 自动转为 null（自动）
-const handleSortChange = (val) => {
-    if (val === 0) {
-        carouselData.value.sort = null
-    }
-}
-
-const dialogVisible = ref(false)
-const dialogTitle = ref('')
-
-// mask弹窗
-const maskVisible = ref(false)
-
-/** 当前是否为编辑模式（区分新增/编辑，用于草稿保存控制） */
-const isEditMode = ref(false)
-
-// 暴露打开遮罩层方法
-// 无论是添加文章还是编辑文章，都需要打开mask弹窗
+/** 暴露打开遮罩层方法 — 无论是添加还是编辑，都需要打开 mask 弹窗 */
 const openMask = () => {
-    maskVisible.value = !maskVisible.value
+  maskVisible.value = !maskVisible.value
 }
 
-// ==================== 草稿自动保存 ====================
-/** 获取安全的 formModel 副本 — File 对象无法 JSON 序列化，保存时置 null */
-const safeFormModel = () => {
-  const copy = { ...formModel }
-  if (copy.cover instanceof File) copy.cover = null
-  return copy
-}
+const handleOpen = async () => {
+  const valid = await blogFormRef.value.validate().catch(() => false)
+  if (!valid) return
 
-/** base64 转回 File 对象 — 用于草稿恢复 */
-const base64ToFile = (base64, filename, mimeType) => {
-  const arr = base64.split(',')
-  const mime = mimeType || (arr[0].match(/:(.*?);/) || [])[1] || 'image/png'
-  const bstr = atob(arr[1])
-  const n = bstr.length
-  const u8arr = new Uint8Array(n)
-  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i)
-  return new File([u8arr], filename, { type: mime })
-}
+  hasSelectedArticle.value = false
+  dialogVisible.value = true
 
-/** 文件上传预览 — File → base64 data URL（File 对象无法序列化到 sessionStorage） */
-const coverFileBase64 = ref(null)
-const coverFileMeta = ref(null)
+  // 等待对话框打开和内容渲染
+  await nextTick()
 
-// 监听 cover 变化 — 当用户选择新文件时，异步读取 base64
-watch(() => formModel.cover, (cover) => {
-  if (cover instanceof File) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      coverFileBase64.value = reader.result
-      coverFileMeta.value = {
-        name: cover.name,
-        size: cover.size,
-        type: cover.type,
-        lastModified: cover.lastModified,
-      }
-    }
-    reader.readAsDataURL(cover)
-  } else {
-    coverFileBase64.value = null
-    coverFileMeta.value = null
+  // 现在 SmartUpload 组件已经创建
+  if (uploadRef.value && uploadRef.value.handleImage) {
+    const imageUrl = formModel.cover instanceof File
+      ? formModel.cover
+      : (!formModel.id ? '' : formModel.cover)
+    console.log('对话框打开后调用 handleImage:', imageUrl)
+    uploadRef.value.handleImage(imageUrl)
   }
-})
-
-/** 防抖保存草稿 — 800ms 无变化后自动写入 sessionStorage（编辑模式受 config 控制，新增永远保存） */
-let saveTimer = null
-const autoSaveDraft = () => {
-  clearTimeout(saveTimer)
-  saveTimer = setTimeout(() => {
-    if (isEditMode.value && !configStore.getArticleSaveEdit()) return
-    if (!maskVisible.value) return
-    if (!blogData.value.title && !blogData.value.content) return
-    draftStore.saveDraft({
-      blogData: blogData.value,
-      formModel: safeFormModel(),
-      carouselData: { ...carouselData.value },
-      selectedCoverArticle: [...selectedCoverArticle.value],
-      coverFileBase64: coverFileBase64.value,
-      coverFileMeta: coverFileMeta.value,
-      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
-      imageRefSelectedArticleId: imageRefSelectedArticleId.value,
-    })
-  }, 800)
 }
 
-// 深度监听表单数据变化 → 自动保存
-watch([blogData, () => formModel, carouselData, selectedCoverArticle, imageRefSelectedArticle, imageRefSelectedArticleId], autoSaveDraft, { deep: true })
-
-// 组件卸载时兜底保存
-onBeforeUnmount(() => {
-  if (isEditMode.value && !configStore.getArticleSaveEdit()) return
-  if (maskVisible.value && (blogData.value.title || blogData.value.content)) {
-    draftStore.saveDraft({
-      blogData: blogData.value,
-      formModel: safeFormModel(),
-      carouselData: { ...carouselData.value },
-      selectedCoverArticle: [...selectedCoverArticle.value],
-      coverFileBase64: coverFileBase64.value,
-      coverFileMeta: coverFileMeta.value,
-      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
-      imageRefSelectedArticleId: imageRefSelectedArticleId.value,
-    })
-  }
-})
-
-// 封面选项切换时，清空另一个字段的值
-const handleCoverOptionChange = (val) => {
-    if (val === 'upload') {
-        // 切换到文件上传：清空自定义链接
-        formModel.customCoverLink = ''
-        formModel.refCover = null
-        nextTick(() => uploadRef.value?.handleImage(formModel.cover))
-    } else if(val === 'custom') {
-        // 切换到自定义链接：清空文件上传的值
-        if(!formModel.id){
-          formModel.refCover = null
-          formModel.cover = null
-        }
-        // 如果 uploadRef 有清空方法，可以调用
-        /* if (uploadRef.value && uploadRef.value.clear) {
-            uploadRef.value.clear()
-        } */
-    }else if (val === 'ref') {
-        // 切换到引用封面时，清空自定义链接
-        formModel.customCoverLink = '';
-        // 如果当前 cover 是自定义链接（http开头），清空
-          formModel.cover = null
-    }
-}
-
-// 处理轮播开关变化
-const handleCarouselChange = (val) => {
-    if (!val) {
-        carouselData.value.sort = null
-    }
-}
-
-// 组件对外暴露一个方法handleToggle
-// 判断添加还是编辑
-/* 
-    添加就重置文章数据，编辑就回显文章数据
+/**
+ * 判断添加还是编辑：添加就重置文章数据，编辑就回显文章数据
  */
-const handleToggle = async(param) => {
-   if(!param.id){
+const handleToggle = async (param) => {
+  if (!param.id) {
     // 添加
     isEditMode.value = false
     dialogTitle.value = '新增文章'
@@ -732,25 +417,25 @@ const handleToggle = async(param) => {
       resetCarouselData()
     }
     focusTitle()
-   }else {
+  } else {
     // 回显
     isEditMode.value = true
     dialogTitle.value = '修改文章'
     const res = await findApi(param.id)
-    console.log("回显res.data",res.data)
-    
-    const {title,content,...rest} = res.data
-    
-    blogData.value = {title,content} 
+    console.log('回显res.data', res.data)
 
-    Object.assign(formModel,rest)
-    if(res.data.isAutoDescription === 0){
-          formModel.descriptionType = 'auto'
-    }else if(res.data.isAutoDescription === 1){
-          formModel.descriptionType = 'empty'
+    const { title, content, ...rest } = res.data
+
+    blogData.value = { title, content }
+
+    Object.assign(formModel, rest)
+    if (res.data.isAutoDescription === 0) {
+      formModel.descriptionType = 'auto'
+    } else if (res.data.isAutoDescription === 1) {
+      formModel.descriptionType = 'empty'
     } else {
-          formModel.descriptionType = 'custom'
-          formModel.customDescription = res.data.description
+      formModel.descriptionType = 'custom'
+      formModel.customDescription = res.data.description
     }
 
     // 根据后端返回的 coverMode 回显封面
@@ -776,158 +461,100 @@ const handleToggle = async(param) => {
       }
       formModel.cover = null
     }
-    
 
     // 查询轮播信息并回显到 carouselData
     try {
-        const carouselRes = await getCarouselByArticleApi(param.id)
-        if (carouselRes.data) {
-            carouselData.value.isCarousel = true
-            carouselData.value.sort = carouselRes.data.sort
-            carouselData.value.carouselId = carouselRes.data.id
-            carouselData.value.articleId = param.id
-        } else {
-            resetCarouselData()
-        }
-    } catch (e) {
-        // 没有轮播记录，保持默认状态
+      const carouselRes = await getCarouselByArticleApi(param.id)
+      if (carouselRes.data) {
+        carouselData.value.isCarousel = true
+        carouselData.value.sort = carouselRes.data.sort
+        carouselData.value.carouselId = carouselRes.data.id
+        carouselData.value.articleId = param.id
+      } else {
         resetCarouselData()
+      }
+    } catch (e) {
+      // 没有轮播记录，保持默认状态
+      resetCarouselData()
     }
-   }
-}
-
-defineExpose({
-    handleToggle, openMask
-})
-
-const emit = defineEmits(['reRender'])
-
-// 监听描述类型变化
-const handleDescriptionTypeChange = (type) => {
-  switch(type) {
-    case 'auto':
-      formModel.description = null // 传null表示自动生成
-      break
-    case 'empty':
-      formModel.description = ''   // 传空字符串表示刻意留空
-      break
-    case 'custom':
-      formModel.description = formModel.customDescription // 使用自定义内容
-      break
   }
 }
 
-
-const blogFormRef = ref(null)
-
-const rules = {
-  title:[
-    { required: true, message: '请输入标题'},
-  ],
-  content:[
-    { required: true, message: '请输入内容'},
-  ],
-}
-
-const uploadRef = ref()
-
-const handleOpen = async() => {
-  const valid = await blogFormRef.value.validate().catch(() => false)
-  if (!valid) return
-
+const handlePublish = async (status) => {
   hasSelectedArticle.value = false
-  dialogVisible.value = true
-  
-  // 等待对话框打开和内容渲染
-  await nextTick()
-  
-  // 现在 SmartUpload 组件已经创建
-  if (uploadRef.value && uploadRef.value.handleImage) {
-    const imageUrl = formModel.cover instanceof File
-      ? formModel.cover
-      : (!formModel.id ? '' : formModel.cover)
-    console.log('对话框打开后调用 handleImage:', imageUrl)
-    uploadRef.value.handleImage(imageUrl)
-  }
-}
+  formModel.status = status
 
-const handlePublish = async(status) => {
-
-    hasSelectedArticle.value = false
-    formModel.status = status
-
-    // 最后一次确认description值
+  // 最后一次确认 description 值
   if (formModel.descriptionType === 'custom') {
     formModel.description = formModel.customDescription
     // formModel.isAutoDescription = null; // 明确设置为null
   }
 
-    let cover;
-    if (formModel.coverOption === 'custom') {
-      if (!formModel.customCoverLink) {
-          msg.warning('请填写自定义图片链接')
-          return
-      }
-      cover = formModel.customCoverLink
-    }else if (formModel.coverOption === 'ref') {
-      // 引用封面模式：使用 refCover
-      if (!formModel.refCoverUuid) {
-        msg.warning('请先选择要引用的文章封面');
-        return;
-      }
-      cover = formModel.refCoverUuid;
-    }else if (formModel.coverOption === 'upload') {
+  let cover
+  if (formModel.coverOption === 'custom') {
+    if (!formModel.customCoverLink) {
+      msg.warning('请填写自定义图片链接')
+      return
+    }
+    cover = formModel.customCoverLink
+  } else if (formModel.coverOption === 'ref') {
+    // 引用封面模式：使用 refCover
+    if (!formModel.refCoverUuid) {
+      msg.warning('请先选择要引用的文章封面')
+      return
+    }
+    cover = formModel.refCoverUuid
+  } else if (formModel.coverOption === 'upload') {
     // 直接传 formModel.cover，不管它是 URL 还是 File
     // 后端会自己判断格式
     if (formModel.cover instanceof File) {
-        cover = null; // 新文件等待上传
+      cover = null // 新文件等待上传
     } else {
-        cover = formModel.cover; // 直接传，后端会提取 UUID
+      cover = formModel.cover // 直接传，后端会提取 UUID
     }
-}
+  }
 
-    const data = {
-      article:{
-        ...blogData.value,
-        ...formModel,
-        cover: cover
-      },
-      tagNames: formModel.tagNames,
-      isCarousel: carouselData.value.isCarousel,
-      sort: carouselData.value.sort || 0
-    }
+  const data = {
+    article: {
+      ...blogData.value,
+      ...formModel,
+      cover: cover
+    },
+    tagNames: formModel.tagNames,
+    isCarousel: carouselData.value.isCarousel,
+    sort: carouselData.value.sort || 0
+  }
 
   // 移除临时字段
   delete data.article.descriptionType
   delete data.article.customDescription
-  delete data.article.tagNames // 移除tagNames字段，因为article表中没有这个字段
+  delete data.article.tagNames // 移除 tagNames 字段，因为 article 表中没有这个字段
 
   try {
-    
     let articleId = formModel.id
 
-    if(!formModel.id){
-        // t_article_request：文章新增请求
-        const res = await addApi(data)
-        const articleId = res.data
-        console.log("==================== articleId ====================", articleId)
-        // 如果是文件上传模式，上传封面
-        if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
-            const coverUrl = await uploadCoverApi(articleId, formModel.cover)
-            if (coverUrl) {
-                formModel.cover = coverUrl
-            }
+    if (!formModel.id) {
+      // t_article_request：文章新增请求
+      const res = await addApi(data)
+      articleId = res.data
+      console.log('==================== articleId ====================', articleId)
+      // 如果是文件上传模式，上传封面
+      if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
+        const coverUrl = await uploadCoverApi(articleId, formModel.cover)
+        if (coverUrl) {
+          formModel.cover = coverUrl
         }
-    }else {
-        // t_article_request：文章修改请求
-        await modifyApi(data)
-        // 如果是文件上传模式，上传封面
-        if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
-            const coverUrl = await uploadCoverApi(articleId, formModel.cover)
-            if (coverUrl) {
-                formModel.cover = coverUrl
-            }
+      }
+    } else {
+      // t_article_request：文章修改请求
+      await modifyApi(data)
+      // 如果是文件上传模式，上传封面
+      if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
+        const coverUrl = await uploadCoverApi(articleId, formModel.cover)
+        if (coverUrl) {
+          formModel.cover = coverUrl
         }
+      }
     }
     msg.primary(formModel.id ? '修改成功' : '添加成功')
     draftStore.clearDraft()
@@ -942,22 +569,407 @@ const handlePublish = async(status) => {
     } else {
       emit('reRender')
     }
-  }catch(error){
+  } catch (error) {
     msg.error('提交失败，请重试')
   }
 }
 
-// 组件挂载时加载标签数据
-onMounted(() => {
-    loadAllTags()
-})
+// ============================================================
+// 辅助函数
+// ============================================================
+
+/** 重置轮播数据 */
+const resetCarouselData = () => {
+  carouselData.value = {
+    isCarousel: false,
+    sort: null,
+    carouselId: null,
+    articleId: null
+  }
+}
+
+/** 处理排序变化：0 自动转为 null（自动） */
+const handleSortChange = (val) => {
+  if (val === 0) {
+    carouselData.value.sort = null
+  }
+}
+
+/** 处理轮播开关变化 */
+const handleCarouselChange = (val) => {
+  if (!val) {
+    carouselData.value.sort = null
+  }
+}
+
+// ============================================================
+// 标签
+// ============================================================
+
+/** 加载所有标签数据 */
+const loadAllTags = async () => {
+  const res = await getTagListApi(1, 999, {})
+  const items = res.data?.items || []
+  tagList.value = items
+    .filter(item => item.name)
+    .map(item => ({
+      value: item.name.trim(),
+      id: item.id,
+      remark: item.remark
+    }))
+  console.log('加载所有标签:', tagList.value.length, '条')
+}
+
+/** 前端搜索标签 */
+const fetchTags = async (params) => {
+  const query = params.keyword || ''
+
+  if (!query) {
+    return tagList.value
+  }
+
+  const lowerQuery = query.toLowerCase()
+
+  const matched = tagList.value.filter(item => {
+    const text = item.value
+    const lowerText = text.toLowerCase()
+
+    // 1. 英文直接包含匹配
+    if (lowerText.includes(lowerQuery)) {
+      return true
+    }
+
+    // 2. PinyinMatch（中文拼音）
+    if (PinyinMatch.match(text, query)) {
+      return true
+    }
+
+    // 3. 单词前缀匹配
+    const words = lowerText.split(/[\s\-_]+/)
+    for (const word of words) {
+      if (word.startsWith(lowerQuery)) {
+        return true
+      }
+    }
+
+    // 4. 复合词首字母匹配
+    if (words.length > 1) {
+      const initials = words.map(word => word[0]).join('')
+      if (initials.includes(lowerQuery)) {
+        return true
+      }
+    }
+
+    // 5. 单词内字符匹配
+    let charIndex = 0
+    for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
+      if (lowerText[i] === lowerQuery[charIndex]) {
+        charIndex++
+      }
+    }
+    if (charIndex === lowerQuery.length) {
+      return true
+    }
+
+    return false
+  })
+
+  return matched
+}
+
+// ============================================================
+// 引用封面
+// ============================================================
+
+/**
+ * 搜索文章（用于引用封面）
+ */
+const fetchArticleForCover = async (params) => {
+  const query = params.keyword || ''
+
+  try {
+    const res = await getArticleBusinessDataApi()
+    if (res.code === 200) {
+      const data = (res.data || []).map(item => ({
+        value: item.title,
+        id: item.id
+      }))
+      coverArticleCache.value = data
+
+      if (!query) {
+        return data
+      }
+
+      const lowerQuery = query.toLowerCase()
+      return data.filter(item => {
+        const text = item.value
+        const lowerText = text.toLowerCase()
+
+        if (lowerText.includes(lowerQuery)) return true
+        if (PinyinMatch.match(text, query)) return true
+
+        const words = lowerText.split(/[\s\-_]+/)
+        for (const word of words) {
+          if (word.startsWith(lowerQuery)) return true
+        }
+
+        if (words.length > 1) {
+          const initials = words.map(w => w[0]).join('')
+          if (initials.includes(lowerQuery)) return true
+        }
+
+        return false
+      })
+    }
+    return []
+  } catch (error) {
+    console.error('搜索文章失败:', error)
+    return []
+  }
+}
+
+/**
+ * 监听 selectedCoverArticle 变化 → 用标题反查 ID → 加载封面
+ */
+watch(selectedCoverArticle, async (newVal) => {
+  if (newVal.length > 0) {
+    const title = newVal[0]
+    // 从缓存中反查 ID
+    const found = coverArticleCache.value.find(item => item.value === title)
+    if (found) {
+      try {
+        const res = await fileMetaListApi(1, 1, {
+          targetIds: found.id,
+          fileType: 'cover'
+        })
+        if (res.code === 200 && res.data.items && res.data.items.length > 0) {
+          const coverFileMeta = res.data.items[0]
+          formModel.refCover = coverFileMeta.img        // 用于预览
+          formModel.refCoverUuid = coverFileMeta.uuid   // 保存 UUID，用于提交
+        } else {
+          formModel.refCover = null
+          msg.warning('该文章暂无封面')
+        }
+      } catch (error) {
+        console.error('获取封面失败:', error)
+        msg.warning('获取封面失败')
+      }
+    }
+  } else {
+    // 移除标签 → 清空封面
+    formModel.refCover = null
+  }
+}, { deep: true })
+
+/**
+ * 移除引用文章 → 清空封面
+ */
+const handleCoverArticleRemoved = () => {
+  formModel.cover = null
+}
+
+/**
+ * 封面选项切换时，清空另一个字段的值
+ */
+const handleCoverOptionChange = (val) => {
+  if (val === 'upload') {
+    // 切换到文件上传：清空自定义链接
+    formModel.customCoverLink = ''
+    formModel.refCover = null
+    nextTick(() => uploadRef.value?.handleImage(formModel.cover))
+  } else if (val === 'custom') {
+    // 切换到自定义链接：清空文件上传的值
+    if (!formModel.id) {
+      formModel.refCover = null
+      formModel.cover = null
+    }
+    // 如果 uploadRef 有清空方法，可以调用
+    /* if (uploadRef.value && uploadRef.value.clear) {
+        uploadRef.value.clear()
+    } */
+  } else if (val === 'ref') {
+    // 切换到引用封面时，清空自定义链接
+    formModel.customCoverLink = ''
+    // 如果当前 cover 是自定义链接（http开头），清空
+    formModel.cover = null
+  }
+}
+
+// ============================================================
+// 引用图片
+// ============================================================
+
+/** 处理选中状态变化 */
+const handleSelectedChange = (selected) => {
+  hasSelectedArticle.value = selected
+}
+
+/**
+ * 选择文章时触发 — 实时同步到草稿 ref，auto-save 直接读取无需
+通过 ref 轮询 ImageReference
+ */
+const handleImageSelectArticle = (data) => {
+  if (data) {
+    imageRefSelectedArticle.value = [data.title]
+    imageRefSelectedArticleId.value = data.id
+  } else {
+    imageRefSelectedArticle.value = []
+    imageRefSelectedArticleId.value = null
+  }
+}
+
+/**
+ * 移除文章标签时触发 — 同步清空草稿引用图片数据
+ */
+const handleImageRemoveArticle = () => {
+  imageRefSelectedArticle.value = []
+  imageRefSelectedArticleId.value = null
+}
+
+/**
+ * 插入图片时触发
+ */
+const handleImageInsert = (data) => {
+  console.log('插入图片:', data)
+
+  // 将图片插入到 Markdown 内容中
+  const currentContent = blogData.value.content || ''
+  blogData.value.content = currentContent + '\n' + data.markdown
+
+  msg.primary(`图片 "${data.title || '图片'}" 已插入到内容末尾`)
+
+  // 重置选中状态
+  imageReferenceRef.value?.resetSelection()
+}
+
+/**
+ * 清空时触发
+ */
+const handleImageClear = () => {
+  imageRefSelectedArticle.value = []
+  imageRefSelectedArticleId.value = null
+}
 
 // 编辑回显时展开，新增时收缩
-/* watch(() => formModel.id, (newVal) => {
-  if (newVal) {
-    hasSelectedArticle.value = true;
+// watch(() => formModel.id, (newVal) => {
+//   if (newVal) {
+//     hasSelectedArticle.value = true
+//   }
+// }, { immediate: true })
+
+// ============================================================
+// 表单校验
+// ============================================================
+
+/** 监听描述类型变化 */
+const handleDescriptionTypeChange = (type) => {
+  switch (type) {
+    case 'auto':
+      formModel.description = null // 传 null 表示自动生成
+      break
+    case 'empty':
+      formModel.description = ''   // 传空字符串表示刻意留空
+      break
+    case 'custom':
+      formModel.description = formModel.customDescription // 使用自定义内容
+      break
   }
-}, { immediate: true }); */
+}
+
+// ============================================================
+// 草稿自动保存
+// ============================================================
+
+/** 获取安全的 formModel 副本 — File 对象无法 JSON 序列化，保存时置 null */
+const safeFormModel = () => {
+  const copy = { ...formModel }
+  if (copy.cover instanceof File) copy.cover = null
+  return copy
+}
+
+/** base64 转回 File 对象 — 用于草稿恢复 */
+const base64ToFile = (base64, filename, mimeType) => {
+  const arr = base64.split(',')
+  const mime = mimeType || (arr[0].match(/:(.*?);/) || [])[1] || 'image/png'
+  const bstr = atob(arr[1])
+  const n = bstr.length
+  const u8arr = new Uint8Array(n)
+  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i)
+  return new File([u8arr], filename, { type: mime })
+}
+
+// 监听 cover 变化 — 当用户选择新文件时，异步读取 base64
+watch(() => formModel.cover, (cover) => {
+  if (cover instanceof File) {
+    const reader = new FileReader()
+    reader.onload = () => {
+      coverFileBase64.value = reader.result
+      coverFileMeta.value = {
+        name: cover.name,
+        size: cover.size,
+        type: cover.type,
+        lastModified: cover.lastModified
+      }
+    }
+    reader.readAsDataURL(cover)
+  } else {
+    coverFileBase64.value = null
+    coverFileMeta.value = null
+  }
+})
+
+/** 防抖保存草稿 — 800ms 无变化后自动写入 sessionStorage（编辑模式受 config 控制，新增永远保存） */
+const autoSaveDraft = () => {
+  clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    if (isEditMode.value && !configStore.getArticleSaveEdit()) return
+    if (!maskVisible.value) return
+    if (!blogData.value.title && !blogData.value.content) return
+    draftStore.saveDraft({
+      blogData: blogData.value,
+      formModel: safeFormModel(),
+      carouselData: { ...carouselData.value },
+      selectedCoverArticle: [...selectedCoverArticle.value],
+      coverFileBase64: coverFileBase64.value,
+      coverFileMeta: coverFileMeta.value,
+      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
+      imageRefSelectedArticleId: imageRefSelectedArticleId.value
+    })
+  }, 800)
+}
+
+// 深度监听表单数据变化 → 自动保存
+watch([blogData, () => formModel, carouselData, selectedCoverArticle, imageRefSelectedArticle, imageRefSelectedArticleId], autoSaveDraft, { deep: true })
+
+// 组件卸载时兜底保存
+onBeforeUnmount(() => {
+  if (isEditMode.value && !configStore.getArticleSaveEdit()) return
+  if (maskVisible.value && (blogData.value.title || blogData.value.content)) {
+    draftStore.saveDraft({
+      blogData: blogData.value,
+      formModel: safeFormModel(),
+      carouselData: { ...carouselData.value },
+      selectedCoverArticle: [...selectedCoverArticle.value],
+      coverFileBase64: coverFileBase64.value,
+      coverFileMeta: coverFileMeta.value,
+      imageRefSelectedArticle: [...imageRefSelectedArticle.value],
+      imageRefSelectedArticleId: imageRefSelectedArticleId.value
+    })
+  }
+})
+
+// ============================================================
+// 生命周期
+// ============================================================
+
+onMounted(() => {
+  loadAllTags()
+})
+
+defineExpose({
+  handleToggle,
+  openMask
+})
 </script>
 
 <style scoped lang="scss">
