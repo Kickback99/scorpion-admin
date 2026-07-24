@@ -91,7 +91,7 @@
         <el-table-column prop="title" label="标题" show-overflow-tooltip/>
         <el-table-column label="封面" width="100px">
             <template #default="{row}">
-                <el-image style="width: 100px; height: 56px"  :src="handleImage(row)" :fit="fit" />
+                <el-image style="width: 100px; height: 56px"  :src="handleImage(row)" :fit="fit" preview-teleported :preview-src-list="[handleImage(row)]"/>
             </template>
         </el-table-column>
         <el-table-column prop="cateName" label="分类" align="center"/>
