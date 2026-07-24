@@ -388,15 +388,21 @@ const loadImages = async (articleId) => {
 };
 
 /**
- * 手动加载指定文章的图片（用于编辑回显）
+ * 手动加载指定文章的图片（用于编辑回显、草稿恢复）
+ * @param {Number} id 文章 ID
+ * @param {String} title 可选：指定显示标题。不传时自动从 articleCache 反查，未命中则回退 articleTitle prop
  */
-const loadByArticleId = async (id) => {
+const loadByArticleId = async (id, title) => {
   if (id) {
-    const found = articleCache.value.find(item => item.id === id);
-    if (found) {
-      selectedArticle.value = [props.articleTitle || found.value];
+    if (title) {
+      selectedArticle.value = [title];
     } else {
-      selectedArticle.value = [props.articleTitle || `ID: ${id}`];
+      const found = articleCache.value.find(item => item.id === id);
+      if (found) {
+        selectedArticle.value = [found.value];
+      } else {
+        selectedArticle.value = [props.articleTitle || `ID: ${id}`];
+      }
     }
     await loadImages(id);
   }
@@ -499,6 +505,7 @@ defineExpose({
   resetSelection,
   clear: handleClear,
   getSelectedArticle: () => selectedArticle.value,
+  getSelectedArticleId: () => getCurrentArticleId(),
   getImageList: () => imageList.value,
   getFilteredImageList: () => filteredImageList.value,
   getSelectedImage: () => filteredImageList.value[selectedIndex.value] || null,

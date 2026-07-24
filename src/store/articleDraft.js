@@ -12,6 +12,8 @@ export const useArticleDraftStore = defineStore({
     selectedCoverArticle: null,    // 引用封面 — SmartAutoComplete 选中的文章标题数组
     coverFileBase64: null,         // 文件上传封面 — base64 data URL（File 无法直接序列化）
     coverFileMeta: null,           // 文件上传封面 — { name, size, type, lastModified }
+    imageRefSelectedArticle: null, // ImageReference 选中的文章标题数组
+    imageRefSelectedArticleId: null, // ImageReference 选中的文章 ID（用于 loadByArticleId 恢复）
     updatedAt: null,               // 最后更新时间戳
   }),
   getters: {
@@ -35,6 +37,8 @@ export const useArticleDraftStore = defineStore({
       this.selectedCoverArticle = JSON.parse(JSON.stringify(data.selectedCoverArticle || []))
       this.coverFileBase64 = data.coverFileBase64 || null
       this.coverFileMeta = data.coverFileMeta ? JSON.parse(JSON.stringify(data.coverFileMeta)) : null
+      this.imageRefSelectedArticle = JSON.parse(JSON.stringify(data.imageRefSelectedArticle || []))
+      this.imageRefSelectedArticleId = data.imageRefSelectedArticleId || null
       this.updatedAt = Date.now()
     },
 
@@ -51,6 +55,8 @@ export const useArticleDraftStore = defineStore({
         selectedCoverArticle: JSON.parse(JSON.stringify(this.selectedCoverArticle || [])),
         coverFileBase64: this.coverFileBase64 || null,
         coverFileMeta: this.coverFileMeta ? JSON.parse(JSON.stringify(this.coverFileMeta)) : null,
+        imageRefSelectedArticle: JSON.parse(JSON.stringify(this.imageRefSelectedArticle || [])),
+        imageRefSelectedArticleId: this.imageRefSelectedArticleId || null,
       }
     },
 
@@ -62,6 +68,8 @@ export const useArticleDraftStore = defineStore({
       this.selectedCoverArticle = null
       this.coverFileBase64 = null
       this.coverFileMeta = null
+      this.imageRefSelectedArticle = null
+      this.imageRefSelectedArticleId = null
       this.updatedAt = null
     },
   },
