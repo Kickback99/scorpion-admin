@@ -266,8 +266,8 @@ const fetchArticleForImage = async (params) => {
         id: item.id
       }));
     } else {
-      const { getArticleBusinessDataApi } = await import('@/api/business');
-      const res = await getArticleBusinessDataApi();
+      const { getArticleContentBusinessDataApi } = await import('@/api/business');
+      const res = await getArticleContentBusinessDataApi();
       if (res.code === 200) {
         data = (res.data || []).map(item => ({
           value: item.title,
