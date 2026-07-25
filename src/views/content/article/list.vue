@@ -21,11 +21,11 @@
             </el-form-item>
 
             <el-form-item>
-                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px;" placeholder="请选择排序(默认置顶+创建时间)">
-                </SmartSelector>
+
             </el-form-item>
 
             <el-form-item>
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px; margin-right: 15px;" placeholder="请选择排序(默认置顶+创建时间)"></SmartSelector>
                 <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
                 <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
@@ -75,15 +75,18 @@
                     @change="updateEndTime"
                 />
             </el-form-item>
+                
+            <template class="flex">
+                <el-form-item>
+                        <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                        <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+                </el-form-item>
 
-            <el-form-item>
-                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
-                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-            </el-form-item>
+                <el-form-item style="margin-left:auto">
+                    <el-button size="small" type="primary" :disabled="$hasPerm('btn.article.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
+                </el-form-item>
+            </template>
         </el-form>
-        <div class="right">
-            <el-button size="small" type="primary" :disabled="$hasPerm('btn.article.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
-        </div>
     </div>
 
     <el-table :data="tableData" :style="{ width: '100%' }" >
