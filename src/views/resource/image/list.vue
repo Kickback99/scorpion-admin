@@ -43,8 +43,16 @@
         <el-radio-button value="title">标题</el-radio-button>
       </el-radio-group>
 
+      <!-- 复制格式下拉选择 -->
+      <SmartSelector 
+        v-model="copyFormat" 
+        :data="copyFormatOptions" 
+        style="width: 160px; margin-left: 12px;" 
+        placeholder="复制格式(默认md)"
+      />
+
       <!-- 排序 -->
-      <SmartSelector v-model="sortField" :data="fields" style="width: 200px; margin-left: 16px;" placeholder="请选择排序">
+      <SmartSelector v-model="sortField" :data="softFields" style="width: 200px; margin-left: 16px;" placeholder="请选择排序">
       </SmartSelector>
       <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
       <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
@@ -152,8 +160,15 @@ import { getAllBusinessDataApi } from '@/api/business'
 
 // 常量
 const DISPLAY_FIELD = 'id'
-const COPY_FORMAT = 'markdown'
 const DEFAULT_ORIGINAL_FILTER = false
+const copyFormat = ref('')
+
+// 复制格式选项
+const copyFormatOptions = [
+  { label: '复制格式(默认md)', value: '' },
+  { label: 'UUID', value: 'uuid' },
+  { label: 'OSS路径', value: 'ossPath' },
+]
 
 // 响应式状态
 const loading = ref(false)
@@ -173,7 +188,7 @@ const searchIds = ref('')
 // 排序
 const sortField = ref('create_time')
 const sortOrder = ref('DESC')
-const fields = ref([
+const softFields = ref([
     { label: '请选择排序', value: '', disabled: true },
     { label: '业务主键ID', value: 'target_id' },
     { label: '创建时间', value: 'create_time' },
@@ -404,12 +419,19 @@ const handleDownload = async (img) => {
 const handleCopy = async (img) => {
   let copyText = '';
   
-  if (COPY_FORMAT === 'uuid') {
-    copyText = img.uuid;
-  } else {
-    // markdown 格式
-    const title = img.title || img.fileType || '图片';
-    copyText = `![${title}](${img.img})`;
+  // 根据选择的格式生成复制内容
+  switch (copyFormat.value) {
+    case 'uuid':
+      copyText = img.uuid;
+      break;
+    case 'ossPath':
+      copyText = img.ossPath;
+      break;
+    case 'markdown':
+    default:
+      const title = img.title || img.fileType || '图片';
+      copyText = `![${title}](${img.img})`;
+      break;
   }
   
   try {
