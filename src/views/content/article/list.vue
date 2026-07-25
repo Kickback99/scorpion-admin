@@ -43,10 +43,10 @@
             <!-- 快捷选择按钮组 -->
             <el-form-item>
                 <el-button-group>
-                    <el-button size="small" @click="setQuickDate('today')" plain>今天</el-button>
-                    <el-button size="small" @click="setQuickDate('yesterday')" plain>昨天</el-button>
-                    <el-button size="small" @click="setQuickDate('week')" plain>最近一周</el-button>
-                    <el-button size="small" @click="setQuickDate('month')" plain>最近一月</el-button>
+                    <el-button size="small" :type="activeQuickDate === 'today' ? 'primary' : ''" @click="setQuickDate('today')" plain>今天</el-button>
+                    <el-button size="small" :type="activeQuickDate === 'yesterday' ? 'primary' : ''" @click="setQuickDate('yesterday')" plain>昨天</el-button>
+                    <el-button size="small" :type="activeQuickDate === 'week' ? 'primary' : ''" @click="setQuickDate('week')" plain>最近一周</el-button>
+                    <el-button size="small" :type="activeQuickDate === 'month' ? 'primary' : ''" @click="setQuickDate('month')" plain>最近一月</el-button>
                 </el-button-group>
             </el-form-item>
 
@@ -235,6 +235,7 @@ const onReset = () => {
     }
     startTime.value = ''   // 清空开始时间
     endTime.value = ''     // 清空结束时间
+    activeQuickDate.value = ''  // 清空快捷按钮高亮状态
     render()
 }
 
@@ -343,8 +344,15 @@ const updateEndTime = (value) => {
     }
 }
 
+// 添加激活状态
+const activeQuickDate = ref('')
+
 // 快捷日期设置
 const setQuickDate = (type) => {
+
+    // 更新激活状态
+    activeQuickDate.value = type
+
     const now = new Date()
     let start = null
     let end = now
