@@ -56,6 +56,7 @@
       </SmartSelector>
       <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
       <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
+      <el-button size="small" type="info" icon="Refresh" @click="onReset" circle plain />
     </div>
 
     <!-- ===== 图片网格 ===== -->
@@ -371,6 +372,20 @@ watch([sortField, sortOrder], () => {
   currentPage.value = 1;
   fetchImages();
 })
+
+// 重置筛选条件
+const onReset = () => {
+  currentImageType.value = 'all'
+  filterOriginal.value = false
+  displayField.value = 'id'
+  copyFormat.value = ''
+  sortField.value = 'create_time'
+  sortOrder.value = 'DESC'
+  selectedSearch.value = []
+  searchIds.value = ''
+  currentPage.value = 1
+  fetchImages()
+}
 
 // ============================================================
 // 图片预览（全局单例 el-image-viewer）
