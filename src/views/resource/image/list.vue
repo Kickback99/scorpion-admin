@@ -158,18 +158,6 @@ import { getAllBusinessDataApi } from '@/api/business'
 // 数据
 // ============================================================
 
-// 常量
-const DISPLAY_FIELD = 'id'
-const DEFAULT_ORIGINAL_FILTER = false
-const copyFormat = ref('')
-
-// 复制格式选项
-const copyFormatOptions = [
-  { label: '复制格式(默认md)', value: '' },
-  { label: 'UUID', value: 'uuid' },
-  { label: 'OSS路径', value: 'ossPath' },
-]
-
 // 响应式状态
 const loading = ref(false)
 const imageList = ref([])
@@ -180,8 +168,9 @@ const hoveredId = ref(null)
 
 // 筛选条件
 const currentImageType = ref('all')
-const filterOriginal = ref(DEFAULT_ORIGINAL_FILTER)
-const displayField = ref(DISPLAY_FIELD)
+const filterOriginal = ref(false)
+const displayField = ref('id')
+const copyFormat = ref('')
 const selectedSearch = ref([])
 const searchIds = ref('')
 
@@ -415,6 +404,13 @@ const handleDownload = async (img) => {
 // ============================================================
 // 复制功能
 // ============================================================
+
+// 复制格式选项
+const copyFormatOptions = [
+  { label: '复制格式(默认md)', value: '' },
+  { label: 'UUID', value: 'uuid' },
+  { label: 'OSS路径', value: 'ossPath' },
+]
 
 const handleCopy = async (img) => {
   let copyText = '';
