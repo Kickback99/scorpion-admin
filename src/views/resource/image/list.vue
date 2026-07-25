@@ -45,6 +45,7 @@
 
       <!-- 复制格式下拉选择 -->
       <SmartSelector 
+        size="small"
         v-model="copyFormat" 
         :data="copyFormatOptions" 
         style="width: 160px; margin-left: 12px;" 
@@ -52,11 +53,13 @@
       />
 
       <!-- 排序 -->
-      <SmartSelector v-model="sortField" :data="softFields" style="width: 200px; margin-left: 16px;" placeholder="请选择排序">
+      <SmartSelector size="small" v-model="sortField" :data="softFields" style="width: 200px; margin-left: 16px;" placeholder="请选择排序">
       </SmartSelector>
-      <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
-      <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
-      <el-button size="small" type="info" icon="Refresh" @click="onReset" circle plain />
+      <span style="display: inline-flex; gap: 0;">
+        <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+        <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
+        <el-button size="small" type="info" icon="Refresh" @click="onReset" circle plain />
+      </span>
     </div>
 
     <!-- ===== 图片网格 ===== -->
