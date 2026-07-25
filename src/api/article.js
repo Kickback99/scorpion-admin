@@ -23,7 +23,9 @@ export const findApi = (articleId) => http.get(`${API.ARTICLE_BY_ID_URL}/${artic
 export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData})
 
 //t_upload_api
-export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData)
+export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData,{
+    timeout: 15000 //本次内容图上传请求超时15秒
+})
 
 //t_upload_api
 export const uploadCoverApi = (articleId,cover) => {
