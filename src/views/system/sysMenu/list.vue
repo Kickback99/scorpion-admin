@@ -177,16 +177,20 @@ const handleExpandMenu = (item) => {
   const found = findByName(tableData.value, targetName, ancestorIds)
   if (!found) return
 
-  const parentIds = ancestorIds.slice(0, -1)
+  const targetRow = findRowById(tableData.value, ancestorIds[ancestorIds.length - 1])
+  // 目标行有子节点则一起展开，叶子节点只展开祖先
+  const expandIds = targetRow?.children?.length
+    ? ancestorIds
+    : ancestorIds.slice(0, -1)
 
-  if (parentIds.length === 0) {
+  if (expandIds.length === 0) {
     nextTick(() => scrollToTarget(targetName))
     return
   }
 
   let step = 0
   const expandNext = () => {
-    if (step >= parentIds.length) {
+    if (step >= expandIds.length) {
       nextTick(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => scrollToTarget(targetName))
@@ -194,7 +198,7 @@ const handleExpandMenu = (item) => {
       })
       return
     }
-    const row = findRowById(tableData.value, parentIds[step])
+    const row = findRowById(tableData.value, expandIds[step])
     if (row) {
       multipleTableRef.value?.toggleRowExpansion(row, true)
     }
