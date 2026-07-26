@@ -123,13 +123,29 @@ const handleExpandMenu = (item) => {
   const found = findByName(sysMenuList.value, targetName, ancestorIds)
   if (!found) return
 
-  const targetRow = findRowById(sysMenuList.value, ancestorIds[ancestorIds.length - 1])
+  const targetId = ancestorIds[ancestorIds.length - 1]
+
+  // 已展开 + 还在高亮中 → 只检查滚动，其余跳过
+  const ancestorsExpanded = ancestorIds.slice(0, -1).every(id => {
+    const node = treeRef.value?.store?.nodesMap[id]
+    return node?.expanded
+  })
+  const isHighlighted = !!document.querySelector(`.el-tree-node[data-key="${targetId}"].menu-search-highlight`)
+  if (ancestorsExpanded && isHighlighted) {
+    nextTick(() => scrollToTarget(targetName))
+    return
+  }
+
+  const targetRow = findRowById(sysMenuList.value, targetId)
   const expandIds = targetRow?.children?.length
     ? ancestorIds
     : ancestorIds.slice(0, -1)
 
   if (expandIds.length === 0) {
-    nextTick(() => scrollToTarget(targetName))
+    nextTick(() => {
+      scrollToTarget(targetName)
+      highlightTarget(targetName)
+    })
     return
   }
 
@@ -149,9 +165,11 @@ const handleExpandMenu = (item) => {
   let step = 0
   const expandNext = () => {
     if (step >= expandIds.length) {
+      // 展开完成 → 立即滚动 → 骨架屏 1.2s → 揭开 + 高亮
+      nextTick(() => scrollToTarget(targetName))
       loadingTimer = setTimeout(() => {
         removeTreeLoading()
-        nextTick(() => scrollToTarget(targetName))
+        highlightTarget(targetName)
       }, 1200)
       return
     }
@@ -169,10 +187,30 @@ const removeTreeLoading = () => {
   document.querySelectorAll('.tree-node-loading').forEach(el => el.classList.remove('tree-node-loading'))
 }
 
-/** 滚动到目标节点并用独立 class 高亮（不受 index.scss is-current 规则影响） */
+/** 滚动到目标节点（距 sticky 头部下方 10px） */
 const scrollToTarget = (targetName) => {
+  const treeEl = document.querySelector('.tree-with-line')
+  if (!treeEl) return
+
+  const nodes = treeEl.querySelectorAll('.el-tree-node')
+  for (const el of nodes) {
+    const label = el.querySelector('.el-tree-node__label')
+    if (label?.textContent?.trim() === targetName) {
+      el.scrollIntoView({ block: 'start', behavior: 'instant' })
+      const wrap = el.closest('.el-scrollbar__wrap')
+      if (wrap) {
+        const header = document.querySelector('.auth-header')
+        const headerH = header?.offsetHeight || 0
+        wrap.scrollTop = Math.max(0, wrap.scrollTop - headerH - 10)
+      }
+      return
+    }
+  }
+}
+
+/** 高亮目标节点（骨架屏揭开后调用，独立于滚动） */
+const highlightTarget = (targetName) => {
   clearTimeout(highlightTimer)
-  // 清除上一次搜索高亮
   const prev = document.querySelector('.tree-with-line .menu-search-highlight')
   if (prev) prev.classList.remove('menu-search-highlight')
 
@@ -183,7 +221,6 @@ const scrollToTarget = (targetName) => {
   for (const el of nodes) {
     const label = el.querySelector('.el-tree-node__label')
     if (label?.textContent?.trim() === targetName) {
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
       el.classList.add('menu-search-highlight')
       highlightTimer = setTimeout(() => {
         el.classList.remove('menu-search-highlight')
