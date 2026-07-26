@@ -80,7 +80,7 @@ const searchIndex = groups.flatMap(group => {
     isGroup: true,
   })
 
-  for (const item of group.items) {
+  for (const item of (group.items || [])) {
     const cfgKey = item.key
     const parts = cfgKey.split('.')
     const breadcrumb = parts.length > 1

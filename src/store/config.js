@@ -19,7 +19,7 @@ const _itemMap = {}
  * @param {string} groupKey — 所属分组 key（client / admin / user）
  */
 export function registerItems(items, groupKey) {
-  for (const it of items) {
+  for (const it of (items || [])) {
     _itemMap[it.key] = { type: it.type, label: it.label, options: it.options, sys: it.sys, group: groupKey }
   }
 }

@@ -281,7 +281,7 @@ const buildDescMap = () => {
   if (Object.keys(CONFIG_DESC_MAP).length) return
   const { groups } = useConfigItems()
   for (const g of groups) {
-    for (const it of g.items) {
+    for (const it of (g.items || [])) {
       CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc, icon: it.icon }
     }
   }
@@ -293,7 +293,7 @@ const buildOptionHints = () => {
   if (Object.keys(OPTION_HINTS).length) return
   const { groups } = useConfigItems()
   for (const g of groups) {
-    for (const it of g.items) {
+    for (const it of (g.items || [])) {
       if (it.type === 'radio' && it.options?.length) {
         OPTION_HINTS[it.key] = it.options.map(o => o.value).join(', ')
       }
