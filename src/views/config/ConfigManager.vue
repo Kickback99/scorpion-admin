@@ -386,7 +386,9 @@ const buildGroupedTreeData = (apiData) => {
   const { groups } = useConfigItems()
   buildDescMap()
   const result = []
+  const knownGroupKeys = new Set(groups.map(g => g.key))
 
+  // 1. 已知分组（client / admin / user）
   for (const group of groups) {
     const groupData = apiData[group.key]
     if (!groupData || typeof groupData !== 'object') continue
@@ -399,6 +401,27 @@ const buildGroupedTreeData = (apiData) => {
       isEditing: false, editValue: null,
       children: convertToTreeData(groupData, '', group.key),
       parentPath: '', min: undefined, max: undefined, isSystem: false
+    })
+  }
+
+  // 2. API 中存在但 configItems 未声明的根级 key（如用户新增的 address）
+  for (const [key, value] of Object.entries(apiData)) {
+    if (knownGroupKeys.has(key)) continue
+    if (key === 'loading' || key === 'numberLimits') continue
+
+    const isObject = value !== null && typeof value === 'object' && !Array.isArray(value)
+    result.push({
+      id: nextId++,
+      key, displayKey: key, originalKey: key,
+      label: '', desc: '', icon: null,
+      value: isObject ? null : value,
+      type: isObject ? 'object' : typeof value,
+      isObject,
+      isEditing: false,
+      editValue: isObject ? null : value,
+      children: isObject ? convertToTreeData(value, key, '') : [],
+      parentPath: '', min: undefined, max: undefined, isSystem: false,
+      _groupKey: '',
     })
   }
 
