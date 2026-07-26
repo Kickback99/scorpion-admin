@@ -11,7 +11,6 @@
         :data="tableData" style="width: 100%;"
         row-key="id"
         :tree-props="treeProps"
-        highlight-current-row
         ref="multipleTableRef"
         border stripe
         >
@@ -146,7 +145,7 @@ import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
 import msg from '@/components/msg'
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
-import { findRowByName, findRowById, findByName } from '@/utils/tree'
+import { findRowById, findByName } from '@/utils/tree'
 
 const userStore = useUserStore()
 
@@ -169,7 +168,7 @@ render()
 let highlightTimer = null
 
 /**
- * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先，setCurrentRow 高亮目标行
+ * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先，DOM class 高亮 + 滚动
  */
 const handleExpandMenu = (item) => {
   const targetName = item.title || item.name
@@ -177,16 +176,6 @@ const handleExpandMenu = (item) => {
   const ancestorIds = []
   const found = findByName(tableData.value, targetName, ancestorIds)
   if (!found) return
-
-  // 先高亮（Element Plus 内置机制，响应式持久）
-  clearTimeout(highlightTimer)
-  const targetRow = findRowByName(tableData.value, targetName)
-  if (targetRow) {
-    multipleTableRef.value?.setCurrentRow(targetRow)
-  }
-  highlightTimer = setTimeout(() => {
-    multipleTableRef.value?.setCurrentRow()
-  }, 2500)
 
   const parentIds = ancestorIds.slice(0, -1)
 
@@ -215,15 +204,25 @@ const handleExpandMenu = (item) => {
   expandNext()
 }
 
-/** 滚动到目标行 */
+/** 滚动到目标行并用独立 class 高亮（不影响 highlight-current-row 默认样式） */
 const scrollToTarget = (targetName) => {
   const bodyWrapper = document.querySelector('.el-table__body-wrapper')
   if (!bodyWrapper) return
+
+  // 清除上一次搜索高亮
+  clearTimeout(highlightTimer)
+  const prev = bodyWrapper.querySelector('.menu-search-highlight')
+  if (prev) prev.classList.remove('menu-search-highlight')
+
   const rows = bodyWrapper.querySelectorAll('.el-table__row')
   for (const el of rows) {
     const firstCell = el.querySelector('.el-table__cell')
     if (firstCell?.textContent?.trim() === targetName) {
       bodyWrapper.scrollTop = el.offsetTop - bodyWrapper.clientHeight / 2
+      el.classList.add('menu-search-highlight')
+      highlightTimer = setTimeout(() => {
+        el.classList.remove('menu-search-highlight')
+      }, 2500)
       return
     }
   }
@@ -477,8 +476,9 @@ const modifyMenu = async() => {
         margin-bottom: 20px;
     }
 
-    /* 搜索高亮：基于 Element Plus highlight-current-row */
-    :deep(.el-table__row.current-row) > .el-table__cell {
+    /* 搜索高亮：独立 class，不影响点击行的默认 highlight-current-row 样式 */
+    :deep(.menu-search-highlight) > .el-table__cell {
+      background-color: var(--el-color-primary-light-9) !important;
       transition: background-color 0.3s;
     }
 </style>
