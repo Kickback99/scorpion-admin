@@ -2,7 +2,7 @@
   <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
     <div class="header-actions">
       <div class="header-left">
-        <el-button type="primary" @click="handleAddRoot" size="small" plain>
+        <el-button :disabled="$hasPerm('btn.config.add')" type="primary" @click="handleAddRoot" size="small" plain>
           <el-icon><Plus /></el-icon>
           新增配置
         </el-button>
@@ -120,14 +120,14 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="row.isObject">
+            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="$hasPerm('btn.config.update') || row.isObject">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
             <!-- 删除按钮：对象有子节点 或 系统预设配置 时禁用 -->
-            <el-button type="danger" link size="small" plain @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || row.isSystem">
+            <el-button type="danger" link size="small" plain @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || $hasPerm('btn.config.remove') || row.isSystem">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
-            <el-button type="primary" link size="small" plain @click="handleAddChild(row)" v-if="row.isObject">
+            <el-button :disabled="$hasPerm('btn.config.add')" type="primary" link size="small" plain @click="handleAddChild(row)" v-if="row.isObject">
               <el-icon><Plus /></el-icon> 新增子项
             </el-button>
           </template>
