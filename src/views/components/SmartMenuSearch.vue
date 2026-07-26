@@ -55,6 +55,20 @@ const userStore = useUserStore()
 const configStore = useConfigStore()
 
 // ============================================================
+// Props
+// ============================================================
+const props = defineProps({
+  /** 回车行为：navigate=跳转路由, expand=展开菜单 emit('expand-menu', item) */
+  actionMode: {
+    type: String,
+    default: 'navigate',
+    validator: (v) => ['navigate', 'expand'].includes(v),
+  },
+})
+
+const emit = defineEmits(['expand-menu'])
+
+// ============================================================
 // 数据
 // ============================================================
 const query = ref('')
@@ -255,14 +269,17 @@ const navigateTo = (item) => {
   recentList.value.unshift({ title: item.title, path: item.path, icon: item.icon, breadcrumb: item.breadcrumb })
   if (recentList.value.length > MAX_RECENT) recentList.value.pop()
 
-  router.push(item.path)
-  if (!configStore.getSearchMenuFocus()) {
-    // 失焦
-    resetState()
+  if (props.actionMode === 'expand') {
+    emit('expand-menu', { ...item })
+    nextTick(() => resetState())
   } else {
-    // 只清空输入，保持焦点和下拉可见，方便继续搜索
-    query.value = ''
-    activeIndex.value = 0
+    router.push(item.path)
+    if (!configStore.getSearchMenuFocus()) {
+      resetState()
+    } else {
+      query.value = ''
+      activeIndex.value = 0
+    }
   }
 }
 
