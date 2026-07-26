@@ -9,7 +9,7 @@
                 <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
             <div>
-                <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
+                <el-button :disabled="$hasPerm('btn.carousel.add')"  size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
             </div>
         </el-form>
     </div>
@@ -111,10 +111,10 @@
                     plain
                 >
                 </el-button>
-                <el-button v-else @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain />
+                <el-button v-else :disabled="$hasPerm('btn.carousel.update')" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain />
                 <el-popconfirm :title="`你确定要删除「${row.articleTitle}」的轮播吗？`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button size="small" type="danger" icon="Delete" circle plain />
+                        <el-button :disabled="$hasPerm('btn.carousel.remove')" size="small" type="danger" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
             </template>

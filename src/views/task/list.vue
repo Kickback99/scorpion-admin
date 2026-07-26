@@ -2,10 +2,10 @@
   <div class="task-container">
     <!-- ==================== 头部工具栏 ==================== -->
     <div class="toolbar">
-      <el-button size="small" type="primary" icon="Plus" @click="openAddDialog" plain>
+      <el-button :disabled="$hasPerm('btn.task.add')" size="small" type="primary" icon="Plus" @click="openAddDialog" plain>
         新增任务
       </el-button>
-      <el-button size="small" type="info" icon="Refresh" @click="refreshAllTasks" plain>
+      <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="info" icon="Refresh" @click="refreshAllTasks" plain>
         刷新所有任务
       </el-button>
     </div>
@@ -44,13 +44,13 @@
       <el-table-column label="操作" width="350" fixed="right" align="center">
         <template #default="{ row }">
           <!-- 编辑任务 -->
-          <el-button size="small" type="warning" @click="editTask(row)" plain>编辑</el-button>
+          <el-button :disabled="$hasPerm('btn.task.update')" size="small" type="warning" @click="editTask(row)" plain>编辑</el-button>
           <!-- 立即执行 -->
-          <el-button size="small" type="warning" @click="executeTask(row)" plain>立即</el-button>
+          <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="warning" @click="executeTask(row)" plain>立即</el-button>
           <!-- 刷新单个任务 -->
-          <el-button size="small" type="info" @click="refreshSingleTask(row)" plain>刷新</el-button>
+          <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="info" @click="refreshSingleTask(row)" plain>刷新</el-button>
           <!-- 启用/禁用 -->
-          <el-button size="small" :type="row.status === 0 ? 'danger' : 'success'" @click="toggleStatus(row)" plain>{{ row.status === 0 ? '禁用' : '启用' }}</el-button>
+          <el-button :disabled="$hasPerm('btn.task.execute')" size="small" :type="row.status === 0 ? 'danger' : 'success'" @click="toggleStatus(row)" plain>{{ row.status === 0 ? '禁用' : '启用' }}</el-button>
           <!-- 删除任务(仅禁用状态可删除) -->
           <el-popconfirm
             :title="`确定要删除【${row.taskName}】吗？`"
@@ -60,7 +60,7 @@
             @confirm="deleteTask(row)"
           >
             <template #reference>
-              <el-button size="small" type="danger" :disabled="row.status === 0" plain>删除</el-button>
+              <el-button size="small" type="danger" :disabled="$hasPerm('btn.task.remove') || row.status === 0" plain>删除</el-button>
             </template>
           </el-popconfirm>
         </template>
