@@ -260,11 +260,9 @@ export const useConfigStore = defineStore({
       try {
         const res = await getConfigApi()
         if (res.code === 200 && res.data) {
-          // res.data = { client: {...}, admin: {...}, user: {...} }
+          // res.data = { client: {...}, admin: {...}, user: {...}, 及可能的孤儿 key }
           for (const gk of Object.keys(res.data)) {
-            if (gk in this.$state) {
-              this.$state[gk] = res.data[gk]
-            }
+            this.$state[gk] = res.data[gk]
           }
           this.executeInit()
         }
