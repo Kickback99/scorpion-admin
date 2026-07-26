@@ -124,18 +124,38 @@ const flattenState = (obj, prefix = '') => {
 const extraKeys = computed(() => {
   const extras = []
   const state = configStore.$state
-  for (const group of groups) {
-    const groupData = state[group.key]
-    if (!groupData || typeof groupData !== 'object') continue
-    const flat = flattenState(groupData, group.key)
-    for (const { configKey, value } of flat) {
-      extras.push({
-        groupKey: group.key, groupLabel: group.label, configKey,
-        label: '', desc: typeof value === 'object' ? '对象' : String(value),
-        breadcrumb: configKey.split('.'), icon: null, isGroup: false,
-      })
+
+  for (const [topKey, topValue] of Object.entries(state)) {
+    if (topKey.startsWith('$') || topKey === 'loading' || topKey === 'numberLimits') continue
+
+    const group = groups.find(g => g.key === topKey)
+
+    if (topValue !== null && typeof topValue === 'object' && !Array.isArray(topValue)) {
+      const groupLabel = group ? group.label : topKey
+      // 非已知 group 时，补一个分组条目（对齐 searchIndex 的 isGroup 条目）
+      if (!group) {
+        extras.push({
+          groupKey: topKey, groupLabel, configKey: topKey,
+          label: topKey, desc: `「${topKey}」分类下的全部配置项`,
+          breadcrumb: [topKey], icon: null, isGroup: true,
+        })
+      }
+
+      const flat = flattenState(topValue, topKey)
+      for (const { configKey, value } of flat) {
+        const parts = configKey.split('.')
+        extras.push({
+          groupKey: topKey, groupLabel, configKey,
+          label: '', desc: typeof value === 'object' ? '对象' : String(value),
+          breadcrumb: parts.length > 2
+            ? [groupLabel, parts[1], parts[2]]
+            : [groupLabel, ...parts.slice(1)],
+          icon: null, isGroup: false,
+        })
+      }
     }
   }
+
   if (extras.length) console.log('SmartConfigSearch extraKeys:', extras.map(e => e.configKey))
   return extras
 })
