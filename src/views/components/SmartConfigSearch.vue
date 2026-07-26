@@ -75,7 +75,7 @@ const searchIndex = groups.flatMap(group => {
     configKey: group.key,
     label: group.label,
     desc: `「${group.label}」分类下的全部配置项`,
-    breadcrumb: [group.label],
+    breadcrumb: [group.key],
     icon: group.icon,
     isGroup: true,
   })
@@ -84,8 +84,8 @@ const searchIndex = groups.flatMap(group => {
     const cfgKey = item.key
     const parts = cfgKey.split('.')
     const breadcrumb = parts.length > 1
-      ? [group.label, parts[0], parts[1]]
-      : [group.label, cfgKey]
+      ? [group.key, parts[0], parts[1]]
+      : [group.key, cfgKey]
 
     result.push({
       groupKey: group.key,
@@ -148,8 +148,8 @@ const extraKeys = computed(() => {
           groupKey: topKey, groupLabel, configKey,
           label: '', desc: typeof value === 'object' ? '对象' : String(value),
           breadcrumb: parts.length > 2
-            ? [groupLabel, parts[1], parts[2]]
-            : [groupLabel, ...parts.slice(1)],
+            ? [topKey, parts[1], parts[2]]
+            : [topKey, ...parts.slice(1)],
           icon: null, isGroup: false,
         })
       }
