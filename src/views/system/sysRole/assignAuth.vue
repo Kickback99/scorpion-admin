@@ -9,6 +9,7 @@
           <el-button text size="small" @click="handleCollapseAll">
             <el-icon><Fold /></el-icon> 全部折叠
           </el-button>
+          <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
         </div>
         <div style="margin: 10px 0;">
           授权角色：{{ route.query.roleName }}
@@ -22,7 +23,6 @@
         :data="sysMenuList"
         node-key="id"
         show-checkbox
-        default-expand-all
         :props="defaultProps"
       />
       <div style="padding: 20px 20px;">
@@ -36,6 +36,8 @@
 import { computed, nextTick, ref } from 'vue';
 import { allocMenusApi, doAllocMenusApi } from '@/api/sysmenu';
 import { useConfigStore } from '@/store/config';
+import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
+import { findRowById, findByName } from '@/utils/tree'
 
 const configStore = useConfigStore()
 const lineClass = computed(() => `tree-line-${configStore.getTreeAuthLineStyle()}`)
@@ -109,6 +111,60 @@ const handleCollapseAll = () => {
   Object.values(nodes).forEach(node => { node.expanded = false })
 }
 
+let highlightTimer = null
+
+/**
+ * 菜单搜索选中 → 同步批量展开 + DOM class 高亮（不走 is-current，绕开全局 index.scss 排它规则）
+ */
+const handleExpandMenu = (item) => {
+  const targetName = item.title || item.name
+
+  const ancestorIds = []
+  const found = findByName(sysMenuList.value, targetName, ancestorIds)
+  if (!found) return
+
+  const targetRow = findRowById(sysMenuList.value, ancestorIds[ancestorIds.length - 1])
+  const expandIds = targetRow?.children?.length
+    ? ancestorIds
+    : ancestorIds.slice(0, -1)
+
+  // 同步批量展开（store 已预填充），Vue 一次渲染
+  const nodesMap = treeRef.value?.store?.nodesMap || {}
+  expandIds.forEach(id => {
+    if (nodesMap[id]) nodesMap[id].expanded = true
+  })
+
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollToTarget(targetName))
+    })
+  })
+}
+
+/** 滚动到目标节点并用独立 class 高亮（不受 index.scss is-current 规则影响） */
+const scrollToTarget = (targetName) => {
+  clearTimeout(highlightTimer)
+  // 清除上一次搜索高亮
+  const prev = document.querySelector('.tree-with-line .menu-search-highlight')
+  if (prev) prev.classList.remove('menu-search-highlight')
+
+  const treeEl = document.querySelector('.tree-with-line')
+  if (!treeEl) return
+
+  const nodes = treeEl.querySelectorAll('.el-tree-node')
+  for (const el of nodes) {
+    const label = el.querySelector('.el-tree-node__label')
+    if (label?.textContent?.trim() === targetName) {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      el.classList.add('menu-search-highlight')
+      highlightTimer = setTimeout(() => {
+        el.classList.remove('menu-search-highlight')
+      }, 2500)
+      return
+    }
+  }
+}
+
 const userStore = useUserStore()
 
 //t_role_request: 为角色分配菜单请求
@@ -164,8 +220,17 @@ const save = async () => {
 
 .auth-toolbar {
   display: flex;
+  align-items: center;
   gap: 4px;
-  // padding: 0 20px;
+}
+
+// ============================================================
+// 搜索高亮：独立 class，不受 index.scss is-current 排它规则影响
+// ============================================================
+:deep(.menu-search-highlight) > .el-tree-node__content {
+  background-color: var(--el-color-primary-light-9) !important;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
 // ============================================================
