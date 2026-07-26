@@ -168,7 +168,7 @@ render()
 let highlightTimer = null
 
 /**
- * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先，DOM class 高亮 + 滚动
+ * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先 → 滚动 + 高亮
  */
 const handleExpandMenu = (item) => {
   const targetName = item.title || item.name
@@ -177,14 +177,30 @@ const handleExpandMenu = (item) => {
   const found = findByName(tableData.value, targetName, ancestorIds)
   if (!found) return
 
-  const targetRow = findRowById(tableData.value, ancestorIds[ancestorIds.length - 1])
-  // 目标行有子节点则一起展开，叶子节点只展开祖先
+  const targetId = ancestorIds[ancestorIds.length - 1]
+
+  // 目标行还在高亮中 → 只检查滚动，其余跳过
+  let alreadyHighlighted = false
+  document.querySelectorAll('.menu-search-highlight').forEach(el => {
+    if (el.querySelector('.el-table__cell')?.textContent?.trim() === targetName) {
+      alreadyHighlighted = true
+    }
+  })
+  if (alreadyHighlighted) {
+    nextTick(() => scrollToTarget(targetName))
+    return
+  }
+
+  const targetRow = findRowById(tableData.value, targetId)
   const expandIds = targetRow?.children?.length
     ? ancestorIds
     : ancestorIds.slice(0, -1)
 
   if (expandIds.length === 0) {
-    nextTick(() => scrollToTarget(targetName))
+    nextTick(() => {
+      scrollToTarget(targetName)
+      highlightTarget(targetName)
+    })
     return
   }
 
@@ -193,7 +209,10 @@ const handleExpandMenu = (item) => {
     if (step >= expandIds.length) {
       nextTick(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => scrollToTarget(targetName))
+          requestAnimationFrame(() => {
+            scrollToTarget(targetName)
+            highlightTarget(targetName)
+          })
         })
       })
       return
@@ -208,21 +227,37 @@ const handleExpandMenu = (item) => {
   expandNext()
 }
 
-/** 滚动到目标行并用独立 class 高亮（不影响 highlight-current-row 默认样式） */
+/** 滚动到目标行（scroll-margin-top 自动扣除 sticky 工具栏高度） */
 const scrollToTarget = (targetName) => {
   const bodyWrapper = document.querySelector('.el-table__body-wrapper')
   if (!bodyWrapper) return
-
-  // 清除上一次搜索高亮
-  clearTimeout(highlightTimer)
-  const prev = bodyWrapper.querySelector('.menu-search-highlight')
-  if (prev) prev.classList.remove('menu-search-highlight')
 
   const rows = bodyWrapper.querySelectorAll('.el-table__row')
   for (const el of rows) {
     const firstCell = el.querySelector('.el-table__cell')
     if (firstCell?.textContent?.trim() === targetName) {
-      bodyWrapper.scrollTop = el.offsetTop - bodyWrapper.clientHeight / 2
+      const toolbar = document.querySelector('.toolbar')
+      const toolbarH = toolbar?.offsetHeight || 0
+      el.style.scrollMarginTop = `${toolbarH + 20}px`
+      el.scrollIntoView({ block: 'start', behavior: 'instant' })
+      return
+    }
+  }
+}
+
+/** 高亮目标行（独立于滚动） */
+const highlightTarget = (targetName) => {
+  clearTimeout(highlightTimer)
+  const prev = document.querySelector('.el-table__body-wrapper .menu-search-highlight')
+  if (prev) prev.classList.remove('menu-search-highlight')
+
+  const bodyWrapper = document.querySelector('.el-table__body-wrapper')
+  if (!bodyWrapper) return
+
+  const rows = bodyWrapper.querySelectorAll('.el-table__row')
+  for (const el of rows) {
+    const firstCell = el.querySelector('.el-table__cell')
+    if (firstCell?.textContent?.trim() === targetName) {
       el.classList.add('menu-search-highlight')
       highlightTimer = setTimeout(() => {
         el.classList.remove('menu-search-highlight')
@@ -478,6 +513,11 @@ const modifyMenu = async() => {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        z-index: 7;
+        background: var(--el-bg-color);
+        padding: 4px 0;
     }
 
     /* 搜索高亮：独立 class，不影响点击行的默认 highlight-current-row 样式 */
