@@ -164,15 +164,17 @@
                 <el-checkbox
                     v-model="checkAll"
                     :indeterminate="isIndeterminate"
+                    :disabled="isRolesLocked"
                     @change="handleCheckAllChange"
                     >
                     全选
                 </el-checkbox>
                 <el-checkbox-group
                 v-model="checkedCities"
+                :disabled="isRolesLocked"
                 @change="handleCheckedCitiesChange"
                 >
-                <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">
+                <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id" :disabled="isRolesLocked">
                     {{ role.roleName }}
                 </el-checkbox>
                 </el-checkbox-group>
@@ -459,6 +461,7 @@ const isIndeterminate = ref(false) //判断当前状态是否半选
 const checkedCities = ref([]) //选中的数组集合
 const allRoles = ref([]) //全部的数组集合
 const allocRolesVisible = ref(false)
+const isRolesLocked = ref(false) //角色复选框是否禁用（id=1的admin用户）
 
 // t_user_request：获取用户角色数据请求
 const showAllocRoles = async(row) =>{
@@ -468,11 +471,20 @@ const showAllocRoles = async(row) =>{
     const res = await allocRolesApi(row.id)
     // 把所有角色集合赋值给 allRoles
     allRoles.value = res.data.allRoles
-    // 把对应用户id的角色ids存入 checkedCities
-    checkedCities.value = res.data.userRoleIds
+    if (row.id === 1) {
+        // admin 用户：全选所有角色并禁用
+        checkedCities.value = allRoles.value.map(item => item.id)
+        checkAll.value = true
+        isIndeterminate.value = false
+        isRolesLocked.value = true
+    } else {
+        // 把对应用户id的角色ids存入 checkedCities
+        checkedCities.value = res.data.userRoleIds
+        checkAll.value = allRoles.value.length === checkedCities.value.length
+        isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
+        isRolesLocked.value = false
+    }
     console.log(checkedCities.value)
-    checkAll.value = allRoles.value.length === checkedCities.value.length
-    isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
 }
 
   //大复选框的事件回调
