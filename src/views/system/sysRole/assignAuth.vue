@@ -70,7 +70,6 @@ const render = async () => {
     }
     const result = await allocMenusApi(roleId);
     sysMenuList.value = result.data;
-    // 等待 el-tree 根据新数据完成 DOM 渲染后再设置勾选状态
     await nextTick()
     const checkedIds = getCheckedIds(sysMenuList.value);
     console.log('getPermissions() checkedIds', checkedIds);
@@ -112,9 +111,10 @@ const handleCollapseAll = () => {
 }
 
 let highlightTimer = null
+let loadingTimer = null
 
 /**
- * 菜单搜索选中 → 同步批量展开 + DOM class 高亮（不走 is-current，绕开全局 index.scss 排它规则）
+ * 菜单搜索选中 → 祖先骨架屏 → 逐层展开 → 揭开 → 滚动高亮
  */
 const handleExpandMenu = (item) => {
   const targetName = item.title || item.name
@@ -128,17 +128,45 @@ const handleExpandMenu = (item) => {
     ? ancestorIds
     : ancestorIds.slice(0, -1)
 
-  // 同步批量展开（store 已预填充），Vue 一次渲染
-  const nodesMap = treeRef.value?.store?.nodesMap || {}
-  expandIds.forEach(id => {
-    if (nodesMap[id]) nodesMap[id].expanded = true
-  })
+  if (expandIds.length === 0) {
+    nextTick(() => scrollToTarget(targetName))
+    return
+  }
 
-  nextTick(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => scrollToTarget(targetName))
-    })
-  })
+  clearTimeout(loadingTimer)
+  removeTreeLoading()
+
+  const treeEl = document.querySelector('.tree-with-line')
+
+  /** 尝试对某节点加骨架屏（仅当它已在 DOM 中） */
+  const tryAddSkeleton = (id) => {
+    const nodeEl = treeEl?.querySelector(`.el-tree-node[data-key="${id}"]`)
+    const content = nodeEl?.querySelector('.el-tree-node__content')
+    if (content) content.classList.add('tree-node-loading')
+  }
+
+  // 逐层展开：每层先加骨架屏再展开，子节点进入 DOM 后下一轮再加
+  let step = 0
+  const expandNext = () => {
+    if (step >= expandIds.length) {
+      loadingTimer = setTimeout(() => {
+        removeTreeLoading()
+        nextTick(() => scrollToTarget(targetName))
+      }, 1200)
+      return
+    }
+    tryAddSkeleton(expandIds[step])
+    const node = treeRef.value?.store?.nodesMap[expandIds[step]]
+    if (node) node.expanded = true
+    step++
+    nextTick(expandNext)
+  }
+  expandNext()
+}
+
+/** 移除所有骨架屏 */
+const removeTreeLoading = () => {
+  document.querySelectorAll('.tree-node-loading').forEach(el => el.classList.remove('tree-node-loading'))
 }
 
 /** 滚动到目标节点并用独立 class 高亮（不受 index.scss is-current 规则影响） */
@@ -222,6 +250,35 @@ const save = async () => {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+// ============================================================
+// 骨架屏：祖先节点展开时的闪烁动画
+// ============================================================
+:deep(.tree-node-loading) {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--el-fill-color-light) 40%,
+      var(--el-fill-color) 50%,
+      var(--el-fill-color-light) 60%,
+      transparent 100%
+    );
+    animation: tree-shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes tree-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 // ============================================================
