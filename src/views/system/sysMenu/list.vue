@@ -1,16 +1,17 @@
 <template>
          <div class="toolbar">
-            <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" plain>新增</el-button>
-            <!-- <el-button :disabled="$hasPerm('btn.sysMenu.remove')" @click="deleteSelectRows()" icon="delete" color="#626aef" :dark="isDark" plain>批量删除</el-button> -->
+           <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" plain>新增</el-button>
+           <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
          </div>
         
 
         <!-- 表格 -->
         <el-table
-        v-loading="loading" 
+        v-loading="loading"
         :data="tableData" style="width: 100%;"
         row-key="id"
         :tree-props="treeProps"
+        highlight-current-row
         ref="multipleTableRef"
         border stripe
         >
@@ -138,11 +139,14 @@ import { IconSelect } from "@/components/MyIcon";
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysmenu'
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
-import { computed, nextTick,ref,watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 const iconRef = ref()
+const multipleTableRef = ref(null)
 import {useUserStore} from '@/store/user'
 import { loadMenu } from '@/router';
 import msg from '@/components/msg'
+import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
+import { findRowByName, findRowById, findByName } from '@/utils/tree'
 
 const userStore = useUserStore()
 
@@ -161,6 +165,69 @@ const render = async() => {
 }
 
 render()
+
+let highlightTimer = null
+
+/**
+ * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先，setCurrentRow 高亮目标行
+ */
+const handleExpandMenu = (item) => {
+  const targetName = item.title || item.name
+
+  const ancestorIds = []
+  const found = findByName(tableData.value, targetName, ancestorIds)
+  if (!found) return
+
+  // 先高亮（Element Plus 内置机制，响应式持久）
+  clearTimeout(highlightTimer)
+  const targetRow = findRowByName(tableData.value, targetName)
+  if (targetRow) {
+    multipleTableRef.value?.setCurrentRow(targetRow)
+  }
+  highlightTimer = setTimeout(() => {
+    multipleTableRef.value?.setCurrentRow()
+  }, 2500)
+
+  const parentIds = ancestorIds.slice(0, -1)
+
+  if (parentIds.length === 0) {
+    nextTick(() => scrollToTarget(targetName))
+    return
+  }
+
+  let step = 0
+  const expandNext = () => {
+    if (step >= parentIds.length) {
+      nextTick(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => scrollToTarget(targetName))
+        })
+      })
+      return
+    }
+    const row = findRowById(tableData.value, parentIds[step])
+    if (row) {
+      multipleTableRef.value?.toggleRowExpansion(row, true)
+    }
+    step++
+    nextTick(expandNext)
+  }
+  expandNext()
+}
+
+/** 滚动到目标行 */
+const scrollToTarget = (targetName) => {
+  const bodyWrapper = document.querySelector('.el-table__body-wrapper')
+  if (!bodyWrapper) return
+  const rows = bodyWrapper.querySelectorAll('.el-table__row')
+  for (const el of rows) {
+    const firstCell = el.querySelector('.el-table__cell')
+    if (firstCell?.textContent?.trim() === targetName) {
+      bodyWrapper.scrollTop = el.offsetTop - bodyWrapper.clientHeight / 2
+      return
+    }
+  }
+}
 
 // t_menu_request：删除菜单请求
 const removeMenu = async(id) =>{
@@ -405,6 +472,13 @@ const modifyMenu = async() => {
 <style lang="scss" scoped>
     .toolbar {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
+    }
+
+    /* 搜索高亮：基于 Element Plus highlight-current-row */
+    :deep(.el-table__row.current-row) > .el-table__cell {
+      transition: background-color 0.3s;
     }
 </style>
