@@ -85,7 +85,8 @@ const flattenMenu = (menus, typePrefix = '', parentPath = '', breadcrumb = []) =
     const icon = menu.meta?.icon || 'ep:menu'
     const currentBreadcrumb = [...breadcrumb, title]
     const currentType = menu.type || typePrefix
-    const isParent = menu.component === 'Layout' || menu.component === 'ParentView'
+    // Layout / ParentView 识别：routesHandler 解析后 component 不再是字符串，改用 children[0].level 判断
+    const isParentView = menu.children?.[0]?.level === true
     const isList = menu.component === 'list'
 
     if (menu.children && menu.children.length > 0 && !isList) {
@@ -95,7 +96,7 @@ const flattenMenu = (menus, typePrefix = '', parentPath = '', breadcrumb = []) =
       const childOptions = flattenMenu(
         menu.children,
         currentType,
-        menu.component === 'ParentView' ? menu.path : '',
+        isParentView ? menu.path : '',
         currentBreadcrumb,
       )
       result.push(...childOptions)
@@ -122,13 +123,15 @@ const resolveFirstLeaf = (menu, typePrefix) => {
     return `/${typePrefix}/${menu.path}`
   }
   const firstChild = menu.children[0]
-  const parentPath = menu.component === 'ParentView' ? menu.path : ''
+  const isParentView = menu.children?.[0]?.level === true
+  const parentPath = isParentView ? menu.path : ''
   return resolveChildPath(firstChild, typePrefix, parentPath)
 }
 
 const resolveChildPath = (menu, typePrefix, parentPath) => {
   if (menu.children && menu.children.length > 0 && menu.component !== 'list') {
-    const nextParent = menu.component === 'ParentView' ? menu.path : parentPath
+    const isParentView = menu.children?.[0]?.level === true
+    const nextParent = isParentView ? menu.path : parentPath
     return resolveChildPath(menu.children[0], typePrefix, nextParent)
   }
   if (menu._addToParentNode) return `/${typePrefix}`
