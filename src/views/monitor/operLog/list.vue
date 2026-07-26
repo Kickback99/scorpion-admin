@@ -348,16 +348,28 @@ const disabledTypes = computed(() => {
   }
   
   // 默认禁用项（适用于所有模块）
-  const defaultDisabled = ['BATCH_INSERT', 'BATCH_UPDATE', 'USER_AUTH', 'ROLE_AUTH'];
+  const defaultDisabled = ['BATCH_INSERT', 'BATCH_UPDATE', 'USER_AUTH', 'ROLE_AUTH', 'AUDIT', "BATCH_AUDIT"];
   
   // 按模块动态调整
   switch (module) {
     case 'CATE': // 分类管理
-      return ['USER_AUTH', 'ROLE_AUTH'];
+      return ['USER_AUTH', 'ROLE_AUTH', 'AUDIT', 'BATCH_AUDIT'];
     case 'USER': // 用户管理
-      return ['ROLE_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE'];
+      return ['ROLE_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE', 'AUDIT', 'BATCH_AUDIT'];
     case 'ROLE': // 角色管理
-      return ['USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE'];
+      return ['USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE', 'AUDIT', 'BATCH_AUDIT'];
+    case 'ARTICLE': // 文章管理
+      return ['ROLE_AUTH', 'USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE',  'BATCH_DELETE', 'AUDIT', 'BATCH_AUDIT'];
+    case 'COMMENT': // 评论管理
+      return ['USER_AUTH', 'ROLE_AUTH', 'BATCH_INSERT', 'UPDATE', 'BATCH_UPDATE'];
+    case 'TASK': // 任务管理
+      return ['USER_AUTH', 'ROLE_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE', 'BATCH_DELETE', 'AUDIT', 'BATCH_AUDIT'];
+    case 'CAROUSEL': // 轮播管理
+      return ['ROLE_AUTH', 'USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE',  'BATCH_DELETE', 'AUDIT', 'BATCH_AUDIT'];
+    case 'META': // 元数据管理
+      return ['INSERT', 'DELETE','ROLE_AUTH', 'USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE',  'BATCH_DELETE', 'AUDIT', 'BATCH_AUDIT'];
+    case 'CONFIG': // 配置管理
+      return ['ROLE_AUTH', 'USER_AUTH', 'BATCH_INSERT', 'BATCH_UPDATE',  'BATCH_DELETE', 'AUDIT', 'BATCH_AUDIT'];
     default: // 其他模块
       return defaultDisabled;
   }
