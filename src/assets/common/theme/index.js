@@ -109,7 +109,7 @@ export function applyTheme(themeName, _isDark) {
   injectHoverCss(types, hoverLevel)
   injectModalCss(types, hoverLevel)
   injectPaginationCss()
-  injectDrawerCss()
+  // injectDrawerCss()
   injectSwitchCss()
   injectBadgeCss()
   injectCheckCss()
@@ -553,7 +553,7 @@ function injectPaginationCss() {
 // ============================================================
 // drawer 抽屉 — 跟随 .ui-full / .ui-plain
 // ============================================================
-var _drawerCssEl = null
+/* var _drawerCssEl = null
 function injectDrawerCss() {
   _drawerCssEl = ensureEl('theme-drawer-fix')
   _drawerCssEl.textContent =
@@ -579,7 +579,7 @@ function injectDrawerCss() {
     'color:var(--el-color-primary-plain)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     '}'
-}
+} */
 
 // ============================================================
 // switch 开关 — 跟随 .ui-full / .ui-plain
