@@ -526,9 +526,19 @@ const modifyMenu = async() => {
         padding: 4px 0;
     }
 
-    /* 搜索高亮：独立 class，不影响点击行的默认 highlight-current-row 样式 */
+    /* 搜索高亮 */
     :deep(.menu-search-highlight) > .el-table__cell {
       background-color: var(--el-color-primary-light-9) !important;
       transition: background-color 0.3s;
     }
+</style>
+
+<style lang="scss">
+/* 深色模式搜索高亮：覆盖 scoped 的 primary-light-9 */
+/* html.dark .menu-search-highlight > .el-table__cell {
+  background-color: var(--el-color-primary-light-9) !important;
+} */
+html.dark .menu-search-highlight > .el-table__cell .cell {
+  color: var(--el-color-info-dark-2) !important;
+}
 </style>
