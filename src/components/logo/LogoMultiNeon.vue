@@ -62,17 +62,17 @@ const collapse = userConfigStore.getCollapseEnabled()
 
 .logo-multi-neon p {
   filter: url(#proto-multi-neon);
-  color: #fff;
+  color: var(--logo-text-color, #fff);
 
   background: linear-gradient(
     90deg,
-    #fff 0%,
-    #fff 25%,
-    #ffffcc 48%,
-    #ffffff 50%,
-    #ffffcc 52%,
-    #fff 75%,
-    #fff 100%
+    var(--logo-text-color, #fff) 0%,
+    var(--logo-text-color, #fff) 25%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 90%, var(--el-color-primary-light-5) 10%) 48%,
+    var(--logo-text-color, #fff) 50%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 90%, var(--el-color-primary-light-5) 10%) 52%,
+    var(--logo-text-color, #fff) 75%,
+    var(--logo-text-color, #fff) 100%
   );
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -96,10 +96,10 @@ const collapse = userConfigStore.getCollapseEnabled()
 
 // 光晕呼吸：爆发瞬间文字阴影扩散
 @keyframes multi-glow-breathe {
-  0%, 32%, 100% { text-shadow: 0 0 2px rgba(255,255,255,0.4); }
-  40%           { text-shadow: 0 0 6px rgba(255,255,255,0.6), 0 0 12px var(--el-color-primary-light-3); }
-  46%           { text-shadow: 0 0 10px #fff, 0 0 24px var(--el-color-primary), 0 0 40px var(--el-color-primary-light-3); }
-  50%           { text-shadow: 0 0 10px #fff, 0 0 24px var(--el-color-primary), 0 0 40px var(--el-color-primary-light-3); }
-  54%           { text-shadow: 0 0 2px rgba(255,255,255,0.4); }
+  0%, 32%, 100% { text-shadow: 0 0 2px color-mix(in srgb, var(--logo-text-color, #fff) 40%, transparent); }
+  40%           { text-shadow: 0 0 6px color-mix(in srgb, var(--logo-text-color, #fff) 60%, transparent), 0 0 12px var(--el-color-primary-light-3); }
+  46%           { text-shadow: 0 0 10px var(--logo-text-color, #fff), 0 0 24px var(--el-color-primary), 0 0 40px var(--el-color-primary-light-3); }
+  50%           { text-shadow: 0 0 10px var(--logo-text-color, #fff), 0 0 24px var(--el-color-primary), 0 0 40px var(--el-color-primary-light-3); }
+  54%           { text-shadow: 0 0 2px color-mix(in srgb, var(--logo-text-color, #fff) 40%, transparent); }
 }
 </style>
