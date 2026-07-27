@@ -296,6 +296,10 @@ const getTagType = (type) => {
     return 'success'
   }
 
+  if(type?.includes('AUDIT')){
+    return 'warning'
+  }
+
   const typeMap = {
     INSERT: 'primary',
     UPDATE: 'warning',

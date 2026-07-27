@@ -46,7 +46,7 @@
           <!-- 编辑任务 -->
           <el-button :disabled="$hasPerm('btn.task.update')" size="small" type="warning" @click="editTask(row)" plain>编辑</el-button>
           <!-- 立即执行 -->
-          <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="warning" @click="executeTask(row)" plain>立即</el-button>
+          <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="success" @click="executeTask(row)" plain>立即</el-button>
           <!-- 刷新单个任务 -->
           <el-button :disabled="$hasPerm('btn.task.execute')" size="small" type="info" @click="refreshSingleTask(row)" plain>刷新</el-button>
           <!-- 启用/禁用 -->
