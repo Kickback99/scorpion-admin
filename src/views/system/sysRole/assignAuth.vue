@@ -33,7 +33,7 @@
   </template>
 
 <script setup>
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { allocMenusApi, doAllocMenusApi } from '@/api/sysmenu';
 import { useConfigStore } from '@/store/config';
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
@@ -77,6 +77,9 @@ const render = async () => {
 };
 
 render()
+
+// 组件复用时（同一路由不同 query），自动重新请求
+watch(() => route.query.id, () => { if (route.query.id) render() })
 
 // 得到所有选中的id列表（递归收集所有 select 为 true 的叶子节点）
 const getCheckedIds = (auths) => {
