@@ -156,6 +156,7 @@
                     :min-search-length="1"
                     :allow-custom="false"
                     custom-disabled-message="请输入已存在的文章标题"
+                    :auto-search-on-enter="true"
                 />
             </el-form-item>
 
