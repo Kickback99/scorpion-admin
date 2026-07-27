@@ -322,9 +322,18 @@ const save = async () => {
 // 搜索高亮：独立 class，不受 index.scss is-current 排它规则影响
 // ============================================================
 :deep(.menu-search-highlight) > .el-tree-node__content {
-  background-color: var(--el-color-primary-light-9) !important;
+  background-color: var(--el-tree-node-hover-bg-color) !important;
   border-radius: 4px;
   transition: background-color 0.3s;
+}
+// 高亮边框跟随树连接线样式（与 index.scss hover 风格一致）
+:deep(.tree-line-solid .menu-search-highlight) > .el-tree-node__content {
+  outline: 1px solid var(--el-color-primary);
+  outline-offset: -1px;
+}
+:deep(.tree-line-dashed .menu-search-highlight) > .el-tree-node__content {
+  outline: 1px dashed var(--el-color-primary);
+  outline-offset: -1px;
 }
 
 // ============================================================
