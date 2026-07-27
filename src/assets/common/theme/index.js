@@ -165,6 +165,17 @@ function injectButtonCss(types) {
     // plain — hover 文字色直接写 color，CSS 变量可能被 EP 内部覆盖
     '.ui-plain .el-button--' + t + ':not(.is-disabled):hover{' +
       'color:var(--el-color-' + t + '-text)!important;' +
+      '}' +
+    // disabled — 全量直接覆写 property，不走 EP 变量机制
+    '.ui-full .el-button--' + t + '.is-disabled:not(.is-link){' +
+      'color:var(--el-color-white)!important;' +
+      'background-color:var(--el-color-' + t + '-light-5)!important;' +
+      'border-color:var(--el-color-' + t + '-light-5)!important;' +
+      '}' +
+    '.ui-plain .el-button--' + t + '.is-disabled:not(.is-link){' +
+      'color:var(--el-color-' + t + '-light-5)!important;' +
+      '--el-button-disabled-text-color:var(--el-color-' + t + '-light-5)!important;' +
+      '--el-button-disabled-bg-color:transparent!important;' +
       '}'
   }
   // link 按钮：full 模式下文字保持主色，不变黑白
