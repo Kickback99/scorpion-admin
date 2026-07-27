@@ -7,7 +7,6 @@
         <el-menu router
           ref="menuRef"
           active-text-color="var(--el-color-primary)"
-          background-color="var(--sidebar-bg)"
           :default-active="handelUrl"
           text-color="var(--sidebar-text)"
           mode="vertical"
