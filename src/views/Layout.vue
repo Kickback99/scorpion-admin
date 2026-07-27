@@ -203,4 +203,17 @@ watch(() => route.path, () => {
   --el-menu-text-color: var(--el-text-color-primary);
   --el-menu-hover-bg-color: var(--el-fill-color);
 }
+
+/* Logo 文字色：默认白色（侧边栏深色），浅色模式 + menuFollow=false 切换深色 */
+.el-aside {
+  --logo-text-color: #fff;
+}
+html:not(.dark) .el-aside.menu-follow-off {
+  --logo-text-color: var(--el-text-color-primary);
+}
+/* LogoNeon / LogoMultiNeon 在浅色中性底下降一级为中灰 */
+html:not(.dark) .el-aside.menu-follow-off .logo-neon p,
+html:not(.dark) .el-aside.menu-follow-off .logo-multi-neon p {
+  --logo-text-color: var(--el-text-color-placeholder);
+}
 </style>

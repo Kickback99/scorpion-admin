@@ -39,7 +39,7 @@ const hideImage = computed(() => configStore.getLogoHideImage())
 <style scoped lang="scss">
 .logo-plain {
   @include flex(center, center, null);
-  color: white;
+  color: var(--el-color-primary);
   font-weight: bold;
   margin: 20px 0;
   height: $base-menu-logo-height;
