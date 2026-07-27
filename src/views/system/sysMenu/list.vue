@@ -178,6 +178,7 @@ const handleExpandMenu = (item) => {
   if (!found) return
 
   const targetId = ancestorIds[ancestorIds.length - 1]
+  const isFirstRoot = tableData.value[0]?.id === targetId
 
   // 目标行还在高亮中 → 只检查滚动，其余跳过
   let alreadyHighlighted = false
@@ -187,7 +188,7 @@ const handleExpandMenu = (item) => {
     }
   })
   if (alreadyHighlighted) {
-    nextTick(() => scrollToTarget(targetName))
+    nextTick(() => scrollToTarget(targetName, isFirstRoot))
     return
   }
 
@@ -198,7 +199,7 @@ const handleExpandMenu = (item) => {
 
   if (expandIds.length === 0) {
     nextTick(() => {
-      scrollToTarget(targetName)
+      scrollToTarget(targetName, isFirstRoot)
       highlightTarget(targetName)
     })
     return
@@ -210,7 +211,7 @@ const handleExpandMenu = (item) => {
       nextTick(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            scrollToTarget(targetName)
+            scrollToTarget(targetName, isFirstRoot)
             highlightTarget(targetName)
           })
         })
@@ -227,8 +228,8 @@ const handleExpandMenu = (item) => {
   expandNext()
 }
 
-/** 滚动到目标行（scroll-margin-top 自动扣除 sticky 工具栏高度） */
-const scrollToTarget = (targetName) => {
+/** 滚动到目标行（第一个根节点不加偏移，其余用 scroll-margin-top 扣除工具栏高度） */
+const scrollToTarget = (targetName, isFirstRoot = false) => {
   const bodyWrapper = document.querySelector('.el-table__body-wrapper')
   if (!bodyWrapper) return
 
@@ -236,10 +237,15 @@ const scrollToTarget = (targetName) => {
   for (const el of rows) {
     const firstCell = el.querySelector('.el-table__cell')
     if (firstCell?.textContent?.trim() === targetName) {
-      const toolbar = document.querySelector('.toolbar')
-      const toolbarH = toolbar?.offsetHeight || 0
-      el.style.scrollMarginTop = `${toolbarH + 20}px`
-      el.scrollIntoView({ block: 'start', behavior: 'instant' })
+      if (isFirstRoot) {
+        const wrap = document.querySelector('.main-scrollbar .el-scrollbar__wrap')
+        if (wrap) wrap.scrollTop = 0
+      } else {
+        const toolbar = document.querySelector('.toolbar')
+        const toolbarH = toolbar?.offsetHeight || 0
+        el.style.scrollMarginTop = `${toolbarH + 20}px`
+        el.scrollIntoView({ block: 'start', behavior: 'instant' })
+      }
       return
     }
   }
