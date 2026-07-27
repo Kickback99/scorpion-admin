@@ -37,6 +37,15 @@
                   </template>
                   <el-switch :model-value="stringStore.keepTabs" @change="onClearTabsChange" size="small" />
                 </el-form-item>
+                <el-form-item>
+                  <template #label>
+                    标签跟随
+                    <el-tooltip content="关闭则激活标签使用浅底色+主色字的统一风格" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.tagFollow" @change="onTagFollowChange" size="small" />
+                </el-form-item>
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
                 <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
                 <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
@@ -243,6 +252,11 @@ const toggleDark = async () => {
 // 退出清标签切换
 const onClearTabsChange = (val) => {
     stringStore.keepTabs = val
+}
+
+// 标签跟随切换
+const onTagFollowChange = (val) => {
+    stringStore.tagFollow = val
 }
 
 // 实心文字色模式切换

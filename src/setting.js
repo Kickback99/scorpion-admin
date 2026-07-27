@@ -15,6 +15,8 @@ export const useSettingStore = defineStore({
         keepTabs: true,
         /** 退出标记：登录后忽略 redirect，直接进首页 */
         logoutIntent: false,
+        /** 标签跟随：true=跟随 ui-mode 风格，false=浅底色+主色字统一风格 */
+        tagFollow: false,
     }),
     actions:{
         setMenuTextColor(data){
@@ -35,7 +37,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent'],
+        paths: ['keepTabs', 'logoutIntent', 'tagFollow'],
     },
 })
 
