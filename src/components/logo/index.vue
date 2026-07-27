@@ -19,6 +19,7 @@ import { computed } from 'vue'
 import { useConfigStore } from '@/store/config'
 import { useSettingStore } from '@/setting'
 import { useUserConfigStore } from '@/store/userConfig'
+import { useUserStore } from '@/store/user'
 import LogoNeon from './LogoNeon.vue'
 import LogoMultiNeon from './LogoMultiNeon.vue'
 import LogoEnergyPulse from './LogoEnergyPulse.vue'
@@ -31,8 +32,16 @@ import LogoGlitch from './LogoGlitch.vue'
 const configStore = useConfigStore()
 const settingStore = useSettingStore()
 const userConfigStore = useUserConfigStore()
+const userStore = useUserStore()
 
-const animStyle = computed(() => configStore.getLogoAnimationStyle())
+const animStyle = computed(() => {
+  // 管理员：按 configStore 配置走（原逻辑）
+  if (userStore.isAdmin) return configStore.getLogoAnimationStyle()
+
+  // 非管理员：menuFollow=true → 霓虹；false → 浅色镂空扫描 / 深色霓虹
+  if (settingStore.menuFollow) return 'neon'
+  return userConfigStore.isDarkEnabled ? 'neon' : 'stroke-scan'
+})
 const hideImage = computed(() => configStore.getLogoHideImage())
 </script>
 

@@ -14,6 +14,9 @@ export const useUserStore = defineStore({
         },
         hasUserInfo: false, // 新增标志位
     }),
+    getters:{
+        isAdmin: (state) => state.userInfo?.isAdmin || false,
+    },
     actions:{
         async getUserInfo(forceRefreshMenu = false){
 
