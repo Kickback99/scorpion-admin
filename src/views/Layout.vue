@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}">
+      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}" :class="{ 'menu-follow-off': !settingStore.menuFollow }">
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
@@ -189,5 +189,18 @@ watch(() => route.path, () => {
 
 .main-scrollbar--plain {
   overflow: hidden;
+}
+</style>
+
+<style lang="scss">
+/* ============================================================
+   menuFollow=false — 侧边栏中性色背景 + 普通文字（激活项主色）
+   ============================================================ */
+.el-aside.menu-follow-off {
+  --sidebar-bg: var(--el-fill-color-light);
+  --sidebar-text: var(--el-text-color-primary);
+  --el-menu-bg-color: var(--el-fill-color-light);
+  --el-menu-text-color: var(--el-text-color-primary);
+  --el-menu-hover-bg-color: var(--el-fill-color);
 }
 </style>

@@ -17,6 +17,8 @@ export const useSettingStore = defineStore({
         logoutIntent: false,
         /** 标签跟随：true=跟随 ui-mode 风格，false=浅底色+主色字统一风格 */
         tagFollow: false,
+        /** 菜单跟随：true=跟随主题侧边栏风格，false=中性色背景+普通文字（激活项主色） */
+        menuFollow: false,
     }),
     actions:{
         setMenuTextColor(data){
@@ -37,7 +39,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent', 'tagFollow'],
+        paths: ['keepTabs', 'logoutIntent', 'tagFollow', 'menuFollow'],
     },
 })
 
