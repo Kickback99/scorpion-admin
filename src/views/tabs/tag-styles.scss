@@ -290,3 +290,46 @@
   background: var(--el-color-primary);
   animation: schedule-out-width 200ms ease-in;
 }
+
+/* ============================================================
+   tagFollow=false — 浅底色+主色字，忽略 ui-full/ui-plain
+   ============================================================ */
+
+/* 激活标签 */
+.tags-view.tag-follow-off .scroll-item.is-active {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+
+  .tag-title { color: var(--el-color-primary) !important; }
+  .el-icon-close { color: var(--el-color-primary) !important; }
+
+  &:hover {
+    background-color: var(--el-fill-color);
+    .el-icon-close { color: var(--el-color-primary) !important; }
+  }
+}
+
+/* 左/右/下箭头 hover */
+.tags-view.tag-follow-off .arrow-left:hover,
+.tags-view.tag-follow-off .arrow-right:hover,
+.tags-view.tag-follow-off .arrow-down:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 右键菜单 */
+.tags-view.tag-follow-off .contextmenu li:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */
+.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+  color: var(--el-color-primary) !important;
+  background-color: var(--el-fill-color-light) !important;
+}

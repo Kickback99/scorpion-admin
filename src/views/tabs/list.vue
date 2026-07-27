@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showTags" class="tags-view">
+  <div v-if="showTags" class="tags-view" :class="{ 'tag-follow-off': !settingStore.tagFollow }">
     <!-- 左滚动按钮 -->
     <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
@@ -47,7 +47,7 @@
     </span>
     
     <!-- 下拉菜单 -->
-    <el-dropdown trigger="click" @command="handleCommand">
+    <el-dropdown trigger="click" @command="handleCommand" :popper-class="!settingStore.tagFollow ? 'tag-follow-off-dropdown' : ''">
       <span class="arrow-down">
         <el-icon><ArrowDown /></el-icon>
       </span>
@@ -119,7 +119,9 @@ import { onClickOutside } from '@vueuse/core';
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
 import { useUserConfigStore } from '@/store/userConfig'
+import { useSettingStore } from '@/setting'
 const userConfigStore = useUserConfigStore()
+const settingStore = useSettingStore()
 // 导入图标
 /* import {
   ArrowLeft,
@@ -530,6 +532,6 @@ nextTick(()=>{
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import './tag-styles.scss';
 </style>
