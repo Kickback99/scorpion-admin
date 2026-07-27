@@ -48,7 +48,7 @@ const collapse = userConfigStore.getCollapseEnabled()
   position: relative;
 
   // 本体：全镂空，仅 --el-text-color-regular 描边
-  -webkit-text-stroke: 1.5px var(--el-text-color-regular);
+  -webkit-text-stroke: 1.5px var(--logo-text-color, var(--el-text-color-regular));
   -webkit-text-fill-color: transparent;
   color: transparent;
 

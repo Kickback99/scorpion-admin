@@ -23,7 +23,7 @@ const collapse = userConfigStore.getCollapseEnabled()
 <style scoped lang="scss">
 .logo {
   @include flex(center, center, null);
-  color: var(--el-color-primary-light-5);
+  color: var(--logo-text-color, var(--el-color-primary-light-5));
   font-weight: bold;
   margin: 20px 0;
   height: $base-menu-logo-height;

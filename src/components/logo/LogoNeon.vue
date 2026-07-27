@@ -23,7 +23,7 @@ const collapse = userConfigStore.getCollapseEnabled()
 <style scoped lang="scss">
 .logo {
   @include flex(center, center, null);
-  color: #fff;
+  color: var(--logo-text-color, #fff);
   font-weight: bold;
   margin: 20px 0;
   height: $base-menu-logo-height;
@@ -49,32 +49,32 @@ const collapse = userConfigStore.getCollapseEnabled()
 @keyframes neon-flicker {
   0%, 100% {
     text-shadow:
-      0 0 3px #fff,
-      0 0 8px #fff,
+      0 0 3px var(--logo-text-color, #fff),
+      0 0 8px var(--logo-text-color, #fff),
       0 0 18px var(--el-color-primary),
       0 0 36px var(--el-color-primary),
       0 0 64px var(--el-color-primary-light-3);
   }
   3% {
     text-shadow:
-      0 0 3px #fff,
-      0 0 8px #fff,
+      0 0 3px var(--logo-text-color, #fff),
+      0 0 8px var(--logo-text-color, #fff),
       0 0 18px var(--el-color-primary),
       0 0 30px var(--el-color-primary),
       0 0 56px var(--el-color-primary-light-3);
   }
   6% {
     text-shadow:
-      0 0 3px #fff,
-      0 0 10px #fff,
+      0 0 3px var(--logo-text-color, #fff),
+      0 0 10px var(--logo-text-color, #fff),
       0 0 22px var(--el-color-primary),
       0 0 42px var(--el-color-primary),
       0 0 76px var(--el-color-primary-light-3);
   }
   50% {
     text-shadow:
-      0 0 4px #fff,
-      0 0 10px #fff,
+      0 0 4px var(--logo-text-color, #fff),
+      0 0 10px var(--logo-text-color, #fff),
       0 0 24px var(--el-color-primary),
       0 0 48px var(--el-color-primary),
       0 0 80px var(--el-color-primary-light-5);

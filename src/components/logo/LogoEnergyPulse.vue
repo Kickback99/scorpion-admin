@@ -45,13 +45,13 @@ const collapse = userConfigStore.getCollapseEnabled()
   // 底色始终 25% 可见，文字不会消失
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(255, 255, 255, 0.25) 28%,
-    rgba(255, 255, 255, 0.9) 47%,
-    #fff 50%,
-    rgba(255, 255, 255, 0.9) 53%,
-    rgba(255, 255, 255, 0.25) 72%,
-    rgba(255, 255, 255, 0.25) 100%
+    color-mix(in srgb, var(--logo-text-color, #fff) 25%, transparent) 0%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 25%, transparent) 28%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 90%, transparent) 47%,
+    var(--logo-text-color, #fff) 50%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 90%, transparent) 53%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 25%, transparent) 72%,
+    color-mix(in srgb, var(--logo-text-color, #fff) 25%, transparent) 100%
   );
   background-size: 300% 100%;
   -webkit-background-clip: text;
@@ -75,8 +75,8 @@ const collapse = userConfigStore.getCollapseEnabled()
 @keyframes energy-glow {
   0%, 100% { text-shadow: none; }
   35%      { text-shadow: 0 0 8px var(--el-color-primary-light-5); }   // 蓄力
-  50%      { text-shadow: 0 0 4px #fff, 0 0 16px var(--el-color-primary), 0 0 36px var(--el-color-primary-light-3); }  // 释放
-  57%      { text-shadow: 0 0 4px #fff, 0 0 16px var(--el-color-primary), 0 0 36px var(--el-color-primary-light-3); }  // 峰值
+  50%      { text-shadow: 0 0 4px var(--logo-text-color, #fff), 0 0 16px var(--el-color-primary), 0 0 36px var(--el-color-primary-light-3); }  // 释放
+  57%      { text-shadow: 0 0 4px var(--logo-text-color, #fff), 0 0 16px var(--el-color-primary), 0 0 36px var(--el-color-primary-light-3); }  // 峰值
   65%      { text-shadow: none; }                                        // 回落
 }
 </style>
