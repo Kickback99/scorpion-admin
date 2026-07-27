@@ -245,45 +245,45 @@ function injectCheckCss() {
   _checkCssEl = ensureEl('theme-check-fix')
   _checkCssEl.textContent =
     // checkbox
-    '.ui-full .el-checkbox__input.is-checked .el-checkbox__inner{' +
+    '.ui-full .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked .el-checkbox__inner{' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
-    '.ui-full .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
+    '.ui-full .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
     'border-color:var(--el-color-primary-text)!important;' +
     '}' +
-    '.ui-full .el-checkbox__input.is-checked+.el-checkbox__label{' +
+    '.ui-full .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked+.el-checkbox__label{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
-    '.ui-plain .el-checkbox__input.is-checked .el-checkbox__inner{' +
+    '.ui-plain .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked .el-checkbox__inner{' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'border-color:var(--el-color-primary-plain)!important;' +
     '}' +
-    '.ui-plain .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
+    '.ui-plain .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked .el-checkbox__inner::after{' +
     'border-color:var(--el-color-primary-plain)!important;' +
     '}' +
-    '.ui-plain .el-checkbox__input.is-checked+.el-checkbox__label{' +
+    '.ui-plain .el-checkbox:not(.is-disabled) .el-checkbox__input.is-checked+.el-checkbox__label{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
     // el-radio — full: 圆点实心填充 + 标签用主色（无背景，不能白字）
-    '.ui-full .el-radio__input.is-checked .el-radio__inner{' +
+    '.ui-full .el-radio:not(.is-disabled) .el-radio__input.is-checked .el-radio__inner{' +
     'background-color:var(--el-color-primary-solid-bg)!important;' +
     'border-color:var(--el-color-primary-solid-bg)!important;' +
     '}' +
-    '.ui-full .el-radio__input.is-checked .el-radio__inner::after{' +
+    '.ui-full .el-radio:not(.is-disabled) .el-radio__input.is-checked .el-radio__inner::after{' +
     'background-color:var(--el-color-primary-text)!important;' +
     '}' +
-    '.ui-full .el-radio__input.is-checked+.el-radio__label{' +
+    '.ui-full .el-radio:not(.is-disabled) .el-radio__input.is-checked+.el-radio__label{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
-    '.ui-plain .el-radio__input.is-checked .el-radio__inner{' +
+    '.ui-plain .el-radio:not(.is-disabled) .el-radio__input.is-checked .el-radio__inner{' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'border-color:var(--el-color-primary-plain)!important;' +
     '}' +
-    '.ui-plain .el-radio__input.is-checked .el-radio__inner::after{' +
+    '.ui-plain .el-radio:not(.is-disabled) .el-radio__input.is-checked .el-radio__inner::after{' +
     'background-color:var(--el-color-primary-plain)!important;' +
     '}' +
-    '.ui-plain .el-radio__input.is-checked+.el-radio__label{' +
+    '.ui-plain .el-radio:not(.is-disabled) .el-radio__input.is-checked+.el-radio__label{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
     // radio-button
