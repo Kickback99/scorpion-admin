@@ -100,7 +100,7 @@
 import { nextTick, ref } from 'vue';
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
 import { ElMessageBox } from 'element-plus';
-import router from '@/router';
+import router, { loadMenu } from '@/router';
 import msg from '@/components/msg'
 const tableData = ref([])
 
@@ -273,7 +273,14 @@ const onReset = () => {
 
 //跳转到分配菜单权限路由页面
 const showAssignAuth = (row) =>{
-    router.push('/system/assignAuth?id='+row.id+'&roleName='+row.roleName)
+    const path = `/system/assignAuth?id=${row.id}&roleName=${row.roleName}`
+    const resolved = router.resolve(path)
+    // 路由未注册时（初次登录异步竞态），强制重走 loadMenu 后跳转
+    if (!resolved.matched.length) {
+      loadMenu(false).finally(() => router.push(path))
+      return
+    }
+    router.push(path)
 }
 
 </script>
