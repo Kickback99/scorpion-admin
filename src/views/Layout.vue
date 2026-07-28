@@ -200,10 +200,16 @@ watch(() => route.path, () => {
     // 收集当前路由的祖先 sub-menu index（动态 + 静态）
     const ids = []
     const found = collectAncestors(userStore.userMenu, route.path, ids)
-    // 静态菜单兜底：路径段数 > 1 时首段即为父级 index（如 /user/profile → /user）
+    // 静态菜单兜底
     if (!found) {
       const parts = route.path.split('/').filter(Boolean)
-      if (parts.length > 1) ids.push('/' + parts[0])
+      // 路径段数 > 1：首段即为父级 index（如 /user/profile → /user）
+      if (parts.length > 1) {
+        ids.push('/' + parts[0])
+      } else if (tempMenuConfig.some(item => item.path === route.path)) {
+        // temp1~15 路径扁平无前缀，归入 /template 子菜单
+        ids.push('/template')
+      }
     }
     const toClose = openedSubMenus.value.filter(i => !ids.includes(i))
     toClose.forEach(i => menuRef.value?.close(i))
