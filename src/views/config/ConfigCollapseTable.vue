@@ -3,11 +3,8 @@
   <div class="cct-root">
     <!-- ===== 展开/折叠工具栏 ===== -->
     <div class="cct-toolbar">
-      <el-button text size="small" @click="handleExpandAll">
-        <el-icon><Expand /></el-icon> 全部展开
-      </el-button>
-      <el-button text size="small" @click="handleCollapseAll">
-        <el-icon><Fold /></el-icon> 全部折叠
+      <el-button text size="small" @click="handleToggleExpand">
+        <el-icon><component :is="isAllExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ isAllExpanded ? '全部折叠' : '全部展开' }}
       </el-button>
     </div>
 
@@ -46,7 +43,7 @@
 // ============================================================
 // 依赖导入
 // ============================================================
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useConfigItems } from './configItems'
 import ConfigControl from './ConfigControl.vue'
 
@@ -63,11 +60,17 @@ const activeNames = ref([])
 // 展开/折叠
 // ============================================================
 
-/** 全部展开 */
-const handleExpandAll = () => { activeNames.value = [...allKeys] }
+/** 是否全部展开 */
+const isAllExpanded = computed(() => activeNames.value.length === allKeys.length)
 
-/** 全部折叠 */
-const handleCollapseAll = () => { activeNames.value = [] }
+/** 展开/折叠切换 */
+const handleToggleExpand = () => {
+  if (isAllExpanded.value) {
+    activeNames.value = []
+  } else {
+    activeNames.value = [...allKeys]
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -3,11 +3,8 @@
       <!-- ===== 展开/折叠工具栏 + 授权角色（sticky 固定） ===== -->
       <div class="auth-header">
         <div class="auth-toolbar">
-          <el-button text size="small" @click="handleExpandAll">
-            <el-icon><Expand /></el-icon> 全部展开
-          </el-button>
-          <el-button text size="small" @click="handleCollapseAll">
-            <el-icon><Fold /></el-icon> 全部折叠
+          <el-button text size="small" @click="handleToggleExpand">
+            <el-icon><component :is="treeExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ treeExpanded ? '全部折叠' : '全部展开' }}
           </el-button>
           <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
         </div>
@@ -100,6 +97,19 @@ const getCheckedIds = (auths) => {
 // ============================================================
 // 展开/折叠
 // ============================================================
+
+/** 树展开状态（响应式切换图标 + 文字） */
+const treeExpanded = ref(false)
+
+/** 展开/折叠切换 */
+const handleToggleExpand = () => {
+  if (treeExpanded.value) {
+    handleCollapseAll()
+  } else {
+    handleExpandAll()
+  }
+  treeExpanded.value = !treeExpanded.value
+}
 
 /** 全部展开 */
 const handleExpandAll = () => {
