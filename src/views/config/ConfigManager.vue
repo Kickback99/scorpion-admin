@@ -2,6 +2,9 @@
   <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
     <div class="header-actions">
       <div class="header-left">
+        <el-button text size="small" @click="handleToggleExpand">
+          <el-icon><component :is="tableExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ tableExpanded ? '全部折叠' : '全部展开' }}
+        </el-button>
         <el-button :disabled="$hasPerm('btn.config.add')" type="primary" @click="handleAddRoot" size="small" plain>
           <el-icon><Plus /></el-icon>
           新增配置
@@ -452,6 +455,25 @@ const handleClearFilter = () => {
       tableRef.value?.toggleRowExpansion(row, false)
     })
   }, 100)
+}
+
+// ============================================================
+// 展开/折叠
+// ============================================================
+
+/** 表格全部展开状态 */
+const tableExpanded = ref(false)
+
+/** 展开/折叠切换（递归遍历树形表格行） */
+const handleToggleExpand = () => {
+  const walk = (rows, expand) => {
+    rows.forEach(row => {
+      tableRef.value?.toggleRowExpansion(row, expand)
+      if (row.children?.length) walk(row.children, expand)
+    })
+  }
+  tableExpanded.value = !tableExpanded.value
+  walk(tableData.value, tableExpanded.value)
 }
 
 /** 搜索选中配置项 — 过滤表格数据并滚动到目标行 */
