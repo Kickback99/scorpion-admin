@@ -1,6 +1,11 @@
 <template>
          <div class="toolbar">
-           <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" plain>新增</el-button>
+           <div class="toolbar-left">
+             <el-button text size="small" @click="handleToggleExpand">
+               <el-icon><component :is="tableExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ tableExpanded ? '全部折叠' : '全部展开' }}
+             </el-button>
+             <el-button size="small" type="primary" :disabled="$hasPerm('btn.sysMenu.add')" @click="addDir" icon="Plus" plain>新增</el-button>
+           </div>
            <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
          </div>
         
@@ -166,6 +171,25 @@ const render = async() => {
 render()
 
 let highlightTimer = null
+
+// ============================================================
+// 展开/折叠
+// ============================================================
+
+/** 表格全部展开状态 */
+const tableExpanded = ref(false)
+
+/** 展开/折叠切换（递归遍历树形表格行） */
+const handleToggleExpand = () => {
+  const walk = (rows, expand) => {
+    rows.forEach(row => {
+      multipleTableRef.value?.toggleRowExpansion(row, expand)
+      if (row.children?.length) walk(row.children, expand)
+    })
+  }
+  tableExpanded.value = !tableExpanded.value
+  walk(tableData.value, tableExpanded.value)
+}
 
 /**
  * 菜单搜索选中 → toggleRowExpansion 逐层展开祖先 → 滚动 + 高亮
@@ -524,6 +548,12 @@ const modifyMenu = async() => {
         z-index: 7;
         background: var(--el-bg-color);
         padding: 4px 0;
+    }
+
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     /* 搜索高亮 */
