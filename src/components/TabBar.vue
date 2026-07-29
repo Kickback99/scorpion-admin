@@ -243,7 +243,7 @@ const handleCommand = async (key) => {
         // userStore.username = ''
         // 提示信息
         msg.primary(res.message)
-        // 标记主动退出 → 登录后进首页
+        // 标记主动退出 → 登录后进仪表盘
         stringStore.setLogoutIntent(true)
         router.push('/login')
     }else {

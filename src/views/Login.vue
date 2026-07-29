@@ -85,7 +85,7 @@ const handleLogin = async() => {
     if(userStore.userInfo.type === 0){
         msg.primary('登录成功')
     }
-    // 处理重定向：主动退出 → 首页；越权拦截 → 跟随 redirect
+    // 处理重定向：主动退出 → 仪表盘；越权拦截 → 跟随 redirect
     const settingStore = useSettingStore()
     if (settingStore.logoutIntent) {
         settingStore.setLogoutIntent(false)

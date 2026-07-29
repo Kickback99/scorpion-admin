@@ -15,6 +15,9 @@ import './assets/style/tailwind.css'
 // element 暗黑模式样式
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
+// ECharts 按需注册
+import './plugins/echarts'
+
 
 // 完整导入
 /* import ElementPlus from 'element-plus'
