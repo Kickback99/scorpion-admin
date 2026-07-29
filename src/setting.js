@@ -13,7 +13,7 @@ export const useSettingStore = defineStore({
         isManualTo403:false,
         /** 退出/401 时是否保留标签页（默认保留） */
         keepTabs: true,
-        /** 退出标记：登录后忽略 redirect，直接进首页 */
+        /** 退出标记：登录后忽略 redirect，直接进仪表盘 */
         logoutIntent: false,
         /** 标签跟随：true=跟随 ui-mode 风格，false=浅底色+主色字统一风格 */
         tagFollow: false,

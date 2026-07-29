@@ -17,6 +17,7 @@ export const themePresets = {
       warning: { bg: '#E6A23C', text: { light: W, dark: WD } },
       danger:  { bg: '#F56C6C', text: { light: W, dark: WD } },
       info:    { bg: '#909399', text: { light: W, dark: WD } },
+      chart: ['#409EFF','#67C23A','#E6A23C','#F56C6C','#5470C6','#91CC75','#FAC858','#EE6666','#73C0DE','#FC8452'],
     },
   },
   orange: {
@@ -27,6 +28,7 @@ export const themePresets = {
       warning: { bg: '#F39C12', text: { light: W, dark: WD } },
       danger:  { bg: '#E74C3C', text: { light: W, dark: WD } },
       info:    { bg: '#7F8C8D', text: { light: W, dark: WD } },
+      chart: ['#E67E22','#27AE60','#F39C12','#E74C3C','#3498DB','#1ABC9C','#9B59B6','#F1C40F','#E67E22','#2ECC71'],
     },
   },
   pink: {
@@ -37,6 +39,7 @@ export const themePresets = {
       warning: { bg: '#FF9800', text: { light: W, dark: WD } },
       danger:  { bg: '#F44336', text: { light: W, dark: WD } },
       info:    { bg: '#607D8B', text: { light: W, dark: WD } },
+      chart: ['#E91E63','#4CAF50','#FF9800','#F44336','#2196F3','#00BCD4','#9C27B0','#FFEB3B','#FF5722','#8BC34A'],
     },
   },
   green: {
@@ -47,6 +50,7 @@ export const themePresets = {
       warning: { bg: '#F1C40F', text: { light: D, dark: D } },
       danger:  { bg: '#E74C3C', text: { light: W, dark: WD } },
       info:    { bg: '#95A5A6', text: { light: W, dark: WD } },
+      chart: ['#2ECC71','#1ABC9C','#F1C40F','#E74C3C','#3498DB','#9B59B6','#E67E22','#1ABC9C','#F39C12','#27AE60'],
     },
   },
   purple: {
@@ -57,6 +61,7 @@ export const themePresets = {
       warning: { bg: '#F39C12', text: { light: W, dark: WD } },
       danger:  { bg: '#E74C3C', text: { light: W, dark: WD } },
       info:    { bg: '#7F8C8D', text: { light: W, dark: WD } },
+      chart: ['#9B59B6','#2ECC71','#F39C12','#E74C3C','#3498DB','#1ABC9C','#E67E22','#F1C40F','#E91E63','#00BCD4'],
     },
   },
 
@@ -70,6 +75,7 @@ export const themePresets = {
       warning: { bg: '#EA580C', text: { light: W, dark: WD } },
       danger:  { bg: '#DC2626', text: { light: W, dark: WD } },
       info:    { bg: '#64748B', text: { light: W, dark: WD } },
+      chart: ['#2563EB','#16A34A','#EA580C','#DC2626','#7C3AED','#0891B2','#D97706','#059669','#4F46E5','#DB2777'],
     },
   },
 
@@ -81,6 +87,7 @@ export const themePresets = {
       warning: { bg: '#F59E0B', text: { light: D, dark: D } },
       danger:  { bg: '#DC2626', text: { light: W, dark: WD } },
       info:    { bg: '#64748B', text: { light: W, dark: WD } },
+      chart: ['#F05454','#10B981','#F59E0B','#DC2626','#3B82F6','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1'],
     },
   },
 
@@ -92,6 +99,7 @@ export const themePresets = {
       warning: { bg: '#EA580C', text: { light: W, dark: WD } },
       danger:  { bg: '#DC2626', text: { light: W, dark: WD } },
       info:    { bg: '#64748B', text: { light: W, dark: WD } },
+      chart: ['#CDCD00','#16A34A','#EA580C','#DC2626','#2563EB','#7C3AED','#EC4899','#0891B2','#D97706','#059669'],
     },
   },
 
@@ -103,6 +111,7 @@ export const themePresets = {
       warning: { bg: '#F59E0B', text: { light: D, dark: D } },
       danger:  { bg: '#DC2626', text: { light: W, dark: WD } },
       info:    { bg: '#64748B', text: { light: W, dark: WD } },
+      chart: ['#2DD4BF','#059669','#F59E0B','#DC2626','#3B82F6','#8B5CF6','#EC4899','#F97316','#6366F1','#14B8A6'],
     },
   },
 
@@ -114,6 +123,7 @@ export const themePresets = {
       warning: { bg: '#F59E0B', text: { light: D, dark: D } },
       danger:  { bg: '#DC2626', text: { light: W, dark: WD } },
       info:    { bg: '#94A3B8', text: { light: D, dark: D } },
+      chart: ['#6366F1','#059669','#F59E0B','#DC2626','#EC4899','#14B8A6','#F97316','#3B82F6','#8B5CF6','#E11D48'],
     },
   },
 }

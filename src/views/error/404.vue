@@ -65,7 +65,7 @@ const router = useRouter();
         type="primary"
         plain
       >
-        返回首页
+        返回仪表盘
       </el-button>
     </div>
   </div>
