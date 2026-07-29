@@ -65,6 +65,12 @@ export function applyTheme(themeName, _isDark) {
   const root = document.documentElement
   const types = ['primary', 'success', 'warning', 'danger', 'info']
 
+  // 图表色 — 直接注入为 CSS 变量
+  const chartColors = preset.colors.chart || []
+  for (let i = 0; i < chartColors.length; i++) {
+    root.style.setProperty('--el-color-chart-' + i, chartColors[i])
+  }
+
   // light-1~9 / dark-2 永远完整色阶
   for (const t of types) {
     var c = preset.colors[t]

@@ -36,7 +36,7 @@ export const routes = [
     children:[
         {path:'/index',component:() => import('@/views/home/index.vue'),
             meta:{
-               title:'首页'     
+               title:'仪表盘'
         }},
         {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue'),meta:{
             title:'个人资料'
@@ -475,10 +475,10 @@ router.beforeEach((to, from, next) => {
     )
 
         //t_handle：处理前后台用户的逻辑
-        // 后台用户，没有菜单，跳到首页
+        // 后台用户，没有菜单，跳到仪表盘
         // 前台用户，跳到404
     /* if(to.path === '/index'){
-        console.log('放首页')
+        console.log('放仪表盘')
         return next()
     } */
 });
