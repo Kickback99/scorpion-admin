@@ -46,8 +46,13 @@
           <div class="card-body">
             <div class="card-label">总访问数</div>
             <div class="card-value">{{ formatNumber(dashboard.totalViewCount ?? 0) }}</div>
-            <div class="card-sub">
-              <span>今日 {{ dashboard.todayViewCount ?? 0 }}</span>
+            <div class="card-stats">
+              <span class="today-val">今日 {{ dashboard.todayViewCount ?? 0 }}</span>
+              <span class="growth" :class="growthClass(dashboard.viewsGrowth)">
+                <el-icon v-if="growthArrow(dashboard.viewsGrowth)"><CaretTop /></el-icon>
+                <el-icon v-else><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.viewsGrowth) }}%
+              </span>
             </div>
           </div>
         </el-card>
@@ -60,8 +65,9 @@
           <div class="card-body">
             <div class="card-label">总文章数</div>
             <div class="card-value">{{ formatNumber(dashboard.articleCount ?? 0) }}</div>
-            <div class="card-sub">
-              <span>已发布 {{ dashboard.publishedCount ?? 0 }}</span>
+            <div class="card-stats">
+              <span class="today-val">已发布 {{ dashboard.publishedCount ?? 0 }}</span>
+              <span class="growth neutral">已发布率 {{ articlePct }}%</span>
             </div>
           </div>
         </el-card>
@@ -74,8 +80,13 @@
           <div class="card-body">
             <div class="card-label">总评论数</div>
             <div class="card-value">{{ formatNumber(dashboard.commentCount ?? 0) }}</div>
-            <div class="card-sub">
-              <span>今日 {{ dashboard.todayCommentCount ?? 0 }}</span>
+            <div class="card-stats">
+              <span class="today-val">今日 {{ dashboard.todayCommentCount ?? 0 }}</span>
+              <span class="growth" :class="growthClass(dashboard.commentsGrowth)">
+                <el-icon v-if="growthArrow(dashboard.commentsGrowth)"><CaretTop /></el-icon>
+                <el-icon v-else><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.commentsGrowth) }}%
+              </span>
             </div>
           </div>
         </el-card>
@@ -88,8 +99,13 @@
           <div class="card-body">
             <div class="card-label">用户总数</div>
             <div class="card-value">{{ formatNumber(dashboard.userCount ?? 0) }}</div>
-            <div class="card-sub">
-              <span>今日 {{ dashboard.todayUserCount ?? 0 }}</span>
+            <div class="card-stats">
+              <span class="today-val">今日 {{ dashboard.todayUserCount ?? 0 }}</span>
+              <span class="growth" :class="growthClass(dashboard.usersGrowth)">
+                <el-icon v-if="growthArrow(dashboard.usersGrowth)"><CaretTop /></el-icon>
+                <el-icon v-else><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.usersGrowth) }}%
+              </span>
             </div>
           </div>
         </el-card>
@@ -127,7 +143,7 @@
 // 依赖导入
 // ============================================================
 import { computed, onMounted, reactive, ref } from 'vue'
-import { View, TrendCharts, ChatDotRound, UserFilled } from '@element-plus/icons-vue'
+import { View, TrendCharts, ChatDotRound, UserFilled, CaretTop, CaretBottom } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import LineChart from './charts/LineChart.vue'
 import PieChart from './charts/PieChart.vue'
@@ -158,6 +174,15 @@ const greeting = computed(() => {
   if (h < 22) return '晚上好'
   return '夜深了'
 })
+
+// ============================================================
+// 百分比 & 增长率
+// ============================================================
+const pct = (part, total) => total > 0 ? (part / total * 100).toFixed(1) : '0'
+const articlePct = computed(() => pct(dashboard.publishedCount, dashboard.articleCount))
+const growthClass = (v) => v > 50 ? 'positive' : 'negative'
+const growthArrow = (v) => v > 50
+const growthValue = (v) => v > 50 ? v : 100 - v
 
 // ============================================================
 // 工具函数
@@ -335,9 +360,17 @@ onMounted(() => {
           margin-bottom: 4px;
         }
 
-        .card-sub {
+        .card-stats {
+          display: flex; justify-content: space-between; align-items: center;
           font-size: 12px;
-          color: var(--el-text-color-secondary);
+
+          .today-val { color: var(--el-text-color-secondary); }
+          .growth {
+            display: flex; align-items: center; gap: 2px; font-weight: 400; scale: 0.9;
+            &.positive  { color: var(--el-color-success); }
+            &.negative  { color: var(--el-color-danger); }
+            &.neutral   { color: var(--el-text-color-secondary); }
+          }
         }
       }
     }
