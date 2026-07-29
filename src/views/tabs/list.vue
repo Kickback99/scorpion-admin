@@ -29,7 +29,7 @@
           <span class="tag-title">
             {{ item.title }}
           </span>
-          <!-- 首页(index === 0)不显示关闭按钮 -->
+          <!-- 仪表盘(index === 0)不显示关闭按钮 -->
           <span
             v-if="item.path !== '/index'"
             class="el-icon-close"
@@ -164,7 +164,7 @@ const linkIsActive = (tab) => {
 const addTab = () => {
   const { path, fullPath, meta: { title } } = route
 
-    // 确保首页始终存在
+    // 确保仪表盘始终存在
   ensureHomeTabExists()
 
   const itemTab = {
@@ -172,9 +172,9 @@ const addTab = () => {
     fullPath,
     title
   }
-  // 如果是首页路径，确保标题正确
+  // 如果是仪表盘路径，确保标题正确
   if (path === '/index') {
-    itemTab.title = '首页'
+    itemTab.title = '仪表盘'
   }
 
   tabStore.addTabs(itemTab)
@@ -183,15 +183,15 @@ const addTab = () => {
   })
 }
 
-// 确保首页标签存在
+// 确保仪表盘标签存在
 const ensureHomeTabExists = () => {
   const homeTab = tabs.value.find(tab => tab.path === '/index')
   if (!homeTab) {
-    // 如果首页不存在，添加首页
+    // 如果仪表盘不存在，添加仪表盘
     tabStore.addTabs({
       path: '/index',
       fullPath: '/index',
-      title: '首页'
+      title: '仪表盘'
     })
   }
 }
@@ -431,28 +431,28 @@ const closeRightTabs = (currentTab) => {
 
 // 关闭其他标签页 - 修复版本
 const closeOtherTabs = (currentTab) => {
-  // 获取首页标签（路径为 '/index'）
+  // 获取仪表盘标签（路径为 '/index'）
   const homeTab = tabs.value.find(tab => tab.path === '/index')
 
-  // 确保保留首页和当前标签页
+  // 确保保留仪表盘和当前标签页
   const tabsToKeep = []
 
-  // 添加首页（如果存在）
+  // 添加仪表盘（如果存在）
   if (homeTab) {
     tabsToKeep.push(homeTab)
   }
 
-  // 添加当前标签页（如果不是首页）
+  // 添加当前标签页（如果不是仪表盘）
   if (currentTab.path !== '/index') {
     tabsToKeep.push(currentTab)
   }
 
-  // 如果首页不存在，创建首页标签
+  // 如果仪表盘不存在，创建仪表盘标签
   if (!homeTab && currentTab.path !== '/index') {
     tabsToKeep.unshift({
       path: '/index',
       fullPath: '/index',
-      title: '首页'
+      title: '仪表盘'
     })
   }
 
@@ -471,17 +471,17 @@ const closeOtherTabs = (currentTab) => {
 
 // 关闭全部标签页 - 修复版本
 const closeAllTabs = () => {
-  // 保留首页（路径为 '/index'）
+  // 保留仪表盘（路径为 '/index'）
   const homeTab = tabs.value.find(tab => tab.path === '/index')
 
-  // 如果首页存在，只保留首页；如果不存在，创建首页
+  // 如果仪表盘存在，只保留仪表盘；如果不存在，创建仪表盘
   if (homeTab) {
     tabStore.tabList = [homeTab]
   } else {
     tabStore.tabList = [{
       path: '/index',
       fullPath: '/index',
-      title: '首页'
+      title: '仪表盘'
     }]
   }
 

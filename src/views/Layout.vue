@@ -16,7 +16,7 @@
           @close="handleMenuClose"
         >
           <el-menu-item index="/index">
-                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>首页</span> 
+                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>仪表盘</span>
           </el-menu-item>
 
               <el-sub-menu index="/template">
