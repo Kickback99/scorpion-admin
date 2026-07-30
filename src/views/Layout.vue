@@ -16,12 +16,12 @@
           @close="handleMenuClose"
         >
           <el-menu-item index="/index">
-                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>仪表盘</span>
+                   <el-icon> <SingleIcon :icon="'ri:airplay-fill'"></SingleIcon> </el-icon> <span>仪表盘</span>
           </el-menu-item>
 
               <el-sub-menu index="/template">
                 <template #title>
-                  <el-icon><Document /></el-icon>
+                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
                   <span>模板页面</span>
                 </template>
                 
@@ -30,7 +30,8 @@
                   :key="item.path"
                   :index="item.path"
                 >
-                  {{ item.title }}
+                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
+                  <span>{{ item.title }}</span>
                 </el-menu-item>
             </el-sub-menu>
       
@@ -39,19 +40,19 @@
           			<!--多级菜单-->
           <el-sub-menu index="/user">
                 <template #title>
-                    <el-icon><Aim /></el-icon> <span>个人中心</span>
+                    <el-icon> <SingleIcon icon="ri:profile-fill"></SingleIcon> </el-icon> <span>个人中心</span>
                 </template>
 			   <!--展开的每一个菜单项-->
                 <el-menu-item index="/user/profile">
-                    <el-icon><Aim /></el-icon> <span>基本资料</span>
+                    <el-icon> <SingleIcon icon="ri:file-user-fill"></SingleIcon> </el-icon> <span>基本资料</span>
                 </el-menu-item>
                 <el-menu-item index="/user/rePassword">
-					          <el-icon><Aim /></el-icon> <span>重置密码</span>
+					          <el-icon> <SingleIcon icon="ri:phone-lock-line"></SingleIcon> </el-icon> <span>重置密码</span>
                 </el-menu-item>
             </el-sub-menu>
 
             <el-menu-item index="/test">
-                   <el-icon> <SingleIcon :icon="'ep:home-filled'"></SingleIcon> </el-icon> <span>测试</span> 
+                   <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试</span> 
             </el-menu-item>
         </el-menu>
       </el-scrollbar>
@@ -87,6 +88,7 @@ import Logo from '@/components/logo/index.vue';
 import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
 import { useUserConfigStore } from '@/store/userConfig';
+import singleIcon from '@/components/MyIcon/src/singleIcon';
 
 const userStore = useUserStore()
 

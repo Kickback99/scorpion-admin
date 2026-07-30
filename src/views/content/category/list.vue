@@ -68,7 +68,7 @@
 
         <!-- 虚拟按钮：修改 -->
 
-        <el-button size="small" type="warning" v-if="data.isCheck" icon="Edit" @click="handleCheck(node,data)" style="margin-left: 8px" circle plain />
+        <el-button size="small" type="warning" v-if="data.isCheck" icon="EditPen" @click="handleCheck(node,data)" style="margin-left: 8px" circle plain />
 
         <!-- 虚拟按钮：恢复 -->
           <!-- 

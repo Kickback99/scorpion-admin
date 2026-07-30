@@ -7,9 +7,10 @@
  * item.key 与后端 key 一致（不含 group 前缀，如 'comment.article_comment_enabled'），
  * group 前缀由 configStore 根据分组自动拼接。
  */
+import { useRenderIcon } from '@/components/MyIcon/src/hook'
 import { useConfigStore, registerItems } from '@/store/config'
 import {
-  Monitor, Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
+  Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
   Aim, Star, ChatDotRound, List, Document, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
   PictureFilled, DeleteFilled, FolderDelete, Grid
@@ -29,7 +30,7 @@ export function useConfigItems() {
 
   const groups = [
     {
-      key: 'client', label: '前台', icon: Monitor,
+      key: 'client', label: '前台', icon: useRenderIcon('ri:xbox-fill'),
       items: [
         // ===== comment =====
         { key: 'comment.article_comment_enabled',    type: 'switch', label: '文章评论',       sys: true,       desc: '开启后文章详情页显示评论区',            icon: ChatDotSquare,  get: () => config.getValue('comment.article_comment_enabled'),     set: (v) => config.updateConfig('comment.article_comment_enabled', v) },
@@ -62,7 +63,7 @@ export function useConfigItems() {
       ]
     },
     {
-      key: 'admin', label: '后台', icon: Monitor,
+      key: 'admin', label: '后台', icon: useRenderIcon('ri:blender-fill'),
       items: [
         // ===== article =====
         { key: 'article.top_limit',                  type: 'number', label: '文章置顶数量限制', sys: true, desc: '允许同时置顶的最大文章数',               icon: "Top",            get: () => config.getValue('article.top_limit'),            set: (v) => config.updateConfig('article.top_limit', v),                  min: () => getMin('article.top_limit'), max: () => getMax('article.top_limit') },
@@ -96,7 +97,7 @@ export function useConfigItems() {
       ]
     },
     {
-      key: 'user_config', label: '用户配置', icon: Collection,
+      key: 'user_config', label: '用户配置', icon: useRenderIcon('ri:user-settings-line'),
       items: [
         { key: 'collapse_enabled',       type: 'switch', label: '菜单折叠', desc: '侧边栏菜单默认折叠状态', icon: "Fold", get: () => config.getValue('collapse_enabled'), set: (v) => config.updateConfig('collapse_enabled', v) },
         { key: 'dark_enabled',           type: 'switch', label: '深色主题', desc: '切换暗色/亮色显示模式',   icon: "Moon", get: () => config.getValue('dark_enabled'),     set: (v) => config.updateConfig('dark_enabled', v) },
