@@ -148,6 +148,11 @@ export const useConfigStore = defineStore({
         animation_style: 'neon',
         hide_image: false,
       },
+      line_config: {
+        y_valid_field: 'any',
+        priority: 'data',
+        week_offset: 12,
+      },
     },
 
     // ===== user 用户配置 =====
@@ -519,6 +524,17 @@ export const useConfigStore = defineStore({
 
     getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
     toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },
+
+    // ==================== line_config ====================
+
+    getLineConfigYValidField()     { return this.getValue('line_config.y_valid_field') },
+    setLineConfigYValidField(v)    { this.updateConfig('line_config.y_valid_field', v) },
+
+    getLineConfigPriority()        { return this.getValue('line_config.priority') },
+    setLineConfigPriority(v)       { this.updateConfig('line_config.priority', v) },
+
+    getLineConfigWeekOffset()      { return this.getValue('line_config.week_offset') },
+    setLineConfigWeekOffset(v)     { this.updateConfig('line_config.week_offset', v) },
   },
 
   // ============================================================
@@ -578,6 +594,11 @@ export const useConfigStore = defineStore({
     // ===== logo (admin 组) =====
     logoAnimationStyle()      { return this.getValue('logo.animation_style') || 'neon' },
     isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
+
+    // ===== line_config (admin 组) =====
+    lineConfigYValidField()   { return this.getValue('line_config.y_valid_field') },
+    lineConfigPriority()      { return this.getValue('line_config.priority') },
+    lineConfigWeekOffset()    { return this.getValue('line_config.week_offset') },
   },
 
   // ============================================================

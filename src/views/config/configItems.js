@@ -89,6 +89,10 @@ export function useConfigItems() {
         // ===== logo =====
         { key: 'logo.animation_style',               type: 'radio',  label: 'Logo 动画样式',    desc: '切换侧边栏 Logo 的文字动效',              icon: "Refresh",      get: () => config.getValue('logo.animation_style'),         set: (v) => config.updateConfig('logo.animation_style', v),                             options: [{ value: 'none', label: '无动画' }, { value: 'neon', label: '霓虹灯管' }, { value: 'multi-neon', label: 'SVG 多重描边霓虹' }, { value: 'energy-pulse', label: '能量脉冲' }, { value: 'stroke-scan', label: '镂空扫描描边' }, { value: 'glitch', label: '故障扫描线' }] },
         { key: 'logo.hide_image',                    type: 'switch', label: '隐藏 Logo 图片',   desc: '隐藏侧边栏 Logo 的头像图片',              icon: "Close",        get: () => config.getValue('logo.hide_image'),              set: (v) => config.updateConfig('logo.hide_image', v) },
+        // ===== line_config =====
+        { key: 'line_config.y_valid_field',     type: 'radio',  label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: "Select",       get: () => config.getValue('line_config.y_valid_field'),   set: (v) => config.updateConfig('line_config.y_valid_field', v),     options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
+        { key: 'line_config.priority',          type: 'radio',  label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: "Sort",         get: () => config.getValue('line_config.priority'),        set: (v) => config.updateConfig('line_config.priority', v),          options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
+        { key: 'line_config.week_offset',       type: 'number', label: '周偏移',       desc: '近 7 天趋势图可回滚的周偏移',             icon: "Refresh",      get: () => config.getValue('line_config.week_offset'),     set: (v) => config.updateConfig('line_config.week_offset', v),       min: () => 0, max: () => 52 },
       ]
     },
     {
