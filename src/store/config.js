@@ -153,6 +153,9 @@ export const useConfigStore = defineStore({
         priority: 'data',
         week_offset: 12,
       },
+      dashboard: {
+        top_card_enabled: false,
+      },
     },
 
     // ===== user 用户配置 =====
@@ -535,6 +538,11 @@ export const useConfigStore = defineStore({
 
     getLineConfigWeekOffset()      { return this.getValue('line_config.week_offset') },
     setLineConfigWeekOffset(v)     { this.updateConfig('line_config.week_offset', v) },
+
+    // ==================== dashboard ====================
+
+    getDashboardTopCardEnabled()   { return this.getValue('dashboard.top_card_enabled') === true },
+    toggleDashboardTopCardEnabled(){ this.updateConfig('dashboard.top_card_enabled', !this.getValue('dashboard.top_card_enabled')) },
   },
 
   // ============================================================
@@ -599,6 +607,9 @@ export const useConfigStore = defineStore({
     lineConfigYValidField()   { return this.getValue('line_config.y_valid_field') },
     lineConfigPriority()      { return this.getValue('line_config.priority') },
     lineConfigWeekOffset()    { return this.getValue('line_config.week_offset') },
+
+    // ===== dashboard (admin 组) =====
+    isDashboardTopCardEnabled() { return this.getValue('dashboard.top_card_enabled') === true },
   },
 
   // ============================================================
