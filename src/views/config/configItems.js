@@ -94,6 +94,8 @@ export function useConfigItems() {
         { key: 'line_config.y_valid_field',     type: 'radio',  label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: "Select",       get: () => config.getValue('line_config.y_valid_field'),   set: (v) => config.updateConfig('line_config.y_valid_field', v),     options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
         { key: 'line_config.priority',          type: 'radio',  label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: "Sort",         get: () => config.getValue('line_config.priority'),        set: (v) => config.updateConfig('line_config.priority', v),          options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
         { key: 'line_config.week_offset',       type: 'number', label: '周偏移',       desc: '近 7 天趋势图可回滚的周偏移',             icon: "Refresh",      get: () => config.getValue('line_config.week_offset'),     set: (v) => config.updateConfig('line_config.week_offset', v),       min: () => 0, max: () => 52 },
+        // ===== dashboard =====
+        { key: 'dashboard.top_card_enabled',    type: 'switch', label: '顶部统计卡片',   desc: '仪表盘顶部问候语和统计数字卡片',            icon: "DataBoard",    get: () => config.getValue('dashboard.top_card_enabled'),  set: (v) => config.updateConfig('dashboard.top_card_enabled', v) },
       ]
     },
     {

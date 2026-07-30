@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <!-- ===== 顶部区域：问候 + 统计 ===== -->
-    <el-card class="top-card" shadow="hover">
+    <el-card v-if="topCardVisible" class="top-card" shadow="hover">
       <div class="top-content">
         <!-- 左侧：问候语 -->
         <div class="profile-section">
@@ -197,6 +197,8 @@ const hitokoto = ref('加载中...')
 // ============================================================
 // 计算属性
 // ============================================================
+const topCardVisible = computed(() => configStore.getDashboardTopCardEnabled())
+
 const nickname = computed(() => userStore.userInfo?.nickname || userStore.userInfo?.username || 'Admin')
 
 const greeting = computed(() => {
@@ -307,8 +309,10 @@ const onKey = (e) => {
 }
 
 onMounted(() => {
+  if (topCardVisible.value) {
+    fetchHitokoto()
+  }
   fetchDashboard()
-  fetchHitokoto()
   fetchLineChart()
   fetchPieChart()
   fetchGauge()
