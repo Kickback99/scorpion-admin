@@ -29,22 +29,36 @@ import msg from '@/components/msg'
 export const routes = [
     //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
-    { path:'/',redirect:'/index',name:'parentNode',meta:{
+    { path:'/',redirect:'/index',name:'parentNode',
+        meta:{
         hidden:true
-    },
+        },
     component:Layout,
     children:[
         {path:'/index',component:() => import('@/views/home/index.vue'),
             meta:{
-               title:'仪表盘'
-        }},
-        {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue'),meta:{
-            title:'个人资料'
-        }},
-        {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue'),meta:{
-            title:'重置密码'
-        }},
-        {path:'/test',component:() => import('@/views/Test.vue')}
+               title:'仪表盘',
+               icon: 'ri:airplay-fill'
+            }
+        },
+        {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue'),
+            meta:{
+                title:'基本资料',
+                icon: 'ri:file-user-fill'
+            }
+        },
+        {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue'),
+            meta:{
+                title:'重置密码',
+                icon: 'ri:phone-lock-line'
+            }
+        },
+        {path:'/test',component:() => import('@/views/Test.vue'),
+            meta: {
+                title: '测试',
+                icon: 'ri:bard-line'
+            }            
+        }
     ]},
 /*     {
     path:'/',
@@ -365,7 +379,7 @@ const routerData = Object.entries(modules).map(([filePath, component]) => {
         path: `/${fileName.toLowerCase()}`, // 路径，如：/temp1
         name: fileName, // 路由名称，如：temp1
         component: component, // 组件
-        meta: { title: `${fileName}页面` } // 可选的元信息
+        meta: { title: `${fileName}页面`,icon: 'ri:zzz-fill' } // 可选的元信息
     }
 })
 

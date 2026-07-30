@@ -3,15 +3,15 @@
   <span v-if="periodLabel" class="chart-period">{{ periodLabel }}</span>
   <div class="chart-nav">
     <el-button size="small" text circle :disabled="leftDisabled || loading" @click="handlePrev">
-      <el-icon><ArrowLeft /></el-icon>
+      <OfflineIcon icon="ri:arrow-left-s-line"></OfflineIcon>
     </el-button>
     <el-button size="small" text circle :disabled="rightDisabled || loading" @click="handleNext">
-      <el-icon><ArrowRight /></el-icon>
+      <OfflineIcon icon="ri:arrow-right-s-line"></OfflineIcon>
     </el-button>
     <span v-if="progressText" class="chart-progress">{{ progressText }}</span>
     <el-tooltip content="回到本周" :show-after="500">
       <el-button size="small" text circle @click="handleReset">
-        <el-icon><HomeFilled /></el-icon>
+        <OfflineIcon icon="ri:home-8-line"></OfflineIcon>
       </el-button>
     </el-tooltip>
   </div>
@@ -20,7 +20,6 @@
 <script setup>
 // ============================================================
 import { computed } from 'vue'
-import { HomeFilled } from '@element-plus/icons-vue'
 
 // ============================================================
 // 数据
