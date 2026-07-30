@@ -480,6 +480,12 @@ const handleToggleExpand = () => {
 const handleConfigSelect = (item) => {
   filterKeyword.value = item.isGroup ? item.groupLabel || item.label : (item.configKey || item.label)
 
+  // 递归检查节点树是否包含关键词
+  const nodeContains = (node, kw, rel) => {
+    if (node.key.toLowerCase().includes(kw) || node.key.toLowerCase().includes(rel)) return true
+    return (node.children || []).some(c => nodeContains(c, kw, rel))
+  }
+
   // 过滤：保留匹配的分组及子节点（支持相对路径和 group 前缀路径）
   let keyword = filterKeyword.value.toLowerCase()
   tableData.value = fullTableData.value
@@ -488,26 +494,20 @@ const handleConfigSelect = (item) => {
       if (keyword && group.children?.length) {
         // 如果 keyword 以 group.key 开头，去掉前缀做相对匹配
         const rel = keyword.startsWith(group.key + '.') ? keyword.slice(group.key.length + 1) : keyword
-        const matched = group.children.filter(child =>
-          child.key.toLowerCase().includes(keyword) || child.key.toLowerCase().includes(rel) ||
-          (child.children || []).some(c => c.key.toLowerCase().includes(keyword) || c.key.toLowerCase().includes(rel))
-        )
+        const matched = group.children.filter(child => nodeContains(child, keyword, rel))
         if (matched.length) return { ...group, children: matched }
       }
       return null
     })
     .filter(Boolean)
 
-  // 展开所有节点 + 滚动到第一个匹配行
+  // 展开所有匹配节点 + 滚动到第一个匹配行
   setTimeout(() => {
-    tableData.value.forEach(row => {
-      tableRef.value?.toggleRowExpansion(row, true)
-      if (row.children) {
-        row.children.forEach(child => {
-          tableRef.value?.toggleRowExpansion(child, true)
-        })
-      }
-    })
+    const expandRecursive = (node) => {
+      tableRef.value?.toggleRowExpansion(node, true)
+      ;(node.children || []).forEach(expandRecursive)
+    }
+    tableData.value.forEach(row => expandRecursive(row))
     const rows = document.querySelectorAll('.config-table .el-table__row')
     for (const row of rows) {
       if (row.textContent?.includes(item.configKey || item.groupLabel || item.label)) {

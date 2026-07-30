@@ -84,7 +84,7 @@ const searchIndex = groups.flatMap(group => {
     const cfgKey = item.key
     const parts = cfgKey.split('.')
     const breadcrumb = parts.length > 1
-      ? [group.key, parts[0], parts[1]]
+      ? [group.key, ...parts]
       : [group.key, cfgKey]
 
     result.push({
@@ -147,9 +147,7 @@ const extraKeys = computed(() => {
         extras.push({
           groupKey: topKey, groupLabel, configKey,
           label: '', desc: typeof value === 'object' ? '对象' : String(value),
-          breadcrumb: parts.length > 2
-            ? [topKey, parts[1], parts[2]]
-            : [topKey, ...parts.slice(1)],
+          breadcrumb: [topKey, ...parts.slice(1)],
           icon: null, isGroup: false,
         })
       }
