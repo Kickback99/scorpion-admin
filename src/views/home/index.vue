@@ -119,11 +119,7 @@
           <template #header>
             <div class="chart-header">
               <span>近7天文章数据趋势</span>
-              <span v-if="lineChart.periodLabel" class="chart-period">{{ lineChart.periodLabel }}</span>
-              <div class="chart-arrows">
-                <el-button size="small" text circle :disabled="lineOffset >= lineChart.maxOffset" @click="handleWeekPrev"><el-icon><ArrowLeft /></el-icon></el-button>
-                <el-button size="small" text circle :disabled="prevStack.length === 0" @click="handleWeekNext"><el-icon><ArrowRight /></el-icon></el-button>
-              </div>
+              <WeekArrows :period-label="lineChart.periodLabel" :left-disabled="lineOffset >= lineChart.maxOffset" :right-disabled="prevStack.length === 0" @prev="handleWeekPrev" @next="handleWeekNext" />
             </div>
           </template>
           <LineChart :x-data="lineChart.xData" :y1="lineChart.y1" :y2="lineChart.y2" :y3="lineChart.y3" />
@@ -153,6 +149,7 @@ import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
 import LineChart from './charts/LineChart.vue'
 import PieChart from './charts/PieChart.vue'
+import WeekArrows from './charts/WeekArrows.vue'
 import { getDashboardApi, getChartLineApi, getChartPieApi } from '@/api/dashboard'
 
 // ============================================================
@@ -415,15 +412,6 @@ onMounted(() => {
       display: flex; align-items: center; gap: 10px;
       font-size: 15px; font-weight: 600;
       color: var(--el-text-color-primary);
-
-      .chart-period {
-        font-size: 12px; font-weight: 400;
-        color: var(--el-text-color-secondary);
-        background: var(--el-fill-color-light);
-        padding: 2px 10px; border-radius: 4px;
-      }
-
-      .chart-arrows { display: flex; gap: 2px; margin-left: auto; }
     }
   }
 }
