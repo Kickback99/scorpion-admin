@@ -119,6 +119,11 @@
           <template #header>
             <div class="chart-header">
               <span>近7天文章数据趋势</span>
+              <span v-if="lineChart.periodLabel" class="chart-period">{{ lineChart.periodLabel }}</span>
+              <div class="chart-arrows">
+                <el-button size="small" text circle :disabled="lineOffset >= lineChart.maxOffset" @click="handleWeekPrev"><el-icon><ArrowLeft /></el-icon></el-button>
+                <el-button size="small" text circle :disabled="prevStack.length === 0" @click="handleWeekNext"><el-icon><ArrowRight /></el-icon></el-button>
+              </div>
             </div>
           </template>
           <LineChart :x-data="lineChart.xData" :y1="lineChart.y1" :y2="lineChart.y2" :y3="lineChart.y3" />
@@ -145,6 +150,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { View, TrendCharts, ChatDotRound, UserFilled, CaretTop, CaretBottom } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
+import { useConfigStore } from '@/store/config'
 import LineChart from './charts/LineChart.vue'
 import PieChart from './charts/PieChart.vue'
 import { getDashboardApi, getChartLineApi, getChartPieApi } from '@/api/dashboard'
@@ -153,8 +159,13 @@ import { getDashboardApi, getChartLineApi, getChartPieApi } from '@/api/dashboar
 // 数据
 // ============================================================
 const userStore = useUserStore()
+const configStore = useConfigStore()
 const dashboard = reactive({})
-const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [] })
+const lineOffset = ref(0)
+const initialOffset = ref(null)
+const prevStack = ref([])
+const fallbackMaxOffset = configStore.getLineConfigWeekOffset() || 12
+const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset })
 const pieChart = reactive({ legendData: [], seriesData: [] })
 const hitokoto = ref('加载中...')
 
@@ -217,13 +228,23 @@ const fetchDashboard = async () => {
   } catch { /* keep defaults */ }
 }
 
-const fetchLineChart = async () => {
+const fetchLineChart = async (direction = 'prev') => {
   try {
-    const res = await getChartLineApi()
+    const res = await getChartLineApi(lineOffset.value, initialOffset.value, direction)
     lineChart.xData = res.data?.xdata || res.data?.xData || []
     lineChart.y1 = res.data?.y1 || []
     lineChart.y2 = res.data?.y2 || []
     lineChart.y3 = res.data?.y3 || []
+    lineChart.periodLabel = res.data?.periodLabel || ''
+    lineChart.hasData = res.data?.hasData || false
+    const actual = res.data?.offset ?? lineOffset.value
+    lineOffset.value = actual
+    if (initialOffset.value === null) {
+      initialOffset.value = actual
+    }
+    const max = res.data?.maxOffset ?? 0
+    lineChart.maxOffset = max
+    lineChart.isLatest = actual <= 0 || actual === initialOffset.value
   } catch { /* keep defaults */ }
 }
 
@@ -233,6 +254,18 @@ const fetchPieChart = async () => {
     pieChart.legendData = res.data?.legendData || []
     pieChart.seriesData = res.data?.seriesData || []
   } catch { /* keep defaults */ }
+}
+
+// ============================================================
+// 周切换
+// ============================================================
+const handleWeekPrev = () => { prevStack.value = [...prevStack.value, lineOffset.value]; lineOffset.value++; fetchLineChart('prev') }
+const handleWeekNext = () => {
+  const s = prevStack.value
+  if (s.length === 0) return
+  lineOffset.value = s[s.length - 1]
+  prevStack.value = s.slice(0, -1)
+  fetchLineChart('next')
 }
 
 // ============================================================
@@ -379,9 +412,18 @@ onMounted(() => {
   // ===== 图表 =====
   .charts-row {
     .chart-header {
-      font-size: 15px;
-      font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600;
       color: var(--el-text-color-primary);
+
+      .chart-period {
+        font-size: 12px; font-weight: 400;
+        color: var(--el-text-color-secondary);
+        background: var(--el-fill-color-light);
+        padding: 2px 10px; border-radius: 4px;
+      }
+
+      .chart-arrows { display: flex; gap: 2px; margin-left: auto; }
     }
   }
 }
