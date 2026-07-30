@@ -148,13 +148,13 @@ export const useConfigStore = defineStore({
         animation_style: 'neon',
         hide_image: false,
       },
-      line_config: {
-        y_valid_field: 'any',
-        priority: 'data',
-        week_offset: 12,
-      },
       dashboard: {
         top_card_enabled: false,
+        line_chart: {
+          y_valid_field: 'all',
+          priority: 'data',
+          week_offset: 12,
+        },
       },
     },
 
@@ -528,16 +528,16 @@ export const useConfigStore = defineStore({
     getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
     toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },
 
-    // ==================== line_config ====================
+    // ==================== dashboard.line_chart ====================
 
-    getLineConfigYValidField()     { return this.getValue('line_config.y_valid_field') },
-    setLineConfigYValidField(v)    { this.updateConfig('line_config.y_valid_field', v) },
+    getDashboardLineChartYValidField()  { return this.getValue('dashboard.line_chart.y_valid_field') },
+    setDashboardLineChartYValidField(v) { this.updateConfig('dashboard.line_chart.y_valid_field', v) },
 
-    getLineConfigPriority()        { return this.getValue('line_config.priority') },
-    setLineConfigPriority(v)       { this.updateConfig('line_config.priority', v) },
+    getDashboardLineChartPriority()     { return this.getValue('dashboard.line_chart.priority') },
+    setDashboardLineChartPriority(v)    { this.updateConfig('dashboard.line_chart.priority', v) },
 
-    getLineConfigWeekOffset()      { return this.getValue('line_config.week_offset') },
-    setLineConfigWeekOffset(v)     { this.updateConfig('line_config.week_offset', v) },
+    getDashboardLineChartWeekOffset()   { return this.getValue('dashboard.line_chart.week_offset') },
+    setDashboardLineChartWeekOffset(v)  { this.updateConfig('dashboard.line_chart.week_offset', v) },
 
     // ==================== dashboard ====================
 
@@ -604,9 +604,9 @@ export const useConfigStore = defineStore({
     isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
 
     // ===== line_config (admin 组) =====
-    lineConfigYValidField()   { return this.getValue('line_config.y_valid_field') },
-    lineConfigPriority()      { return this.getValue('line_config.priority') },
-    lineConfigWeekOffset()    { return this.getValue('line_config.week_offset') },
+    dashboardLineChartYValidField() { return this.getValue('dashboard.line_chart.y_valid_field') },
+    dashboardLineChartPriority()    { return this.getValue('dashboard.line_chart.priority') },
+    dashboardLineChartWeekOffset()  { return this.getValue('dashboard.line_chart.week_offset') },
 
     // ===== dashboard (admin 组) =====
     isDashboardTopCardEnabled() { return this.getValue('dashboard.top_card_enabled') === true },
