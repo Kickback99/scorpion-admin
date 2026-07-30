@@ -1,17 +1,27 @@
 <template>
-  <!-- ===== 周切换箭头 ===== -->
+  <!-- ===== 周切换控件 ===== -->
   <span v-if="periodLabel" class="chart-period">{{ periodLabel }}</span>
-  <div class="chart-arrows">
-    <el-button size="small" text circle :disabled="leftDisabled" @click="handlePrev">
+  <div class="chart-nav">
+    <el-button size="small" text circle :disabled="leftDisabled || loading" @click="handlePrev">
       <el-icon><ArrowLeft /></el-icon>
     </el-button>
-    <el-button size="small" text circle :disabled="rightDisabled" @click="handleNext">
+    <el-button size="small" text circle :disabled="rightDisabled || loading" @click="handleNext">
       <el-icon><ArrowRight /></el-icon>
     </el-button>
+    <span v-if="progressText" class="chart-progress">{{ progressText }}</span>
+    <el-tooltip content="回到本周" :show-after="500">
+      <el-button size="small" text circle @click="handleReset">
+        <el-icon><HomeFilled /></el-icon>
+      </el-button>
+    </el-tooltip>
   </div>
 </template>
 
 <script setup>
+// ============================================================
+import { computed } from 'vue'
+import { HomeFilled } from '@element-plus/icons-vue'
+
 // ============================================================
 // 数据
 // ============================================================
@@ -19,15 +29,24 @@ const props = defineProps({
   periodLabel: { type: String, default: '' },
   leftDisabled:  { type: Boolean, default: false },
   rightDisabled: { type: Boolean, default: true },
+  loading:       { type: Boolean, default: false },
+  offset:        { type: Number, default: 0 },
+  maxOffset:     { type: Number, default: 0 },
 })
 
-const emit = defineEmits(['prev', 'next'])
+const emit = defineEmits(['prev', 'next', 'reset'])
 
 // ============================================================
 // 渲染
 // ============================================================
+const progressText = computed(() => {
+  if (props.maxOffset <= 0|| props.maxOffset > 999) return ''
+  return `${props.offset} / ${props.maxOffset}`
+})
+
 const handlePrev = () => emit('prev')
 const handleNext = () => emit('next')
+const handleReset = () => emit('reset')
 </script>
 
 <style scoped lang="scss">
@@ -38,7 +57,14 @@ const handleNext = () => emit('next')
   padding: 2px 10px; border-radius: 4px;
 }
 
-.chart-arrows {
-  display: flex; gap: 2px; margin-left: auto;
+.chart-nav {
+  display: flex; align-items: center; gap: 2px; margin-left: auto;
+}
+
+.chart-progress {
+  font-size: 11px;
+  color: var(--el-text-color-secondary);
+  margin: 6px;
+  white-space: nowrap;
 }
 </style>
