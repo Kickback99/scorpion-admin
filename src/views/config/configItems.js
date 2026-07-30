@@ -13,7 +13,7 @@ import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
   Aim, Star, ChatDotRound, List, Document, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
-  PictureFilled, DeleteFilled, FolderDelete, Grid
+  PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort
 } from '@element-plus/icons-vue'
 
 export function useConfigItems() {
@@ -91,10 +91,10 @@ export function useConfigItems() {
         { key: 'logo.animation_style',               type: 'radio',  label: 'Logo 动画样式',    desc: '切换侧边栏 Logo 的文字动效',              icon: "Refresh",      get: () => config.getValue('logo.animation_style'),         set: (v) => config.updateConfig('logo.animation_style', v),                             options: [{ value: 'none', label: '无动画' }, { value: 'neon', label: '霓虹灯管' }, { value: 'multi-neon', label: 'SVG 多重描边霓虹' }, { value: 'energy-pulse', label: '能量脉冲' }, { value: 'stroke-scan', label: '镂空扫描描边' }, { value: 'glitch', label: '故障扫描线' }] },
         { key: 'logo.hide_image',                    type: 'switch', label: '隐藏 Logo 图片',   desc: '隐藏侧边栏 Logo 的头像图片',              icon: "Close",        get: () => config.getValue('logo.hide_image'),              set: (v) => config.updateConfig('logo.hide_image', v) },
         // ===== dashboard =====
-        { key: 'dashboard.top_card_enabled',    type: 'switch', label: '顶部统计卡片',   desc: '仪表盘顶部问候语和统计数字卡片',            icon: "DataBoard",    get: () => config.getValue('dashboard.top_card_enabled'),  set: (v) => config.updateConfig('dashboard.top_card_enabled', v) },
+        { key: 'dashboard.top_card_enabled',    type: 'switch', label: '顶部统计卡片',   desc: '仪表盘顶部问候语和统计数字卡片',            icon: DataBoard,    get: () => config.getValue('dashboard.top_card_enabled'),  set: (v) => config.updateConfig('dashboard.top_card_enabled', v) },
         // ===== dashboard.line_chart =====
-        { key: 'dashboard.line_chart.y_valid_field', type:'radio', label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: "Select",       get: () => config.getValue('dashboard.line_chart.y_valid_field'), set: (v) => config.updateConfig('dashboard.line_chart.y_valid_field', v), options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
-        { key: 'dashboard.line_chart.priority',      type:'radio', label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: "Sort",         get: () => config.getValue('dashboard.line_chart.priority'),      set: (v) => config.updateConfig('dashboard.line_chart.priority', v),        options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
+        { key: 'dashboard.line_chart.y_valid_field', type:'radio', label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: SemiSelect,       get: () => config.getValue('dashboard.line_chart.y_valid_field'), set: (v) => config.updateConfig('dashboard.line_chart.y_valid_field', v), options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
+        { key: 'dashboard.line_chart.priority',      type:'radio', label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: Sort,         get: () => config.getValue('dashboard.line_chart.priority'),      set: (v) => config.updateConfig('dashboard.line_chart.priority', v),        options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
         { key: 'dashboard.line_chart.week_offset',   type:'number',label: '周偏移',       desc: '近 7 天趋势图可回滚的周偏移',             icon: "Refresh",      get: () => config.getValue('dashboard.line_chart.week_offset'),   set: (v) => config.updateConfig('dashboard.line_chart.week_offset', v),     min: () => 0, max: () => 52 },
       ]
     },
