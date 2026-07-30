@@ -112,10 +112,25 @@
       </el-col>
     </el-row>
 
-    <!-- ===== 图表区域 ===== -->
-    <el-row :gutter="14" class="charts-row">
+    <!-- ===== 第一排：Gauge + AreaChart ===== -->
+    <el-row :gutter="14" class="section-row">
+      <el-col :xs="24" :md="12">
+        <GaugeGroup :items="gaugeData" />
+      </el-col>
+      <el-col :xs="24" :md="12">
+        <el-card shadow="never">
+          <template #header>
+            <div class="chart-header"><span>近7天文章访问趋势</span></div>
+          </template>
+          <AreaChart :x-data="areaChart.xData" :y1="areaChart.y1" />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- ===== 第二排：LineChart + PieChart ===== -->
+    <el-row :gutter="14" class="section-row">
       <el-col :xs="24" :md="15">
-        <el-card shadow="hover">
+        <el-card shadow="never">
           <template #header>
             <div class="chart-header">
               <span>近7天文章数据趋势</span>
@@ -136,11 +151,9 @@
         </el-card>
       </el-col>
       <el-col :xs="24" :md="9">
-        <el-card shadow="hover">
+        <el-card shadow="never">
           <template #header>
-            <div class="chart-header">
-              <span>分类统计</span>
-            </div>
+            <div class="chart-header"><span>分类统计</span></div>
           </template>
           <PieChart :legend-data="pieChart.legendData" :series-data="pieChart.seriesData" />
         </el-card>
@@ -159,8 +172,10 @@ import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
 import LineChart from './charts/LineChart.vue'
 import PieChart from './charts/PieChart.vue'
+import GaugeGroup from './charts/GaugeGroup.vue'
+import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
-import { getDashboardApi, getChartLineApi, getChartPieApi } from '@/api/dashboard'
+import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartsAreaApi } from '@/api/dashboard'
 
 // ============================================================
 // 数据
@@ -175,6 +190,8 @@ const lineLoading = ref(false)
 const fallbackMaxOffset = configStore.getLineConfigWeekOffset() || 12
 const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset })
 const pieChart = reactive({ legendData: [], seriesData: [] })
+const gaugeData = ref([])
+const areaChart = reactive({ xData: [], y1: [] })
 const hitokoto = ref('加载中...')
 
 // ============================================================
@@ -294,10 +311,30 @@ onMounted(() => {
   fetchHitokoto()
   fetchLineChart()
   fetchPieChart()
+  fetchGauge()
+  fetchAreaChart()
   window.addEventListener('keydown', onKey)
 })
 
 onUnmounted(() => window.removeEventListener('keydown', onKey))
+
+// ============================================================
+// Gauge + Area
+// ============================================================
+const fetchGauge = async () => {
+  try {
+    const res = await getChartsGaugeApi()
+    gaugeData.value = res.data?.items || []
+  } catch { /* keep defaults */ }
+}
+
+const fetchAreaChart = async () => {
+  try {
+    const res = await getChartsAreaApi()
+    areaChart.xData = res.data?.xdata || res.data?.xData || []
+    areaChart.y1 = res.data?.y1 || []
+  } catch { /* keep defaults */ }
+}
 </script>
 
 <style scoped lang="scss">
@@ -431,9 +468,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   }
 
   // ===== 图表 =====
-  .charts-row {
+  .section-row, .charts-row {
+    margin-bottom: 14px;
+
+    :deep(.el-card) { height: 100%; }
+
     .chart-header {
       display: flex; align-items: center; gap: 10px;
+      flex-wrap: nowrap;
       font-size: 15px; font-weight: 600;
       color: var(--el-text-color-primary);
     }
