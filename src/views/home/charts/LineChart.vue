@@ -1,5 +1,8 @@
 <template>
-  <div ref="chartRef" class="chart-box"></div>
+  <div class="chart-wrapper">
+    <div ref="chartRef" class="chart-box"></div>
+    <div v-if="!hasData" class="chart-empty-hint">暂无数据</div>
+  </div>
 </template>
 
 <script setup>
@@ -15,6 +18,7 @@ const props = defineProps({
   y1: { type: Array, default: () => [] },
   y2: { type: Array, default: () => [] },
   y3: { type: Array, default: () => [] },
+  hasData: { type: Boolean, default: true },
 })
 
 const chartRef = ref(null)
@@ -61,5 +65,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.chart-box { width: 100%; height: 320px; }
+.chart-wrapper {
+  position: relative;
+}
+
+.chart-box {
+  width: 100%;
+  height: 320px;
+}
+
+.chart-empty-hint {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px; color: var(--el-text-color-placeholder);
+  pointer-events: none;
+}
 </style>

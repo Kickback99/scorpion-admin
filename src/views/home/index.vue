@@ -119,10 +119,20 @@
           <template #header>
             <div class="chart-header">
               <span>近7天文章数据趋势</span>
-              <WeekArrows :period-label="lineChart.periodLabel" :left-disabled="lineOffset >= lineChart.maxOffset" :right-disabled="prevStack.length === 0" @prev="handleWeekPrev" @next="handleWeekNext" />
+              <WeekArrows
+                :period-label="lineChart.periodLabel"
+                :left-disabled="lineOffset >= lineChart.maxOffset"
+                :right-disabled="prevStack.length === 0"
+                :loading="lineLoading"
+                :offset="lineOffset"
+                :max-offset="lineChart.maxOffset"
+                @prev="handleWeekPrev"
+                @next="handleWeekNext"
+                @reset="handleWeekReset"
+              />
             </div>
           </template>
-          <LineChart :x-data="lineChart.xData" :y1="lineChart.y1" :y2="lineChart.y2" :y3="lineChart.y3" />
+          <LineChart :x-data="lineChart.xData" :y1="lineChart.y1" :y2="lineChart.y2" :y3="lineChart.y3" :has-data="lineChart.hasData" />
         </el-card>
       </el-col>
       <el-col :xs="24" :md="9">
@@ -143,7 +153,7 @@
 // ============================================================
 // 依赖导入
 // ============================================================
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { View, TrendCharts, ChatDotRound, UserFilled, CaretTop, CaretBottom } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
@@ -161,6 +171,7 @@ const dashboard = reactive({})
 const lineOffset = ref(0)
 const initialOffset = ref(null)
 const prevStack = ref([])
+const lineLoading = ref(false)
 const fallbackMaxOffset = configStore.getLineConfigWeekOffset() || 12
 const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset })
 const pieChart = reactive({ legendData: [], seriesData: [] })
@@ -226,6 +237,7 @@ const fetchDashboard = async () => {
 }
 
 const fetchLineChart = async (direction = 'prev') => {
+  lineLoading.value = true
   try {
     const res = await getChartLineApi(lineOffset.value, initialOffset.value, direction)
     lineChart.xData = res.data?.xdata || res.data?.xData || []
@@ -243,6 +255,7 @@ const fetchLineChart = async (direction = 'prev') => {
     lineChart.maxOffset = max
     lineChart.isLatest = actual <= 0 || actual === initialOffset.value
   } catch { /* keep defaults */ }
+  lineLoading.value = false
 }
 
 const fetchPieChart = async () => {
@@ -257,6 +270,7 @@ const fetchPieChart = async () => {
 // 周切换
 // ============================================================
 const handleWeekPrev = () => { prevStack.value = [...prevStack.value, lineOffset.value]; lineOffset.value++; fetchLineChart('prev') }
+const handleWeekReset = () => { prevStack.value = []; lineOffset.value = 0; fetchLineChart('prev') }
 const handleWeekNext = () => {
   const s = prevStack.value
   if (s.length === 0) return
@@ -268,12 +282,22 @@ const handleWeekNext = () => {
 // ============================================================
 // 生命周期
 // ============================================================
+const onKey = (e) => {
+  if (e.target.matches('input, textarea, [contenteditable]')) return
+  if (e.key === 'ArrowLeft' && lineOffset.value < lineChart.maxOffset)   { e.preventDefault(); handleWeekPrev() }
+  if (e.key === 'ArrowRight' && prevStack.value.length > 0)              { e.preventDefault(); handleWeekNext() }
+  if (e.key === 'Escape')                                                  { e.preventDefault(); handleWeekReset() }
+}
+
 onMounted(() => {
   fetchDashboard()
   fetchHitokoto()
   fetchLineChart()
   fetchPieChart()
+  window.addEventListener('keydown', onKey)
 })
+
+onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <style scoped lang="scss">
