@@ -6,10 +6,16 @@
 const cssVar = (name) => getComputedStyle(document.documentElement)
   .getPropertyValue(name).trim()
 
-/** 向上取整到最近的"美观"数值：5000 → 10000 → 15000 → … */
-const ceilToNice = (val, base = 5000) => {
-  if (val <= 0) return base
-  return Math.ceil(val / base) * base
+/** 动态取整：数据全 0 → 5000；否则按数量级上浮到美观数值 */
+const ceilToNice = (val) => {
+  if (val <= 0) return 5000
+  const mag = Math.pow(10, Math.floor(Math.log10(val)))
+  const nice = [1, 2, 5, 10]
+  for (const n of nice) {
+    const step = n * mag
+    if (val <= step * 5) return step * 5
+  }
+  return Math.ceil(val / mag) * mag
 }
 
 export const createLineChart = (props = {}) => {
