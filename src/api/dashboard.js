@@ -22,9 +22,10 @@ export const getChartsBarApi = () => http.get(API.CHARTS_BAR)
 
 /**
  * 获取近7天折线图数据
- * @returns {Promise} { xData:[], y1:[] }
+ * @param {number} [offset=0] 周偏移（0=本周，1=上周...）
+ * @returns {Promise} { xData:[], y1:[], y2:[], y3:[], periodLabel, hasData, offset }
  */
-export const getChartLineApi = () => http.get(API.CHART_LINE)
+export const getChartLineApi = (offset = 0, initialOffset = null, direction = 'prev') => http.get(API.CHART_LINE, { params: { offset, initialOffset, direction } })
 
 /**
  * 获取文章状态饼图数据
