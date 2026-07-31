@@ -232,8 +232,14 @@ watch(() => route.path, () => {
 }
 
 .el-header {
-  @include flex(space-between,center,null)
+  --el-header-height: 48px;
+  height: 48px;
+  @include flex(space-between, center, null);
+  background: var(--el-fill-color-light)
+}
 
+html.dark .el-header {
+  background-color: var(--el-color-black);
 }
 
 .el-aside {
@@ -271,6 +277,11 @@ watch(() => route.path, () => {
   flex-direction: column;
   overflow: hidden;
   padding: 0 20px;
+  background: var(--el-fill-color-light);
+}
+
+html.dark .main-container {
+  background-color: var(--el-color-black);
 }
 
 .main-scrollbar {
@@ -287,9 +298,9 @@ watch(() => route.path, () => {
    menuFollow=false — 侧边栏中性色背景 + 普通文字（激活项主色）
    ============================================================ */
 .el-aside.menu-follow-off {
-  --sidebar-bg: var(--el-fill-color-light);
+  --sidebar-bg: var(--el-bg-color);
   --sidebar-text: var(--el-text-color-primary);
-  --el-menu-bg-color: var(--el-fill-color-light);
+  --el-menu-bg-color: var(--el-bg-color);
   --el-menu-text-color: var(--el-text-color-primary);
   --el-menu-hover-bg-color: var(--el-fill-color);
 }
