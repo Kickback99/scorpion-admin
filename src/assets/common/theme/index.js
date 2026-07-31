@@ -98,6 +98,9 @@ export function applyTheme(themeName, _isDark) {
   const primary = preset.colors.primary.bg
   root.style.setProperty('--sidebar-bg', mix(primary, '#0a0a0f', 0.88))
   root.style.setProperty('--sidebar-text', '#eee')
+  // tagMode=theme 标签栏：对齐 sidebar 深色底（0.88），激活略浅（0.75）
+  root.style.setProperty('--tab-theme-bg', mix(primary, '#0a0a0f', 0.88))
+  root.style.setProperty('--tab-theme-hover-bg', mix(primary, '#0a0a0f', 0.75))
   root.style.setProperty('--sidebar-active-text', primary)
 
   // el-menu
@@ -351,7 +354,7 @@ function injectDropdownCss() {
     '.ui-plain ' + item + ':focus,' +
     '.ui-plain ' + item + ':hover,' +
     '.ui-plain ' + item + '.is-active{' +
-    'color:var(--el-color-primary)!important;' +
+    'color:var(--el-color-primary-plain)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     '}'
 }
