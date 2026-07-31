@@ -208,17 +208,16 @@
     }
   }
 }
-	/* 未激活标签 hover — 对齐激活标签默认样式（非 hover 态） */
-	.ui-full .scroll-item:not(.is-active):hover {
+// 未激活标签 hover — 对齐激活标签默认样式（排除 tag-mode-neutral/theme）
+	.ui-full .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
 	  color: var(--el-color-primary-text);
 	  background-color: var(--tab-active-bg);
 	  .tag-title { color: var(--el-color-primary-text) !important; }
 	  .el-icon-close { color: var(--el-color-primary-text) !important; }
 	}
-	.ui-plain .scroll-item:not(.is-active):hover {
+	.ui-plain .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
 	  color: var(--el-color-primary-plain);
 	  background-color: var(--el-color-primary-plain-bg);
-	  // border: 1px solid var(--el-color-primary-plain);
 	  border-radius: 4px;
 	  .tag-title { color: var(--el-color-primary-plain) !important; }
 	  .el-icon-close { color: var(--el-color-primary-plain) !important; }
@@ -356,7 +355,7 @@
   background-color: var(--tab-theme-bg);
 }
 
-/* 激活标签 */
+/* 激活标签（保持主色，不受 uiMode 影响） */
 .tags-view.tag-mode-theme .scroll-item.is-active {
   color: var(--el-color-primary);
   background-color: transparent;
@@ -368,8 +367,11 @@
   .el-icon-close { color: var(--el-color-primary) !important; }
 
   &:hover {
-    background-color: transparent;
-    .el-icon-close { color: var(--el-color-primary) !important; }
+    background-color: var(--tab-theme-hover-bg);
+    .el-icon-close {
+      color: var(--el-color-primary) !important;
+      background-color: transparent !important;
+    }
   }
 }
 
@@ -378,10 +380,24 @@
   .tag-title { color: var(--sidebar-text); }
   .el-icon-close { color: var(--sidebar-text) !important; }
 
-  &:hover {
+  /* full — hover 白字 */
+  .ui-full &:hover {
     background-color: var(--tab-theme-hover-bg);
-    .tag-title { color: var(--sidebar-text); }
-    .el-icon-close { color: var(--sidebar-text) !important; }
+    .tag-title { color: var(--el-color-white); }
+    .el-icon-close {
+      color: var(--el-color-white) !important;
+      background-color: transparent !important;
+    }
+  }
+
+  /* plain — hover 主色字 */
+  .ui-plain &:hover {
+    background-color: var(--tab-theme-hover-bg);
+    .tag-title { color: var(--el-color-primary-plain); }
+    .el-icon-close {
+      color: var(--el-color-primary-plain) !important;
+      background-color: transparent !important;
+    }
   }
 }
 
@@ -392,8 +408,12 @@
   color: var(--sidebar-text);
   background: var(--tab-theme-bg);
 
-  &:hover {
-    color: var(--sidebar-text);
+  .ui-full &:hover {
+    color: var(--el-color-white);
+    background-color: var(--tab-theme-hover-bg);
+  }
+  .ui-plain &:hover {
+    color: var(--el-color-primary-plain);
     background-color: var(--tab-theme-hover-bg);
   }
 }
@@ -405,11 +425,37 @@
   li {
     color: var(--sidebar-text);
 
-    &:hover {
-      // color: var(--el-color-primary);
+    .ui-full &:hover {
+      color: var(--el-color-primary-text);
+      background-color: var(--el-color-primary-solid-bg);
+    }
+    .ui-plain &:hover {
+      color: var(--el-color-primary-plain);
       background-color: var(--tab-theme-hover-bg);
     }
   }
+}
+
+/* 下箭头下拉选项（teleported） */
+.el-popper.tag-mode-theme-dropdown,
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu {
+  background-color: var(--tab-theme-bg) !important;
+}
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
+  color: var(--sidebar-text) !important;
+  background-color: var(--tab-theme-bg) !important;
+}
+.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+  color: var(--el-color-primary-text) !important;
+  background-color: var(--el-color-primary-solid-bg) !important;
+}
+.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+  color: var(--el-color-primary-plain) !important;
+  background-color: var(--tab-theme-hover-bg) !important;
 }
 
 /* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */

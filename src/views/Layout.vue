@@ -305,6 +305,18 @@ html.dark .main-container {
   --el-menu-hover-bg-color: var(--el-fill-color);
 }
 
+/* menuThemeColor=true + plain — 菜单文字/悬浮跟随 plain 风格，hover 对齐标签 theme 模式 */
+.ui-plain .el-aside:not(.menu-theme-off) {
+  --el-menu-text-color: var(--el-color-primary-plain);
+  --el-menu-active-color: var(--el-color-primary-plain);
+  --el-menu-hover-bg-color: var(--tab-theme-hover-bg);
+
+  .el-menu-item:not(.is-active):hover,
+  .el-sub-menu__title:not(.is-active):hover {
+    color: var(--el-color-primary-plain) !important;
+  }
+}
+
 /* Logo 文字色：默认白色（侧边栏深色），浅色模式 + menuThemeColor=false 切换深色 */
 .el-aside {
   --logo-text-color: #fff;
