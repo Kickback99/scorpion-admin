@@ -413,6 +413,7 @@ const fetchAreaChart = async () => {
 
     .overview-card {
       border-radius: 10px;
+      border: none;
       transition: box-shadow 0.3s;
 
       :deep(.el-card__body) {
@@ -476,7 +477,7 @@ const fetchAreaChart = async () => {
   .section-row, .charts-row {
     margin-bottom: 14px;
 
-    :deep(.el-card) { height: 100%; border-radius: 10px; }
+    :deep(.el-card) { height: 100%; border-radius: 10px; border: none; }
 
     :deep(.el-card__header) { border-bottom: none; }
 
