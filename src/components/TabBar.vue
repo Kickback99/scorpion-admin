@@ -46,6 +46,15 @@
                   </template>
                   <el-switch :model-value="stringStore.menuThemeColor" @change="onMenuThemeColorChange" size="small" />
                 </el-form-item>
+                <el-form-item>
+                  <template #label>
+                    灵动模式
+                    <el-tooltip content="标签主题+菜单主题+深色 plain，统一跟随" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.dynamicMode" @change="onDynamicModeChange" size="small" />
+                </el-form-item>
                 <el-form-item label="标签模式">
                   <el-radio-group :model-value="stringStore.tagMode" @change="onTagModeChange" size="small">
                     <el-radio-button type="primary" value="neutral">中性</el-radio-button>
@@ -269,6 +278,21 @@ const onTagModeChange = (val) => {
 // 菜单主题色切换
 const onMenuThemeColorChange = (val) => {
     stringStore.menuThemeColor = val
+}
+
+// 灵动模式切换（标签主题+菜单主题+深色plain，统一跟随）
+const onDynamicModeChange = (val) => {
+    stringStore.dynamicMode = val
+    if (val) {
+        stringStore.tagMode = 'theme'
+        stringStore.menuThemeColor = true
+        uiStore.setUiMode('plain')
+        // 开启深色模式
+        const html = document.documentElement
+        html.classList.add('dark')
+        userConfigStore.dark_enabled = true
+        applyTheme(userConfigStore.currentTheme, true)
+    }
 }
 
 // 实心文字色模式切换

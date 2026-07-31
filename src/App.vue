@@ -13,10 +13,17 @@ import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useUiStore } from '@/store/ui'
+import { useSettingStore } from '@/setting'
 import { applyTheme } from '@/assets/common/theme'
 
 const route = useRoute()
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
+const settingStore = useSettingStore()
+
+// 灵动模式 class 开关
+watch(() => settingStore.dynamicMode, (val) => {
+  document.documentElement.classList.toggle('dynamic-mode', val)
+}, { immediate: true })
 
 /** 根据当前路由和缓存注入主题，登录页从 uiStore 读取上次主题 */
 function applyInitialTheme() {

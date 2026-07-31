@@ -19,6 +19,8 @@ export const useSettingStore = defineStore({
         tagMode: 'neutral',
         /** 菜单主题色：true=跟随主题侧边栏风格，false=中性色背景+普通文字（激活项主色） */
         menuThemeColor: false,
+        /** 灵动模式：标签主题+菜单主题+深色plain，统一跟随 */
+        dynamicMode: false,
     }),
     actions:{
         setMenuTextColor(data){
@@ -39,7 +41,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuThemeColor'],
+        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuThemeColor', 'dynamicMode'],
     },
 })
 

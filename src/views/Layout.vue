@@ -306,7 +306,7 @@ html.dark .main-container {
 }
 
 /* menuThemeColor=true + plain — 菜单文字/悬浮跟随 plain 风格，hover 对齐标签 theme 模式 */
-.ui-plain .el-aside:not(.menu-theme-off) {
+.dynamic-mode.ui-plain .el-aside:not(.menu-theme-off) {
   --el-menu-text-color: var(--el-color-primary-plain);
   --el-menu-active-color: var(--el-color-primary-plain);
   --el-menu-hover-bg-color: var(--tab-theme-hover-bg);
