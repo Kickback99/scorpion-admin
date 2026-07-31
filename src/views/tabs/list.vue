@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showTags" class="tags-view" :class="{ 'tag-follow-off': !settingStore.tagFollow }">
+  <div v-if="showTags" class="tags-view" :class="tagModeClass">
     <!-- 左滚动按钮 -->
     <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
@@ -47,7 +47,7 @@
     </span>
     
     <!-- 下拉菜单 -->
-    <el-dropdown trigger="click" @command="handleCommand" :popper-class="!settingStore.tagFollow ? 'tag-follow-off-dropdown' : ''">
+    <el-dropdown trigger="click" @command="handleCommand" :popper-class="tagModePopperClass">
       <span class="arrow-down">
         <el-icon><ArrowDown /></el-icon>
       </span>
@@ -122,6 +122,19 @@ import { useUserConfigStore } from '@/store/userConfig'
 import { useSettingStore } from '@/setting'
 const userConfigStore = useUserConfigStore()
 const settingStore = useSettingStore()
+
+// 标签模式 class 绑定
+const tagModeClass = computed(() => {
+  if (settingStore.tagMode === 'neutral') return 'tag-mode-neutral'
+  if (settingStore.tagMode === 'theme') return 'tag-mode-theme'
+  return ''
+})
+const tagModePopperClass = computed(() => {
+  if (settingStore.tagMode === 'neutral') return 'tag-mode-neutral-dropdown'
+  if (settingStore.tagMode === 'theme') return 'tag-mode-theme-dropdown'
+  return ''
+})
+
 // 导入图标
 /* import {
   ArrowLeft,

@@ -156,7 +156,7 @@
 
     /* plain — hover 浅底色+主色字 */
     .ui-plain & li:hover {
-      color: var(--el-color-primary);
+      color: var(--el-color-primary-plain);
       background-color: var(--el-color-primary-plain-bg);
     }
   }
@@ -208,6 +208,21 @@
     }
   }
 }
+	/* 未激活标签 hover — 对齐激活标签默认样式（非 hover 态） */
+	.ui-full .scroll-item:not(.is-active):hover {
+	  color: var(--el-color-primary-text);
+	  background-color: var(--tab-active-bg);
+	  .tag-title { color: var(--el-color-primary-text) !important; }
+	  .el-icon-close { color: var(--el-color-primary-text) !important; }
+	}
+	.ui-plain .scroll-item:not(.is-active):hover {
+	  color: var(--el-color-primary-plain);
+	  background-color: var(--el-color-primary-plain-bg);
+	  // border: 1px solid var(--el-color-primary-plain);
+	  border-radius: 4px;
+	  .tag-title { color: var(--el-color-primary-plain) !important; }
+	  .el-icon-close { color: var(--el-color-primary-plain) !important; }
+	}
 
 
 
@@ -292,11 +307,11 @@
 }
 
 /* ============================================================
-   tagFollow=false — 浅底色+主色字，忽略 ui-full/ui-plain
+   tag-mode-neutral — 中性色（浅底色+主色字，忽略 ui-full/ui-plain）
    ============================================================ */
 
 /* 激活标签 */
-.tags-view.tag-follow-off .scroll-item.is-active {
+.tags-view.tag-mode-neutral .scroll-item.is-active {
   color: var(--el-color-primary);
   background-color: var(--el-fill-color-light);
   border: none;
@@ -313,23 +328,141 @@
 }
 
 /* 左/右/下箭头 hover */
-.tags-view.tag-follow-off .arrow-left:hover,
-.tags-view.tag-follow-off .arrow-right:hover,
-.tags-view.tag-follow-off .arrow-down:hover {
+.tags-view.tag-mode-neutral .arrow-left:hover,
+.tags-view.tag-mode-neutral .arrow-right:hover,
+.tags-view.tag-mode-neutral .arrow-down:hover {
   color: var(--el-color-primary);
   background-color: var(--el-fill-color-light);
 }
 
 /* 右键菜单 */
-.tags-view.tag-follow-off .contextmenu li:hover {
+.tags-view.tag-mode-neutral .contextmenu li:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 下箭头下拉选项（teleported） */
+.tag-mode-neutral-dropdown .el-dropdown-menu__item:hover {
+  color: var(--el-color-primary) !important;
+  background-color: var(--el-fill-color-light) !important;
+}
+
+/* ============================================================
+   tag-mode-theme — 主题色深底风格（不受 uiMode 影响，统一处理）
+   ============================================================ */
+
+/* 底色 */
+.tags-view.tag-mode-theme {
+  background-color: var(--tab-theme-bg);
+}
+
+/* 激活标签 */
+.tags-view.tag-mode-theme .scroll-item.is-active {
+  color: var(--el-color-primary);
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+
+  .tag-title { color: var(--el-color-primary) !important; }
+  .el-icon-close { color: var(--el-color-primary) !important; }
+
+  &:hover {
+    background-color: transparent;
+    .el-icon-close { color: var(--el-color-primary) !important; }
+  }
+}
+
+/* 普通标签 */
+.tags-view.tag-mode-theme .scroll-item:not(.is-active) {
+  .tag-title { color: var(--sidebar-text); }
+  .el-icon-close { color: var(--sidebar-text) !important; }
+
+  &:hover {
+    background-color: var(--tab-theme-hover-bg);
+    .tag-title { color: var(--sidebar-text); }
+    .el-icon-close { color: var(--sidebar-text) !important; }
+  }
+}
+
+/* 左/右/下箭头 */
+.tags-view.tag-mode-theme .arrow-left,
+.tags-view.tag-mode-theme .arrow-right,
+.tags-view.tag-mode-theme .arrow-down {
+  color: var(--sidebar-text);
+  background: var(--tab-theme-bg);
+
+  &:hover {
+    color: var(--sidebar-text);
+    background-color: var(--tab-theme-hover-bg);
+  }
+}
+
+/* 右键菜单 */
+.tags-view.tag-mode-theme .contextmenu {
+  background: var(--tab-theme-bg);
+
+  li {
+    color: var(--sidebar-text);
+
+    &:hover {
+      // color: var(--el-color-primary);
+      background-color: var(--tab-theme-hover-bg);
+    }
+  }
+}
+
+/* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */
+.el-popper.tag-mode-theme-dropdown,
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu {
+  background-color: var(--tab-theme-bg) !important;
+}
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
+  color: var(--sidebar-text) !important;
+  background-color: var(--tab-theme-bg) !important;
+}
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+  color: var(--el-color-primary) !important;
+  background-color: var(--tab-theme-hover-bg) !important;
+}
+
+/* 激活标签 */
+.tags-view.tag-mode-neutral .scroll-item.is-active {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+
+  .tag-title { color: var(--el-color-primary) !important; }
+  .el-icon-close { color: var(--el-color-primary) !important; }
+
+  &:hover {
+    background-color: var(--el-fill-color);
+    .el-icon-close { color: var(--el-color-primary) !important; }
+  }
+}
+
+/* 左/右/下箭头 hover */
+.tags-view.tag-mode-neutral .arrow-left:hover,
+.tags-view.tag-mode-neutral .arrow-right:hover,
+.tags-view.tag-mode-neutral .arrow-down:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 右键菜单 */
+.tags-view.tag-mode-neutral .contextmenu li:hover {
   color: var(--el-color-primary);
   background-color: var(--el-fill-color-light);
 }
 
 /* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */
-.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
-.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
-.el-popper.tag-follow-off-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
   color: var(--el-color-primary) !important;
   background-color: var(--el-fill-color-light) !important;
 }
