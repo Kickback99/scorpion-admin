@@ -40,8 +40,8 @@
     <el-row :gutter="14" class="overview-cards">
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="overview-card" shadow="hover">
-          <div class="card-icon icon-blue">
-            <el-icon><TrendCharts /></el-icon>
+          <div class="card-icon icon-primary">
+            <el-icon><View /></el-icon>
           </div>
           <div class="card-body">
             <div class="card-label">总访问数</div>
@@ -59,8 +59,8 @@
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="overview-card" shadow="hover">
-          <div class="card-icon icon-purple">
-            <el-icon><View /></el-icon>
+          <div class="card-icon icon-danger">
+            <el-icon><TrendCharts /></el-icon>
           </div>
           <div class="card-body">
             <div class="card-label">总文章数</div>
@@ -74,7 +74,7 @@
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="overview-card" shadow="hover">
-          <div class="card-icon icon-green">
+          <div class="card-icon icon-success">
             <el-icon><ChatDotRound /></el-icon>
           </div>
           <div class="card-body">
@@ -93,7 +93,7 @@
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="overview-card" shadow="hover">
-          <div class="card-icon icon-orange">
+          <div class="card-icon icon-warning">
             <el-icon><UserFilled /></el-icon>
           </div>
           <div class="card-body">
@@ -412,6 +412,7 @@ const fetchAreaChart = async () => {
     margin-bottom: 14px;
 
     .overview-card {
+      border-radius: 10px;
       transition: box-shadow 0.3s;
 
       :deep(.el-card__body) {
@@ -431,10 +432,10 @@ const fetchAreaChart = async () => {
         font-size: 24px;
         flex-shrink: 0;
 
-        &.icon-purple { background-color: var(--el-color-primary-light-9); color: var(--el-color-primary); }
-        &.icon-blue   { background-color: #e8f4ff; color: #409eff; }
-        &.icon-green  { background-color: #e8f8f0; color: #67c23a; }
-        &.icon-orange { background-color: #fff3e0; color: #e6a23c; }
+        &.icon-primary   { background-color: var(--el-color-primary-light-9);  color: var(--el-color-primary); }
+        &.icon-danger    { background-color: var(--el-color-danger-light-9); color: var(--el-color-danger); }
+        &.icon-success   { background-color: var(--el-color-success-light-9); color: var(--el-color-success); }
+        &.icon-warning   { background-color: var(--el-color-warning-light-9); color: var(--el-color-warning); }
       }
 
       .card-body {
@@ -475,7 +476,9 @@ const fetchAreaChart = async () => {
   .section-row, .charts-row {
     margin-bottom: 14px;
 
-    :deep(.el-card) { height: 100%; }
+    :deep(.el-card) { height: 100%; border-radius: 10px; }
+
+    :deep(.el-card__header) { border-bottom: none; }
 
     .chart-header {
       display: flex; align-items: center; gap: 10px;
