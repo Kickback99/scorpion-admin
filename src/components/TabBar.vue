@@ -39,21 +39,19 @@
                 </el-form-item>
                 <el-form-item>
                   <template #label>
-                    标签跟随
-                    <el-tooltip content="关闭则激活标签使用浅底色+主色字的统一风格" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.tagFollow" @change="onTagFollowChange" size="small" />
-                </el-form-item>
-                <el-form-item>
-                  <template #label>
                     菜单主题色
                     <el-tooltip content="关闭则侧边栏菜单使用中性色背景+主色文字" placement="top">
                       <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                   </template>
                   <el-switch :model-value="stringStore.menuThemeColor" @change="onMenuThemeColorChange" size="small" />
+                </el-form-item>
+                <el-form-item label="标签模式">
+                  <el-radio-group :model-value="stringStore.tagMode" @change="onTagModeChange" size="small">
+                    <el-radio-button type="primary" value="neutral">中性</el-radio-button>
+                    <el-radio-button type="primary" value="ui">ui</el-radio-button>
+                    <el-radio-button type="primary" value="theme">主题</el-radio-button>
+                  </el-radio-group>
                 </el-form-item>
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
                 <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
@@ -263,9 +261,9 @@ const onClearTabsChange = (val) => {
     stringStore.keepTabs = val
 }
 
-// 标签跟随切换
-const onTagFollowChange = (val) => {
-    stringStore.tagFollow = val
+// 标签模式切换
+const onTagModeChange = (val) => {
+    stringStore.tagMode = val
 }
 
 // 菜单主题色切换
