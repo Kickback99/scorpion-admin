@@ -208,6 +208,8 @@
     }
   }
 }
+   /* 灵动模式 — ui 模式下未激活标签 hover 跟随 full/plain 差异化
+   ============================================================ */
 // 未激活标签 hover — 对齐激活标签默认样式（排除 tag-mode-neutral/theme）
 	.dynamic-mode.ui-full .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
 	  color: var(--el-color-primary-text);
@@ -346,6 +348,45 @@
   background-color: var(--el-fill-color-light) !important;
 }
 
+/* 激活标签 */
+.tags-view.tag-mode-neutral .scroll-item.is-active {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+
+  .tag-title { color: var(--el-color-primary) !important; }
+  .el-icon-close { color: var(--el-color-primary) !important; }
+
+  &:hover {
+    background-color: var(--el-fill-color);
+    .el-icon-close { color: var(--el-color-primary) !important; }
+  }
+}
+
+/* 左/右/下箭头 hover */
+.tags-view.tag-mode-neutral .arrow-left:hover,
+.tags-view.tag-mode-neutral .arrow-right:hover,
+.tags-view.tag-mode-neutral .arrow-down:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 右键菜单 */
+.tags-view.tag-mode-neutral .contextmenu li:hover {
+  color: var(--el-color-primary);
+  background-color: var(--el-fill-color-light);
+}
+
+/* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+  color: var(--el-color-primary) !important;
+  background-color: var(--el-fill-color-light) !important;
+}
+
 /* ============================================================
    tag-mode-theme — 主题色深底风格（不受 uiMode 影响，统一处理）
    ============================================================ */
@@ -416,6 +457,7 @@
   }
 }
 
+/* 灵动模式 — 箭头 hover 颜色 */
 .dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-left:hover,
 .dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-right:hover,
 .dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-down:hover {
@@ -433,6 +475,7 @@
   color: var(--sidebar-text);
 }
 
+/* 灵动模式 — 右键菜单 hover */
 .dynamic-mode.ui-full .tags-view.tag-mode-theme .contextmenu li:hover {
   color: var(--el-color-primary-text);
   background-color: var(--el-color-primary-solid-bg);
@@ -443,6 +486,7 @@
 }
 
 /* 下箭头下拉选项（teleported） */
+/* 灵动模式 — 下拉选项 */
 .dynamic-mode.el-popper.tag-mode-theme-dropdown,
 .dynamic-mode.el-popper.tag-mode-theme-dropdown .el-dropdown-menu {
   background-color: var(--tab-theme-bg) !important;
@@ -472,43 +516,4 @@
 .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
   color: var(--sidebar-text) !important;
   background-color: var(--tab-theme-bg) !important;
-}
-
-/* 激活标签 */
-.tags-view.tag-mode-neutral .scroll-item.is-active {
-  color: var(--el-color-primary);
-  background-color: var(--el-fill-color-light);
-  border: none;
-  border-radius: 4px;
-  box-shadow: none;
-
-  .tag-title { color: var(--el-color-primary) !important; }
-  .el-icon-close { color: var(--el-color-primary) !important; }
-
-  &:hover {
-    background-color: var(--el-fill-color);
-    .el-icon-close { color: var(--el-color-primary) !important; }
-  }
-}
-
-/* 左/右/下箭头 hover */
-.tags-view.tag-mode-neutral .arrow-left:hover,
-.tags-view.tag-mode-neutral .arrow-right:hover,
-.tags-view.tag-mode-neutral .arrow-down:hover {
-  color: var(--el-color-primary);
-  background-color: var(--el-fill-color-light);
-}
-
-/* 右键菜单 */
-.tags-view.tag-mode-neutral .contextmenu li:hover {
-  color: var(--el-color-primary);
-  background-color: var(--el-fill-color-light);
-}
-
-/* 下箭头下拉选项（teleported，主题的 injectDropdownCss 特异性 4 级，此处用 5 级覆盖） */
-.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
-.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
-.el-popper.tag-mode-neutral-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
-  color: var(--el-color-primary) !important;
-  background-color: var(--el-fill-color-light) !important;
 }

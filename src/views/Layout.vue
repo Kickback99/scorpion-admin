@@ -305,7 +305,9 @@ html.dark .main-container {
   --el-menu-hover-bg-color: var(--el-fill-color);
 }
 
-/* menuThemeColor=true + plain — 菜单文字/悬浮跟随 plain 风格，hover 对齐标签 theme 模式 */
+/* ============================================================
+   灵动模式 — menuThemeColor=true + plain，菜单跟随 plain 风格
+   ============================================================ */
 .dynamic-mode.ui-plain .el-aside:not(.menu-theme-off) {
   --el-menu-text-color: var(--el-color-primary-plain);
   --el-menu-active-color: var(--el-color-primary-plain);
