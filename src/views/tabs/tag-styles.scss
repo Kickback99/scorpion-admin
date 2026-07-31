@@ -209,13 +209,13 @@
   }
 }
 // 未激活标签 hover — 对齐激活标签默认样式（排除 tag-mode-neutral/theme）
-	.ui-full .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
+	.dynamic-mode.ui-full .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
 	  color: var(--el-color-primary-text);
 	  background-color: var(--tab-active-bg);
 	  .tag-title { color: var(--el-color-primary-text) !important; }
 	  .el-icon-close { color: var(--el-color-primary-text) !important; }
 	}
-	.ui-plain .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
+	.dynamic-mode.ui-plain .tags-view:not(.tag-mode-neutral):not(.tag-mode-theme) .scroll-item:not(.is-active):hover {
 	  color: var(--el-color-primary-plain);
 	  background-color: var(--el-color-primary-plain-bg);
 	  border-radius: 4px;
@@ -380,24 +380,27 @@
   .tag-title { color: var(--sidebar-text); }
   .el-icon-close { color: var(--sidebar-text) !important; }
 
-  /* full — hover 白字 */
-  .ui-full &:hover {
+  &:hover {
     background-color: var(--tab-theme-hover-bg);
-    .tag-title { color: var(--el-color-white); }
-    .el-icon-close {
-      color: var(--el-color-white) !important;
-      background-color: transparent !important;
-    }
+    .tag-title { color: var(--sidebar-text); }
+    .el-icon-close { color: var(--sidebar-text) !important; }
   }
+}
 
-  /* plain — hover 主色字 */
-  .ui-plain &:hover {
-    background-color: var(--tab-theme-hover-bg);
-    .tag-title { color: var(--el-color-primary-plain); }
-    .el-icon-close {
-      color: var(--el-color-primary-plain) !important;
-      background-color: transparent !important;
-    }
+/* 灵动模式 — full/plain hover 文字差异化（平铺避免 SCSS & 编译错位） */
+.dynamic-mode.ui-full .tags-view.tag-mode-theme .scroll-item:not(.is-active):hover {
+  .tag-title { color: var(--el-color-white); }
+  .el-icon-close {
+    color: var(--el-color-white) !important;
+    background-color: transparent !important;
+  }
+}
+
+.dynamic-mode.ui-plain .tags-view.tag-mode-theme .scroll-item:not(.is-active):hover {
+  .tag-title { color: var(--el-color-primary-plain); }
+  .el-icon-close {
+    color: var(--el-color-primary-plain) !important;
+    background-color: transparent !important;
   }
 }
 
@@ -408,52 +411,55 @@
   color: var(--sidebar-text);
   background: var(--tab-theme-bg);
 
-  .ui-full &:hover {
-    color: var(--el-color-white);
+  &:hover {
     background-color: var(--tab-theme-hover-bg);
   }
-  .ui-plain &:hover {
-    color: var(--el-color-primary-plain);
-    background-color: var(--tab-theme-hover-bg);
-  }
+}
+
+.dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-left:hover,
+.dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-right:hover,
+.dynamic-mode.ui-full .tags-view.tag-mode-theme .arrow-down:hover {
+  color: var(--el-color-white);
+}
+.dynamic-mode.ui-plain .tags-view.tag-mode-theme .arrow-left:hover,
+.dynamic-mode.ui-plain .tags-view.tag-mode-theme .arrow-right:hover,
+.dynamic-mode.ui-plain .tags-view.tag-mode-theme .arrow-down:hover {
+  color: var(--el-color-primary-plain);
 }
 
 /* 右键菜单 */
 .tags-view.tag-mode-theme .contextmenu {
   background: var(--tab-theme-bg);
+  color: var(--sidebar-text);
+}
 
-  li {
-    color: var(--sidebar-text);
-
-    .ui-full &:hover {
-      color: var(--el-color-primary-text);
-      background-color: var(--el-color-primary-solid-bg);
-    }
-    .ui-plain &:hover {
-      color: var(--el-color-primary-plain);
-      background-color: var(--tab-theme-hover-bg);
-    }
-  }
+.dynamic-mode.ui-full .tags-view.tag-mode-theme .contextmenu li:hover {
+  color: var(--el-color-primary-text);
+  background-color: var(--el-color-primary-solid-bg);
+}
+.dynamic-mode.ui-plain .tags-view.tag-mode-theme .contextmenu li:hover {
+  color: var(--el-color-primary-plain);
+  background-color: var(--tab-theme-hover-bg);
 }
 
 /* 下箭头下拉选项（teleported） */
-.el-popper.tag-mode-theme-dropdown,
-.el-popper.tag-mode-theme-dropdown .el-dropdown-menu {
+.dynamic-mode.el-popper.tag-mode-theme-dropdown,
+.dynamic-mode.el-popper.tag-mode-theme-dropdown .el-dropdown-menu {
   background-color: var(--tab-theme-bg) !important;
 }
-.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
+.dynamic-mode.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
   color: var(--sidebar-text) !important;
   background-color: var(--tab-theme-bg) !important;
 }
-.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
-.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
-.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+.dynamic-mode.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.dynamic-mode.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.dynamic-mode.ui-full .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
   color: var(--el-color-primary-text) !important;
   background-color: var(--el-color-primary-solid-bg) !important;
 }
-.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
-.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
-.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
+.dynamic-mode.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
+.dynamic-mode.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
+.dynamic-mode.ui-plain .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
   color: var(--el-color-primary-plain) !important;
   background-color: var(--tab-theme-hover-bg) !important;
 }
@@ -466,12 +472,6 @@
 .el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item {
   color: var(--sidebar-text) !important;
   background-color: var(--tab-theme-bg) !important;
-}
-.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:hover,
-.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item:focus,
-.el-popper.tag-mode-theme-dropdown .el-dropdown-menu .el-dropdown-menu__item.is-active {
-  color: var(--el-color-primary) !important;
-  background-color: var(--tab-theme-hover-bg) !important;
 }
 
 /* 激活标签 */
