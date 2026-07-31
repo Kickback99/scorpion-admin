@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}" :class="{ 'menu-follow-off': !settingStore.menuFollow }">
+      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}" :class="{ 'menu-theme-off': !settingStore.menuThemeColor }">
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
@@ -295,9 +295,9 @@ html.dark .main-container {
 
 <style lang="scss">
 /* ============================================================
-   menuFollow=false — 侧边栏中性色背景 + 普通文字（激活项主色）
+   menuThemeColor=false — 侧边栏中性色背景 + 普通文字（激活项主色）
    ============================================================ */
-.el-aside.menu-follow-off {
+.el-aside.menu-theme-off {
   --sidebar-bg: var(--el-bg-color);
   --sidebar-text: var(--el-text-color-primary);
   --el-menu-bg-color: var(--el-bg-color);
@@ -305,16 +305,16 @@ html.dark .main-container {
   --el-menu-hover-bg-color: var(--el-fill-color);
 }
 
-/* Logo 文字色：默认白色（侧边栏深色），浅色模式 + menuFollow=false 切换深色 */
+/* Logo 文字色：默认白色（侧边栏深色），浅色模式 + menuThemeColor=false 切换深色 */
 .el-aside {
   --logo-text-color: #fff;
 }
-html:not(.dark) .el-aside.menu-follow-off {
+html:not(.dark) .el-aside.menu-theme-off {
   --logo-text-color: var(--el-text-color-primary);
 }
 /* LogoNeon / LogoMultiNeon 在浅色中性底下降一级为中灰 */
-html:not(.dark) .el-aside.menu-follow-off .logo-neon p,
-html:not(.dark) .el-aside.menu-follow-off .logo-multi-neon p {
+html:not(.dark) .el-aside.menu-theme-off .logo-neon p,
+html:not(.dark) .el-aside.menu-theme-off .logo-multi-neon p {
   --logo-text-color: var(--el-text-color-placeholder);
 }
 </style>

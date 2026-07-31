@@ -38,8 +38,8 @@ const animStyle = computed(() => {
   // 管理员：按 configStore 配置走（原逻辑）
   if (userStore.isAdmin) return configStore.getLogoAnimationStyle()
 
-  // 非管理员：menuFollow=true → 霓虹；false → 浅色镂空扫描 / 深色霓虹
-  if (settingStore.menuFollow) return 'neon'
+  // 非管理员：menuThemeColor=true → 霓虹；false → 浅色镂空扫描 / 深色霓虹
+  if (settingStore.menuThemeColor) return 'neon'
   return userConfigStore.isDarkEnabled ? 'neon' : 'stroke-scan'
 })
 const hideImage = computed(() => configStore.getLogoHideImage())
