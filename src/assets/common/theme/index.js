@@ -101,6 +101,8 @@ export function applyTheme(themeName, _isDark) {
   // tagMode=theme 标签栏：对齐 sidebar 深色底（0.88），激活略浅（0.75）
   root.style.setProperty('--tab-theme-bg', mix(primary, '#0a0a0f', 0.88))
   root.style.setProperty('--tab-theme-hover-bg', mix(primary, '#0a0a0f', 0.75))
+  // pageTheme 页面主题：比标签栏更深（0.95），形成页底层→标签层的视觉层次
+  root.style.setProperty('--page-theme-bg', mix(primary, '#0a0a0f', 0.95))
   root.style.setProperty('--sidebar-active-text', primary)
 
   // el-menu

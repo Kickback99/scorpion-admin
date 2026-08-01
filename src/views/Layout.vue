@@ -58,10 +58,10 @@
       </el-scrollbar>
       </el-aside>
       <el-container>
-        <el-header>
+        <el-header :class="{ 'page-theme': settingStore.pageTheme }">
             <TabBar></TabBar>
         </el-header>
-        <el-main class="main-container">
+        <el-main class="main-container" :class="{ 'page-theme': settingStore.pageTheme }">
           <Tabs></Tabs>
           <el-scrollbar v-if="!isConfigRoute" class="main-scrollbar">
             <router-view v-if="isDestroy"/>
@@ -238,8 +238,12 @@ watch(() => route.path, () => {
   background: var(--el-fill-color-light)
 }
 
-html.dark .el-header {
+html.dark .el-header:not(.page-theme) {
   background-color: var(--el-color-black);
+}
+
+.el-header.page-theme {
+  background-color: var(--page-theme-bg);
 }
 
 .el-aside {
@@ -280,8 +284,13 @@ html.dark .el-header {
   background: var(--el-fill-color-light);
 }
 
-html.dark .main-container {
+html.dark .main-container:not(.page-theme) {
   background-color: var(--el-color-black);
+}
+
+/* 页面主题 — 跟标签栏同色系但更深（0.95 > 0.88），形成页底→标签的层次感 */
+.main-container.page-theme {
+  background-color: var(--page-theme-bg);
 }
 
 .main-scrollbar {
