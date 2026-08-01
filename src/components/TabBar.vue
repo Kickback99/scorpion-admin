@@ -39,6 +39,15 @@
                 </el-form-item>
                 <el-form-item>
                   <template #label>
+                    菜单手风琴
+                    <el-tooltip content="开启则排它式展开，同一时间只展开一个子菜单" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.menuAccordion" @change="onMenuAccordionChange" size="small" />
+                </el-form-item>
+                <el-form-item>
+                  <template #label>
                     菜单主题色
                     <el-tooltip content="关闭则侧边栏菜单使用中性色背景+主色文字" placement="top">
                       <el-icon><QuestionFilled /></el-icon>
@@ -287,6 +296,11 @@ const onClearTabsChange = (val) => {
 // 标签模式切换
 const onTagModeChange = (val) => {
     stringStore.tagMode = val
+}
+
+// 菜单手风琴切换
+const onMenuAccordionChange = (val) => {
+    stringStore.menuAccordion = val
 }
 
 // 菜单主题色切换
