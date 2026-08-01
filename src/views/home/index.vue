@@ -120,9 +120,22 @@
       <el-col :xs="24" :md="12">
         <el-card shadow="never">
           <template #header>
-            <div class="chart-header"><span>近7天文章访问趋势</span></div>
+            <div class="chart-header">
+              <span>近7天文章访问趋势</span>
+              <WeekArrows
+                :period-label="areaChart.periodLabel"
+                :left-disabled="areaOffset >= areaChart.maxOffset"
+                :right-disabled="areaStack.length === 0"
+                :loading="areaLoading"
+                :offset="areaOffset"
+                :max-offset="areaChart.maxOffset"
+                @prev="handleAreaPrev"
+                @next="handleAreaNext"
+                @reset="handleAreaReset"
+              />
+            </div>
           </template>
-          <AreaChart :x-data="areaChart.xData" :y1="areaChart.y1" />
+          <AreaChart :x-data="areaChart.xData" :y1="areaChart.y1" :has-data="areaChart.hasData" />
         </el-card>
       </el-col>
     </el-row>
@@ -175,7 +188,7 @@ import PieChart from './charts/PieChart.vue'
 import GaugeGroup from './charts/GaugeGroup.vue'
 import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
-import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartsAreaApi } from '@/api/dashboard'
+import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartAreaApi } from '@/api/dashboard'
 
 // ============================================================
 // 数据
@@ -191,7 +204,11 @@ const fallbackMaxOffset = configStore.getDashboardLineChartWeekOffset() || 12
 const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset })
 const pieChart = reactive({ legendData: [], seriesData: [] })
 const gaugeData = ref([])
-const areaChart = reactive({ xData: [], y1: [] })
+const areaChart = reactive({ xData: [], y1: [], periodLabel: '', hasData: false, maxOffset: 12 })
+const areaOffset = ref(0)
+const areaStack = ref([])
+const areaLoading = ref(false)
+const areaInitialOffset = ref(null)
 const hitokoto = ref('加载中...')
 
 // ============================================================
@@ -332,13 +349,34 @@ const fetchGauge = async () => {
   } catch { /* keep defaults */ }
 }
 
-const fetchAreaChart = async () => {
+const fetchAreaChart = async (direction = 'prev') => {
+  areaLoading.value = true
   try {
-    const res = await getChartsAreaApi()
-    areaChart.xData = res.data?.xdata || res.data?.xData || []
-    areaChart.y1 = res.data?.y1 || []
+    const res = await getChartAreaApi(areaOffset.value, areaInitialOffset.value, direction)
+    Object.assign(areaChart, {
+      xData: res.data?.xdata || res.data?.xData || [],
+      y1: res.data?.y1 || [],
+      periodLabel: res.data?.periodLabel || '',
+      hasData: res.data?.hasData || false,
+      maxOffset: res.data?.maxOffset || 12,
+    })
+    areaOffset.value = res.data?.offset ?? areaOffset.value
+    if (areaInitialOffset.value === null) {
+      areaInitialOffset.value = areaOffset.value
+    }
   } catch { /* keep defaults */ }
+  areaLoading.value = false
 }
+
+const handleAreaPrev = () => { areaStack.value = [...areaStack.value, areaOffset.value]; areaOffset.value++; fetchAreaChart('prev') }
+const handleAreaNext = () => {
+  const s = areaStack.value
+  if (s.length === 0) return
+  areaOffset.value = s[s.length - 1]
+  areaStack.value = s.slice(0, -1)
+  fetchAreaChart('next')
+}
+const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; areaInitialOffset.value = null; fetchAreaChart('prev') }
 </script>
 
 <style scoped lang="scss">
