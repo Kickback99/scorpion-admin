@@ -272,9 +272,10 @@ const toggleDark = async () => {
     await userConfigStore.toggleDark()
     const html = document.documentElement
     html.classList.toggle('dark', userConfigStore.isDarkEnabled)
-    // 切到浅色模式时关闭页面主题
+    // 切到浅色模式时关闭页面主题 + 灵动模式
     if (!userConfigStore.isDarkEnabled) {
         stringStore.pageTheme = false
+        stringStore.dynamicMode = false
     }
 }
 
@@ -293,9 +294,14 @@ const onMenuThemeColorChange = (val) => {
     stringStore.menuThemeColor = val
 }
 
-// 页面主题切换
-const onPageThemeChange = (val) => {
+// 页面主题切换（开启时自动切深色模式）
+const onPageThemeChange = async (val) => {
     stringStore.pageTheme = val
+    if (val && !userConfigStore.isDarkEnabled) {
+        await userConfigStore.toggleDark()
+        document.documentElement.classList.add('dark')
+        applyTheme(userConfigStore.currentTheme, true)
+    }
 }
 
 // 灵动模式切换（标签主题+菜单主题+深色plain，统一跟随）

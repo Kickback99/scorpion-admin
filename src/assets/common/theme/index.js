@@ -94,22 +94,23 @@ export function applyTheme(themeName, _isDark) {
     }
   }
 
-  // 侧边栏
+  // 侧边栏 / 标签 / 页面 — 深浅模式用不同混合比
   const primary = preset.colors.primary.bg
-  root.style.setProperty('--sidebar-bg', mix(primary, '#0a0a0f', 0.88))
+  var blend = _isDark ? 0.88 : 0.58
+  root.style.setProperty('--sidebar-bg', mix(primary, '#0a0a0f', blend))
   root.style.setProperty('--sidebar-text', '#eee')
-  // tagMode=theme 标签栏：对齐 sidebar 深色底（0.88），激活略浅（0.75）
-  root.style.setProperty('--tab-theme-bg', mix(primary, '#0a0a0f', 0.88))
-  root.style.setProperty('--tab-theme-hover-bg', mix(primary, '#0a0a0f', 0.75))
-  // pageTheme 页面主题：比标签栏更深（0.95），形成页底层→标签层的视觉层次
-  root.style.setProperty('--page-theme-bg', mix(primary, '#0a0a0f', 0.95))
+  // tagMode=theme 标签栏：对齐 sidebar 同色底，激活略浅
+  root.style.setProperty('--tab-theme-bg', mix(primary, '#0a0a0f', blend))
+  root.style.setProperty('--tab-theme-hover-bg', mix(primary, '#0a0a0f', _isDark ? 0.75 : 0.45))
+  // pageTheme 页面主题：比标签栏更深，形成页底层→标签层的视觉层次
+  root.style.setProperty('--page-theme-bg', mix(primary, '#0a0a0f', _isDark ? 0.95 : 0.65))
   root.style.setProperty('--sidebar-active-text', primary)
 
   // el-menu
-  root.style.setProperty('--el-menu-bg-color', mix(primary, '#0a0a0f', 0.88))
+  root.style.setProperty('--el-menu-bg-color', mix(primary, '#0a0a0f', blend))
   root.style.setProperty('--el-menu-text-color', '#eee')
   root.style.setProperty('--el-menu-active-color', primary)
-  root.style.setProperty('--el-menu-hover-bg-color', mix(primary, '#0a0a0f', 0.75))
+  root.style.setProperty('--el-menu-hover-bg-color', mix(primary, '#0a0a0f', _isDark ? 0.75 : 0.45))
 
   // html 类注入 — 供所有组件（tab / button 等）读取 uiMode
   root.classList.remove('ui-full', 'ui-plain')
