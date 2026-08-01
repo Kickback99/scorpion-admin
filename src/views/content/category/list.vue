@@ -20,7 +20,7 @@
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
+  <el-tree class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass, { 'page-theme': settingStore.pageTheme }]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
@@ -119,8 +119,10 @@ import { addApi, listApi, modifyApi, removeApi } from '@/api/category';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import msg from '@/components/msg';
 import { useConfigStore } from '@/store/config';
+import { useSettingStore } from '@/setting';
 
 const configStore = useConfigStore()
+const settingStore = useSettingStore()
 const lineClass = computed(() => `tree-line-${configStore.getTreeCateLineStyle()}`)
 const cateParentClass = computed(() => `tree-cate-parent-${configStore.getTreeCateParentMode()}`)
 const cateChildClass = computed(() => `tree-cate-child-${configStore.getTreeCateChildMode()}`)

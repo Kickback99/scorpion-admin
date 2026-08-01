@@ -104,6 +104,8 @@ export function applyTheme(themeName, _isDark) {
   root.style.setProperty('--tab-theme-hover-bg', mix(primary, '#0a0a0f', _isDark ? 0.75 : 0.45))
   // pageTheme 页面主题：比标签栏更深，形成页底层→标签层的视觉层次
   root.style.setProperty('--page-theme-bg', mix(primary, '#0a0a0f', _isDark ? 0.95 : 0.65))
+  // 骨架屏闪烁色：深色用 dark-2（低调），浅色用 light-8（极淡）
+  root.style.setProperty('--skeleton-shimmer', _isDark ? 'var(--el-color-primary-dark-2)' : 'var(--el-color-primary-light-8)')
   root.style.setProperty('--sidebar-active-text', primary)
 
   // el-menu
