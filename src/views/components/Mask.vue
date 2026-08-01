@@ -1,6 +1,6 @@
 <template>
     <div v-if="maskVisible" class="window" :style="{
-        backgroundColor:userConfigStore.isDarkEnabled?'#222':'#fff',
+        backgroundColor: settingStore.pageTheme ? 'var(--page-theme-bg)' : (userConfigStore.isDarkEnabled ? '#222' : '#fff'),
         }">
         <!-- <div class="header">
             <span class="iconfont icon-back" @click="close"></span>
@@ -19,7 +19,9 @@
 
 <script setup>
 import { useUserConfigStore } from '@/store/userConfig'
+import { useSettingStore } from '@/setting'
 const userConfigStore = useUserConfigStore()
+const settingStore = useSettingStore()
 const windowWidth = window.innerWidth - 260
 
 defineProps({

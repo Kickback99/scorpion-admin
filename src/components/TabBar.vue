@@ -48,8 +48,17 @@
                 </el-form-item>
                 <el-form-item>
                   <template #label>
+                    页面主题
+                    <el-tooltip content="主容器跟随标签主题色深底，与标签栏形成层次" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.pageTheme" @change="onPageThemeChange" size="small" />
+                </el-form-item>
+                <el-form-item>
+                  <template #label>
                     灵动模式
-                    <el-tooltip content="标签主题+菜单主题+深色 plain，统一跟随" placement="top">
+                    <el-tooltip content="标签+菜单+页面主题+深色+plain，统一跟随" placement="top">
                       <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                   </template>
@@ -263,6 +272,10 @@ const toggleDark = async () => {
     await userConfigStore.toggleDark()
     const html = document.documentElement
     html.classList.toggle('dark', userConfigStore.isDarkEnabled)
+    // 切到浅色模式时关闭页面主题
+    if (!userConfigStore.isDarkEnabled) {
+        stringStore.pageTheme = false
+    }
 }
 
 // 退出清标签切换
@@ -280,12 +293,18 @@ const onMenuThemeColorChange = (val) => {
     stringStore.menuThemeColor = val
 }
 
+// 页面主题切换
+const onPageThemeChange = (val) => {
+    stringStore.pageTheme = val
+}
+
 // 灵动模式切换（标签主题+菜单主题+深色plain，统一跟随）
 const onDynamicModeChange = (val) => {
     stringStore.dynamicMode = val
     if (val) {
         stringStore.tagMode = 'theme'
         stringStore.menuThemeColor = true
+        stringStore.pageTheme = true
         uiStore.setUiMode('plain')
         // 开启深色模式
         const html = document.documentElement
