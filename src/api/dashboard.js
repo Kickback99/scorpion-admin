@@ -49,9 +49,3 @@ export const getChartAreaApi = (offset = 0, initialOffset = null, direction = 'p
  * @returns {Promise} { items: [{label, value, color}] }
  */
 export const getChartsGaugeApi = () => http.get('/admin/charts/gauge')
-
-/**
- * 获取近7天面积图数据
- * @returns {Promise} { xData:[], y1:[] }
- */
-export const getChartsAreaApi = () => http.get('/admin/charts/area')
