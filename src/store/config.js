@@ -147,6 +147,8 @@ export const useConfigStore = defineStore({
       logo: {
         animation_style: 'neon',
         hide_image: false,
+        user_light_logo: 'stroke-scan',
+        admin_light_logo: 'stroke-scan',
       },
       dashboard: {
         top_card_enabled: false,
@@ -288,14 +290,24 @@ export const useConfigStore = defineStore({
      * @param {any} value 新值
      */
     async updateConfig(key, value) {
-      const item = _itemMap[key]
+      let item = _itemMap[key] || {}
       if (!item.type) {
-        console.error(`未找到配置项: ${key}`)
-        return
+        // _itemMap 未填充时，回退到遍历 group 查找并补全 item
+        for (const gk of ['client', 'admin', 'user_config']) {
+          const path = [gk, ...key.split('.')]
+          if (deepGet(this, path) !== undefined) {
+            item = { type: 'unknown', label: key, group: gk }
+            break
+          }
+        }
+        if (!item.group) {
+          console.error(`未找到配置项: ${key}`)
+          return
+        }
       }
 
       // 拼接完整 API key：group.key（如 client.comment.article_comment_enabled）
-      const apiKey = item.group ? `${item.group}.${key}` : key
+      const apiKey = `${item.group}.${key}`
 
       try {
         const res = await updateConfigValueApi(apiKey, value)
@@ -528,6 +540,12 @@ export const useConfigStore = defineStore({
     getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
     toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },
 
+    getUserLightLogo()             { return this.getValue('logo.user_light_logo') || 'stroke-scan' },
+    setUserLightLogo(v)            { this.updateConfig('logo.user_light_logo', v) },
+
+    getAdminLightLogo()            { return this.getValue('logo.admin_light_logo') || 'stroke-scan' },
+    setAdminLightLogo(v)           { this.updateConfig('logo.admin_light_logo', v) },
+
     // ==================== dashboard.line_chart ====================
 
     getDashboardLineChartYValidField()  { return this.getValue('dashboard.line_chart.y_valid_field') },
@@ -602,6 +620,8 @@ export const useConfigStore = defineStore({
     // ===== logo (admin 组) =====
     logoAnimationStyle()      { return this.getValue('logo.animation_style') || 'neon' },
     isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
+    userLightLogo()           { return this.getValue('logo.user_light_logo') || 'stroke-scan' },
+    adminLightLogo()          { return this.getValue('logo.admin_light_logo') || 'stroke-scan' },
 
     // ===== line_config (admin 组) =====
     dashboardLineChartYValidField() { return this.getValue('dashboard.line_chart.y_valid_field') },

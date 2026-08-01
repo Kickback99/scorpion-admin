@@ -276,6 +276,16 @@ const handleCommand = async (key) => {
     }
 }
 
+// 管理员：同步 Logo 动画样式（menuThemeColor > dark > adminLightLogo）
+const syncAdminLogoStyle = () => {
+    if (!userStore.isAdmin) return
+    configStore.setLogoAnimationStyle(
+        stringStore.menuThemeColor ? 'neon'
+            : userConfigStore.isDarkEnabled ? 'neon'
+            : configStore.getAdminLightLogo()
+    )
+}
+
 // 暗黑模式切换
 const toggleDark = async () => {
     await userConfigStore.toggleDark()
@@ -286,6 +296,7 @@ const toggleDark = async () => {
         stringStore.pageTheme = false
         stringStore.dynamicMode = false
     }
+    syncAdminLogoStyle()
 }
 
 // 退出清标签切换
@@ -306,6 +317,7 @@ const onMenuAccordionChange = (val) => {
 // 菜单主题色切换
 const onMenuThemeColorChange = (val) => {
     stringStore.menuThemeColor = val
+    syncAdminLogoStyle()
 }
 
 // 页面主题切换（开启时自动切深色模式）
@@ -316,6 +328,7 @@ const onPageThemeChange = async (val) => {
         document.documentElement.classList.add('dark')
         applyTheme(userConfigStore.currentTheme, true)
     }
+    syncAdminLogoStyle()
 }
 
 // 灵动模式切换（标签主题+菜单主题+深色plain，统一跟随）
@@ -332,6 +345,7 @@ const onDynamicModeChange = (val) => {
         userConfigStore.dark_enabled = true
         applyTheme(userConfigStore.currentTheme, true)
     }
+    syncAdminLogoStyle()
 }
 
 // 实心文字色模式切换
