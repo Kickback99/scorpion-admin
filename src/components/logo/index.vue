@@ -35,12 +35,12 @@ const userConfigStore = useUserConfigStore()
 const userStore = useUserStore()
 
 const animStyle = computed(() => {
-  // 管理员：按 configStore 配置走（原逻辑）
+  // 管理员：按 configStore 全局配置走，覆盖一切
   if (userStore.isAdmin) return configStore.getLogoAnimationStyle()
 
-  // 非管理员：menuThemeColor=true → 霓虹；false → 浅色镂空扫描 / 深色霓虹
-  if (settingStore.menuThemeColor) return 'neon'
-  return userConfigStore.isDarkEnabled ? 'neon' : 'stroke-scan'
+  // 非管理员：深色或主题色菜单 → 霓虹；浅色 → 用户浅色 Logo 配置
+  if (userConfigStore.isDarkEnabled || settingStore.menuThemeColor) return 'neon'
+  return configStore.getUserLightLogo()
 })
 const hideImage = computed(() => configStore.getLogoHideImage())
 </script>
