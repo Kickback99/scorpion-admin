@@ -118,7 +118,7 @@
         <GaugeGroup :items="gaugeData" />
       </el-col>
       <el-col :xs="24" :md="12">
-        <el-card shadow="never">
+        <el-card shadow="never" @mouseenter="hoverArea = true" @mouseleave="hoverArea = false">
           <template #header>
             <div class="chart-header">
               <span>近7天文章访问趋势</span>
@@ -143,7 +143,7 @@
     <!-- ===== 第二排：LineChart + PieChart ===== -->
     <el-row :gutter="14" class="section-row">
       <el-col :xs="24" :md="15">
-        <el-card shadow="never">
+        <el-card shadow="never" @mouseenter="hoverLine = true" @mouseleave="hoverLine = false">
           <template #header>
             <div class="chart-header">
               <span>近7天文章数据趋势</span>
@@ -209,6 +209,8 @@ const areaOffset = ref(0)
 const areaStack = ref([])
 const areaLoading = ref(false)
 const areaInitialOffset = ref(null)
+const hoverArea = ref(false)
+const hoverLine = ref(false)
 const hitokoto = ref('加载中...')
 
 // ============================================================
@@ -320,9 +322,23 @@ const handleWeekNext = () => {
 // ============================================================
 const onKey = (e) => {
   if (e.target.matches('input, textarea, [contenteditable]')) return
-  if (e.key === 'ArrowLeft' && lineOffset.value < lineChart.maxOffset)   { e.preventDefault(); handleWeekPrev() }
-  if (e.key === 'ArrowRight' && prevStack.value.length > 0)              { e.preventDefault(); handleWeekNext() }
-  if (e.key === 'Escape')                                                  { e.preventDefault(); handleWeekReset() }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Escape') {
+    e.preventDefault()
+    if (e.key === 'Escape') {
+      if (hoverArea.value) handleAreaReset()
+      if (hoverLine.value) handleWeekReset()
+      if (!hoverArea.value && !hoverLine.value) { handleWeekReset(); handleAreaReset() }
+      return
+    }
+    const area = hoverArea.value
+    if (e.key === 'ArrowLeft') {
+      if (area && areaOffset.value < areaChart.maxOffset)  handleAreaPrev()
+      else if (lineOffset.value < lineChart.maxOffset)     handleWeekPrev()
+    } else {
+      if (area && areaStack.value.length > 0)              handleAreaNext()
+      else if (prevStack.value.length > 0)                 handleWeekNext()
+    }
+  }
 }
 
 onMounted(() => {

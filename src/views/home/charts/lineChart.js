@@ -65,7 +65,7 @@ export const createLineChart = (props = {}) => {
       data: xData,
       type: 'category',
       boundaryGap: false,
-      axisLabel: { color: cssVar('--el-text-color-secondary'), fontSize: 10, rotate: 30 },
+      axisLabel: { color: cssVar('--el-text-color-secondary'), fontSize: 10 },
       axisLine: { lineStyle: { color: cssVar('--el-border-color-lighter') } },
       axisTick: { show: false },
     },
