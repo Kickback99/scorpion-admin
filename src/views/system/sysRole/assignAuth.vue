@@ -1,7 +1,7 @@
 <template>
     <div class="app-container">
       <!-- ===== 展开/折叠工具栏 + 授权角色（sticky 固定） ===== -->
-      <div class="auth-header">
+      <div class="auth-header" :class="{ 'page-theme': settingStore.pageTheme }">
         <div class="auth-toolbar">
           <el-button text size="small" @click="handleToggleExpand">
             <el-icon><component :is="treeExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ treeExpanded ? '全部折叠' : '全部展开' }}
@@ -14,7 +14,7 @@
       </div>
       <el-tree
         class="tree-with-line"
-        :class="[lineClass, authChildClass]"
+        :class="[lineClass, authChildClass, { 'page-theme': settingStore.pageTheme }]"
         style="margin: 12px 0"
         ref="treeRef"
         :data="sysMenuList"
@@ -41,11 +41,13 @@ const lineClass = computed(() => `tree-line-${configStore.getTreeAuthLineStyle()
 const authChildClass = computed(() => `tree-auth-child-${configStore.getTreeAuthChildMode()}`)
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user';
+import { useSettingStore } from '@/setting'
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
 import msg from '@/components/msg'
 const route = useRoute()
 const router = useRouter()
+const settingStore = useSettingStore()
 
 const props = defineProps({
   id: String,
@@ -292,7 +294,6 @@ const save = async () => {
   position: sticky;
   top: 0;
   z-index: 7;
-  background: var(--el-bg-color);
   padding: 4px 0;
 }
 
@@ -317,9 +318,9 @@ const save = async () => {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      var(--el-fill-color-light) 40%,
-      var(--el-fill-color) 50%,
-      var(--el-fill-color-light) 60%,
+      var(--skeleton-shimmer) 40%,
+      var(--skeleton-shimmer) 50%,
+      var(--skeleton-shimmer) 60%,
       transparent 100%
     );
     animation: tree-shimmer 1.5s ease-in-out infinite;
