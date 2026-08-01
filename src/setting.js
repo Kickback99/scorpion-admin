@@ -17,6 +17,8 @@ export const useSettingStore = defineStore({
         logoutIntent: false,
         /** 标签模式：'neutral'=中性色 | 'ui'=跟随 ui-mode | 'theme'=主题色 */
         tagMode: 'neutral',
+        /** 菜单手风琴：true=排它式展开，同一时间只展开一个子菜单 */
+        menuAccordion: false,
         /** 菜单主题色：true=跟随主题侧边栏风格，false=中性色背景+普通文字（激活项主色） */
         menuThemeColor: false,
         /** 页面主题：true=主容器跟随标签主题色深底，与标签栏形成层次 */
@@ -43,7 +45,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuThemeColor', 'pageTheme', 'dynamicMode'],
+        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuAccordion', 'menuThemeColor', 'pageTheme', 'dynamicMode'],
     },
 })
 
