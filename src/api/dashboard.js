@@ -6,6 +6,7 @@ const API = {
   CHARTS_BAR: '/admin/charts/bar',
   CHART_LINE: '/admin/chart/line',
   CHART_PIE: '/admin/chart/pie',
+  CHART_AREA: '/admin/chart/area',
 }
 
 /**
@@ -32,6 +33,16 @@ export const getChartLineApi = (offset = 0, initialOffset = null, direction = 'p
  * @returns {Promise} { legendData:[], seriesData:[] }
  */
 export const getChartPieApi = () => http.get(API.CHART_PIE)
+
+/**
+ * 获取近7天面积图数据
+ * @param {number} [offset=0] 周偏移
+ * @param {number} [initialOffset=null]
+ * @param {string} [direction='prev'] 切换方向
+ * @returns {Promise} { xData:[], y1:[], periodLabel, hasData, offset, maxOffset }
+ */
+export const getChartAreaApi = (offset = 0, initialOffset = null, direction = 'prev') =>
+  http.get(API.CHART_AREA, { params: { offset, initialOffset, direction } })
 
 /**
  * 获取环形仪表盘数据
