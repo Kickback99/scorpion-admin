@@ -87,6 +87,33 @@
   border-radius: 4px;
 }
 
+// 去除 el-tree 默认背景（跟随父容器）
+// 悬浮背景 全局背景跟随（深浅 / pageTheme 自适应）
+.el-tree{
+  background-color: transparent !important;
+  --el-tree-node-hover-bg-color: var(--el-fill-color-light) !important;
+}
+html.dark .el-tree:not(.page-theme) {
+ --el-tree-node-hover-bg-color: var(--el-color-black) !important;
+}
+.el-tree.page-theme{
+  --el-tree-node-hover-bg-color: var(--page-theme-bg) !important;
+}
+.el-tree-node__content:hover {
+  background-color: var(--el-tree-node-hover-bg-color) !important;
+}
+
+// auth-header 全局背景跟随（深浅 / pageTheme 自适应）
+.auth-header {
+  background-color: var(--el-fill-color-light);
+}
+html.dark .auth-header:not(.page-theme) {
+  background-color: var(--el-color-black);
+}
+.auth-header.page-theme {
+  background-color: var(--page-theme-bg);
+}
+
 // 精准排它：鼠标离开后清除残留背景（:focus / is-current），悬浮时保留
 // 子节点悬浮时，父节点也清除背景 — 避免鼠标穿过父到子时残留
 .el-tree-node:focus:not(:hover) > .el-tree-node__content,
