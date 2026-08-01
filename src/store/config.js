@@ -158,8 +158,8 @@ export const useConfigStore = defineStore({
       },
     },
 
-    // ===== user 用户配置 =====
-    user: {
+    // ===== user_config 用户配置 =====
+    user_config: {
         collapse_enabled: false,
         dark_enabled: false,
         theme: 'default',
@@ -232,7 +232,7 @@ export const useConfigStore = defineStore({
         return deepGet(this, [item.group, ...key.split('.')])
       }
       // _itemMap 未填充时（非配置页面直接访问），回退到遍历 group 查找
-      for (const gk of ['client', 'admin', 'user']) {
+      for (const gk of ['client', 'admin', 'user_config']) {
         const val = deepGet(this, [gk, ...key.split('.')])
         if (val !== undefined) return val
       }
@@ -251,7 +251,7 @@ export const useConfigStore = defineStore({
         return
       }
       // _itemMap 未填充时，回退到遍历 group 查找已有 key
-      for (const gk of ['client', 'admin', 'user']) {
+      for (const gk of ['client', 'admin', 'user_config']) {
         const path = [gk, ...key.split('.')]
         if (deepGet(this, path) !== undefined) {
           deepSet(this, path, value)
