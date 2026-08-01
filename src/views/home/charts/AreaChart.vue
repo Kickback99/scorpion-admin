@@ -1,46 +1,27 @@
 <template>
-  <el-card shadow="none" class="area-chart-card">
-    <template #header>
-      <div class="area-chart-header">
-        <span>近7天浏览量趋势</span>
-        <WeekArrows
-          :period-label="areaData.periodLabel"
-          :left-disabled="areaOffset >= areaData.maxOffset"
-          :right-disabled="areaStack.length === 0"
-          :loading="areaLoading"
-          :offset="areaOffset"
-          :max-offset="areaData.maxOffset"
-          @prev="handleAreaPrev"
-          @next="handleAreaNext"
-          @reset="handleAreaReset"
-        />
-      </div>
-    </template>
-    <div class="area-chart-wrapper">
-      <div ref="chartRef" class="area-chart-box"></div>
-      <div v-if="!areaData.hasData" class="chart-empty-hint">暂无数据</div>
-    </div>
-  </el-card>
+  <div class="area-chart-wrapper">
+    <div ref="chartRef" class="area-chart-box"></div>
+    <div v-if="!hasData" class="chart-empty-hint">暂无数据</div>
+  </div>
 </template>
 
 <script setup>
 // ============================================================
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { init } from 'echarts/core'
-import WeekArrows from './WeekArrows.vue'
-import { getChartAreaApi } from '@/api/dashboard'
 
 // ============================================================
 // 数据
 // ============================================================
+const props = defineProps({
+  xData: { type: Array, default: () => [] },
+  y1: { type: Array, default: () => [] },
+  hasData: { type: Boolean, default: true },
+})
+
 const chartRef = ref(null)
 let chartInstance = null
 let themeObserver = null
-
-const areaOffset = ref(0)
-const areaStack = ref([])
-const areaLoading = ref(false)
-const areaData = reactive({ xData: [], y1: [], periodLabel: '', hasData: false, maxOffset: 12 })
 
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 
@@ -64,7 +45,7 @@ const buildOption = () => ({
   },
   grid: { left: 0, right: 10, bottom: 20, top: 20, containLabel: true },
   xAxis: {
-    data: areaData.xData, type: 'category', boundaryGap: false,
+    data: props.xData, type: 'category', boundaryGap: false,
     axisLabel: { color: cssVar('--el-text-color-secondary'), fontSize: 11 },
     axisLine: { show: false },
     axisTick: { show: false },
@@ -75,7 +56,7 @@ const buildOption = () => ({
     splitLine: { lineStyle: { color: cssVar('--el-border-color-lighter') } },
   },
   series: [{
-    type: 'line', data: areaData.y1, smooth: true, symbol: 'circle', symbolSize: 8,
+    type: 'line', data: props.y1, smooth: true, symbol: 'circle', symbolSize: 8,
     lineStyle: { color: cssVar('--el-color-primary'), width: 3, shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.15)' },
     itemStyle: { color: cssVar('--el-color-primary'), borderColor: cssVar('--el-bg-color'), borderWidth: 2 },
     areaStyle: {
@@ -100,49 +81,19 @@ const renderChart = () => {
   chartInstance.setOption(buildOption(), true)
 }
 
-watch(() => [areaData.xData, areaData.y1], renderChart, { deep: true })
+const handleResize = () => chartInstance?.resize()
 
-const fetchArea = async (direction = 'prev') => {
-  areaLoading.value = true
-  try {
-    const res = await getChartAreaApi(areaOffset.value, null, direction)
-    Object.assign(areaData, {
-      xData: res.data?.xdata || res.data?.xData || [],
-      y1: res.data?.y1 || [],
-      periodLabel: res.data?.periodLabel || '',
-      hasData: res.data?.hasData || false,
-      maxOffset: res.data?.maxOffset || 12,
-    })
-    areaOffset.value = res.data?.offset ?? areaOffset.value
-  } catch { /* keep defaults */ }
-  areaLoading.value = false
-}
+watch(() => [props.xData, props.y1], renderChart, { deep: true })
 
-// ============================================================
-// 周切换
-// ============================================================
-const handleAreaPrev = () => { areaStack.value = [...areaStack.value, areaOffset.value]; areaOffset.value++; fetchArea('prev') }
-const handleAreaNext = () => {
-  const s = areaStack.value
-  if (s.length === 0) return
-  areaOffset.value = s[s.length - 1]
-  areaStack.value = s.slice(0, -1)
-  fetchArea('next')
-}
-const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; fetchArea('prev') }
-
-// ============================================================
-// 生命周期
-// ============================================================
 onMounted(() => {
-  fetchArea()
-  window.addEventListener('resize', () => chartInstance?.resize())
+  renderChart()
+  window.addEventListener('resize', handleResize)
   themeObserver = new MutationObserver(renderChart)
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', () => chartInstance?.resize())
+  window.removeEventListener('resize', handleResize)
   themeObserver?.disconnect()
   chartInstance?.dispose()
   chartInstance = null
@@ -150,28 +101,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.area-chart-card {
-  border: none;
-  border-radius: 10px;
-  :deep(.el-card__header) { border-bottom: none; padding-bottom: 0; }
-  :deep(.el-card__body) { padding-top: 0; }
-}
-
-.area-chart-header {
-  display: flex; align-items: center;
-  font-size: 15px; font-weight: 500;
-  color: var(--el-text-color-primary);
-}
-
-.area-chart-wrapper {
-  position: relative;
-}
-
-.area-chart-box {
-  width: 100%;
-  height: 190px;
-}
-
+.area-chart-wrapper { position: relative; }
+.area-chart-box { width: 100%; height: 190px; }
 .chart-empty-hint {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
