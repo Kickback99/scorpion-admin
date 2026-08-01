@@ -116,6 +116,23 @@ watch(()=>settingStore.refresh,()=>{
   })
 })
 
+// 手风琴开启时立即折叠非激活菜单
+watch(() => settingStore.menuAccordion, (val) => {
+  if (!val) return
+  nextTick(() => {
+    const ids = []
+    const found = collectAncestors(userStore.userMenu, route.path, ids)
+    if (!found) {
+      const parts = route.path.split('/').filter(Boolean)
+      if (parts.length > 1) ids.push('/' + parts[0])
+      else if (tempMenuConfig.some(item => item.path === route.path)) ids.push('/template')
+    }
+    // 关闭所有已展开的 sub-menu，只保留激活链路
+    const toClose = openedSubMenus.value.filter(i => !ids.includes(i))
+    toClose.forEach(i => menuRef.value?.close(i))
+  })
+})
+
 // 处理菜单的默认展开
 const handelUrl = ref('/')
 handelUrl.value = route.path
@@ -143,7 +160,12 @@ const openedSubMenus = ref([])
  * @param {string[]} indexPath - 从根到当前菜单的完整 index 路径链
  */
 const handleExclusiveMenuOpen = (index, indexPath) => {
-  if (!menuRef.value) return
+  // 始终追踪已展开菜单（手风琴关闭时也需要知道哪些菜单展开了）
+  if (!openedSubMenus.value.includes(index)) {
+    openedSubMenus.value.push(index)
+  }
+
+  if (!settingStore.menuAccordion || !menuRef.value) return
 
   // 关闭所有不在当前 indexPath 链路中的已展开子菜单
   // 排除自身及子孙：以当前 index 为前缀的菜单也不关闭（如展开 /system 时不关闭 /system/user）
@@ -153,12 +175,6 @@ const handleExclusiveMenuOpen = (index, indexPath) => {
     return true
   })
   toClose.forEach(i => menuRef.value.close(i))
-
-  // 同步追踪列表
-  openedSubMenus.value = openedSubMenus.value.filter(i => !toClose.includes(i))
-  if (!openedSubMenus.value.includes(index)) {
-    openedSubMenus.value.push(index)
-  }
 }
 
 /**
@@ -199,22 +215,21 @@ const collectAncestors = (list, targetPath, ids) => {
 watch(() => route.path, () => {
   handelUrl.value = route.path
   nextTick(() => {
-    // 收集当前路由的祖先 sub-menu index（动态 + 静态）
-    const ids = []
-    const found = collectAncestors(userStore.userMenu, route.path, ids)
-    // 静态菜单兜底
-    if (!found) {
-      const parts = route.path.split('/').filter(Boolean)
-      // 路径段数 > 1：首段即为父级 index（如 /user/profile → /user）
-      if (parts.length > 1) {
-        ids.push('/' + parts[0])
-      } else if (tempMenuConfig.some(item => item.path === route.path)) {
-        // temp1~15 路径扁平无前缀，归入 /template 子菜单
-        ids.push('/template')
+    // 手风琴模式：收集祖先 + 排它折叠
+    if (settingStore.menuAccordion) {
+      const ids = []
+      const found = collectAncestors(userStore.userMenu, route.path, ids)
+      if (!found) {
+        const parts = route.path.split('/').filter(Boolean)
+        if (parts.length > 1) {
+          ids.push('/' + parts[0])
+        } else if (tempMenuConfig.some(item => item.path === route.path)) {
+          ids.push('/template')
+        }
       }
+      const toClose = openedSubMenus.value.filter(i => !ids.includes(i))
+      toClose.forEach(i => menuRef.value?.close(i))
     }
-    const toClose = openedSubMenus.value.filter(i => !ids.includes(i))
-    toClose.forEach(i => menuRef.value?.close(i))
     const activeEl = menuRef.value?.$el?.querySelector('.is-active')
     if (activeEl) {
       activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
