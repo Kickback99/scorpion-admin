@@ -37,8 +37,8 @@ const DEFAULT_NUMBER_LIMITS = {
   'article.carousel_limit':                   { min: 0, max: 99 },
   'article_list.scroll_page_size':            { min: 5, max: 15 },
   'article_list.pagination_page_size':        { min: 5, max: 15 },
-  'oss.data_retention_days':                  { min: 0, max: 100 },
-  'oss.file_retention_days':                  { min: 0, max: 100 },
+  'storage.data_retention_days':              { min: 0, max: 100 },
+  'storage.file_retention_days':              { min: 0, max: 100 },
   'tree_cate_parent_width':                   { min: 12, max: 200 },
 }
 
@@ -140,9 +140,10 @@ export const useConfigStore = defineStore({
       notification: {
         comment_enabled: true,
       },
-      oss: {
+      storage: {
         data_retention_days: 30,
         file_retention_days: 7,
+        log_retention_days: 7,
       },
       logo: {
         animation_style: 'neon',
@@ -524,13 +525,16 @@ export const useConfigStore = defineStore({
     getUserConfigTheme()           { return this.getValue('theme') || 'default' },
     setUserConfigTheme(v)          { this.updateConfig('theme', v) },
 
-    // ==================== oss ====================
+    // ==================== storage ====================
 
-    getOssDataRetentionDays()      { return this.getValue('oss.data_retention_days') ?? 30 },
-    setDataRetentionDays(v)        { this.updateConfig('oss.data_retention_days', v) },
+    getStorageDataRetentionDays()  { return this.getValue('storage.data_retention_days') ?? 30 },
+    setStorageDataRetentionDays(v) { this.updateConfig('storage.data_retention_days', v) },
 
-    getOssFileRetentionDays()      { return this.getValue('oss.file_retention_days') ?? 7 },
-    setFileRetentionDays(v)        { this.updateConfig('oss.file_retention_days', v) },
+    getStorageFileRetentionDays()  { return this.getValue('storage.file_retention_days') ?? 7 },
+    setStorageFileRetentionDays(v) { this.updateConfig('storage.file_retention_days', v) },
+
+    getStorageLogRetentionDays()   { return this.getValue('storage.log_retention_days') ?? 7 },
+    setStorageLogRetentionDays(v)  { this.updateConfig('storage.log_retention_days', v) },
 
     // ==================== logo ====================
 
@@ -622,6 +626,11 @@ export const useConfigStore = defineStore({
     isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
     userLightLogo()           { return this.getValue('logo.user_light_logo') || 'stroke-scan' },
     adminLightLogo()          { return this.getValue('logo.admin_light_logo') || 'stroke-scan' },
+
+    // ===== storage (admin 组) =====
+    storageDataRetentionDays() { return this.getValue('storage.data_retention_days') ?? 30 },
+    storageFileRetentionDays() { return this.getValue('storage.file_retention_days') ?? 7 },
+    storageLogRetentionDays()  { return this.getValue('storage.log_retention_days') ?? 7 },
 
     // ===== line_config (admin 组) =====
     dashboardLineChartYValidField() { return this.getValue('dashboard.line_chart.y_valid_field') },
