@@ -55,7 +55,7 @@
         </el-form>
 
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%" @close="hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">
-            <el-form ref="formRef" :model="formModel" label-width="auto" size="small">
+            <el-form ref="formRef" :model="formModel" :rules="dialogRules" label-width="auto" size="small">
                 <el-form-item label="文章描述" prop="description">
                     <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
                         <el-radio :label="'auto'">自动生成</el-radio>
@@ -92,7 +92,7 @@
               </el-form-item>
 
               <!-- 文章封面：支持文件上传 / 自定义链接 / 引用封面 三种模式 -->
-              <el-form-item label="文章封面" prop="cover">
+              <el-form-item label="文章封面">
                   <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
                       <el-radio :label="'upload'">文件上传</el-radio>
                       <el-radio :label="'custom'">自定义链接</el-radio>
@@ -102,7 +102,7 @@
 
               <!-- 文件上传模式 -->
               <el-form-item v-if="formModel.coverOption === 'upload'" label=" " prop="cover">
-                  <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
+                  <SmartUpload ref="uploadRef" v-model="formModel.cover" :onValidate="handleCoverValidate"></SmartUpload>
               </el-form-item>
 
               <!-- 自定义链接模式 -->
@@ -120,7 +120,7 @@
               </el-form-item>
 
               <!-- 引用封面模式 -->
-              <el-form-item v-if="formModel.coverOption === 'ref'" label=" " prop="coverReference">
+              <el-form-item v-if="formModel.coverOption === 'ref'" label=" " prop="refCover">
                 <div class="cover-reference-wrapper">
                   <SmartAutoComplete
                     v-model="selectedCoverArticle"
@@ -299,10 +299,62 @@ const dialogTitle = ref('')
 const maskVisible = ref(false)
 const isEditMode = ref(false)
 const blogFormRef = ref(null)
+const formRef = ref(null)
 
 const rules = {
   title: [{ required: true, message: '请输入标题' }],
   content: [{ required: true, message: '请输入内容' }]
+}
+
+// ============================================================
+// 弹窗表单校验
+// ============================================================
+
+/** 校验封面 — 文件上传模式 */
+const validateCover = (rule, value, callback) => {
+  if (formModel.coverOption === 'upload') {
+    if (!formModel.cover) {
+      callback(new Error('请上传文章封面'))
+    } else {
+      callback()
+    }
+    return
+  }
+  callback()
+}
+
+/** 校验封面 — 自定义链接模式 */
+const validateCustomCoverLink = (rule, value, callback) => {
+  if (formModel.coverOption === 'custom') {
+    if (!value || !value.trim()) {
+      callback(new Error('请输入图片链接地址'))
+    } else {
+      callback()
+    }
+    return
+  }
+  callback()
+}
+
+/** 校验封面 — 引用封面模式 */
+const validateCoverReference = (rule, value, callback) => {
+  if (formModel.coverOption === 'ref' && !value) {
+    callback(new Error('请选择要引用的文章封面'))
+  } else {
+    callback()
+  }
+}
+
+const dialogRules = {
+  cover: [
+    { required: true, validator: validateCover, trigger: 'change'  }
+  ],
+  customCoverLink: [
+    { required: true, validator: validateCustomCoverLink, trigger: 'blur'  }
+  ],
+  refCover: [
+    { required: true, validator: validateCoverReference, trigger: 'blur'  }
+  ]
 }
 
 const uploadRef = ref()
@@ -484,6 +536,13 @@ const handlePublish = async (status) => {
   hasSelectedArticle.value = false
   formModel.status = status
 
+  // 弹窗表单校验（封面相关字段）
+  try {
+    await formRef.value?.validate()
+  } catch (e) {
+    return
+  }
+
   // 最后一次确认 description 值
   if (formModel.descriptionType === 'custom') {
     formModel.description = formModel.customDescription
@@ -492,21 +551,10 @@ const handlePublish = async (status) => {
 
   let cover
   if (formModel.coverOption === 'custom') {
-    if (!formModel.customCoverLink) {
-      msg.warning('请填写自定义图片链接')
-      return
-    }
     cover = formModel.customCoverLink
   } else if (formModel.coverOption === 'ref') {
-    // 引用封面模式：使用 refCover
-    if (!formModel.refCoverUuid) {
-      msg.warning('请先选择要引用的文章封面')
-      return
-    }
     cover = formModel.refCoverUuid
   } else if (formModel.coverOption === 'upload') {
-    // 直接传 formModel.cover，不管它是 URL 还是 File
-    // 后端会自己判断格式
     if (formModel.cover instanceof File) {
       cover = null // 新文件等待上传
     } else {
@@ -748,16 +796,19 @@ watch(selectedCoverArticle, async (newVal) => {
           formModel.refCoverUuid = coverFileMeta.uuid   // 保存 UUID，用于提交
         } else {
           formModel.refCover = null
+          formModel.refCoverUuid = null
           msg.warning('该文章暂无封面')
         }
       } catch (error) {
         console.error('获取封面失败:', error)
+        formModel.refCoverUuid = null
         msg.warning('获取封面失败')
       }
     }
   } else {
     // 移除标签 → 清空封面
     formModel.refCover = null
+    formModel.refCoverUuid = null
   }
 }, { deep: true })
 
@@ -773,26 +824,34 @@ const handleCoverArticleRemoved = () => {
  */
 const handleCoverOptionChange = (val) => {
   if (val === 'upload') {
-    // 切换到文件上传：清空自定义链接
     formModel.customCoverLink = ''
     formModel.refCover = null
+    formModel.refCoverUuid = null
+    selectedCoverArticle.value = []
     nextTick(() => uploadRef.value?.handleImage(formModel.cover))
   } else if (val === 'custom') {
-    // 切换到自定义链接：清空文件上传的值
+    formModel.refCover = null
+    formModel.refCoverUuid = null
+    selectedCoverArticle.value = []
     if (!formModel.id) {
-      formModel.refCover = null
       formModel.cover = null
     }
-    // 如果 uploadRef 有清空方法，可以调用
-    /* if (uploadRef.value && uploadRef.value.clear) {
-        uploadRef.value.clear()
-    } */
   } else if (val === 'ref') {
-    // 切换到引用封面时，清空自定义链接
     formModel.customCoverLink = ''
-    // 如果当前 cover 是自定义链接（http开头），清空
     formModel.cover = null
+    formModel.refCover = null
+    formModel.refCoverUuid = null
+    selectedCoverArticle.value = []
   }
+  // 切换封面模式时清除相关字段的校验状态
+  formRef.value?.clearValidate(['cover', 'customCoverLink', 'refCover'])
+}
+
+/** SmartUpload 图片变更时触发封面校验 */
+const handleCoverValidate = () => {
+  nextTick(() => {
+    formRef.value?.validateField('cover')
+  })
 }
 
 // ============================================================
@@ -1043,14 +1102,14 @@ defineExpose({
     border: 1px solid var(--el-border-color-lighter);
     background: var(--el-fill-color-light);
     transition: all 0.3s ease;
-    aspect-ratio: 16 / 9;
     max-width: 120px;
 
     .cover-image {
       width: 100%;
       height: auto;
       display: block;
-      object-fit: contain;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
     }
   }
 
