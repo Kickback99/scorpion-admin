@@ -469,6 +469,7 @@ const handleSelectChildren = async (row) => {
     searchData.sortField = 'group'
     searchData.sortOrder = 'DESC'
     searchData.rootId = ''
+    searchData.keyword = ''
     // pickMode.value = 'children'
     currentPickComment.value = row
     // searchData.rootId = ''
@@ -484,6 +485,7 @@ const handleSelectParent = async (row) => {
     searchData.sortField = 'group'
     searchData.sortOrder = 'DESC'
     searchData.rootId = ''
+    searchData.keyword = ''
     // pickMode.value = 'parent'
     updateModeSettings()  // 手动调用
     currentPickComment.value = row
