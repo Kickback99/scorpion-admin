@@ -130,6 +130,7 @@
                     :model-value="formModel.content"
                     @update:model-value="(val) => formModel.content = val"
                     :height="400"
+                    upload-handler="notice"
                 />
             </el-form-item>
 
