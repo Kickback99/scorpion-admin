@@ -276,6 +276,7 @@ const fileTypeOptions = [
     { label: '封面', value: 'cover' },
     { label: '轮播', value: 'carousel' },
     { label: '内容', value: 'content' },
+    { label: '公告', value: 'notice' },
     { label: '孤儿', value: 'orphan' }
 ];
 
@@ -296,7 +297,8 @@ const getFileTypeLabel = (type) => {
         'avatar': '头像',
         'cover': '封面',
         'carousel': '轮播图',
-        'content': '内容'
+        'content': '内容',
+        'notice': '公告'
     };
     return map[type] || type;
 };
@@ -309,7 +311,8 @@ const getFileTypeTag = (type) => {
         'avatar': 'primary',
         'cover': 'success',
         'carousel': 'warning',
-        'content': 'info'
+        'content': 'info',
+        'notice': 'info'
     };
     return map[type] || '';
 };
