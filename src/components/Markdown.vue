@@ -35,13 +35,18 @@ const MarkdownPreview = computed(() => {
 
 // import { uploadImgService } from '@/api/article'
 
-defineProps({
+const props = defineProps({
     modelValue: {
         type: String
     },
     height: {
         type: Number,
         default: 500
+    },
+    // 上传回调名称，默认使用 'default'
+    uploadHandler: {
+        type: String,
+        default: 'default'
     }
 })
 
@@ -52,8 +57,8 @@ const onChange = (markdownContent,htmlContent) =>{
     // emit('htmlContent',htmlContent)
 }
 
-
-const handleUploadImage = async (event, insertImage, files) => {
+// 默认上传处理器（文章内容图片）
+const handleDefaultUpload  = async (event, insertImage, files) => {
     const formData = new FormData()
     formData.append('content', files[0])
     try {
@@ -68,6 +73,37 @@ const handleUploadImage = async (event, insertImage, files) => {
     } catch (error) {
         console.error('上传失败', error)
     }
+}
+
+
+// 公告内容图片上传处理器
+const handleNoticeUpload = async (event, insertImage, files) => {
+    const formData = new FormData()
+    formData.append('notice', files[0])
+    try {
+        // 使用公告专用上传接口
+        const { noticeUploadApi } = await import('@/api/notice')
+        const res = await noticeUploadApi(formData)
+        insertImage({
+            url: res.data,
+            desc: '公告图片',
+        })
+    } catch (error) {
+        console.error('公告图片上传失败', error)
+    }
+}
+
+// 自定义上传处理器映射表
+const uploadHandlers = {
+    default: handleDefaultUpload,
+    notice: handleNoticeUpload,
+}
+
+// 根据 props.uploadHandler 动态选择上传处理器
+const handleUploadImage = async (event, insertImage, files) => {
+    console.log('📢 [Markdown] uploadHandler:', props.uploadHandler)
+    const handler = uploadHandlers[props.uploadHandler] || uploadHandlers.default
+    await handler(event, insertImage, files)
 }
 </script>
 
