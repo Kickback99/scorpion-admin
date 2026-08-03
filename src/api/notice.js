@@ -8,18 +8,17 @@ export const noticeListApi = () => http.get('/admin/msg/notice/list')
 
 /**
  * 新增公告
- * @param {String} content 公告内容
+ * @param {Object} params 公告数据 { title, content, type, isCurrent }
  * @returns {Promise}
  */
-export const noticeAddApi = (content) => http.post('/admin/msg/notice/add', null, { params: { content } })
+export const noticeAddApi = (params) => http.post('/admin/msg/notice/add', params)
 
 /**
  * 修改公告
- * @param {Number} id 公告ID
- * @param {String} content 公告内容
+ * @param {Object} params 公告数据 { id, title, content, type, isCurrent }
  * @returns {Promise}
  */
-export const noticeUpdateApi = (id, content) => http.put('/admin/msg/notice/update', null, { params: { id, content } })
+export const noticeUpdateApi = (params) => http.put('/admin/msg/notice/update', params)
 
 /**
  * 删除公告
