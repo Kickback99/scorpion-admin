@@ -47,3 +47,8 @@ export const noticeOfflineApi = (id) => http.put(`/admin/msg/notice/offline/${id
  * @returns {Promise}
  */
 export const noticePushApi = (id) => http.post(`/admin/msg/notice/push/${id}`)
+
+// 公告图片上传
+export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
+  timeout: 15000 //本次公告图上传请求超时15秒
+})
