@@ -8,6 +8,9 @@
             <el-form-item style="width: 200px">
                 <SmartSelector v-model="searchModel.status" :data="statusOptions" placeholder="请选择状态" />
             </el-form-item>
+            <el-form-item style="width: 200px">
+                <SmartSelector v-model="searchModel.type" :data="typeOptions" placeholder="请选择消息类型" />
+            </el-form-item>
             <el-form-item>
                 <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
@@ -25,10 +28,23 @@
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="content" label="公告内容" show-overflow-tooltip />
+        <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
+        <el-table-column label="消息类型" width="100">
+            <template #default=" { row} ">
+                <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
+                <el-button v-else type="warning" size="small" plain>长文本</el-button>
+            </template>
+        </el-table-column>
+        <el-table-column label="当前展示" width="100" align="center">
+            <template #default="{ row }">
+                <el-tag v-if="row.isCurrent === 1" type="success" size="small">是</el-tag>
+                <el-tag v-else type="info" size="small">否</el-tag>
+            </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
             <template #default="{ row }">
-                <el-tag size="small" type="success" v-if="row.status === 1">生效中</el-tag>
-                <el-tag size="small" type="danger" v-else>已下架</el-tag>
+                <el-button size="small" type="success" v-if="row.status === 1">生效中</el-button>
+                <el-button size="small" type="danger" v-else>已下架</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="200" />
@@ -69,10 +85,38 @@
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
-        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" status-icon size="small">
-            <el-form-item prop="content" label="公告内容">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%">
+        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="100px" status-icon size="small">
+            
+            <!-- 公告标题 -->
+            <el-form-item prop="title" label="公告标题">
                 <el-input
+                    v-model="formModel.title"
+                    placeholder="请输入公告标题"
+                    maxlength="100"
+                    show-word-limit
+                />
+            </el-form-item>
+
+            <!-- 消息类型（el-radio-group） -->
+            <el-form-item prop="type" label="消息类型">
+                <template #label>
+                    消息类型
+                    <el-tooltip content="普通文本适合简短通知，长文本支持 Markdown 格式" placement="top">
+                        <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                </template>
+                <el-radio-group v-model="formModel.type" @change="handleTypeChange">
+                    <el-radio :value="0">普通</el-radio>
+                    <el-radio :value="1">长文本</el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <!-- 公告内容（根据 type 切换） -->
+            <el-form-item prop="content" label="公告内容">
+                <!-- 普通文本模式 -->
+                <el-input
+                    v-if="formModel.type === 0"
                     v-model="formModel.content"
                     type="textarea"
                     :rows="6"
@@ -80,7 +124,29 @@
                     maxlength="2000"
                     show-word-limit
                 />
+                <!-- 长文本模式（Markdown） -->
+                <Markdown
+                    v-else
+                    :model-value="formModel.content"
+                    @update:model-value="(val) => formModel.content = val"
+                    :height="400"
+                />
             </el-form-item>
+
+            <!-- 是否设为当前展示 -->
+            <el-form-item prop="isCurrent" label="设为当前展示">
+                <template #label>
+                    设为当前展示
+                    <el-tooltip content="设为当前展示后，用户刷新页面将看到此公告" placement="top">
+                        <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                </template>
+                <el-radio-group v-model="formModel.isCurrent">
+                    <el-radio :value="0">否</el-radio>
+                    <el-radio :value="1">是</el-radio>
+                </el-radio-group>
+            </el-form-item>
+
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -96,6 +162,7 @@ import { ref, reactive, nextTick, onMounted } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import msg from '@/components/msg'
+import Markdown from '@/components/Markdown.vue'  // 引入 Markdown 组件
 import {
     noticeListApi,
     noticeAddApi,
@@ -119,7 +186,8 @@ const pagination = reactive({
 
 const searchModel = reactive({
     keyword: '',
-    status: ''
+    status: '',
+    type: ''
 })
 
 const dialogVisible = ref(false)
@@ -127,7 +195,10 @@ const dialogTitle = ref('')
 
 const formModel = reactive({
     id: null,
-    content: ''
+    title: '',
+    content: '',
+    type: 0,        // 0-普通 1-长文本
+    isCurrent: 0    // 0-否 1-是
 })
 
 const ruleFormRef = ref(null)
@@ -141,6 +212,13 @@ const statusOptions = [
     { label: '已下架', value: '0' }
 ]
 
+// 消息类型选项
+const typeOptions = [
+    { label: '全部类型', value: '' },
+    { label: '普通', value: '0' },
+    { label: '长文本', value: '1' }
+]
+
 // ============================================================
 // 表单校验规则
 // ============================================================
@@ -149,6 +227,13 @@ const rules = {
         { required: true, message: '请输入公告内容', trigger: 'blur' },
         { min: 2, max: 2000, message: '公告内容长度为 2-2000 个字符', trigger: 'blur' }
     ]
+}
+
+const handleTypeChange = () => {
+    // 切换消息类型时，重置 content 字段的校验状态
+    nextTick(() => {
+        ruleFormRef.value?.clearValidate(['content'])
+    })
 }
 
 // ============================================================
@@ -168,6 +253,11 @@ const fetchNotices = async () => {
     }
     if (searchModel.status !== '') {
         list = list.filter(item => item.status === Number(searchModel.status))
+    }
+
+    // 类型搜索过滤
+    if (searchModel.type !== '') {
+        list = list.filter(item => item.type === Number(searchModel.type))
     }
 
     totalCount.value = list.length
@@ -216,6 +306,7 @@ const handleReset = () => {
     pagination.pageNum = 1
     searchModel.keyword = ''
     searchModel.status = ''
+    searchModel.type = ''
     fetchNotices()
 }
 
@@ -229,7 +320,10 @@ const handleAdd = async () => {
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, {
         id: null,
-        content: ''
+        title: '',
+        content: '',
+        type: 0,
+        isCurrent: 0
     })
 }
 
@@ -243,7 +337,10 @@ const handleEdit = async (row) => {
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, {
         id: row.id,
-        content: row.content
+        title: row.title || '',
+        content: row.content || '',
+        type: row.type !== undefined ? row.type : 0,
+        isCurrent: row.isCurrent || 0
     })
 }
 
@@ -253,10 +350,19 @@ const handleEdit = async (row) => {
 const handleConfirm = async () => {
     await ruleFormRef.value.validate()
     try {
+        const params = {
+            title: formModel.title,
+            content: formModel.content,
+            type: formModel.type,
+            isCurrent: formModel.isCurrent
+        }
         if (!formModel.id) {
-            await noticeAddApi(formModel.content)
+            await noticeAddApi(params)
         } else {
-            await noticeUpdateApi(formModel.id, formModel.content)
+            await noticeUpdateApi({
+                id: formModel.id,
+                ...params
+            })
         }
         msg.primary('操作成功')
         dialogVisible.value = false
@@ -319,5 +425,13 @@ const handlePush = async (row) => {
 }
 .items-center {
     align-items: center;
+}
+
+/* 弹窗样式调整 */
+:deep(.el-dialog) {
+    .el-dialog__body {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
 }
 </style>
