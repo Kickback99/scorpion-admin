@@ -27,6 +27,7 @@
         <el-radio-button value="cover">封面</el-radio-button>
         <el-radio-button value="content">内容图</el-radio-button>
         <el-radio-button value="carousel">轮播</el-radio-button>
+        <el-radio-button value="notice">公告</el-radio-button>
         <el-radio-button value="avatar">头像</el-radio-button>
       </el-radio-group>
 
@@ -207,7 +208,8 @@ const getFileTypeLabel = (type) => {
     'avatar': '头像',
     'cover': '封面',
     'carousel': '轮播图',
-    'content': '内容'
+    'content': '内容',
+    'notice': '公告'
   };
   return map[type] || type;
 };
@@ -217,7 +219,8 @@ const getFileTypeTag = (type) => {
     'avatar': 'primary',
     'cover': 'success',
     'carousel': 'warning',
-    'content': 'info'
+    'content': 'info',
+    'notice': 'info'
   };
   return map[type] || '';
 };
