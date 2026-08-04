@@ -39,6 +39,12 @@ export const getArticleContentBusinessDataApi = (id, includeDeleted = false) => 
  * @returns {Promise}
  */
 export const getAllArticlesApi = () => http.get('/admin/content/article/list/all')
+
+/**
+ * 获取所有后台用户列表（用于 SmartAutoComplete 联想搜索）
+ * @returns {Promise}
+ */
+export const getAllUsersApi = () => http.get('/admin/system/users/list/all')
   
 /**
  * 分页查询标签列表（用于 SmartAutoComplete 联想搜索）

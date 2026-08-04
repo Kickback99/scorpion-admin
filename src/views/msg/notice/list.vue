@@ -178,11 +178,35 @@
                         <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="formModel.targetType">
+                <el-radio-group v-model="formModel.targetType" @change="handleTargetTypeChange">
                     <el-radio :value="1">前台用户</el-radio>
                     <el-radio :value="2">后台管理员</el-radio>
                     <el-radio :value="3">全部</el-radio>
                 </el-radio-group>
+            </el-form-item>
+
+            <!-- 后台指定用户（推送范围=后台时显示） -->
+            <el-form-item v-if="formModel.targetType === 2" label="目标用户">
+                <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange">
+                    <el-radio value="all">所有用户</el-radio>
+                    <el-radio value="specific">指定用户</el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'specific'" label=" " prop="specifiedUsers">
+                <SmartAutoComplete
+                    ref="userAutoCompleteRef"
+                    v-model="selectedUserNames"
+                    :fetch-suggestions-api="fetchUsers"
+                    placeholder="请输入用户名|昵称搜索"
+                    :max="10"
+                    :debounce-delay="300"
+                    :min-search-length="1"
+                    :allow-custom="false"
+                    custom-disabled-message="请输入已存在的用户名|呢称"
+                    :auto-search-on-enter="true"
+                    style="width: 100%"
+                />
             </el-form-item>
 
             <!-- 状态（仅编辑时显示，只读） -->
@@ -206,6 +230,7 @@
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import msg from '@/components/msg'
 import Markdown from '@/components/Markdown.vue'  // 引入 Markdown 组件
 import {
@@ -217,6 +242,8 @@ import {
     noticeOfflineApi,
     noticePushApi
 } from '@/api/notice'
+import { getAllUsersApi } from '@/api/business'
+import PinyinMatch from 'pinyin-match'
 
 // ============================================================
 // 数据
@@ -252,6 +279,7 @@ const formModel = reactive({ ...defaultModel })
 const ruleFormRef = ref(null)
 const multipleTableRef = ref(null)
 const selectedRows = ref([])
+const userAutoCompleteRef = ref(null)
 
 // 状态选项
 const statusOptions = [
@@ -276,6 +304,77 @@ const targetTypeOptions = [
     { label: '全部', value: '3' }
 ]
 
+// 后台指定用户相关
+const targetUserType = ref('all')                    // 'all' | 'specific'
+const selectedUserNames = ref([])                    // SmartAutoComplete v-model（标签数组）
+const selectedUserIds = ref([])                      // 选中的用户 ID 列表
+const userCache = ref([])                            // 用户搜索结果缓存
+
+/**
+ * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
+ */
+const loadAllUsers = async () => {
+    const res = await getAllUsersApi()
+    const items = res.data || []
+    userCache.value = items.map(item => ({
+        value: item.displayName,
+        id: item.id
+    }))
+}
+
+/**
+ * 联想搜索用户
+ */
+const fetchUsers = async (params) => {
+    const query = params.keyword || ''
+    if (userCache.value.length === 0) {
+        await loadAllUsers()
+    }
+    if (!query) return userCache.value
+
+    const lowerQuery = query.toLowerCase()
+    return userCache.value.filter(item => {
+        const text = item.value
+        const lowerText = text.toLowerCase()
+        if (lowerText.includes(lowerQuery)) return true
+        // 拼音匹配
+        if (PinyinMatch.match(text, query)) return true
+        return false
+    })
+}
+
+const handleTargetTypeChange = (val) => {
+    if (val !== 2) {
+        targetUserType.value = 'all'
+        selectedUserNames.value = []
+        selectedUserIds.value = []
+        nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+    }
+}
+
+const handleTargetUserTypeChange = (val) => {
+    selectedUserNames.value = []
+    selectedUserIds.value = []
+    // 清除校验
+    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+    if (val === 'specific') {
+        // 自动聚焦 SmartAutoComplete
+        nextTick(() => userAutoCompleteRef.value?.focus())
+    }
+}
+
+/**
+ * 监听选中用户名变化 → 反查 userCache 同步 ID 列表
+ * 模式：multipleIdMode=false + watch，参考 ImageReference.vue
+ */
+watch(selectedUserNames, (names) => {
+    selectedUserIds.value = names
+        .map(name => userCache.value.find(u => u.value === name))
+        .filter(Boolean)
+        .map(u => u.id)
+    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+}, { deep: true })
+
 // ============================================================
 // 表单校验规则
 // ============================================================
@@ -289,6 +388,18 @@ const rules = {
     ],
     targetType: [
         { required: true, message: '请选择推送范围', trigger: 'change' }
+    ],
+    specifiedUsers: [
+        {
+            validator: (rule, value, callback) => {
+                if (targetUserType.value === 'specific' && selectedUserNames.value.length === 0) {
+                    callback(new Error('请至少选择一位指定用户'))
+                } else {
+                    callback()
+                }
+            },
+            trigger: 'blur'
+        }
     ]
 }
 
@@ -319,6 +430,7 @@ const fetchNotices = async () => {
 
 onMounted(() => {
     fetchNotices()
+    loadAllUsers()
 })
 
 /**
@@ -365,6 +477,9 @@ const handleReset = () => {
 const handleAdd = async () => {
     dialogVisible.value = true
     dialogTitle.value = '新增公告'
+    targetUserType.value = 'all'
+    selectedUserNames.value = []
+    selectedUserIds.value = []
     await nextTick()
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, defaultModel)
