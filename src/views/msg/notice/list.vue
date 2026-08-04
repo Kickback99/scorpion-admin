@@ -35,18 +35,13 @@
                 <el-button v-else type="warning" size="small" plain>长文本</el-button>
             </template>
         </el-table-column>
-        <el-table-column label="当前展示" width="100" align="center">
-            <template #default="{ row }">
-                <el-tag v-if="row.isCurrent === 1" type="success" size="small">是</el-tag>
-                <el-tag v-else type="info" size="small">否</el-tag>
-            </template>
-        </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
             <template #default="{ row }">
                 <el-button size="small" type="success" v-if="row.status === 1">生效中</el-button>
                 <el-button size="small" type="danger" v-else>已下架</el-button>
             </template>
         </el-table-column>
+        <el-table-column prop="pushTime" label="推送时间" width="200" />
         <el-table-column prop="createTime" label="创建时间" width="200" />
         <el-table-column prop="updateTime" label="更新时间" width="200" />
 
@@ -134,20 +129,6 @@
                 />
             </el-form-item>
 
-            <!-- 是否设为当前展示 -->
-            <el-form-item prop="isCurrent" label="设为当前展示">
-                <template #label>
-                    设为当前展示
-                    <el-tooltip content="设为当前展示后，用户刷新页面将看到此公告" placement="top">
-                        <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                </template>
-                <el-radio-group v-model="formModel.isCurrent">
-                    <el-radio :value="0">否</el-radio>
-                    <el-radio :value="1">是</el-radio>
-                </el-radio-group>
-            </el-form-item>
-
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -199,7 +180,6 @@ const formModel = reactive({
     title: '',
     content: '',
     type: 0,        // 0-普通 1-长文本
-    isCurrent: 0    // 0-否 1-是
 })
 
 const ruleFormRef = ref(null)
@@ -324,7 +304,6 @@ const handleAdd = async () => {
         title: '',
         content: '',
         type: 0,
-        isCurrent: 0
     })
 }
 
@@ -341,7 +320,6 @@ const handleEdit = async (row) => {
         title: row.title || '',
         content: row.content || '',
         type: row.type !== undefined ? row.type : 0,
-        isCurrent: row.isCurrent || 0
     })
 }
 
@@ -355,7 +333,6 @@ const handleConfirm = async () => {
             title: formModel.title,
             content: formModel.content,
             type: formModel.type,
-            isCurrent: formModel.isCurrent
         }
         if (!formModel.id) {
             await noticeAddApi(params)
