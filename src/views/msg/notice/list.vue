@@ -11,6 +11,9 @@
             <el-form-item style="width: 200px">
                 <SmartSelector v-model="searchModel.type" :data="typeOptions" placeholder="请选择消息类型" />
             </el-form-item>
+            <el-form-item style="width: 200px">
+                <SmartSelector v-model="searchModel.targetType" :data="targetTypeOptions" placeholder="请选择推送范围" />
+            </el-form-item>
             <el-form-item>
                 <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
@@ -37,8 +40,17 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
             <template #default="{ row }">
-                <el-button size="small" type="success" v-if="row.status === 1">生效中</el-button>
-                <el-button size="small" type="danger" v-else>已下架</el-button>
+                <el-button size="small" type="info" v-if="row.status === 0">草稿</el-button>
+                <el-button size="small" type="success" v-if="row.status === 1">已推送</el-button>
+                <el-button size="small" type="success" v-if="row.status === 2">已下架</el-button>
+            </template>
+        </el-table-column>
+        <el-table-column label="推送范围" width="120">
+            <template #default="{ row }">
+                <el-button v-if="row.targetType === 1" type="primary" size="small">前台用户</el-button>
+                <el-button v-else-if="row.targetType === 2" type="warning" size="small">后台管理员</el-button>
+                <el-button v-else-if="row.targetType === 3" type="success" size="small">全部</el-button>
+                <el-button v-else type="info" size="small">未设置</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="pushTime" label="推送时间" width="200" />
@@ -47,17 +59,46 @@
 
         <el-table-column label="操作" width="320" fixed="right">
             <template #default="{ row }">
-                <!-- 生效中：显示推送 + 下架 -->
-                <template v-if="row.status === 1">
-                    <el-button size="small" type="success" icon="Position" @click="handlePush(row)" plain>推送</el-button>
-                    <el-button size="small" type="warning" icon="Bottom" @click="handleOffline(row)" plain>下架</el-button>
-                </template>
-                <!-- 已下架：显示上架 -->
-                <template v-else>
-                    <el-button size="small" type="primary" icon="Top" @click="handleOnline(row)" plain>上架</el-button>
-                </template>
+                <!-- 推送按钮 -->
+                <el-button 
+                    v-if="row.status === 0 || row.status === 2"
+                    size="small" 
+                    type="success" 
+                    icon="Position" 
+                    @click="handlePush(row)" 
+                    plain
+                >推送</el-button>
+
+                <!-- 下架按钮 -->
+                <el-button 
+                    v-if="row.status === 0 || row.status === 1"
+                    size="small" 
+                    type="warning" 
+                    icon="Bottom" 
+                    @click="handleOffline(row)" 
+                    plain
+                >下架</el-button>
+
+                <!-- 上架按钮 -->
+                <el-button 
+                    v-if="row.status === 2"
+                    size="small" 
+                    type="primary" 
+                    icon="Top" 
+                    @click="handleOnline(row)" 
+                    plain
+                >上架</el-button>
+
+                <!-- 编辑 -->
                 <el-button size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
-                <el-popconfirm :title="`你确定要删除该公告吗？`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
+
+                <!-- 删除 -->
+                <el-popconfirm 
+                    :title="`你确定要删除该公告吗？`" 
+                    @confirm="handleDelete(row.id)" 
+                    width="250px" 
+                    icon="WarnTriangleFilled"
+                >
                     <template #reference>
                         <el-button size="small" type="danger" icon="Delete" plain>删除</el-button>
                     </template>
@@ -129,6 +170,28 @@
                 />
             </el-form-item>
 
+            <!-- 推送范围 -->
+            <el-form-item prop="targetType" label="推送范围">
+                <template #label>
+                    推送范围
+                    <el-tooltip content="选择公告的推送目标用户" placement="top">
+                        <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                </template>
+                <el-radio-group v-model="formModel.targetType">
+                    <el-radio :value="1">前台用户</el-radio>
+                    <el-radio :value="2">后台管理员</el-radio>
+                    <el-radio :value="3">全部</el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <!-- 状态（仅编辑时显示，只读） -->
+            <el-form-item v-if="formModel.id" label="状态">
+                <el-tag v-if="formModel.status === 0" type="info" size="small">草稿</el-tag>
+                <el-tag v-else-if="formModel.status === 1" type="success" size="small">已推送</el-tag>
+                <el-tag v-else-if="formModel.status === 2" type="danger" size="small">已下架</el-tag>
+            </el-form-item>
+
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -175,12 +238,16 @@ const searchModel = reactive({
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 
-const formModel = reactive({
+const defaultModel = {
     id: null,
     title: '',
     content: '',
     type: 0,        // 0-普通 1-长文本
-})
+    targetType: 1,  // 1-前台用户 2-后台管理员 3-全部
+    status: 0       // 0-草稿 1-已推送 2-已下架
+}
+
+const formModel = reactive({ ...defaultModel })
 
 const ruleFormRef = ref(null)
 const multipleTableRef = ref(null)
@@ -189,8 +256,9 @@ const selectedRows = ref([])
 // 状态选项
 const statusOptions = [
     { label: '全部状态', value: '' },
-    { label: '生效中', value: '1' },
-    { label: '已下架', value: '0' }
+    { label: '草稿', value: '0' },
+    { label: '已推送', value: '1' },
+    { label: '已下架', value: '2' }
 ]
 
 // 消息类型选项
@@ -200,6 +268,14 @@ const typeOptions = [
     { label: '长文本', value: '1' }
 ]
 
+// 推送范围选项
+const targetTypeOptions = [
+    { label: '全部范围', value: '' },
+    { label: '前台用户', value: '1' },
+    { label: '后台管理员', value: '2' },
+    { label: '全部', value: '3' }
+]
+
 // ============================================================
 // 表单校验规则
 // ============================================================
@@ -207,6 +283,12 @@ const rules = {
     content: [
         { required: true, message: '请输入公告内容', trigger: 'blur' },
         { min: 2, max: 2000, message: '公告内容长度为 2-2000 个字符', trigger: 'blur' }
+    ],
+    type: [
+        { required: true, message: '请选择消息类型', trigger: 'change' }
+    ],
+    targetType: [
+        { required: true, message: '请选择推送范围', trigger: 'change' }
     ]
 }
 
@@ -285,12 +367,7 @@ const handleAdd = async () => {
     dialogTitle.value = '新增公告'
     await nextTick()
     ruleFormRef.value?.resetFields()
-    Object.assign(formModel, {
-        id: null,
-        title: '',
-        content: '',
-        type: 0,
-    })
+    Object.assign(formModel, defaultModel)
 }
 
 // ============================================================
@@ -306,6 +383,8 @@ const handleEdit = async (row) => {
         title: row.title || '',
         content: row.content || '',
         type: row.type !== undefined ? row.type : 0,
+        targetType: row.targetType !== undefined ? row.targetType : 3,
+        status: row.status !== undefined ? row.status : 0
     })
 }
 
@@ -319,6 +398,7 @@ const handleConfirm = async () => {
             title: formModel.title,
             content: formModel.content,
             type: formModel.type,
+            targetType: formModel.targetType
         }
         if (!formModel.id) {
             await noticeAddApi(params)
@@ -375,8 +455,16 @@ const handleOffline = async (row) => {
 }
 
 const handlePush = async (row) => {
+
+    // 已推送的状态不能再次推送
+    if (row.status === 1) {
+        msg.error('该公告已推送，不能重复推送')
+        return
+    }
+
     await noticePushApi(row.id)
     msg.primary('推送成功，所有在线用户已收到公告')
+    fetchNotices()
 }
 </script>
 
