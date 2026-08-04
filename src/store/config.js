@@ -116,6 +116,9 @@ export const useConfigStore = defineStore({
         pagination_page_size: 7,
       },
       websocket_enabled: true,
+      notice: {
+        dismissed_level: 'session',
+      },
     },
 
     // ===== admin 后台 =====
@@ -390,6 +393,11 @@ export const useConfigStore = defineStore({
     getWebsocketEnabled()          { return this.getValue('websocket_enabled') ?? true },
     toggleWebsocketEnabled()       { this.updateConfig('websocket_enabled', !this.getValue('websocket_enabled')) },
 
+    // ==================== notice ====================
+
+    getNoticeDismissedLevel()      { return this.getValue('notice.dismissed_level') || 'session' },
+    setNoticeDismissedLevel(v)     { this.updateConfig('notice.dismissed_level', v) },
+
     // -- search_menu_focus --
     getSearchMenuFocus()           { return this.getValue('search_menu_focus') === true },
     toggleSearchMenuFocus()        { this.updateConfig('search_menu_focus', !this.getValue('search_menu_focus')) },
@@ -575,6 +583,7 @@ export const useConfigStore = defineStore({
     configViewMode()          { return this.getValue('config_view_mode') || 'card' },
     tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
     isWebsocketEnabled()      { return this.getValue('websocket_enabled') === true },
+    noticeDismissedLevel()    { return this.getValue('notice.dismissed_level') || 'session' },
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
     themeDotShape()           { return this.getValue('theme_dot_shape') || 'circle' },

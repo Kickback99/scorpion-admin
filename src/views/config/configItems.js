@@ -60,6 +60,8 @@ export function useConfigItems() {
         { key: 'article_list.pagination_page_size',  type: 'number', label: '分页大小',       desc: '分页模式下每页文章数量',                  icon: List,           get: () => config.getValue('article_list.pagination_page_size'),     set: (v) => config.updateConfig('article_list.pagination_page_size', v), min: () => getMin('article_list.pagination_page_size'), max: () => getMax('article_list.pagination_page_size') },
         // ===== 顶层配置 =====
         { key: 'websocket_enabled',                  type: 'switch', label: 'WebSocket 连接', desc: '控制前端 WebSocket 连接的开启与关闭',      icon: Connection,     get: () => config.getValue('websocket_enabled'),           set: (v) => config.updateConfig('websocket_enabled', v) },
+        // ===== notice =====
+        { key: 'notice.dismissed_level',         type: 'radio',  label: '公告生效级别',   desc: '公告不再提示的生效级别',                  icon: "Bell",         get: () => config.getValue('notice.dismissed_level'),      set: (v) => config.updateConfig('notice.dismissed_level', v),     options: [{ value: 'permanent', label: '永久' }, { value: 'session', label: '会话' }] },
       ]
     },
     {
