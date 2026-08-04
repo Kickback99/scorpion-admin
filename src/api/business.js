@@ -36,18 +36,10 @@ export const getArticleContentBusinessDataApi = (id, includeDeleted = false) => 
 
 /**
  * 获取所有文章列表（用于 SmartAutoComplete 联想搜索）
- * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认false）
  * @returns {Promise}
  */
-export const getAllArticlesApi = (includeDeleted = false) => {
-  const params = {}
-  if (includeDeleted) {
-    params.includeDeleted = true
-  }
-  return http.get('/admin/content/article/list/all', { params })
+export const getAllArticlesApi = () => http.get('/admin/content/article/list/all')
   
-}
-
 /**
  * 分页查询标签列表（用于 SmartAutoComplete 联想搜索）
  * @param {Number} pageNum 页码
