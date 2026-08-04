@@ -4,7 +4,7 @@ import http from '@/utils/request'
  * 查询公告列表
  * @returns {Promise}
  */
-export const noticeListApi = () => http.get('/admin/msg/notice/list')
+export const noticeListApi = (pageNum,pageSize,searchData) => http.get(`/admin/msg/notice/list/${pageNum}/${pageSize}`,{params:searchData})
 
 /**
  * 新增公告

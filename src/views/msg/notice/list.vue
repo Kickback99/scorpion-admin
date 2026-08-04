@@ -221,32 +221,18 @@ const handleTypeChange = () => {
 // 数据渲染
 // ============================================================
 /**
- * 获取公告列表（前端分页）
+ * 获取公告列表（后端分页）
  */
 const fetchNotices = async () => {
-    const res = await noticeListApi()
-    // 前端做分页和搜索过滤
-    let list = res.data || []
-
-    // 搜索过滤
-    if (searchModel.keyword) {
-        list = list.filter(item => item.content.includes(searchModel.keyword))
+    try {
+        const res = await noticeListApi(pagination.pageNum, pagination.pageSize, searchModel)
+        tableData.value = res.data.items || []
+        totalCount.value = res.data.total || 0
+    } catch (error) {
+        console.error('获取公告列表失败:', error)
+        tableData.value = []
+        totalCount.value = 0
     }
-    if (searchModel.status !== '') {
-        list = list.filter(item => item.status === Number(searchModel.status))
-    }
-
-    // 类型搜索过滤
-    if (searchModel.type !== '') {
-        list = list.filter(item => item.type === Number(searchModel.type))
-    }
-
-    totalCount.value = list.length
-
-    // 分页切割
-    const start = (pagination.pageNum - 1) * pagination.pageSize
-    const end = start + pagination.pageSize
-    tableData.value = list.slice(start, end)
 }
 
 onMounted(() => {
