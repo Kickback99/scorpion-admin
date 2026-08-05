@@ -89,6 +89,14 @@ export const noticeReadListApi = (pageNum, pageSize) =>
 export const noticeDetailApi = (id) =>
   http.get(`/admin/msg/notice/detail/${id}`)
 
+/**
+ * 获取公告指定用户的阅读状态
+ * @param {Number} noticeId 公告ID
+ * @returns {Promise}
+ */
+export const noticeReadStatusApi = (noticeId) =>
+  http.get(`/admin/msg/notice/${noticeId}/read-status`)
+
 // 公告图片上传
 export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
   timeout: 15000 //本次公告图上传请求超时15秒
