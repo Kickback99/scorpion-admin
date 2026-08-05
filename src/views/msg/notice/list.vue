@@ -122,8 +122,8 @@
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%">
-        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="100px" status-icon size="small">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%">
+        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" status-icon size="small">
             
             <!-- 公告标题 -->
             <el-form-item prop="title" label="公告标题">
@@ -171,8 +171,10 @@
                     :height="400"
                     upload-handler="notice"
                 />
-                <!-- 长文本模式（只读） -->
-                <div v-else class="notice-content-view">{{ formModel.content }}</div>
+                <!-- 长文本模式（只读 → MarkdownPreview） -->
+                <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
+                    <component :is="MarkdownPreview" :text="formModel.content" />
+                </div>
             </el-form-item>
 
             <!-- 推送范围 -->
@@ -238,7 +240,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
@@ -256,6 +258,8 @@ import {
 } from '@/api/notice'
 import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi } from '@/api/business'
+import { createMarkdownPreview } from '@/utils/markdown-config'
+import { useUserConfigStore } from '@/store/userConfig'
 import PinyinMatch from 'pinyin-match'
 
 // ============================================================
@@ -323,6 +327,11 @@ const selectedUserNames = ref([])                    // SmartAutoComplete v-mode
 const selectedUserIds = ref([])                      // 选中的用户 ID 列表
 const userCache = ref([])                            // 用户搜索结果缓存
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
+
+const userConfigStore = useUserConfigStore()
+const MarkdownPreview = computed(() => {
+  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
+})
 
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -550,7 +559,7 @@ const handleEdit = async (row) => {
 // ============================================================
 const handleDetail = async (row) => {
   dialogVisible.value = true
-  dialogTitle.value = '公告详情 — ' + (row.title || '')
+  dialogTitle.value = '公告详情'
   isReadonly.value = true
   await nextTick()
   ruleFormRef.value?.resetFields()
@@ -697,5 +706,39 @@ const handlePush = async (row) => {
   color: var(--el-text-color-primary);
   background: var(--el-fill-color-light);
   border-radius: 4px;
+}
+
+/* 暗黑模式 — 参考 article/list.vue */
+.dark-mode {
+  :deep(.v-md-editor) {
+    background-color: #000 !important;
+  }
+  :deep(.v-md-editor__preview-wrapper) {
+    background: black !important;
+  }
+  :deep(.vuepress-markdown-body) {
+    color: #fff;
+    background: black !important;
+  }
+}
+
+/* 代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
+.detail-panel {
+  :deep(.vuepress-markdown-body code) {
+    color: $code-color !important;
+    .token .operator {
+      background-color: transparent !important;
+    }
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+      background-color: transparent !important;
+    }
+  }
+  :deep(.vuepress-markdown-body img){
+    width: 200px !important;
+    margin: 15px !important;
+  }
+  :deep(.vuepress-markdown-body tr:nth-child(2n)) {
+    color: black;
+  }
 }
 </style>
