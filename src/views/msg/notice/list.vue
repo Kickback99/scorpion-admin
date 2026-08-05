@@ -89,8 +89,9 @@
                     plain
                 >上架</el-button>
 
-                <!-- 编辑 -->
-                <el-button size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
+                <!-- 编辑 / 详情 -->
+                <el-button v-if="row.status === 0" size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
+                <el-button v-else size="small" type="info" :icon="View" @click="handleDetail(row)" plain>详情</el-button>
 
                 <!-- 删除 -->
                 <el-popconfirm 
@@ -131,6 +132,7 @@
                     placeholder="请输入公告标题"
                     maxlength="100"
                     show-word-limit
+                    :disabled="isReadonly"
                 />
             </el-form-item>
 
@@ -142,7 +144,7 @@
                         <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="formModel.type" @change="handleTypeChange">
+                <el-radio-group v-model="formModel.type" @change="handleTypeChange" :disabled="isReadonly">
                     <el-radio :value="0">普通</el-radio>
                     <el-radio :value="1">长文本</el-radio>
                 </el-radio-group>
@@ -159,15 +161,18 @@
                     placeholder="请输入公告内容"
                     maxlength="2000"
                     show-word-limit
+                    :disabled="isReadonly"
                 />
-                <!-- 长文本模式（Markdown） -->
+                <!-- 长文本模式（可编辑） -->
                 <Markdown
-                    v-else
+                    v-else-if="!isReadonly"
                     :model-value="formModel.content"
                     @update:model-value="(val) => formModel.content = val"
                     :height="400"
                     upload-handler="notice"
                 />
+                <!-- 长文本模式（只读） -->
+                <div v-else class="notice-content-view">{{ formModel.content }}</div>
             </el-form-item>
 
             <!-- 推送范围 -->
@@ -178,7 +183,7 @@
                         <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="formModel.targetType" @change="handleTargetTypeChange">
+                <el-radio-group v-model="formModel.targetType" @change="handleTargetTypeChange" :disabled="isReadonly">
                     <el-radio :value="1">前台用户</el-radio>
                     <el-radio :value="2">后台管理员</el-radio>
                     <el-radio :value="3">全部</el-radio>
@@ -187,7 +192,7 @@
 
             <!-- 后台指定用户（推送范围=后台时显示） -->
             <el-form-item v-if="formModel.targetType === 2" label="目标用户">
-                <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange">
+                <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly">
                     <el-radio value="all">所有用户</el-radio>
                     <el-radio value="specific">指定用户</el-radio>
                 </el-radio-group>
@@ -195,6 +200,7 @@
 
             <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'specific'" label=" " prop="specifiedUsers">
                 <SmartAutoComplete
+                    v-if="!isReadonly"
                     ref="userAutoCompleteRef"
                     v-model="selectedUserNames"
                     :fetch-suggestions-api="fetchUsers"
@@ -207,6 +213,11 @@
                     :auto-search-on-enter="true"
                     style="width: 100%"
                 />
+                <!-- 只读模式：用 el-tag 展示已选用户名 -->
+                <div v-else>
+                    <el-tag v-for="name in selectedUserNames" :key="name" size="small" style="margin: 2px">{{ name }}</el-tag>
+                    <span v-if="!selectedUserNames.length" style="color: var(--el-text-color-secondary)">无</span>
+                </div>
             </el-form-item>
 
             <!-- 状态（仅编辑时显示，只读） -->
@@ -219,15 +230,15 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button size="small" type="primary" @click="handleConfirm" plain>确认</el-button>
-                <el-button size="small" type="info" @click="dialogVisible = false" plain>取消</el-button>
+                <el-button v-if="!isReadonly" size="small" type="primary" @click="handleConfirm" plain>确认</el-button>
+                <el-button size="small" type="info" @click="dialogVisible = false" plain>关闭</el-button>
             </span>
         </template>
     </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
@@ -240,8 +251,10 @@ import {
     noticeRemoveApi,
     noticeOnlineApi,
     noticeOfflineApi,
-    noticePushApi
+    noticePushApi,
+    noticeDetailApi
 } from '@/api/notice'
+import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi } from '@/api/business'
 import PinyinMatch from 'pinyin-match'
 
@@ -309,6 +322,7 @@ const targetUserType = ref('all')                    // 'all' | 'specific'
 const selectedUserNames = ref([])                    // SmartAutoComplete v-model（标签数组）
 const selectedUserIds = ref([])                      // 选中的用户 ID 列表
 const userCache = ref([])                            // 用户搜索结果缓存
+const isReadonly = ref(false)                        // 只读模式（详情查看时）
 
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -477,6 +491,7 @@ const handleReset = () => {
 const handleAdd = async () => {
     dialogVisible.value = true
     dialogTitle.value = '新增公告'
+    isReadonly.value = false
     targetUserType.value = 'all'
     selectedUserNames.value = []
     selectedUserIds.value = []
@@ -497,16 +512,75 @@ const handleEdit = async (row) => {
 
     dialogVisible.value = true
     dialogTitle.value = '编辑公告'
+    isReadonly.value = false
     await nextTick()
     ruleFormRef.value?.resetFields()
+
+    // 加载完整详情，含 pushScope 和 targetUserIds
+    try {
+        const res = await noticeDetailApi(row.id)
+        const detail = res.data
+        Object.assign(formModel, {
+            id: detail.id,
+            title: detail.title || '',
+            content: detail.content || '',
+            type: detail.type !== undefined ? detail.type : 0,
+            targetType: detail.targetType !== undefined ? detail.targetType : 3,
+            status: detail.status !== undefined ? detail.status : 0
+        })
+        // 回显指定用户
+        if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
+            targetUserType.value = 'specific'
+            selectedUserIds.value = detail.targetUserIds
+            const userMap = {}
+            userCache.value.forEach(u => { userMap[u.id] = u.value })
+            selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
+        } else {
+            targetUserType.value = 'all'
+            selectedUserNames.value = []
+            selectedUserIds.value = []
+        }
+    } catch (e) {
+        msg.error('获取公告详情失败')
+    }
+}
+
+// ============================================================
+// 详情（只读查看）
+// ============================================================
+const handleDetail = async (row) => {
+  dialogVisible.value = true
+  dialogTitle.value = '公告详情 — ' + (row.title || '')
+  isReadonly.value = true
+  await nextTick()
+  ruleFormRef.value?.resetFields()
+
+  try {
+    const res = await noticeDetailApi(row.id)
+    const detail = res.data
     Object.assign(formModel, {
-        id: row.id,
-        title: row.title || '',
-        content: row.content || '',
-        type: row.type !== undefined ? row.type : 0,
-        targetType: row.targetType !== undefined ? row.targetType : 3,
-        status: row.status !== undefined ? row.status : 0
+      id: detail.id,
+      title: detail.title || '',
+      content: detail.content || '',
+      type: detail.type !== undefined ? detail.type : 0,
+      targetType: detail.targetType !== undefined ? detail.targetType : 3,
+      status: detail.status !== undefined ? detail.status : 0,
+      pushTime: detail.pushTime || ''
     })
+    if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
+      targetUserType.value = 'specific'
+      selectedUserIds.value = detail.targetUserIds
+      const userMap = {}
+      userCache.value.forEach(u => { userMap[u.id] = u.value })
+      selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
+    } else {
+      targetUserType.value = 'all'
+      selectedUserNames.value = []
+      selectedUserIds.value = []
+    }
+  } catch (e) {
+    msg.error('获取详情失败')
+  }
 }
 
 // ============================================================
@@ -520,6 +594,15 @@ const handleConfirm = async () => {
             content: formModel.content,
             type: formModel.type,
             targetType: formModel.targetType
+        }
+        // pushScope + targetUserIds
+        if (formModel.targetType === 2 && targetUserType.value === 'specific'
+            && selectedUserIds.value.length > 0) {
+            params.pushScope = 2
+            params.targetUserIds = selectedUserIds.value
+        } else {
+            params.pushScope = 1
+            params.targetUserIds = null
         }
         if (!formModel.id) {
             await noticeAddApi(params)
@@ -580,11 +663,7 @@ const handlePush = async (row) => {
     msg.error('该公告已推送，不能重复推送')
     return
   }
-  // targetType=2（后台）且选择了指定用户时传递 userIds
-  const userIds = row.targetType === 2 && selectedUserIds.value.length > 0
-    ? selectedUserIds.value
-    : null
-  await noticePushApi(row.id, userIds)
+  await noticePushApi(row.id)
   msg.primary('推送成功')
   fetchNotices()
 }
@@ -607,5 +686,16 @@ const handlePush = async (row) => {
         max-height: 80vh;
         overflow-y: auto;
     }
+}
+
+.notice-content-view {
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 100px;
+  padding: 8px 12px;
+  line-height: 1.6;
+  color: var(--el-text-color-primary);
+  background: var(--el-fill-color-light);
+  border-radius: 4px;
 }
 </style>
