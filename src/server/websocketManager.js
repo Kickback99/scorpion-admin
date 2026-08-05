@@ -214,6 +214,15 @@ class WebSocketManager {
         }
         break
 
+      case 'notice':
+        const noticeId = arr[1]
+        const noticeTitle = arr[2]
+        // 触发全局事件，NoticeBell 组件监听此事件更新未读数
+        window.dispatchEvent(new CustomEvent('notice-push', {
+          detail: { noticeId, title: noticeTitle }
+        }))
+        break
+
       default:
         // 未知类型的数组消息，尝试显示
         console.warn('未知的数组消息类型:', messageType, arr)

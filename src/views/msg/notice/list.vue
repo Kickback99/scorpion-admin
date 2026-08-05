@@ -489,6 +489,12 @@ const handleAdd = async () => {
 // 编辑
 // ============================================================
 const handleEdit = async (row) => {
+
+    if (row.status === 1 || row.status === 2) {
+        msg.error('已推送或已下架的公告不允许编辑');
+        return;
+    }
+
     dialogVisible.value = true
     dialogTitle.value = '编辑公告'
     await nextTick()
@@ -570,16 +576,17 @@ const handleOffline = async (row) => {
 }
 
 const handlePush = async (row) => {
-
-    // 已推送的状态不能再次推送
-    if (row.status === 1) {
-        msg.error('该公告已推送，不能重复推送')
-        return
-    }
-
-    await noticePushApi(row.id)
-    msg.primary('推送成功，所有在线用户已收到公告')
-    fetchNotices()
+  if (row.status === 1) {
+    msg.error('该公告已推送，不能重复推送')
+    return
+  }
+  // targetType=2（后台）且选择了指定用户时传递 userIds
+  const userIds = row.targetType === 2 && selectedUserIds.value.length > 0
+    ? selectedUserIds.value
+    : null
+  await noticePushApi(row.id, userIds)
+  msg.primary('推送成功')
+  fetchNotices()
 }
 </script>
 
