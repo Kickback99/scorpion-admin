@@ -66,6 +66,13 @@ export const noticeMarkReadApi = (noticeId) =>
   http.put(`/admin/msg/notice/unread/read/${noticeId}`)
 
 /**
+ * 一键全部已读
+ * @returns {Promise}
+ */
+export const noticeMarkAllReadApi = () =>
+  http.delete('/admin/msg/notice/unread/all')
+
+/**
  * 获取未读公告数量
  * @returns {Promise}
  */
