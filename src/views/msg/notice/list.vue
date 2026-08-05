@@ -122,8 +122,8 @@
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%">
-        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="100px" status-icon size="small">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%">
+        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" status-icon size="small">
             
             <!-- 公告标题 -->
             <el-form-item prop="title" label="公告标题">
@@ -235,10 +235,76 @@
             </span>
         </template>
     </el-dialog>
+
+    <!-- ===== 详情弹窗（el-tabs） ===== -->
+    <el-dialog v-model="detailDialogVisible" width="50%" destroy-on-close>
+      <el-tabs v-model="detailActiveTab" class="detail-panel">
+        <!-- Tab 1: 基本信息 -->
+        <el-tab-pane label="基本信息" name="basic">
+          <el-form :model="detailData" label-width="100px" size="small">
+            <el-form-item label="公告标题">
+              <el-input :model-value="detailData.title" disabled />
+            </el-form-item>
+            <el-form-item label="消息类型">
+              <el-link type="primary" :underline="false" @click="handleJumpToContent">
+                {{ detailData.type === 0 ? '普通文本' : '长文本' }}
+              </el-link>
+            </el-form-item>
+            <el-form-item label="推送范围">
+              <el-tag v-if="detailData.targetType === 1" type="primary" size="small">前台用户</el-tag>
+              <el-tag v-else-if="detailData.targetType === 2" type="warning" size="small">后台管理员</el-tag>
+              <el-tag v-else-if="detailData.targetType === 3" type="success" size="small">全部</el-tag>
+            </el-form-item>
+            <el-form-item v-if="detailData.targetType === 2" label="后台范围">
+              <el-tag :type="detailData.pushScope === 2 ? 'warning' : ''" size="small">
+                {{ detailData.pushScope === 2 ? '指定用户' : '全部后台用户' }}
+              </el-tag>
+            </el-form-item>
+            <el-form-item label="状态">
+              <el-tag v-if="detailData.status === 0" type="info" size="small">草稿</el-tag>
+              <el-tag v-else-if="detailData.status === 1" type="success" size="small">已推送</el-tag>
+              <el-tag v-else-if="detailData.status === 2" type="danger" size="small">已下架</el-tag>
+            </el-form-item>
+            <el-form-item v-if="detailData.pushTime" label="推送时间">
+              <span>{{ detailData.pushTime }}</span>
+            </el-form-item>
+            <el-form-item v-if="detailData.createTime" label="创建时间">
+              <span>{{ detailData.createTime }}</span>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+
+        <!-- Tab 2: 公告详情 -->
+        <el-tab-pane label="公告详情" name="content">
+          <div v-if="detailData.type === 0" class="notice-content-view">{{ detailData.content }}</div>
+          <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
+            <component :is="MarkdownPreview" :text="detailData.content" />
+          </div>
+        </el-tab-pane>
+
+        <!-- Tab 3: 阅读状态（仅指定用户公告） -->
+        <el-tab-pane label="阅读状态" name="readStatus" :disabled="detailData.pushScope !== 2">
+          <div v-loading="readStatusLoading" class="read-status-list">
+            <div v-for="item in readStatusList" :key="item.userId" class="read-status-item">
+              <el-checkbox :model-value="item.read" disabled>{{ item.userName }}</el-checkbox>
+            </div>
+            <el-empty v-if="!readStatusLoading && readStatusList.length === 0" description="暂无数据" :image-size="0" />
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+      <template #footer>
+        <el-button size="small" type="info" @click="detailDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- Markdown 预览弹窗 -->
+    <el-dialog v-model="mdPreviewVisible" title="公告内容预览" width="60%" top="2vh" destroy-on-close>
+      <component :is="MarkdownPreview" :text="mdPreviewContent" />
+    </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
@@ -252,10 +318,13 @@ import {
     noticeOnlineApi,
     noticeOfflineApi,
     noticePushApi,
-    noticeDetailApi
+    noticeDetailApi,
+    noticeReadStatusApi
 } from '@/api/notice'
 import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi } from '@/api/business'
+import { createMarkdownPreview } from '@/utils/markdown-config'
+import { useUserConfigStore } from '@/store/userConfig'
 import PinyinMatch from 'pinyin-match'
 
 // ============================================================
@@ -323,6 +392,20 @@ const selectedUserNames = ref([])                    // SmartAutoComplete v-mode
 const selectedUserIds = ref([])                      // 选中的用户 ID 列表
 const userCache = ref([])                            // 用户搜索结果缓存
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
+
+// 详情弹窗（el-tabs）
+const userConfigStore = useUserConfigStore()
+const detailDialogVisible = ref(false)
+const detailActiveTab = ref('basic')
+const detailData = reactive({ ...defaultModel, pushTime: '', createTime: '', pushScope: 1 })
+const readStatusList = ref([])
+const readStatusLoading = ref(false)
+const mdPreviewVisible = ref(false)
+const mdPreviewContent = ref('')
+
+const MarkdownPreview = computed(() => {
+  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
+})
 
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -546,41 +629,49 @@ const handleEdit = async (row) => {
 }
 
 // ============================================================
-// 详情（只读查看）
+// 详情（只读查看，el-tabs 展示）
 // ============================================================
 const handleDetail = async (row) => {
-  dialogVisible.value = true
-  dialogTitle.value = '公告详情 — ' + (row.title || '')
-  isReadonly.value = true
-  await nextTick()
-  ruleFormRef.value?.resetFields()
-
+  detailDialogVisible.value = true
+  detailActiveTab.value = 'basic'
   try {
     const res = await noticeDetailApi(row.id)
     const detail = res.data
-    Object.assign(formModel, {
+    Object.assign(detailData, {
       id: detail.id,
       title: detail.title || '',
       content: detail.content || '',
       type: detail.type !== undefined ? detail.type : 0,
       targetType: detail.targetType !== undefined ? detail.targetType : 3,
       status: detail.status !== undefined ? detail.status : 0,
-      pushTime: detail.pushTime || ''
+      pushTime: detail.pushTime || '',
+      createTime: detail.createTime || '',
+      pushScope: detail.pushScope !== undefined ? detail.pushScope : 1
     })
-    if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
-      targetUserType.value = 'specific'
-      selectedUserIds.value = detail.targetUserIds
-      const userMap = {}
-      userCache.value.forEach(u => { userMap[u.id] = u.value })
-      selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
-    } else {
-      targetUserType.value = 'all'
-      selectedUserNames.value = []
-      selectedUserIds.value = []
+    // 加载阅读状态
+    if (detail.pushScope === 2) {
+      readStatusLoading.value = true
+      try {
+        const statusRes = await noticeReadStatusApi(row.id)
+        readStatusList.value = statusRes.data || []
+      } catch (e) {
+        console.error('获取阅读状态失败:', e)
+      } finally {
+        readStatusLoading.value = false
+      }
     }
   } catch (e) {
     msg.error('获取详情失败')
   }
+}
+
+const handleMdPreview = () => {
+  mdPreviewContent.value = detailData.content || ''
+  mdPreviewVisible.value = true
+}
+
+const handleJumpToContent = () => {
+  detailActiveTab.value = 'content'
 }
 
 // ============================================================
@@ -697,5 +788,45 @@ const handlePush = async (row) => {
   color: var(--el-text-color-primary);
   background: var(--el-fill-color-light);
   border-radius: 4px;
+}
+
+.read-status-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+
+  .read-status-item {
+    min-width: 70px;
+  }
+}
+
+/* 暗黑模式 — 参考 article/list.vue */
+.dark-mode {
+  :deep(.v-md-editor) {
+    background-color: #000 !important;
+  }
+  :deep(.v-md-editor__preview-wrapper) {
+    background: black !important;
+  }
+  :deep(.vuepress-markdown-body) {
+    color: #fff;
+    background: black !important;
+  }
+}
+
+/* 代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
+.detail-panel {
+  :deep(.vuepress-markdown-body code) {
+    color: $code-color !important;
+    .token .operator {
+      background-color: transparent !important;
+    }
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+      background-color: transparent !important;
+    }
+  }
+  :deep(.vuepress-markdown-body tr:nth-child(2n)) {
+    color: black;
+  }
 }
 </style>
