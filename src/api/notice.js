@@ -44,13 +44,9 @@ export const noticeOfflineApi = (id) => http.put(`/admin/msg/notice/offline/${id
 /**
  * 推送公告
  * @param {Number} id 公告ID
- * @param {Number[]} [userIds] 指定后台用户ID（仅 targetType=2 时有效）
  * @returns {Promise}
  */
-export const noticePushApi = (id, userIds) => {
-  const data = (userIds && userIds.length > 0) ? userIds : undefined
-  return http.post(`/admin/msg/notice/push/${id}`, data)
-}
+export const noticePushApi = (id) => http.post(`/admin/msg/notice/push/${id}`)
 
 /**
  * 获取当前用户未读公告列表
@@ -84,6 +80,14 @@ export const noticeUnreadCountApi = () =>
  */
 export const noticeReadListApi = (pageNum, pageSize) =>
   http.get(`/admin/msg/notice/read/list/${pageNum}/${pageSize}`)
+
+/**
+ * 获取公告详情（含推送目标用户）
+ * @param {Number} id 公告ID
+ * @returns {Promise}
+ */
+export const noticeDetailApi = (id) =>
+  http.get(`/admin/msg/notice/detail/${id}`)
 
 // 公告图片上传
 export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
