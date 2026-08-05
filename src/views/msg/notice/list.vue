@@ -60,12 +60,12 @@
         <el-table-column label="操作" width="320" fixed="right">
             <template #default="{ row }">
                 <!-- 推送按钮 -->
-                <el-button 
-                    v-if="row.status === 0 || row.status === 2"
-                    size="small" 
-                    type="success" 
-                    icon="Position" 
-                    @click="handlePush(row)" 
+                <el-button
+                    v-if="(row.status === 0 || row.status === 2) && !row.pushTime"
+                    size="small"
+                    type="success"
+                    icon="Position"
+                    @click="handlePush(row)"
                     plain
                 >推送</el-button>
 
@@ -90,7 +90,7 @@
                 >上架</el-button>
 
                 <!-- 编辑 / 详情 -->
-                <el-button v-if="row.status === 0" size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
+                <el-button v-if="row.status === 0 || row.status === 2" size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
                 <el-button v-else size="small" type="info" :icon="View" @click="handleDetail(row)" plain>详情</el-button>
 
                 <!-- 删除 -->
@@ -514,8 +514,8 @@ const handleAdd = async () => {
 // ============================================================
 const handleEdit = async (row) => {
 
-    if (row.status === 1 || row.status === 2) {
-        msg.error('已推送或已下架的公告不允许编辑');
+    if (row.status === 1) {
+        msg.error('已推送的公告不允许编辑');
         return;
     }
 
@@ -650,21 +650,26 @@ const handleDelete = async (id) => {
     await noticeRemoveApi(id)
     msg.primary('操作成功')
     fetchNotices()
+    notifyRefresh()
 }
 
 // ============================================================
 // 上架/下架/推送
 // ============================================================
+const notifyRefresh = () => window.dispatchEvent(new CustomEvent('notice-refresh'))
+
 const handleOnline = async (row) => {
     await noticeOnlineApi(row.id)
     msg.primary('上架成功')
     fetchNotices()
+    notifyRefresh()
 }
 
 const handleOffline = async (row) => {
     await noticeOfflineApi(row.id)
     msg.primary('下架成功')
     fetchNotices()
+    notifyRefresh()
 }
 
 const handlePush = async (row) => {
@@ -675,6 +680,7 @@ const handlePush = async (row) => {
   await noticePushApi(row.id)
   msg.primary('推送成功')
   fetchNotices()
+  notifyRefresh()
 }
 </script>
 
