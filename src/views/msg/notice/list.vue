@@ -751,8 +751,8 @@ const handlePush = async (row) => {
     }
   }
   :deep(.vuepress-markdown-body img){
-    width: 200px !important;
-    margin: 15px !important;
+    width: $notice-img !important;
+    margin: $notice-img-margin !important;
   }
   :deep(.vuepress-markdown-body tr:nth-child(2n)) {
     color: black;
