@@ -215,7 +215,7 @@
                 />
                 <!-- 富文本模式（只读 → MarkdownPreview） -->
                 <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
-                    <component :is="MarkdownPreview" :text="formModel.content" />
+                    <component :is="MarkdownPreview" :text="formModel.content" @click="handleCopyCodeSuccess" />
                 </div>
             </el-form-item>
 
@@ -834,6 +834,13 @@ const handleDelete = async (row) => {
 // ============================================================
 const notifyRefresh = () => window.dispatchEvent(new CustomEvent('notice-refresh'))
 
+const handleCopyCodeSuccess = (e) => {
+  const btn = e.target.closest('.v-md-copy-code-btn')
+  if (!btn) return
+  btn.classList.add('copied')
+  setTimeout(() => btn.classList.remove('copied'), 1500)
+}
+
 const handleOnline = async (row) => {
     await noticeOnlineApi(row.id)
     msg.primary('上架成功')
@@ -922,6 +929,21 @@ const handlePush = async (row) => {
     display: block !important;
     width: $notice-img !important;
     margin: auto !important;
+  }
+  :deep(.v-md-copy-code-btn.copied svg) {
+    display: none;
+  }
+  :deep(.v-md-copy-code-btn.copied::after) {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 8px;
+    height: 14px;
+    border-right: 2.5px solid var(--el-color-white);
+    border-bottom: 2.5px solid var(--el-color-white);
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 1px;
   }
 }
 </style>

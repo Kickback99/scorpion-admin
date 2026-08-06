@@ -85,7 +85,7 @@
     <el-divider />
     <div v-if="currentNotice?.type === 0" class="notice-body">{{ currentNotice?.content || '' }}</div>
     <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
-      <component :is="MarkdownPreview" :text="currentNotice?.content || ''" />
+      <component :is="MarkdownPreview" :text="currentNotice?.content || ''" @click="handleCopyCodeSuccess" />
     </div>
   </el-dialog>
 </template>
@@ -208,6 +208,13 @@ const handleMarkAllRead = async () => {
   } catch (e) {
     console.error('全部已读失败:', e)
   }
+}
+
+const handleCopyCodeSuccess = (e) => {
+  const btn = e.target.closest('.v-md-copy-code-btn')
+  if (!btn) return
+  btn.classList.add('copied')
+  setTimeout(() => btn.classList.remove('copied'), 1500)
 }
 
 // 6. WebSocket 事件处理
@@ -368,6 +375,21 @@ defineExpose({})
     display: block !important;
     width: $notice-img !important;
     margin: auto !important;
+  }
+  :deep(.v-md-copy-code-btn.copied svg) {
+    display: none;
+  }
+  :deep(.v-md-copy-code-btn.copied::after) {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 8px;
+    height: 14px;
+    border-right: 2.5px solid var(--el-color-white);
+    border-bottom: 2.5px solid var(--el-color-white);
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 1px;
   }
 }
 </style>
