@@ -73,6 +73,7 @@
         <!-- <el-footer>Footer</el-footer> -->
       </el-container>
     </el-container>
+    <NoticeBell />
   </div>
 </template>
 
@@ -89,6 +90,7 @@ import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
 import { useUserConfigStore } from '@/store/userConfig';
 import singleIcon from '@/components/MyIcon/src/singleIcon';
+import NoticeBell from '@/views/msg/notice/NoticeBell.vue';
 
 const userStore = useUserStore()
 
