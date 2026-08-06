@@ -2,7 +2,6 @@
     
     <el-config-provider :locale="zhCn">
         <router-view></router-view>
-        <NoticeBell />
     </el-config-provider>
 
 </template>
@@ -16,7 +15,7 @@ import { useUserConfigStore } from '@/store/userConfig'
 import { useUiStore } from '@/store/ui'
 import { useSettingStore } from '@/setting'
 import { applyTheme } from '@/assets/common/theme'
-import NoticeBell from '@/views/msg/notice/NoticeBell.vue'
+
 
 const route = useRoute()
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
