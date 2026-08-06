@@ -53,6 +53,7 @@
                 <el-button v-else type="info" size="small">未设置</el-button>
             </template>
         </el-table-column>
+        <el-table-column prop="createByName" label="创建者" width="120" />
         <el-table-column prop="pushTime" label="推送时间" width="200" />
         <el-table-column prop="createTime" label="创建时间" width="200" />
         <el-table-column prop="updateTime" label="更新时间" width="200" />
