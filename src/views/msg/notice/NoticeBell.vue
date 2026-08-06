@@ -31,7 +31,7 @@
       <el-tab-pane label="未读" name="unread">
         <div v-loading="loading" class="notice-list">
           <div v-for="item in unreadList" :key="item.id" class="notice-item">
-            <span class="notice-title">{{ item.title }}</span>
+            <span class="notice-title">{{ item.title  || '公告消息' }}</span>
             <div class="notice-actions">
               <el-button type="primary" link size="small" @click="handleViewDetail(item)">查看详情</el-button>
               <el-button type="success" link size="small" @click="handleMarkRead(item.id)">已读</el-button>
@@ -55,7 +55,7 @@
       <el-tab-pane label="已读" name="read">
         <div v-loading="readLoading" class="notice-list">
           <div v-for="item in readList" :key="item.id" class="notice-item">
-            <span class="notice-title">{{ item.title }}</span>
+            <span class="notice-title">{{ item.title || '公告消息' }}</span>
             <div class="notice-actions">
               <el-button type="primary" link size="small" @click="handleViewDetail(item)">查看详情</el-button>
             </div>
@@ -78,7 +78,7 @@
   </el-popover>
 
   <!-- 区块4: 详情弹窗 -->
-  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告详情'" width="650px" destroy-on-close>
+  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" width="650px" destroy-on-close>
     <div class="notice-meta">
       <span class="meta-time">推送时间：{{ currentNotice?.pushTime || '-' }}</span>
     </div>
