@@ -185,7 +185,7 @@
                         <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="formModel.targetType" @change="handleTargetTypeChange" :disabled="isReadonly">
+                <el-radio-group v-model="formModel.targetType" @change="handleTargetTypeChange" :disabled="isReadonly || !!formModel.pushTime">
                     <el-radio :value="1">前台用户</el-radio>
                     <el-radio :value="2">后台管理员</el-radio>
                     <el-radio :value="3">全部</el-radio>
@@ -194,7 +194,7 @@
 
             <!-- 后台指定用户（推送范围=后台时显示） -->
             <el-form-item v-if="formModel.targetType === 2" label="目标用户">
-                <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly">
+                <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly || !!formModel.pushTime">
                     <el-radio value="all">所有用户</el-radio>
                     <el-radio value="specific">指定用户</el-radio>
                 </el-radio-group>
@@ -202,7 +202,6 @@
 
             <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'specific'" label=" " prop="specifiedUsers">
                 <SmartAutoComplete
-                    v-if="!isReadonly"
                     ref="userAutoCompleteRef"
                     v-model="selectedUserNames"
                     :fetch-suggestions-api="fetchUsers"
@@ -213,13 +212,9 @@
                     :allow-custom="false"
                     custom-disabled-message="请输入已存在的用户名|呢称"
                     :auto-search-on-enter="true"
+                    :disabled="isReadonly || !!formModel.pushTime"
                     style="width: 100%"
                 />
-                <!-- 只读模式：用 el-tag 展示已选用户名 -->
-                <div v-else>
-                    <el-tag v-for="name in selectedUserNames" :key="name" size="small" style="margin: 2px">{{ name }}</el-tag>
-                    <span v-if="!selectedUserNames.length" style="color: var(--el-text-color-secondary)">无</span>
-                </div>
             </el-form-item>
 
             <!-- 状态（仅编辑时显示，只读） -->
@@ -288,7 +283,8 @@ const defaultModel = {
     content: '',
     type: 0,        // 0-普通 1-长文本
     targetType: 1,  // 1-前台用户 2-后台管理员 3-全部
-    status: 0       // 0-草稿 1-已推送 2-已下架
+    status: 0,      // 0-草稿 1-已推送 2-已下架
+    pushTime: null  // 推送时间（用于判断是否曾推送过）
 }
 
 const formModel = reactive({ ...defaultModel })
@@ -535,7 +531,8 @@ const handleEdit = async (row) => {
             content: detail.content || '',
             type: detail.type !== undefined ? detail.type : 0,
             targetType: detail.targetType !== undefined ? detail.targetType : 3,
-            status: detail.status !== undefined ? detail.status : 0
+            status: detail.status !== undefined ? detail.status : 0,
+            pushTime: detail.pushTime || null
         })
         // 回显指定用户
         if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
