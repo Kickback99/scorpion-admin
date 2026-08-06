@@ -94,10 +94,10 @@
                 <el-button v-else size="small" type="info" :icon="View" @click="handleDetail(row)" plain>详情</el-button>
 
                 <!-- 删除 -->
-                <el-popconfirm 
-                    :title="`你确定要删除该公告吗？`" 
-                    @confirm="handleDelete(row.id)" 
-                    width="250px" 
+                <el-popconfirm
+                    :title="`你确定要删除该公告吗？`"
+                    @confirm="handleDelete(row)"
+                    width="250px"
                     icon="WarnTriangleFilled"
                 >
                     <template #reference>
@@ -634,6 +634,11 @@ const handleBatchDelete = async () => {
         msg.error('请先勾选要删除的行')
         return
     }
+    const pushed = selectedRows.value.filter(r => r.status === 1)
+    if (pushed.length > 0) {
+        msg.error(`已推送的公告不能删除（共 ${pushed.length} 条），请先下架`)
+        return
+    }
     await ElMessageBox.confirm('你确认要进行删除么？', '温馨提示', {
         type: 'warning',
         confirmButtonText: '确认',
@@ -643,8 +648,17 @@ const handleBatchDelete = async () => {
     await handleDelete(ids)
 }
 
-const handleDelete = async (id) => {
-    await noticeRemoveApi(id)
+const handleDelete = async (row) => {
+    // 批量删除传的是 id 数组
+    if (Array.isArray(row)) {
+        await noticeRemoveApi(row)
+    } else {
+        if (row.status === 1) {
+            msg.error('已推送的公告不能删除，请先下架')
+            return
+        }
+        await noticeRemoveApi(row.id)
+    }
     msg.primary('操作成功')
     fetchNotices()
     notifyRefresh()
