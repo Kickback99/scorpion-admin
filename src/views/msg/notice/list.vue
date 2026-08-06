@@ -1,30 +1,71 @@
 <template>
     <!-- ===== 搜索栏 ===== -->
-    <div class="flex justify-between">
-        <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
-            <el-form-item>
-                <el-input v-model="searchModel.keyword" placeholder="请输入公告内容" clearable />
-            </el-form-item>
-            <el-form-item style="width: 200px">
-                <SmartSelector v-model="searchModel.status" :data="statusOptions" placeholder="请选择状态" />
-            </el-form-item>
-            <el-form-item style="width: 200px">
-                <SmartSelector v-model="searchModel.type" :data="typeOptions" placeholder="请选择消息类型" />
-            </el-form-item>
-            <el-form-item style="width: 200px">
-                <SmartSelector v-model="searchModel.targetType" :data="targetTypeOptions" placeholder="请选择推送范围" />
-            </el-form-item>
-            <el-form-item>
-                <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
-                <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
-            </el-form-item>
-        </el-form>
+    <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
+        <!-- 第一排：基础筛选 -->
+        <el-form-item>
+            <el-input v-model="searchModel.keyword" placeholder="请输入公告内容" clearable style="width:180px" />
+        </el-form-item>
+        <el-form-item>
+            <SmartSelector v-model="searchModel.status" :data="statusOptions" style="width:140px" placeholder="请选择状态" />
+        </el-form-item>
+        <el-form-item>
+            <SmartSelector v-model="searchModel.type" :data="typeOptions" style="width:140px" placeholder="请选择消息类型" />
+        </el-form-item>
+        <el-form-item>
+            <SmartSelector v-model="searchModel.targetType" :data="targetTypeOptions" style="width:140px" placeholder="请选择推送范围" />
+        </el-form-item>
+        <br />
 
-        <div>
+        <!-- 第二排：排序 + 时间筛选 -->
+        <el-form-item>
+            <SmartSelector v-model="searchModel.sortField" :data="sortFieldOptions" style="width:160px" placeholder="请选择排序" />
+        </el-form-item>
+        <el-form-item>
+            <el-button size="small" :type="sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+            <el-button size="small" :type="sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
+        </el-form-item>
+        <el-form-item>
+            <SmartSelector v-model="searchModel.timeField" :data="timeFieldOptions" style="width:130px" placeholder="请选择时间" />
+        </el-form-item>
+        <el-form-item>
+            <SmartSelector v-model="quickDate" :data="quickDateOptions" style="width:130px" placeholder="快捷日期" />
+        </el-form-item>
+        <el-form-item>
+            <el-date-picker
+                v-model="startTime"
+                type="datetime"
+                placeholder="开始时间"
+                format="YYYY-MM-DD HH:mm:ss"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                :clearable="true"
+                style="width:190px"
+                @change="(val) => { applyTimeParams(); handleSearch() }"
+            />
+        </el-form-item>
+        <el-form-item>
+            <el-date-picker
+                v-model="endTime"
+                type="datetime"
+                placeholder="结束时间"
+                format="YYYY-MM-DD HH:mm:ss"
+                value-format="YYYY-MM-DD HH:mm:ss"
+                :clearable="true"
+                style="width:190px"
+                @change="(val) => { applyTimeParams(); handleSearch() }"
+            />
+        </el-form-item>
+        <br />
+
+        <!-- 第四排：操作按钮 -->
+        <el-form-item>
+            <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
+            <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
+        </el-form-item>
+        <el-form-item style="float:right">
             <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增公告</el-button>
             <el-button size="small" type="danger" icon="Delete" @click="handleBatchDelete" plain>批量删除</el-button>
-        </div>
-    </div>
+        </el-form-item>
+    </el-form>
 
     <!-- ===== 数据表格 ===== -->
     <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
@@ -257,9 +298,21 @@ import { getAllUsersApi } from '@/api/business'
 import { createMarkdownPreview } from '@/utils/markdown-config'
 import { useUserConfigStore } from '@/store/userConfig'
 import PinyinMatch from 'pinyin-match'
+import dayjs from 'dayjs'
 
 // ============================================================
 // 数据
+// ============================================================
+const startTime = ref('')
+const endTime = ref('')
+const quickDate = ref('')
+const quickDateOptions = [
+    { label: '快捷日期', value: '', disabled: true },
+    { label: '今天', value: 'today' },
+    { label: '昨天', value: 'yesterday' },
+    { label: '最近一周', value: 'week' },
+    { label: '最近一月', value: 'month' }
+]
 // ============================================================
 const tableData = ref([])
 const totalCount = ref(0)
@@ -269,11 +322,82 @@ const pagination = reactive({
     pageSize: 10
 })
 
+const sortOrder = ref('DESC')
+
 const searchModel = reactive({
     keyword: '',
     status: '',
-    type: ''
+    type: '',
+    targetType: '',
+    sortField: 'create_time',
+    sortOrder: 'DESC',
+    timeField: 'create_time',
+    createTimeBegin: null,
+    createTimeEnd: null,
+    updateTimeBegin: null,
+    updateTimeEnd: null,
+    pushTimeBegin: null,
+    pushTimeEnd: null
 })
+
+watch(sortOrder, (val) => { searchModel.sortOrder = val })
+
+// 时间字段切换 → 重新映射时间范围
+const clearTimeParams = () => {
+    searchModel.createTimeBegin = null
+    searchModel.createTimeEnd = null
+    searchModel.updateTimeBegin = null
+    searchModel.updateTimeEnd = null
+    searchModel.pushTimeBegin = null
+    searchModel.pushTimeEnd = null
+}
+
+const applyTimeParams = () => {
+    clearTimeParams()
+    switch (searchModel.timeField) {
+        case 'push_time':
+            searchModel.pushTimeBegin = startTime.value || null
+            searchModel.pushTimeEnd = endTime.value || null
+            break
+        case 'update_time':
+            searchModel.updateTimeBegin = startTime.value || null
+            searchModel.updateTimeEnd = endTime.value || null
+            break
+        default:
+            searchModel.createTimeBegin = startTime.value || null
+            searchModel.createTimeEnd = endTime.value || null
+    }
+}
+
+watch(() => searchModel.timeField, applyTimeParams)
+
+const setQuickDate = (type) => {
+    const now = new Date()
+    let start = null
+    let end = now
+    switch (type) {
+        case 'today':
+            start = new Date(now)
+            start.setHours(0, 0, 0, 0)
+            break
+        case 'yesterday':
+            start = new Date(now); start.setDate(start.getDate() - 1); start.setHours(0, 0, 0, 0)
+            end = new Date(now); end.setHours(0, 0, 0, 0)
+            break
+        case 'week':
+            start = new Date(now); start.setDate(start.getDate() - 7)
+            break
+        case 'month':
+            start = new Date(now); start.setMonth(start.getMonth() - 1)
+            break
+    }
+    startTime.value = start ? dayjs(start).format('YYYY-MM-DD HH:mm:ss') : ''
+    endTime.value = end ? dayjs(end).format('YYYY-MM-DD HH:mm:ss') : ''
+    applyTimeParams()
+    handleSearch()
+}
+
+watch(quickDate, (val) => { if (val) setQuickDate(val) })
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -317,6 +441,35 @@ const targetTypeOptions = [
     { label: '后台管理员', value: '2' },
     { label: '全部', value: '3' }
 ]
+
+// 排序字段选项
+const sortFieldOptions = [
+    { label: '请选择排序', value: '', disabled: true },
+    { label: '创建时间', value: 'create_time' },
+    { label: '推送时间', value: 'push_time' },
+    { label: '修改时间', value: 'update_time' },
+    { label: '标题', value: 'title' },
+    { label: '消息类型', value: 'type' },
+    { label: '推送范围', value: 'target_type' },
+    { label: '状态', value: 'status' }
+]
+
+// 时间字段选项
+const timeFieldOptions = [
+    { label: '请选择时间', value: '', disabled: true },
+    { label: '创建时间', value: 'create_time' },
+    { label: '推送时间', value: 'push_time' },
+    { label: '修改时间', value: 'update_time' }
+]
+
+const setSortOrder = (order) => {
+    sortOrder.value = order
+    searchModel.sortOrder = order
+}
+
+watch(() => searchModel.timeField, (val) => {
+    searchModel.timeBegin = startTime.value || null
+})
 
 // 后台指定用户相关
 const targetUserType = ref('all')                    // 'all' | 'specific'
@@ -490,6 +643,15 @@ const handleReset = () => {
     searchModel.keyword = ''
     searchModel.status = ''
     searchModel.type = ''
+    searchModel.targetType = ''
+    searchModel.sortField = 'create_time'
+    sortOrder.value = 'DESC'
+    searchModel.sortOrder = 'DESC'
+    searchModel.timeField = 'create_time'
+    startTime.value = ''
+    endTime.value = ''
+    quickDate.value = ''
+    clearTimeParams()
     fetchNotices()
 }
 
