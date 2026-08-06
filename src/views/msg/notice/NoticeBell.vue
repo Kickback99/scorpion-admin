@@ -21,7 +21,10 @@
 
     <div class="popover-header">
       <span class="popover-title">公告通知</span>
-      <el-button :icon="Close" link size="small" @click="popoverVisible = false" />
+      <div class="popover-header-actions">
+        <el-button v-if="unreadCount > 0" type="primary" link size="small" @click="handleMarkAllRead">全部已读</el-button>
+        <el-button :icon="Close" link size="small" @click="popoverVisible = false" />
+      </div>
     </div>
 
     <el-tabs v-model="activeTab" @tab-change="handleTabChange">
@@ -91,7 +94,7 @@
 // 1. 导入
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Bell, Close } from '@element-plus/icons-vue'
-import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi } from '@/api/notice'
+import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
 
 // 2. 状态
 const popoverVisible = ref(false)
@@ -189,6 +192,17 @@ const handleMarkRead = async (noticeId) => {
   }
 }
 
+const handleMarkAllRead = async () => {
+  try {
+    await noticeMarkAllReadApi()
+    unreadCount.value = 0
+    unreadList.value = []
+    unreadTotal.value = 0
+  } catch (e) {
+    console.error('全部已读失败:', e)
+  }
+}
+
 // 6. WebSocket 事件处理
 const handleNoticePush = () => {
   fetchUnreadCount()
@@ -238,6 +252,12 @@ defineExpose({})
     font-size: 14px;
     font-weight: 500;
     color: var(--el-text-color-primary);
+  }
+
+  .popover-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 }
 
