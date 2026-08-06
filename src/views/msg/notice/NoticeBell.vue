@@ -202,10 +202,12 @@ const handleNoticePush = () => {
 onMounted(() => {
   fetchUnreadCount()
   window.addEventListener('notice-push', handleNoticePush)
+  window.addEventListener('notice-refresh', fetchUnreadCount)
 })
 
 onUnmounted(() => {
   window.removeEventListener('notice-push', handleNoticePush)
+  window.removeEventListener('notice-refresh', fetchUnreadCount)
 })
 
 // 8. 暴露
