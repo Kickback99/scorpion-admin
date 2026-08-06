@@ -339,14 +339,14 @@ defineExpose({})
 
 .dark-mode {
   :deep(.v-md-editor) {
-    background-color: #000 !important;
+    background-color: var(--el-bg-color) !important;
   }
   :deep(.v-md-editor__preview-wrapper) {
-    background: black !important;
+    background: var(--el-bg-color) !important;
   }
   :deep(.vuepress-markdown-body) {
     color: #fff;
-    background: black !important;
+    background: var(--el-bg-color) !important;
   }
 }
 
