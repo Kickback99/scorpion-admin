@@ -398,9 +398,11 @@ watch(selectedUserNames, (names) => {
 // 表单校验规则
 // ============================================================
 const rules = {
+    title: [
+        { required: true, message: '请输入公告标题', trigger: 'blur' }
+    ],
     content: [
-        { required: true, message: '请输入公告内容', trigger: 'blur' },
-        { min: 2, max: 2000, message: '公告内容长度为 2-2000 个字符', trigger: 'blur' }
+        { required: true, message: '请输入公告内容', trigger: 'blur' }
     ],
     type: [
         { required: true, message: '请选择消息类型', trigger: 'change' }
