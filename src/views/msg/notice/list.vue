@@ -35,7 +35,7 @@
         <el-table-column label="消息类型" width="100">
             <template #default=" { row} ">
                 <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
-                <el-button v-else type="warning" size="small" plain>长文本</el-button>
+                <el-button v-else type="warning" size="small" plain>富文本</el-button>
             </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
@@ -141,13 +141,13 @@
             <el-form-item prop="type" label="消息类型">
                 <template #label>
                     消息类型
-                    <el-tooltip content="普通文本适合简短通知，长文本支持 Markdown 格式" placement="top">
+                    <el-tooltip content="普通文本适合简短通知，富文本支持 Markdown 格式" placement="top">
                         <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                 </template>
                 <el-radio-group v-model="formModel.type" @change="handleTypeChange" :disabled="isReadonly">
                     <el-radio :value="0">普通</el-radio>
-                    <el-radio :value="1">长文本</el-radio>
+                    <el-radio :value="1">富文本</el-radio>
                 </el-radio-group>
             </el-form-item>
 
@@ -164,7 +164,7 @@
                     show-word-limit
                     :disabled="isReadonly"
                 />
-                <!-- 长文本模式（可编辑） -->
+                <!-- 富文本模式（可编辑） -->
                 <Markdown
                     v-else-if="!isReadonly"
                     :model-value="formModel.content"
@@ -172,7 +172,7 @@
                     :height="400"
                     upload-handler="notice"
                 />
-                <!-- 长文本模式（只读 → MarkdownPreview） -->
+                <!-- 富文本模式（只读 → MarkdownPreview） -->
                 <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
                     <component :is="MarkdownPreview" :text="formModel.content" />
                 </div>
@@ -282,7 +282,7 @@ const defaultModel = {
     id: null,
     title: '',
     content: '',
-    type: 0,        // 0-普通 1-长文本
+    type: 0,        // 0-普通 1-富文本
     targetType: 1,  // 1-前台用户 2-后台管理员 3-全部
     status: 0,      // 0-草稿 1-已推送 2-已下架
     pushTime: null  // 推送时间（用于判断是否曾推送过）
@@ -307,7 +307,7 @@ const statusOptions = [
 const typeOptions = [
     { label: '全部类型', value: '' },
     { label: '普通', value: '0' },
-    { label: '长文本', value: '1' }
+    { label: '富文本', value: '1' }
 ]
 
 // 推送范围选项
