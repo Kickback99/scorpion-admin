@@ -30,8 +30,8 @@
     <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="content" label="公告内容" show-overflow-tooltip />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
+        <el-table-column prop="content" label="公告内容" show-overflow-tooltip />
         <el-table-column label="消息类型" width="100">
             <template #default=" { row} ">
                 <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
