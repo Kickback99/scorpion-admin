@@ -78,23 +78,30 @@
   </el-popover>
 
   <!-- 区块4: 详情弹窗 -->
-  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告详情'" width="600px" destroy-on-close>
+  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告详情'" width="650px" destroy-on-close>
     <div class="notice-meta">
-      <el-tag size="small" :type="currentNotice?.type === 0 ? '' : 'warning'">
-        {{ currentNotice?.type === 0 ? '普通文本' : '长文本' }}
-      </el-tag>
       <span class="meta-time">推送时间：{{ currentNotice?.pushTime || '-' }}</span>
     </div>
     <el-divider />
-    <div class="notice-body">{{ currentNotice?.content || '' }}</div>
+    <div v-if="currentNotice?.type === 0" class="notice-body">{{ currentNotice?.content || '' }}</div>
+    <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
+      <component :is="MarkdownPreview" :text="currentNotice?.content || ''" />
+    </div>
   </el-dialog>
 </template>
 
 <script setup>
 // 1. 导入
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Bell, Close } from '@element-plus/icons-vue'
 import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
+import { createMarkdownPreview } from '@/utils/markdown-config'
+import { useUserConfigStore } from '@/store/userConfig'
+
+const userConfigStore = useUserConfigStore()
+const MarkdownPreview = computed(() => {
+  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
+})
 
 // 2. 状态
 const popoverVisible = ref(false)
@@ -323,5 +330,38 @@ defineExpose({})
 :deep(.el-empty .el-empty__image) {
   display: none !important;
   margin: 0;
+}
+
+.dark-mode {
+  :deep(.v-md-editor) {
+    background-color: #000 !important;
+  }
+  :deep(.v-md-editor__preview-wrapper) {
+    background: black !important;
+  }
+  :deep(.vuepress-markdown-body) {
+    color: #fff;
+    background: black !important;
+  }
+}
+
+/* 代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
+.detail-panel {
+  :deep(.vuepress-markdown-body code) {
+    color: $code-color !important;
+    .token .operator {
+      background-color: transparent !important;
+    }
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+      background-color: transparent !important;
+    }
+  }
+  :deep(.vuepress-markdown-body img){
+    width: $notice-img !important;
+    margin: $notice-img-margin !important;
+  }
+  :deep(.vuepress-markdown-body tr:nth-child(2n)) {
+    color: black;
+  }
 }
 </style>
