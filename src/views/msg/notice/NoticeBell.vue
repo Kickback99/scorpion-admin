@@ -211,12 +211,17 @@ const handleMarkAllRead = async () => {
 }
 
 // 6. WebSocket 事件处理
+let syncTimer = null
 const handleNoticePush = () => {
-  fetchUnreadCount()
+  // 乐观更新：立即 +1，避免竞态
+  unreadCount.value++
   // 如果弹窗已打开，同时刷新列表
   if (popoverVisible.value) {
     fetchUnreadList()
   }
+  // 去抖同步：300ms 内多次推送只发一次 API 校准
+  clearTimeout(syncTimer)
+  syncTimer = setTimeout(() => fetchUnreadCount(), 300)
 }
 
 // 7. 生命周期
