@@ -61,7 +61,8 @@ export function useConfigItems() {
         // ===== 顶层配置 =====
         { key: 'websocket_enabled',                  type: 'switch', label: 'WebSocket 连接', desc: '控制前端 WebSocket 连接的开启与关闭',      icon: Connection,     get: () => config.getValue('websocket_enabled'),           set: (v) => config.updateConfig('websocket_enabled', v) },
         // ===== notice =====
-        { key: 'notice.dismissed_level',         type: 'radio',  label: '公告生效级别',   desc: '公告不再提示的生效级别',                  icon: "Bell",         get: () => config.getValue('notice.dismissed_level'),      set: (v) => config.updateConfig('notice.dismissed_level', v),     options: [{ value: 'permanent', label: '永久' }, { value: 'session', label: '会话' }] },
+        { key: 'notice.enabled',                 type: 'switch', label: '公告通知',       desc: '控制前台公告通知的开启与关闭',            icon: Bell,         get: () => config.getValue('notice.enabled'),              set: (v) => config.updateConfig('notice.enabled', v) },
+        { key: 'notice.dismissed_level',         type: 'radio',  label: '公告生效级别',   desc: '公告不再提示的生效级别',                  icon: Bell,         get: () => config.getValue('notice.dismissed_level'),      set: (v) => config.updateConfig('notice.dismissed_level', v),     options: [{ value: 'permanent', label: '永久' }, { value: 'session', label: '会话' }] },
       ]
     },
     {
