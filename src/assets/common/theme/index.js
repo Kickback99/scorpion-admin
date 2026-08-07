@@ -552,12 +552,12 @@ function injectPaginationCss() {
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'border-color:var(--el-color-primary-plain)!important;' +
     '}' +
-    '.ui-full .el-pager li:hover,' +
+    '.ui-full .el-pager li:not(.is-active):hover,' +
     '.ui-full .btn-next:hover,' +
     '.ui-full .btn-prev:hover{' +
     'color:var(--el-color-primary)!important;' +
     '}' +
-    '.ui-plain .el-pager li:hover,' +
+    '.ui-plain .el-pager li:not(.is-active):hover,' +
     '.ui-plain .btn-next:hover,' +
     '.ui-plain .btn-prev:hover{' +
     'color:var(--el-color-primary-plain)!important;' +
