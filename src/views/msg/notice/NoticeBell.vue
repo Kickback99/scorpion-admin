@@ -78,7 +78,8 @@
   </el-popover>
 
   <!-- 区块4: 详情弹窗 -->
-  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" width="650px" destroy-on-close>
+  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" width="650px" destroy-on-close
+  class="notice-detail-dialog">
     <div class="notice-meta">
       <span class="meta-time">推送时间：{{ currentNotice?.pushTime || '-' }}</span>
     </div>
@@ -284,6 +285,21 @@ defineExpose({})
   min-height: 200px;
   max-height: 360px;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 .notice-item {
@@ -337,6 +353,21 @@ defineExpose({})
   line-height: 1.7;
   max-height: 400px;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 :deep(.el-empty .el-empty__image) {
@@ -398,5 +429,23 @@ defineExpose({})
     transform: translate(-50%, -50%) rotate(45deg);
     border-radius: 1px;
   }
+}
+</style>
+
+<style lang="scss">
+/* 详情弹窗滚动条同步 index.scss 半透明风格 */
+.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+  border-radius: 2px;
+}
+.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+}
+.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>
