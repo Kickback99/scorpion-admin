@@ -59,8 +59,8 @@ const buildOption = () => ({
   series: [{
     name: '分类统计',
     type: 'pie',
-    radius: ['40%', '70%'],
-    center: ['40%', '50%'],
+    radius: window.innerWidth < 992 ? ['30%', '55%'] : ['40%', '70%'],
+    center: window.innerWidth < 992 ? ['32%', '50%'] : ['40%', '50%'],
     avoidLabelOverlap: false,
     padAngle: 2,
     itemStyle: {
@@ -83,7 +83,10 @@ const renderChart = () => {
   chartInstance.setOption(buildOption(), true)
 }
 
-const handleResize = () => chartInstance?.resize()
+const handleResize = () => {
+  chartInstance?.resize()
+  chartInstance?.setOption(buildOption())
+}
 
 watch(() => [props.legendData, props.seriesData], renderChart, { deep: true })
 

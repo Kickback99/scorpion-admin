@@ -5,7 +5,7 @@
             <component :is="userConfigStore.getCollapseEnabled() ?'Expand':'Fold'"></component>
         </el-icon>
         <!-- 面包屑 -->
-        <el-breadcrumb separator-icon="ArrowRight">
+        <el-breadcrumb v-show="!isMediumDown" separator-icon="ArrowRight">
             <el-breadcrumb-item v-for="(item, index) in route.matched" :key="index" v-show="!item.meta.hidden"
                 :to="item.path" class="breadcrumb">
                 <el-icon>
@@ -83,7 +83,7 @@
                 <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
                 <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
                 <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
-                <el-form-item v-if="configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
+                <el-form-item v-if="isMediumDown || configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
               </el-form>
             </el-popover>
 
@@ -106,8 +106,8 @@
         </el-dropdown>
     </div>
 
-    <!-- 主题布局切换器（float:底部浮动 / inline:行内色点 / popover:Popover 内） -->
-    <ThemeSwitcher />
+    <!-- 主题布局切换器（中屏幕以下隐藏，主题统一走 popover） -->
+    <ThemeSwitcher v-if="!isMediumDown" />
 </template>
 
 <script setup>
@@ -122,7 +122,7 @@ import { useUiStore } from '@/store/ui'
 import { applyTheme } from '@/assets/common/theme'
 import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
 import UiStyleSettings from '@/components/UiStyleSettings.vue'
 import UiSlider from '@/components/UiSlider.vue'
@@ -142,6 +142,41 @@ const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
 const configStore = useConfigStore()
+
+// ============================================================
+// 响应式中屏幕检测
+// ============================================================
+const isMediumDown = ref(false)
+const mediaQuery = window.matchMedia('(max-width: 991px)')
+
+function handleMediaChange(e) {
+  isMediumDown.value = e.matches
+}
+
+// 中屏幕以下自动折叠菜单
+const savedCollapse = ref(null)
+watch(isMediumDown, (val) => {
+  if (val) {
+    savedCollapse.value = userConfigStore.getCollapseEnabled()
+    if (!userConfigStore.getCollapseEnabled()) {
+      userConfigStore.toggleCollapse()
+    }
+  } else if (savedCollapse.value !== null) {
+    if (userConfigStore.getCollapseEnabled() !== savedCollapse.value) {
+      userConfigStore.toggleCollapse()
+    }
+    savedCollapse.value = null
+  }
+}, { immediate: true })
+
+onMounted(() => {
+  isMediumDown.value = mediaQuery.matches
+  mediaQuery.addEventListener('change', handleMediaChange)
+})
+
+onUnmounted(() => {
+  mediaQuery.removeEventListener('change', handleMediaChange)
+})
 
 // ============================================================
 // UI 滑块
@@ -415,6 +450,13 @@ const onTextColorModeChange = (mode) => {
 // 滑块容器撑满 el-form-item__content 宽度，避免右侧留白
 .slider-group {
   width: 100%;
+}
+
+// 中屏幕以下压缩搜索框宽度，防止断行
+@media (max-width: 991px) {
+  :deep(.smart-menu-search .search-input-row) {
+    width: 130px;
+  }
 }
 
 </style>

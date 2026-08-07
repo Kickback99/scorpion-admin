@@ -10,7 +10,7 @@
   <el-popover
     :visible="popoverVisible"
     placement="top-end"
-    :width="420"
+    :width="popoverWidth"
     trigger="manual"
     :hide-on-click="false"
     @hide="popoverVisible = false"
@@ -78,8 +78,8 @@
   </el-popover>
 
   <!-- 区块4: 详情弹窗 -->
-  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" width="650px" destroy-on-close
-  class="notice-detail-dialog">
+  <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" :width="dialogWidth" destroy-on-close
+      class="notice-detail-dialog">
     <div class="notice-meta">
       <span class="meta-time">推送时间：{{ currentNotice?.pushTime || '-' }}</span>
     </div>
@@ -112,6 +112,19 @@ const unreadCount = ref(0)
 const unreadTotal = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
+
+// ============================================================
+// 响应式中屏幕检测
+// ============================================================
+const isMediumDown = ref(false)
+const mediaQuery = window.matchMedia('(max-width: 991px)')
+const popoverWidth = computed(() => isMediumDown.value ? 320 : 420)
+const dialogWidth = computed(() => isMediumDown.value ? '90%' : '650px')
+
+function handleMediaChange(e) {
+  isMediumDown.value = e.matches
+}
+
 const loading = ref(false)
 const readList = ref([])
 const readTotal = ref(0)
@@ -234,12 +247,15 @@ const handleNoticePush = () => {
 
 // 7. 生命周期
 onMounted(() => {
+  isMediumDown.value = mediaQuery.matches
+  mediaQuery.addEventListener('change', handleMediaChange)
   fetchUnreadCount()
   window.addEventListener('notice-push', handleNoticePush)
   window.addEventListener('notice-refresh', fetchUnreadCount)
 })
 
 onUnmounted(() => {
+  mediaQuery.removeEventListener('change', handleMediaChange)
   window.removeEventListener('notice-push', handleNoticePush)
   window.removeEventListener('notice-refresh', fetchUnreadCount)
 })
