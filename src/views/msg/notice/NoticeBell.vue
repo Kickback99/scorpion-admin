@@ -357,6 +357,13 @@ defineExpose({})
   }
 }
 
+.detail-panel {
+  :deep(.github-markdown-body),
+  :deep(.vuepress-markdown-body) {
+    padding: 0 !important;
+  }
+}
+
 /* 代码高亮 + 表格样式 + 图片（同步 Markdown.vue scoped 块） */
 .detail-panel {
   :deep(.vuepress-markdown-body code) {
