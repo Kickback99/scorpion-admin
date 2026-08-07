@@ -117,6 +117,7 @@ export const useConfigStore = defineStore({
       },
       websocket_enabled: true,
       notice: {
+        enabled: false,
         dismissed_level: 'session',
       },
     },
@@ -395,6 +396,9 @@ export const useConfigStore = defineStore({
 
     // ==================== notice ====================
 
+    getNoticeEnabled()             { return this.getValue('notice.enabled') === true },
+    toggleNoticeEnabled()          { this.updateConfig('notice.enabled', !this.getValue('notice.enabled')) },
+
     getNoticeDismissedLevel()      { return this.getValue('notice.dismissed_level') || 'session' },
     setNoticeDismissedLevel(v)     { this.updateConfig('notice.dismissed_level', v) },
 
@@ -583,6 +587,7 @@ export const useConfigStore = defineStore({
     configViewMode()          { return this.getValue('config_view_mode') || 'card' },
     tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
     isWebsocketEnabled()      { return this.getValue('websocket_enabled') === true },
+    isNoticeEnabled()         { return this.getValue('notice.enabled') === true },
     noticeDismissedLevel()    { return this.getValue('notice.dismissed_level') || 'session' },
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
