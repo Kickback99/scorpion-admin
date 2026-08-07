@@ -287,6 +287,22 @@ html.dark .el-header:not(.page-theme) {
   width: $menu-min-width;
 }
 
+// 折叠状态下，子菜单右侧加小三角标识
+:deep(.el-menu--collapse .el-sub-menu__title) {
+  position: relative;
+}
+:deep(.el-menu--collapse .el-sub-menu__title::after) {
+  content: '';
+  position: absolute;
+  right: 6px;
+  top: calc(50% - 3px);
+  width: 0;
+  height: 0;
+  border-left: 4px solid var(--el-text-color-placeholder);
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
 // 侧边栏滚动区：flex:1 自动填充 Logo 下方剩余高度
 .scrollbar {
   flex: 1;
