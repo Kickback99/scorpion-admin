@@ -70,25 +70,15 @@
 // 浅色模式 pagination 输入框/选择器/页码/翻页按钮背景统一为 fill-color-light
 // ============================================================
 html:not(.dark) {
-  .el-pagination .el-input__wrapper,
-  .el-pagination .el-pager li,
-  .el-pagination .btn-prev,
-  .el-pagination .btn-next,
-  .el-pagination .btn-prev:disabled,
-  .el-pagination .btn-next:disabled {
-    background-color: var(--el-fill-color-light);
-  }
-}
-
-// NoticeBell 内 el-pagination 不跟随全局浅色背景
-html:not(.dark) {
-  .notice-pagination .el-pagination .el-input__wrapper,
-  .notice-pagination .el-pagination .el-pager li,
-  .notice-pagination .el-pagination .btn-prev,
-  .notice-pagination .el-pagination .btn-next,
-  .notice-pagination .el-pagination .btn-prev:disabled,
-  .notice-pagination .el-pagination .btn-next:disabled {
-    background-color: var(--el-bg-color);
+  .el-pagination:not(.notice-pagination .el-pagination) {
+    .el-input__wrapper,
+    .el-pager li,
+    .btn-prev,
+    .btn-next,
+    .btn-prev:disabled,
+    .btn-next:disabled {
+      background-color: var(--el-fill-color-light);
+    }
   }
 }
 
