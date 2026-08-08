@@ -1,12 +1,12 @@
 <template>
-  <!-- 区块1: 固定右下角铃铛按钮 -->
+  <!-- 固定右下角铃铛按钮 -->
   <div class="notice-bell-wrapper">
     <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
       <el-button type="primary" circle :icon="Bell" size="medium" @click="handleTogglePopover" />
     </el-badge>
   </div>
 
-  <!-- 区块2: 弹出列表卡片 -->
+  <!-- 弹出列表卡片 -->
   <el-popover
     :visible="popoverVisible"
     placement="top-end"
@@ -77,7 +77,7 @@
     </el-tabs>
   </el-popover>
 
-  <!-- 区块4: 详情弹窗 -->
+  <!-- 详情弹窗 -->
   <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" :width="dialogWidth" destroy-on-close
       class="notice-detail-dialog">
     <div class="notice-meta">
@@ -92,7 +92,9 @@
 </template>
 
 <script setup>
-// 1. 导入
+// ============================================================
+// 导入
+// ============================================================
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Bell, Close } from '@element-plus/icons-vue'
 import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
@@ -104,7 +106,9 @@ const MarkdownPreview = computed(() => {
   return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
 })
 
-// 2. 状态
+// ============================================================
+// 状态
+// ============================================================
 const popoverVisible = ref(false)
 const activeTab = ref('unread')
 const unreadList = ref([])
@@ -133,10 +137,9 @@ const readLoading = ref(false)
 const detailVisible = ref(false)
 const currentNotice = ref(null)
 
-// 3. 常量
-// (无)
-
-// 4. 数据获取
+// ============================================================
+// 数据获取
+// ============================================================
 const fetchUnreadCount = async () => {
   try {
     const res = await noticeUnreadCountApi()
@@ -172,7 +175,9 @@ const fetchReadList = async () => {
   }
 }
 
-// 5. 操作
+// ============================================================
+// 操作
+// ============================================================
 const handleTogglePopover = () => {
   popoverVisible.value = !popoverVisible.value
   if (popoverVisible.value) {
@@ -231,7 +236,9 @@ const handleCopyCodeSuccess = (e) => {
   setTimeout(() => btn.classList.remove('copied'), 1500)
 }
 
-// 6. WebSocket 事件处理
+// ============================================================
+// WebSocket 事件处理
+// ============================================================
 let syncTimer = null
 const handleNoticePush = () => {
   // 乐观更新：立即 +1，避免竞态
@@ -245,7 +252,9 @@ const handleNoticePush = () => {
   syncTimer = setTimeout(() => fetchUnreadCount(), 300)
 }
 
-// 7. 生命周期
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(() => {
   isMediumDown.value = mediaQuery.matches
   mediaQuery.addEventListener('change', handleMediaChange)
@@ -260,7 +269,9 @@ onUnmounted(() => {
   window.removeEventListener('notice-refresh', fetchUnreadCount)
 })
 
-// 8. 暴露
+// ============================================================
+// 暴露
+// ============================================================
 defineExpose({})
 </script>
 
