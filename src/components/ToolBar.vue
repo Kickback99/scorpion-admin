@@ -25,66 +25,68 @@
             <!-- 设置 popover -->
             <el-popover placement="bottom" :width="260" trigger="hover">
               <template #reference><el-button size="small" circle icon="Setting" plain></el-button></template>
-              <el-form size="small">
-                <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
-                <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
-                <el-form-item>
-                  <template #label>
-                    保存标签
-                    <el-tooltip content="退出或 401 后是否保留已打开的标签页" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.keepTabs" @change="onClearTabsChange" size="small" />
-                </el-form-item>
-                <el-form-item>
-                  <template #label>
-                    菜单手风琴
-                    <el-tooltip content="开启则排它式展开，同一时间只展开一个子菜单" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.menuAccordion" @change="onMenuAccordionChange" size="small" />
-                </el-form-item>
-                <el-form-item>
-                  <template #label>
-                    菜单主题色
-                    <el-tooltip content="关闭则侧边栏菜单使用中性色背景+主色文字" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.menuThemeColor" @change="onMenuThemeColorChange" size="small" />
-                </el-form-item>
-                <el-form-item>
-                  <template #label>
-                    页面主题
-                    <el-tooltip content="主容器跟随标签主题色深底，与标签栏形成层次" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.pageTheme" @change="onPageThemeChange" size="small" />
-                </el-form-item>
-                <el-form-item>
-                  <template #label>
-                    灵动模式
-                    <el-tooltip content="标签+菜单+页面主题+深色+plain，统一跟随" placement="top">
-                      <el-icon><QuestionFilled /></el-icon>
-                    </el-tooltip>
-                  </template>
-                  <el-switch :model-value="stringStore.dynamicMode" @change="onDynamicModeChange" size="small" />
-                </el-form-item>
-                <el-form-item label="标签模式">
-                  <el-radio-group :model-value="stringStore.tagMode" @change="onTagModeChange" size="small">
-                    <el-radio-button type="primary" value="neutral">中性</el-radio-button>
-                    <el-radio-button type="primary" value="ui">ui</el-radio-button>
-                    <el-radio-button type="primary" value="theme">主题</el-radio-button>
-                  </el-radio-group>
-                </el-form-item>
-                <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
-                <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
-                <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
-                <el-form-item v-if="isMediumDown || configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
-              </el-form>
+              <div class="popover-scroll">
+                  <el-form size="small">
+                    <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
+                    <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
+                    <el-form-item>
+                      <template #label>
+                        保存标签
+                        <el-tooltip content="退出或 401 后是否保留已打开的标签页" placement="top">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </template>
+                      <el-switch :model-value="stringStore.keepTabs" @change="onClearTabsChange" size="small" />
+                    </el-form-item>
+                    <el-form-item>
+                      <template #label>
+                        菜单手风琴
+                        <el-tooltip content="开启则排它式展开，同一时间只展开一个子菜单" placement="top">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </template>
+                      <el-switch :model-value="stringStore.menuAccordion" @change="onMenuAccordionChange" size="small" />
+                    </el-form-item>
+                    <el-form-item>
+                      <template #label>
+                        菜单主题色
+                        <el-tooltip content="关闭则侧边栏菜单使用中性色背景+主色文字" placement="top">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </template>
+                      <el-switch :model-value="stringStore.menuThemeColor" @change="onMenuThemeColorChange" size="small" />
+                    </el-form-item>
+                    <el-form-item>
+                      <template #label>
+                        页面主题
+                        <el-tooltip content="主容器跟随标签主题色深底，与标签栏形成层次" placement="top">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </template>
+                      <el-switch :model-value="stringStore.pageTheme" @change="onPageThemeChange" size="small" />
+                    </el-form-item>
+                    <el-form-item>
+                      <template #label>
+                        灵动模式
+                        <el-tooltip content="标签+菜单+页面主题+深色+plain，统一跟随" placement="top">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </template>
+                      <el-switch :model-value="stringStore.dynamicMode" @change="onDynamicModeChange" size="small" />
+                    </el-form-item>
+                    <el-form-item label="标签模式">
+                      <el-radio-group :model-value="stringStore.tagMode" @change="onTagModeChange" size="small">
+                        <el-radio-button type="primary" value="neutral">中性</el-radio-button>
+                        <el-radio-button type="primary" value="ui">ui</el-radio-button>
+                        <el-radio-button type="primary" value="theme">主题</el-radio-button>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="ui模式"><UiStyleSettings /></el-form-item>
+                    <el-form-item label="文字色模式"><el-radio-group :model-value="uiStore.textColorMode" @change="onTextColorModeChange" size="small"><el-radio-button type="primary" value="preset">配置文件</el-radio-button><el-radio-button type="primary" value="dynamic">动态计算</el-radio-button></el-radio-group></el-form-item>
+                    <el-form-item><div class="slider-group"><UiSlider :label="depthLabel" :model-value="depthValue" :min="0" :max="100" :step="5" :format-tooltip="depthTooltip" @update:model-value="onDepthChange" /><UiSlider label="hover强度" :model-value="hoverValue" :min="1" :max="9" :step="1" :format-tooltip="(v)=>'light-'+v" @update:model-value="onHoverChange" /></div></el-form-item>
+                    <el-form-item v-if="isMediumDown || configStore.getThemeLayoutMode() === 'popover'" label="主题色"><ThemeDots :columns="5" /></el-form-item>
+                  </el-form>
+              </div>
             </el-popover>
 
             <SmartMenuSearch />
@@ -445,6 +447,12 @@ const onTextColorModeChange = (mode) => {
 // 弹窗内表单 label 与控件垂直居中对齐
 :deep(.el-form-item) {
   align-items: center;
+}
+
+// 设置 popover 内容过长时启用滚动
+.popover-scroll {
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 // 滑块容器撑满 el-form-item__content 宽度，避免右侧留白
