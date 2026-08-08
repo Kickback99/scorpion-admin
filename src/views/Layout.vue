@@ -59,7 +59,7 @@
       </el-aside>
       <el-container>
         <el-header :class="{ 'page-theme': settingStore.pageTheme }">
-            <TabBar></TabBar>
+            <ToolBar></ToolBar>
         </el-header>
         <el-main class="main-container" :class="{ 'page-theme': settingStore.pageTheme }">
           <Tabs></Tabs>
@@ -79,7 +79,7 @@
 
 <script setup>
 import MenuTree from '@/components/MenuTree.vue';
-import TabBar from '@/components/TabBar.vue';
+import ToolBar from '@/components/ToolBar.vue';
 import {useUserStore} from '@/store/user'
 import { computed, nextTick, onMounted, ref,watch } from 'vue';
 import {useSettingStore} from '@/setting'

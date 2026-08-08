@@ -2,7 +2,7 @@
   <!-- ===== 主题布局切换：按 theme_layout_mode 渲染对应变体 ===== -->
   <ThemeFloat v-if="mode === 'float'" />
   <ThemeInline v-else-if="mode === 'inline'" />
-  <!-- popover: 主题色点由外部（TabBar settings popover）直接使用 ThemeDots -->
+  <!-- popover: 主题色点由外部（ToolBar settings popover）直接使用 ThemeDots -->
 </template>
 
 <script setup>

@@ -1,5 +1,5 @@
 <template>
-  <!-- ===== B: TabBar 中间色点行 ===== -->
+  <!-- ===== B: ToolBar 中间色点行 ===== -->
   <span class="ti-root">
     <ThemeDots />
   </span>
@@ -7,7 +7,7 @@
 
 <script setup>
 // ============================================================
-// 行内色点 — 绝对定位在 TabBar 中间
+// 行内色点 — 绝对定位在 ToolBar 中间
 // ============================================================
 import ThemeDots from './ThemeDots.vue'
 </script>
