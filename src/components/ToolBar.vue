@@ -453,6 +453,21 @@ const onTextColorModeChange = (mode) => {
 .popover-scroll {
   max-height: 70vh;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 // 滑块容器撑满 el-form-item__content 宽度，避免右侧留白
