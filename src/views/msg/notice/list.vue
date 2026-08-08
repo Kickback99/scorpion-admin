@@ -62,8 +62,8 @@
             <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-            <el-button size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增公告</el-button>
-            <el-button size="small" type="danger" icon="Delete" @click="handleBatchDelete" plain>批量删除</el-button>
+            <el-button :disabled="$hasPerm('btn.notice.add')" size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增公告</el-button>
+            <el-button :disabled="$hasPerm('btn.notice.remove')" size="small" type="danger" icon="Delete" @click="handleBatchDelete" plain>批量删除</el-button>
         </el-form-item>
     </el-form>
 
@@ -104,6 +104,7 @@
                 <!-- 推送按钮 -->
                 <el-button
                     v-if="(row.status === 0 || row.status === 2) && !row.pushTime"
+                    :disabled="$hasPerm('btn.notice.execute')"
                     size="small"
                     type="success"
                     icon="Position"
@@ -114,6 +115,7 @@
                 <!-- 下架按钮 -->
                 <el-button 
                     v-if="row.status === 0 || row.status === 1"
+                    :disabled="$hasPerm('btn.notice.update')"
                     size="small" 
                     type="warning" 
                     icon="Bottom" 
@@ -124,6 +126,7 @@
                 <!-- 上架按钮 -->
                 <el-button 
                     v-if="row.status === 2"
+                    :disabled="$hasPerm('btn.notice.update')"
                     size="small" 
                     type="primary" 
                     icon="Top" 
@@ -132,8 +135,8 @@
                 >上架</el-button>
 
                 <!-- 编辑 / 详情 -->
-                <el-button v-if="row.status === 0 || row.status === 2" size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
-                <el-button v-else size="small" type="info" :icon="View" @click="handleDetail(row)" plain>详情</el-button>
+                <el-button v-if="row.status === 0 || row.status === 2" :disabled="$hasPerm('btn.notice.update')" size="small" type="warning" icon="Edit" @click="handleEdit(row)" plain>编辑</el-button>
+                <el-button v-else :disabled="$hasPerm('btn.notice.list')" size="small" type="info" :icon="View" @click="handleDetail(row)" plain>详情</el-button>
 
                 <!-- 删除 -->
                 <el-popconfirm
@@ -143,7 +146,7 @@
                     icon="WarnTriangleFilled"
                 >
                     <template #reference>
-                        <el-button size="small" type="danger" icon="Delete" plain>删除</el-button>
+                        <el-button :disabled="$hasPerm('btn.notice.remove')" size="small" type="danger" icon="Delete" plain>删除</el-button>
                     </template>
                 </el-popconfirm>
             </template>
