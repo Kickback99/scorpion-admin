@@ -68,7 +68,7 @@ const close = () => {
 
 .content {
     height: calc(100vh - 250px);
-    overflow-y: auto;
+    // overflow-y: auto;
     padding: 10px;
 }
 
@@ -77,7 +77,7 @@ const close = () => {
     // background: coral;
     // line-height: 50px;
     .el-row {
-        margin-top: 35px;
+        margin-top: 95px;
     }
 
     // background-color: deeppink;

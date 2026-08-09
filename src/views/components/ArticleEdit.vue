@@ -49,7 +49,7 @@
                 <!-- 我使用的是 -->
                 <!-- md格式到数据库content -->
                 <!-- 后期如何将md格式展示到前端，可以看 obsidian笔记 ➟ 12、富文本编辑器 -->
-                <Markdown :height="mdHeight" v-model="blogData.content"></Markdown>
+                <Markdown :height="395" v-model="blogData.content"></Markdown>
                 <!-- {{ blogData.content }} -->
             </el-form-item>
         </el-form>
