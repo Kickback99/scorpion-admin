@@ -11,9 +11,25 @@ class WebSocketManager {
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 10
     this.reconnectInterval = 5000
+    this.reconnectTimer = null
     this.isConnecting = false
     this.isManualClose = false  // 是否手动关闭
+    this.hasLoggedFailOnce = false // 是否已提示过一次连接失败，避免刷屏
     this.cachedOnlineUsers = null  // 缓存在线用户
+  }
+
+  // 拼接 WebSocket 地址：优先用 VITE_WS_URL，否则按当前页面主机名 + 8800 端口
+  getWsUrl(role, userId) {
+    const wsHost = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:8800`
+    return `${wsHost}/websocket/${role}/${userId}?ip=127.0.0.1`
+  }
+
+  // 清除待执行的重连定时器
+  clearReconnectTimer() {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
   }
 
   // 初始化 WebSocket 连接
@@ -37,9 +53,11 @@ class WebSocketManager {
     }
 
     this.isConnecting = true
-    
+    this.hasLoggedFailOnce = false
+    this.clearReconnectTimer()
+
     try {
-      const wsUrl = `ws://localhost:8800/websocket/${role}/${userId}`
+      const wsUrl = this.getWsUrl(role, userId)
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
@@ -55,6 +73,7 @@ class WebSocketManager {
       this.socket.onclose = (event) => {
         console.log('🔌 WebSocket 连接关闭:', event.code, event.reason)
         this.isConnecting = false
+        this.socket = null
         // this.handleReconnect(userId)
 
         // 只在应该重连且不是手动关闭才重连
@@ -63,10 +82,13 @@ class WebSocketManager {
         }
       }
 
-      this.socket.onerror = (error) => {
-        console.error('❌ WebSocket 连接错误:', error)
+      this.socket.onerror = () => {
+        // 后台服务不可用时只提示一次，避免控制台刷屏；不影响页面请求，重连由 onclose 驱动
+        if (!this.hasLoggedFailOnce) {
+          this.hasLoggedFailOnce = true
+          console.warn(`⚠️ WebSocket 连接失败（后台服务未启动或不可达）: ${wsUrl}，不影响页面请求，将自动重连`)
+        }
         this.isConnecting = false
-        // this.handleReconnect(userId)
       }
 
     } catch (error) {
@@ -96,13 +118,13 @@ class WebSocketManager {
     return true
   }
 
-  // 处理重连逻辑
+  // 处理重连逻辑：固定间隔重试，最多重试 maxReconnectAttempts 次
   handleReconnect(userId, role) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
-      console.log(`🔄 尝试重新连接 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
-      
-      setTimeout(() => {
+      console.log(`🔄 后台服务不可用，自动重连中 (第${this.reconnectAttempts}/${this.maxReconnectAttempts}次)，${this.reconnectInterval / 1000}s 后重试`)
+      this.clearReconnectTimer()
+      this.reconnectTimer = setTimeout(() => {
         this.init(userId, role)
       }, this.reconnectInterval)
     } else {
@@ -330,6 +352,7 @@ class WebSocketManager {
       this.socket.close(1000, 'Manual close')
       this.socket = null
     }
+    this.clearReconnectTimer()
     this.isConnecting = false
     this.reconnectAttempts = 0
   }
