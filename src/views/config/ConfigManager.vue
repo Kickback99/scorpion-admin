@@ -123,7 +123,7 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="$hasPerm('btn.config.update') || row.isObject">
+            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="$hasPerm('btn.config.update') || row.isObject || row.readonly">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
             <!-- 删除按钮：对象有子节点 或 系统预设配置 时禁用 -->
@@ -285,7 +285,7 @@ const buildDescMap = () => {
   const { groups } = useConfigItems()
   for (const g of groups) {
     for (const it of (g.items || [])) {
-      CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc, icon: it.icon }
+      CONFIG_DESC_MAP[it.key] = { label: it.label, desc: it.desc, icon: it.icon, readonly: it.readonly }
     }
   }
 }
@@ -371,6 +371,7 @@ const convertToTreeData = (obj, parentPath = '', _groupKey = '') => {
       min: isFinite(min) ? min : undefined,
       max: isFinite(max) ? max : undefined,
       isSystem: isSystemField(fullPath),
+      readonly: meta?.readonly || false,
       _groupKey,
     }
 

@@ -115,7 +115,10 @@ export const useConfigStore = defineStore({
         scroll_page_size: 10,
         pagination_page_size: 7,
       },
-      websocket_enabled: true,
+      websocket: {
+        enabled: true,
+        backend_enabled: false,
+      },
       notice: {
         enabled: false,
         dismissed_level: 'session',
@@ -390,9 +393,13 @@ export const useConfigStore = defineStore({
     getTagViewMode()               { return this.getValue('tag_view_mode') || 'card' },
     setTagViewMode(v)              { this.updateConfig('tag_view_mode', v) },
 
-    // -- websocket_enabled --
-    getWebsocketEnabled()          { return this.getValue('websocket_enabled') ?? true },
-    toggleWebsocketEnabled()       { this.updateConfig('websocket_enabled', !this.getValue('websocket_enabled')) },
+    // ==================== websocket ====================
+
+    getWebsocketEnabled()          { return this.getValue('websocket.enabled') ?? true },
+    toggleWebsocketEnabled()       { this.updateConfig('websocket.enabled', !this.getValue('websocket.enabled')) },
+
+    getWebsocketBackendEnabled()   { return this.getValue('websocket.backend_enabled') === true },
+    setWebsocketBackendEnabled(v)  { this.updateConfig('websocket.backend_enabled', v) },
 
     // ==================== notice ====================
 
@@ -586,7 +593,8 @@ export const useConfigStore = defineStore({
     // ===== 顶层（admin 组） =====
     configViewMode()          { return this.getValue('config_view_mode') || 'card' },
     tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
-    isWebsocketEnabled()      { return this.getValue('websocket_enabled') === true },
+    isWebsocketEnabled()        { return this.getValue('websocket.enabled') === true },
+    isWebsocketBackendEnabled() { return this.getValue('websocket.backend_enabled') === true },
     isNoticeEnabled()         { return this.getValue('notice.enabled') === true },
     noticeDismissedLevel()    { return this.getValue('notice.dismissed_level') || 'session' },
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
