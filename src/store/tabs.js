@@ -4,7 +4,8 @@ import { defineStore } from "pinia"
 export const useTabStore = defineStore({
   id: 'tabs',
   state: () => ({
-    tabList:[]
+    tabList:[],
+    collapseStates:{}  // 搜索面板折叠偏好 { '/system/sysUser': ['search'], ... }
   }),
   getters:{
     getTabs:(state) => state.tabList
@@ -22,6 +23,13 @@ export const useTabStore = defineStore({
     removeTab(path) {
       const idx = this.tabList.findIndex(t => t.path === path)
       if (idx !== -1) this.tabList.splice(idx, 1)
+      this.removeCollapseState(path)
+    },
+    setCollapseState(path, value) {
+      this.collapseStates[path] = value
+    },
+    removeCollapseState(path) {
+      delete this.collapseStates[path]
     },
     clearTabs(){
       this.$reset()

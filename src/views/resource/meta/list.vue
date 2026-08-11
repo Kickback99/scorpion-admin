@@ -215,13 +215,23 @@ import { reactive, ref, onMounted, watch } from 'vue';
 import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { useConfigStore } from '@/store/config';
+import { useTabStore } from '@/store/tabs';
+import { useRoute } from 'vue-router';
 import PinyinMatch from 'pinyin-match'
 import { dayjs } from 'element-plus'
 
 const configStore = useConfigStore()
+const tabStore = useTabStore()
 
-// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
-const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
+// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
+const route = useRoute()
+const saved = tabStore.collapseStates[route.path]
+const searchActiveNames = ref(
+    saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
+)
+watch(searchActiveNames, (val) => {
+    tabStore.setCollapseState(route.path, val)
+})
 
 // ==================== 数据定义 ====================
 

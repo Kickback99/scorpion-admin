@@ -213,16 +213,17 @@
 import {listApi,addApi,removeApi,modifyApi,statusApi} from '@/api/sysuser'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import msg from '@/components/msg';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useConfigStore } from '@/store/config';
+import { useTabStore } from '@/store/tabs';
 const {auth} = getCurrentInstance()
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs } from 'element-plus';
 import avatar from '@/assets/images/avatar-square.png'
@@ -508,9 +509,17 @@ const showAllocRoles = async(row) =>{
 
 const userStore = useUserStore()
 const configStore = useConfigStore()
+const tabStore = useTabStore()
 
-// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
-const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
+// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
+const route = useRoute()
+const saved = tabStore.collapseStates[route.path]
+const searchActiveNames = ref(
+    saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
+)
+watch(searchActiveNames, (val) => {
+    tabStore.setCollapseState(route.path, val)
+})
 const router =  useRouter()
 
 // t_user_request：为用户分配角色请求
