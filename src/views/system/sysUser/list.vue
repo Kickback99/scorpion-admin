@@ -1,71 +1,75 @@
 <template>
-    <div class="layout">
-        <el-form
-            inline
-            ref="formRef"
-            label-width="auto"
-            class="demo-ruleForm"
-            size="small"
-            status-icon
-            >
-            <el-form-item>
-            <el-input prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
-            </el-form-item>
+    <el-collapse class="search-collapse" v-model="searchActiveNames">
+        <el-collapse-item title="" name="search">
+            <div class="layout">
+                <el-form
+                    inline
+                    ref="formRef"
+                    label-width="auto"
+                    class="demo-ruleForm"
+                    size="small"
+                    status-icon
+                    >
+                    <el-form-item>
+                    <el-input prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
+                    </el-form-item>
 
-            <el-form-item>
-                <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
-            </el-form-item>
+                    <el-form-item>
+                        <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
+                    </el-form-item>
 
-            <!-- 排序字段选择器（SmartSelector） -->
-            <el-form-item>
-                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序(默认创建时间)">
-                </SmartSelector>
-            </el-form-item>
+                    <!-- 排序字段选择器（SmartSelector） -->
+                    <el-form-item>
+                        <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序(默认创建时间)">
+                        </SmartSelector>
+                    </el-form-item>
 
-            <!-- 升序/降序按钮 -->
-            <el-form-item>
-                <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
-                <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
-            </el-form-item>
+                    <!-- 升序/降序按钮 -->
+                    <el-form-item>
+                        <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
+                        <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
+                    </el-form-item>
 
-            <br>
+                    <br>
 
-            <!-- 时间字段选择器 -->
-            <el-form-item>
-                <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
-                    <el-option label="请选择时间" value="" :disabled="true" />
-                    <el-option label="创建时间" value="create_time" />
-                    <el-option label="修改时间" value="update_time" />
-                </el-select>
-            </el-form-item>
+                    <!-- 时间字段选择器 -->
+                    <el-form-item>
+                        <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
+                            <el-option label="请选择时间" value="" :disabled="true" />
+                            <el-option label="创建时间" value="create_time" />
+                            <el-option label="修改时间" value="update_time" />
+                        </el-select>
+                    </el-form-item>
 
-            <!-- 日期时间范围选择器（带 shortcuts） -->
-            <el-form-item>
-                <el-date-picker
-                    v-model="dataTimeRange"
-                    type="datetimerange"
-                    :shortcuts="shortcuts"
-                    range-separator="至"
-                    start-placeholder="开始日期时间"
-                    end-placeholder="结束日期时间"
-                    :popper-options="{
-                        placement: 'bottom-start'
-                    }"
-                    :size="default"
-                    @change="updateDataTime"
-                />
-            </el-form-item>
+                    <!-- 日期时间范围选择器（带 shortcuts） -->
+                    <el-form-item>
+                        <el-date-picker
+                            v-model="dataTimeRange"
+                            type="datetimerange"
+                            :shortcuts="shortcuts"
+                            range-separator="至"
+                            start-placeholder="开始日期时间"
+                            end-placeholder="结束日期时间"
+                            :popper-options="{
+                                placement: 'bottom-start'
+                            }"
+                            :size="default"
+                            @change="updateDataTime"
+                        />
+                    </el-form-item>
 
-            <el-form-item>
-            <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
-            <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-            </el-form-item>
-        </el-form>
-        <div class="right">
-            <el-button size="small" type="danger" @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" plain>批量删除</el-button>
-            <el-button size="small" type="primary" @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" plain>新增</el-button>
-        </div>
-    </div>
+                    <el-form-item>
+                    <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+                    <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+                    </el-form-item>
+                </el-form>
+                <div class="right">
+                    <el-button size="small" type="danger" @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" plain>批量删除</el-button>
+                    <el-button size="small" type="primary" @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" plain>新增</el-button>
+                </div>
+            </div>
+        </el-collapse-item>
+    </el-collapse>
 
 
 
@@ -214,6 +218,7 @@ import msg from '@/components/msg';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
 import { useUserStore } from '@/store/user';
+import { useConfigStore } from '@/store/config';
 const {auth} = getCurrentInstance()
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
@@ -502,6 +507,10 @@ const showAllocRoles = async(row) =>{
   }
 
 const userStore = useUserStore()
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
 const router =  useRouter()
 
 // t_user_request：为用户分配角色请求
