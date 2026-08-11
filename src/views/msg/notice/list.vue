@@ -1,5 +1,7 @@
 <template>
     <!-- ===== 搜索栏 ===== -->
+    <el-collapse class="search-collapse" v-model="searchActiveNames">
+        <el-collapse-item title="" name="search">
     <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
         <!-- 第一排：基础筛选 -->
         <el-form-item>
@@ -66,6 +68,8 @@
             <el-button :disabled="$hasPerm('btn.notice.remove')" size="small" type="danger" icon="Delete" @click="handleBatchDelete" plain>批量删除</el-button>
         </el-form-item>
     </el-form>
+        </el-collapse-item>
+    </el-collapse>
 
     <!-- ===== 数据表格 ===== -->
     <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
@@ -300,6 +304,7 @@ import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi } from '@/api/business'
 import { createMarkdownPreview } from '@/utils/markdown-config'
 import { useUserConfigStore } from '@/store/userConfig'
+import { useConfigStore } from '@/store/config'
 import PinyinMatch from 'pinyin-match'
 import dayjs from 'dayjs'
 
@@ -482,6 +487,11 @@ const userCache = ref([])                            // 用户搜索结果缓存
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
 
 const userConfigStore = useUserConfigStore()
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
+
 const MarkdownPreview = computed(() => {
   return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
 })

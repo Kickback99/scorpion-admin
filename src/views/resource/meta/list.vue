@@ -1,6 +1,8 @@
 <template>
     <div class="file-meta-container">
         <!-- 搜索区域 -->
+        <el-collapse class="search-collapse" v-model="searchActiveNames">
+            <el-collapse-item title="" name="search">
         <div class="flex justify-between items-center mb-4">
             <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
                 <el-form-item label="业务ID">
@@ -104,6 +106,8 @@
                 </el-form-item>
             </el-form>
         </div>
+            </el-collapse-item>
+        </el-collapse>
 
         <!-- 表格区域 -->
         <el-table 
@@ -210,8 +214,14 @@ import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted, watch } from 'vue';
 import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import { useConfigStore } from '@/store/config';
 import PinyinMatch from 'pinyin-match'
 import { dayjs } from 'element-plus'
+
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
 
 // ==================== 数据定义 ====================
 
