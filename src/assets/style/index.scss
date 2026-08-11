@@ -184,3 +184,26 @@ html.dark .auth-header:not(.page-theme) {
   font-size: var(--el-font-size-small);
   padding: 5px 11px;
 }
+
+// ============================================================
+// 搜索面板折叠条 — 透明背景、图标居中、保持最低高度
+// ============================================================
+.el-collapse.search-collapse {
+  --el-collapse-header-bg-color: transparent;
+  --el-collapse-content-bg-color: transparent;
+  border: none;
+}
+.el-collapse.search-collapse .el-collapse-item__header {
+  min-height: 26px;
+  justify-content: center;
+}
+.el-collapse.search-collapse .el-collapse-item__title {
+  flex: none;
+}
+.el-collapse.search-collapse .el-collapse-item__arrow {
+  margin-top: -20px !important;
+  transform: rotate(90deg) !important;
+}
+.el-collapse.search-collapse .el-collapse-item__arrow.is-active {
+  transform: rotate(-90deg) !important;
+}
