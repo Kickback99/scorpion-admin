@@ -1,6 +1,8 @@
 <template>
-    <div class="layout">
-        <el-form ref="formRef" label-width="auto" inline size="small"> 
+    <el-collapse class="search-collapse" v-model="searchActiveNames">
+        <el-collapse-item title="" name="search">
+            <div class="layout">
+                <el-form ref="formRef" label-width="auto" inline size="small">
             <el-form-item>
                 <el-input v-model="searchData.keyword" placeholder="请输入标题 | 内容" />
             </el-form-item>
@@ -87,7 +89,9 @@
                 </el-form-item>
             </template>
         </el-form>
-    </div>
+            </div>
+        </el-collapse-item>
+    </el-collapse>
 
     <el-table :data="tableData" :style="{ width: '100%' }" >
         <el-table-column type="index" label="序号" width="55"></el-table-column>
@@ -160,8 +164,13 @@ import msg from '@/components/msg';
 import { createMarkdownPreview } from '@/utils/markdown-config';
 import { useUserConfigStore } from '@/store/userConfig';
 import { useArticleDraftStore } from '@/store/articleDraft';
+import { useConfigStore } from '@/store/config';
 const userConfigStore = useUserConfigStore()
 const draftStore = useArticleDraftStore()
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
 import cover from '@/assets/images/cover-rect.png'
 
 const handleImage = (row) => {

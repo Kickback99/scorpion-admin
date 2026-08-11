@@ -1,7 +1,9 @@
 <template>
+    <el-collapse class="search-collapse" v-model="searchActiveNames">
+        <el-collapse-item title="" name="search">
     <div class="layout">
 
-        <el-form ref="formRef" :model="form" label-width="auto" inline size="small"> 
+        <el-form ref="formRef" :model="form" label-width="auto" inline size="small">
 
             <!-- 模式切换按钮组 - 新增挑拣模式（只读，不可选择） -->
             <el-form-item>
@@ -109,6 +111,8 @@
         </div>
 
     </div>
+        </el-collapse-item>
+    </el-collapse>
 
 
     <el-table :data="tableData" style="width: 100%"
@@ -314,12 +318,17 @@ import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
 import { useUserConfigStore } from '@/store/userConfig';
+import { useConfigStore } from '@/store/config';
 import PinyinMatch from 'pinyin-match'
 import { getAllArticlesApi } from '@/api/business';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import msg from '@/components/msg'
 
 const userConfigStore = useUserConfigStore()
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
 const { isDarkEnabled: isDark } = storeToRefs(userConfigStore)
 
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式
