@@ -17,7 +17,8 @@
                     v-for="item in [
                         { label: '登录', value: '0' },
                         { label: '注册', value: '1' },
-                        { label: '退出', value: '2' }
+                        { label: '退出', value: '2' },
+                        { label: '注销', value: '3' }
                     ]"
                     :key="item.value"
                     :label="item.label"
@@ -73,9 +74,10 @@
         </el-table-column>
         <el-table-column prop="status" label="登录状态">
             <template #default="{row}">
-                <el-tag type="success" size="small" v-if="row.status === 0">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
-                <el-tag type="primary" size="small" v-if="row.status === 1">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
-                <el-tag type="danger" size="small" v-if="row.status === 2">{{ { 0: '登录', 1: '注册', 2: '退出' }[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="success" size="small" v-if="row.status === 0">{{ statusMap[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="primary" size="small" v-if="row.status === 1">{{ statusMap[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="danger" size="small" v-if="row.status === 2">{{ statusMap[row.status] || '未知状态' }}</el-tag>
+                <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
         <el-table-column label="token" >
@@ -137,6 +139,8 @@ import msg from '@/components/msg';
 
 const searchData = reactive({})
 
+// 登录状态映射（对齐后端 LoginLogEnum）
+const statusMap = { 0: '登录', 1: '注册', 2: '退出', 3: '注销' }
 
 const tableData = ref([])
 
@@ -228,7 +232,7 @@ const disabledStatusOptions = computed(() => {
     return [];
   }
   if (searchData.type === '0') {
-    return ['1']; // 禁用注册选项（value="1"）
+    return ['1', '3']; // 后台用户无注册/注销操作
   }
   return [];
 });
