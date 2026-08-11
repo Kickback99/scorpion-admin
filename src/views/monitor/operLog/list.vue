@@ -1,5 +1,7 @@
 <template>
-        <el-form label-width="auto" inline size="small"> 
+        <el-collapse class="search-collapse" v-model="searchActiveNames">
+            <el-collapse-item title="" name="search">
+        <el-form label-width="auto" inline size="small">
             <el-form-item>
                 <el-input v-model="searchData.username" placeholder="请输入用户名" />
             </el-form-item>
@@ -62,6 +64,8 @@
             </el-form-item>
             </el-form-item>
         </el-form>
+            </el-collapse-item>
+        </el-collapse>
         <el-table :data="tableData" :style="{ width: '100%' }" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" />
             <el-table-column type="index" label="序号"  width="60"/>
@@ -191,9 +195,14 @@
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
 import { reactive, ref,computed,watch } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
+import { useConfigStore } from '@/store/config';
 import { createMarkdownPreview } from '@/utils/markdown-config'
 import msg from '@/components/msg'
 const userConfigStore = useUserConfigStore()
+const configStore = useConfigStore()
+
+// 搜索面板折叠：collapse_search_enabled 为 true 时折叠（隐藏搜索条件）
+const searchActiveNames = ref(configStore.getCollapseSearchEnabled() ? [] : ['search'])
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
   console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
