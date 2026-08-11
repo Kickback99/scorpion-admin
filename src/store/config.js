@@ -133,6 +133,7 @@ export const useConfigStore = defineStore({
         save_edit: false,
       },
       icon_enabled: true,
+      collapse_search_enabled: false,
       config_view_mode: 'card',
       tag_view_mode: 'card',
       search_menu_focus: false,
@@ -385,6 +386,10 @@ export const useConfigStore = defineStore({
     getIconEnabled()               { return this.getValue('icon_enabled') === true },
     toggleIconEnabled()            { this.updateConfig('icon_enabled', !this.getValue('icon_enabled')) },
 
+    // -- collapse_search_enabled --
+    getCollapseSearchEnabled()     { return this.getValue('collapse_search_enabled') === true },
+    toggleCollapseSearchEnabled()  { this.updateConfig('collapse_search_enabled', !this.getValue('collapse_search_enabled')) },
+
     // -- config_view_mode --
     getConfigViewMode()            { return this.getValue('config_view_mode') || 'card' },
     setConfigViewMode(v)           { this.updateConfig('config_view_mode', v) },
@@ -591,6 +596,7 @@ export const useConfigStore = defineStore({
   // ============================================================
   getters: {
     // ===== 顶层（admin 组） =====
+    isCollapseSearchEnabled() { return this.getValue('collapse_search_enabled') === true },
     configViewMode()          { return this.getValue('config_view_mode') || 'card' },
     tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
     isWebsocketEnabled()        { return this.getValue('websocket.enabled') === true },
