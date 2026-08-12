@@ -439,7 +439,7 @@ const fetchRoles = async (params) => {
  * 监听选中角色名变化 -> 反查 roleCache 同步所有角色 ID
  */
 watch(selectedRoleName, (names) => {
-    selectedRoleIds.value = names
+    selectedRoleIds.value = (names || [])
         .map(name => roleCache.value.find(r => r.value === name))
         .filter(Boolean)
         .map(r => r.id)

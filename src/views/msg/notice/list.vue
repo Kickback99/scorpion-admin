@@ -624,7 +624,7 @@ const handleTargetUserTypeChange = (val) => {
  * 模式：multipleIdMode=false + watch，参考 ImageReference.vue
  */
 watch(selectedUserNames, (names) => {
-    selectedUserIds.value = names
+    selectedUserIds.value = (names || [])
         .map(name => userCache.value.find(u => u.value === name))
         .filter(Boolean)
         .map(u => u.id)
@@ -633,7 +633,7 @@ watch(selectedUserNames, (names) => {
 
 // 角色名称 → 角色 ID 同步
 watch(selectedRoleNames, (names) => {
-    selectedRoleIds.value = names
+    selectedRoleIds.value = (names || [])
         .map(name => roleCache.value.find(r => r.value === name))
         .filter(Boolean)
         .map(r => r.id)
@@ -659,7 +659,7 @@ const rules = {
     specifiedUsers: [
         {
             validator: (rule, value, callback) => {
-                if (targetUserType.value === 'specific' && selectedUserNames.value.length === 0) {
+                if (targetUserType.value === 'specific' && !selectedUserNames.value?.length) {
                     callback(new Error('请至少选择一位指定用户'))
                 } else {
                     callback()
@@ -671,7 +671,7 @@ const rules = {
     specifiedRoles: [
         {
             validator: (rule, value, callback) => {
-                if (targetUserType.value === 'role' && selectedRoleNames.value.length === 0) {
+                if (targetUserType.value === 'role' && !selectedRoleNames.value?.length) {
                     callback(new Error('请至少选择一个角色'))
                 } else {
                     callback()
