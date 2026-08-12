@@ -175,7 +175,7 @@ const fetchUsers = async (params) => {
 }
 
 watch(selectedUserNames, (names) => {
-    selectedUserIds.value = names
+    selectedUserIds.value = (names || [])
         .map(name => userCache.value.find(u => u.value === name))
         .filter(Boolean)
         .map(u => u.id)
