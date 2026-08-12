@@ -515,6 +515,11 @@ const editDialog = async (row) =>{
 // t_user_request：用户添加请求
 const addUser = async() =>{
     await ruleFormRef.value.validate()
+    // 有角色时必须是后台用户
+    if (selectedRoleIds.value.length > 0 && formData.value.type !== '0') {
+        msg.error('已选角色仅限后台用户，请将用户类型切换为"后台"')
+        return
+    }
     formData.value.roleIdList = selectedRoleIds.value
     await addApi(formData.value)
     dialogVisible.value = false
@@ -526,6 +531,11 @@ const addUser = async() =>{
 // t_user_request：用户修改请求
 const modifyUser = async() => {
     await ruleFormRef.value.validate()
+    // 有角色时必须是后台用户
+    if (selectedRoleIds.value.length > 0 && formData.value.type !== '0') {
+        msg.error('已选角色仅限后台用户，请将用户类型切换为"后台"')
+        return
+    }
     // admin 不修改角色
     if (formData.value.id !== 1) {
         formData.value.roleIdList = selectedRoleIds.value
