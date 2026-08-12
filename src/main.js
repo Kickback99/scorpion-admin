@@ -15,6 +15,10 @@ import './assets/style/tailwind.css'
 // element 暗黑模式样式
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
+// 全局设置 el-dialog 默认不通过点击遮罩层关闭
+import { ElDialog } from 'element-plus'
+ElDialog.props.closeOnClickModal.default = false
+
 // ECharts 按需注册
 import './plugins/echarts'
 
