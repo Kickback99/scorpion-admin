@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between">
         <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
             <el-form-item>
                 <el-input v-model="searchModel.keyword" placeholder="请输入轮播标题/文章标题" />
@@ -8,10 +8,10 @@
                 <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
-            <div>
-                <el-button :disabled="$hasPerm('btn.carousel.add')"  size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
-            </div>
         </el-form>
+        <div>
+            <el-button :disabled="$hasPerm('btn.carousel.add')"  size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
+        </div>
     </div>
 
     <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple">
