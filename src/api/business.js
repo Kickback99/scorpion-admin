@@ -45,6 +45,12 @@ export const getAllArticlesApi = () => http.get('/admin/content/article/list/all
  * @returns {Promise}
  */
 export const getAllUsersApi = () => http.get('/admin/system/users/list/all')
+
+/**
+ * 获取所有角色列表（用于 SmartAutoComplete 联想搜索）
+ * @returns {Promise}
+ */
+export const getAllRolesApi = () => http.get('/admin/system/roles/list/all')
   
 /**
  * 分页查询标签列表（用于 SmartAutoComplete 联想搜索）
