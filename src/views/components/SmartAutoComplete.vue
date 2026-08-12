@@ -10,7 +10,7 @@
       :disabled="disabled"
       :size="size"
       :readonly="readonly"
-      :clearable="clearable"
+      :clearable="modelValue.length > 1"
       :trigger="null"
       tag-type="primary"
       @remove-tag="handleTagRemove"
@@ -84,10 +84,6 @@ const props = defineProps({
     default: 'small'
   },
   readonly: {
-    type: Boolean,
-    default: false
-  },
-  clearable: {
     type: Boolean,
     default: false
   },
