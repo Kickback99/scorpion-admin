@@ -21,7 +21,7 @@
                 <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
             </el-form-item>
         </el-form>
-        <div class="bottom">
+        <div class="bottom" style="margin-bottom: 20px;">
             <div class="file-operate">
                 <el-button size="small" type="danger" :disabled="$hasPerm('btn.file.remove')" @click="deleteSelectRows()" plain>
                     <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
