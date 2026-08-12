@@ -69,6 +69,20 @@
             <el-form-item label="角色编码" prop="roleCode">
                 <el-input v-model="dialogData.roleCode" placeholder="请输入角色编码"/>
             </el-form-item>
+            <el-form-item label="关联用户">
+                <SmartAutoComplete
+                    v-model="selectedUserNames"
+                    :fetch-suggestions-api="fetchUsers"
+                    placeholder="请输入用户名|昵称搜索"
+                    :max="10"
+                    :debounce-delay="300"
+                    :min-search-length="1"
+                    :allow-custom="false"
+                    custom-disabled-message="请选择已存在的用户"
+                    :auto-search-on-enter="true"
+                    style="width: 100%"
+                />
+            </el-form-item>
         </el-form>
 
         <template #footer>
@@ -97,11 +111,14 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue';
-import {listApi,addApi,modifyApi,removeApi} from '@/api/sysrole'
+import { nextTick, ref, watch } from 'vue';
+import {listApi,addApi,modifyApi,removeApi,getDetailApi} from '@/api/sysrole'
 import { ElMessageBox } from 'element-plus';
 import router, { loadMenu } from '@/router';
 import msg from '@/components/msg'
+import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import { getAllUsersApi } from '@/api/business'
+import PinyinMatch from 'pinyin-match'
 const tableData = ref([])
 
 const searchData = ref({})
@@ -132,6 +149,40 @@ const render = async(pager = 1) => {
 }
 
 render()
+
+// 用户搜索相关
+const userCache = ref([])
+const selectedUserNames = ref([])
+const selectedUserIds = ref([])
+
+const loadAllUsers = async () => {
+    const res = await getAllUsersApi()
+    const items = res.data || []
+    userCache.value = items.map(item => ({ value: item.displayName || item.username, id: item.id }))
+}
+
+const fetchUsers = async (params) => {
+    const query = params.keyword || ''
+    if (userCache.value.length === 0) await loadAllUsers()
+    if (!query) return userCache.value
+    const lowerQuery = query.toLowerCase()
+    return userCache.value.filter(item => {
+        const text = item.value
+        if (text.toLowerCase().includes(lowerQuery)) return true
+        if (PinyinMatch.match(text, query)) return true
+        return false
+    })
+}
+
+watch(selectedUserNames, (names) => {
+    selectedUserIds.value = names
+        .map(name => userCache.value.find(u => u.value === name))
+        .filter(Boolean)
+        .map(u => u.id)
+}, { deep: true })
+
+// 预加载用户数据
+loadAllUsers()
 
 //点击分页事件
 const onSizeChange = (size) => {
@@ -213,6 +264,8 @@ const onReset = () => {
         dialogVisible.value = true
         title.value = '新增角色'
         dialogData.value = {}
+        selectedUserNames.value = []
+        selectedUserIds.value = []
         // 重置上一次的表单验证
         nextTick(()=>{
             ruleFormRef.value.clearValidate("roleName")
@@ -220,23 +273,47 @@ const onReset = () => {
         })
     }
 
-    // 修改角色弹层
-    const editDialog = (row) => {
-        dialogVisible.value = true
-        title.value = '编辑角色'
-        dialogData.value = {...row}
-        // 重置上一次的表单验证
-        nextTick(()=>{
-            ruleFormRef.value.clearValidate("roleName")
-            ruleFormRef.value.clearValidate("roleCode")
-        })
+/**
+ * 编辑角色：加载完整详情（含用户）后回显
+ */
+const editDialog = async (row) => {
+    dialogVisible.value = true
+    title.value = '编辑角色'
+    try {
+        const res = await getDetailApi(row.id)
+        const role = res.data
+        dialogData.value = {
+            id: role.id,
+            roleName: role.roleName || '',
+            roleCode: role.roleCode || ''
+        }
+        // 用户回显
+        if (userCache.value.length === 0) await loadAllUsers()
+        const userIds = role.userIdList || []
+        if (userIds.length > 0) {
+            selectedUserNames.value = userIds
+                .map(id => userCache.value.find(u => u.id === id))
+                .filter(Boolean)
+                .map(u => u.value)
+        } else {
+            selectedUserNames.value = []
+        }
+    } catch (e) {
+        msg.error('获取角色详情失败')
     }
+    // 重置上一次的表单验证
+    nextTick(()=>{
+        ruleFormRef.value.clearValidate("roleName")
+        ruleFormRef.value.clearValidate("roleCode")
+    })
+}
 
 
     // 新增角色请求
     // t_role_request：新增角色请求
     const addRole = async() => {
         await ruleFormRef.value.validate()
+        dialogData.value.userIdList = selectedUserIds.value
         const res = await addApi(dialogData.value)
         console.log('增加请求')
         console.log(res)
@@ -250,6 +327,7 @@ const onReset = () => {
     // t_role_request：修改角色请求
     const modifyRole = async() =>{
         await ruleFormRef.value.validate()
+        dialogData.value.userIdList = selectedUserIds.value
         await modifyApi(dialogData.value)
         dialogVisible.value = false
         msg.primary('修改成功')
