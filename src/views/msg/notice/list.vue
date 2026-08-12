@@ -245,6 +245,7 @@
             <el-form-item v-if="formModel.targetType === 2" label="目标用户">
                 <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly || !!formModel.pushTime">
                     <el-radio value="all">所有用户</el-radio>
+                    <el-radio value="role">指定角色</el-radio>
                     <el-radio value="specific">指定用户</el-radio>
                 </el-radio-group>
             </el-form-item>
@@ -262,6 +263,25 @@
                     custom-disabled-message="请输入已存在的用户名|呢称"
                     :auto-search-on-enter="true"
                     :disabled="isReadonly || !!formModel.pushTime"
+                    style="width: 100%"
+                />
+            </el-form-item>
+
+            <!-- 指定角色 -->
+            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'role'" label=" " prop="specifiedRoles">
+                <SmartAutoComplete
+                    ref="roleAutoCompleteRef"
+                    v-model="selectedRoleNames"
+                    :fetch-suggestions-api="fetchRoles"
+                    placeholder="请输入角色名称搜索"
+                    :max="10"
+                    :debounce-delay="300"
+                    :min-search-length="1"
+                    :allow-custom="false"
+                    custom-disabled-message="请输入已存在的角色"
+                    :auto-search-on-enter="true"
+                    :disabled="isReadonly || !!formModel.pushTime"
+                    :locked-tags="formModel.pushTime ? selectedRoleNames : []"
                     style="width: 100%"
                 />
             </el-form-item>
@@ -301,7 +321,7 @@ import {
     noticeDetailApi
 } from '@/api/notice'
 import { View } from '@element-plus/icons-vue'
-import { getAllUsersApi } from '@/api/business'
+import { getAllUsersApi, getAllRolesApi } from '@/api/business'
 import { createMarkdownPreview } from '@/utils/markdown-config'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
@@ -482,10 +502,14 @@ watch(() => searchModel.timeField, (val) => {
 })
 
 // 后台指定用户相关
-const targetUserType = ref('all')                    // 'all' | 'specific'
+const targetUserType = ref('all')                    // 'all' | 'role' | 'specific'
 const selectedUserNames = ref([])                    // SmartAutoComplete v-model（标签数组）
 const selectedUserIds = ref([])                      // 选中的用户 ID 列表
 const userCache = ref([])                            // 用户搜索结果缓存
+const selectedRoleNames = ref([])                    // 角色 SmartAutoComplete v-model
+const selectedRoleIds = ref([])                      // 选中的角色 ID 列表
+const roleCache = ref([])                            // 角色搜索结果缓存
+const roleAutoCompleteRef = ref(null)
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
 
 const userConfigStore = useUserConfigStore()
@@ -539,23 +563,59 @@ const fetchUsers = async (params) => {
     })
 }
 
+const loadAllRoles = async () => {
+    const res = await getAllRolesApi()
+    const items = res.data || []
+    roleCache.value = items.map(item => ({
+        value: item.role_name,
+        id: item.id
+    }))
+}
+
+/**
+ * 联想搜索角色
+ */
+const fetchRoles = async (params) => {
+    const query = params.keyword || ''
+    if (roleCache.value.length === 0) {
+        await loadAllRoles()
+    }
+    if (!query) return roleCache.value
+
+    const lowerQuery = query.toLowerCase()
+    return roleCache.value.filter(item => {
+        const text = item.value
+        if (text.toLowerCase().includes(lowerQuery)) return true
+        if (PinyinMatch.match(text, query)) return true
+        return false
+    })
+}
+
 const handleTargetTypeChange = (val) => {
     if (val !== 2) {
         targetUserType.value = 'all'
         selectedUserNames.value = []
         selectedUserIds.value = []
-        nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+        selectedRoleNames.value = []
+        selectedRoleIds.value = []
+        nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers', 'specifiedRoles']))
     }
 }
 
 const handleTargetUserTypeChange = (val) => {
     selectedUserNames.value = []
     selectedUserIds.value = []
+    selectedRoleNames.value = []
+    selectedRoleIds.value = []
     // 清除校验
-    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers', 'specifiedRoles']))
     if (val === 'specific') {
         // 自动聚焦 SmartAutoComplete
         nextTick(() => userAutoCompleteRef.value?.focus())
+    }
+    if (val === 'role') {
+        // 自动聚焦角色 SmartAutoComplete
+        nextTick(() => roleAutoCompleteRef.value?.focus())
     }
 }
 
@@ -569,6 +629,15 @@ watch(selectedUserNames, (names) => {
         .filter(Boolean)
         .map(u => u.id)
     nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers']))
+}, { deep: true })
+
+// 角色名称 → 角色 ID 同步
+watch(selectedRoleNames, (names) => {
+    selectedRoleIds.value = names
+        .map(name => roleCache.value.find(r => r.value === name))
+        .filter(Boolean)
+        .map(r => r.id)
+    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedRoles']))
 }, { deep: true })
 
 // ============================================================
@@ -592,6 +661,18 @@ const rules = {
             validator: (rule, value, callback) => {
                 if (targetUserType.value === 'specific' && selectedUserNames.value.length === 0) {
                     callback(new Error('请至少选择一位指定用户'))
+                } else {
+                    callback()
+                }
+            },
+            trigger: 'blur'
+        }
+    ],
+    specifiedRoles: [
+        {
+            validator: (rule, value, callback) => {
+                if (targetUserType.value === 'role' && selectedRoleNames.value.length === 0) {
+                    callback(new Error('请至少选择一个角色'))
                 } else {
                     callback()
                 }
@@ -630,6 +711,9 @@ onMounted(() => {
     fetchNotices()
     loadAllUsers()
 })
+
+// 预加载角色缓存（顶层立即执行）
+loadAllRoles()
 
 /**
  * 每页条数变化
@@ -688,6 +772,8 @@ const handleAdd = async () => {
     targetUserType.value = 'all'
     selectedUserNames.value = []
     selectedUserIds.value = []
+    selectedRoleNames.value = []
+    selectedRoleIds.value = []
     await nextTick()
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, defaultModel)
@@ -722,17 +808,34 @@ const handleEdit = async (row) => {
             status: detail.status !== undefined ? detail.status : 0,
             pushTime: detail.pushTime || null
         })
-        // 回显指定用户
-        if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
+        // 回显角色
+        if (detail.targetRoleIds && detail.targetRoleIds.length > 0) {
+            targetUserType.value = 'role'
+            selectedRoleIds.value = detail.targetRoleIds
+            const res = await getAllRolesApi()
+            roleCache.value = (res.data || []).map(item => ({
+                value: item.role_name,
+                id: item.id
+            }))
+            const roleMap = {}
+            roleCache.value.forEach(r => { roleMap[r.id] = r.value })
+            selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+            selectedUserNames.value = []
+            selectedUserIds.value = []
+        } else if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
             targetUserType.value = 'specific'
             selectedUserIds.value = detail.targetUserIds
             const userMap = {}
             userCache.value.forEach(u => { userMap[u.id] = u.value })
             selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
+            selectedRoleNames.value = []
+            selectedRoleIds.value = []
         } else {
             targetUserType.value = 'all'
             selectedUserNames.value = []
             selectedUserIds.value = []
+            selectedRoleNames.value = []
+            selectedRoleIds.value = []
         }
     } catch (e) {
         msg.error('获取公告详情失败')
@@ -761,16 +864,34 @@ const handleDetail = async (row) => {
       status: detail.status !== undefined ? detail.status : 0,
       pushTime: detail.pushTime || ''
     })
-    if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
-      targetUserType.value = 'specific'
-      selectedUserIds.value = detail.targetUserIds
-      const userMap = {}
-      userCache.value.forEach(u => { userMap[u.id] = u.value })
-      selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
+    // 回显角色
+    if (detail.targetRoleIds && detail.targetRoleIds.length > 0) {
+        targetUserType.value = 'role'
+        selectedRoleIds.value = detail.targetRoleIds
+        const res = await getAllRolesApi()
+        roleCache.value = (res.data || []).map(item => ({
+            value: item.role_name,
+            id: item.id
+        }))
+        const roleMap = {}
+        roleCache.value.forEach(r => { roleMap[r.id] = r.value })
+        selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+        selectedUserNames.value = []
+        selectedUserIds.value = []
+    } else if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
+        targetUserType.value = 'specific'
+        selectedUserIds.value = detail.targetUserIds
+        const userMap = {}
+        userCache.value.forEach(u => { userMap[u.id] = u.value })
+        selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
+        selectedRoleNames.value = []
+        selectedRoleIds.value = []
     } else {
-      targetUserType.value = 'all'
-      selectedUserNames.value = []
-      selectedUserIds.value = []
+        targetUserType.value = 'all'
+        selectedUserNames.value = []
+        selectedUserIds.value = []
+        selectedRoleNames.value = []
+        selectedRoleIds.value = []
     }
   } catch (e) {
     msg.error('获取详情失败')
@@ -789,11 +910,15 @@ const handleConfirm = async () => {
             type: formModel.type,
             targetType: formModel.targetType
         }
-        // pushScope + targetUserIds
-        if (formModel.targetType === 2 && targetUserType.value === 'specific'
-            && selectedUserIds.value.length > 0) {
-            params.pushScope = 2
-            params.targetUserIds = selectedUserIds.value
+        // pushScope + targetUserIds + targetRoleIds（角色→用户转换由后端内部完成）
+        if (formModel.targetType === 2) {
+            if (targetUserType.value === 'role' && selectedRoleIds.value.length > 0) {
+                params.pushScope = 2
+                params.targetRoleIds = selectedRoleIds.value
+            } else if (targetUserType.value === 'specific' && selectedUserIds.value.length > 0) {
+                params.pushScope = 2
+                params.targetUserIds = selectedUserIds.value
+            }
         } else {
             params.pushScope = 1
             params.targetUserIds = null
