@@ -24,3 +24,10 @@ export const allocRolesApi = (userId) => http.get(`/admin/system/roles/assign/${
 // 给用户分配角色
 export const doAllocRolesApi = (userRoleData) => http.post(`/admin/system/roles/assign`,userRoleData)
 
+/**
+ * 获取角色详情（含用户ID列表）
+ * @param {Number} id 角色ID
+ * @returns {Promise}
+ */
+export const getDetailApi = (id) => http.get(`/admin/system/roles/detail/${id}`)
+
