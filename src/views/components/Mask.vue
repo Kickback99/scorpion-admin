@@ -52,7 +52,7 @@ const close = () => {
     width: 100%;
     height: calc(100vh - 70px);
     // min-height: 100%;
-    z-index: 8;
+    z-index: 10;
 }
 
 .header {
