@@ -181,6 +181,7 @@ const fetchReadList = async () => {
 const handleTogglePopover = () => {
   popoverVisible.value = !popoverVisible.value
   if (popoverVisible.value) {
+    fetchUnreadCount()
     pageNum.value = 1
     if (activeTab.value === 'unread') {
       fetchUnreadList()
@@ -192,9 +193,13 @@ const handleTogglePopover = () => {
 }
 
 const handleTabChange = (tab) => {
-  if (tab === 'read' && readList.value.length === 0) {
-    readPageNum.value = 1
+  fetchUnreadCount()
+  readPageNum.value = 1
+  pageNum.value = 1
+  if (tab === 'read') {
     fetchReadList()
+  } else {
+    fetchUnreadList()
   }
 }
 
@@ -252,6 +257,15 @@ const handleNoticePush = () => {
   syncTimer = setTimeout(() => fetchUnreadCount(), 300)
 }
 
+const handleNoticeRefresh = () => {
+  clearTimeout(syncTimer)
+  fetchUnreadCount()
+  if (popoverVisible.value) {
+    if (activeTab.value === 'unread') fetchUnreadList()
+    else fetchReadList()
+  }
+}
+
 // ============================================================
 // 生命周期
 // ============================================================
@@ -260,13 +274,13 @@ onMounted(() => {
   mediaQuery.addEventListener('change', handleMediaChange)
   fetchUnreadCount()
   window.addEventListener('notice-push', handleNoticePush)
-  window.addEventListener('notice-refresh', fetchUnreadCount)
+  window.addEventListener('notice-refresh', handleNoticeRefresh)
 })
 
 onUnmounted(() => {
   mediaQuery.removeEventListener('change', handleMediaChange)
   window.removeEventListener('notice-push', handleNoticePush)
-  window.removeEventListener('notice-refresh', fetchUnreadCount)
+  window.removeEventListener('notice-refresh', handleNoticeRefresh)
 })
 
 // ============================================================
