@@ -21,4 +21,11 @@ export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/
 // 修改用户状态
 export const statusApi = (id,status) => http.get(`/admin/system/users/${id}`,{params:{status}})
 
+/**
+ * 获取用户详情（含角色ID列表）
+ * @param {Number} id 用户ID
+ * @returns {Promise}
+ */
+export const getDetailApi = (id) => http.get(`/admin/system/users/detail/${id}`)
+
 
