@@ -12,7 +12,7 @@ export const useUserStore = defineStore({
             routers:[],
             permissions:[]
         },
-        hasUserInfo: false, // 新增标志位
+        hasUserInfo: false
     }),
     getters:{
         isAdmin: (state) => state.userInfo?.isAdmin || false,
@@ -20,27 +20,14 @@ export const useUserStore = defineStore({
     actions:{
         async getUserInfo(forceRefreshMenu = false){
 
-            // 如果已有用户信息，直接返回
-            /* if (this.hasUserInfo) {
-                return {
-                    data: {
-                        userInfo: this.userInfo,
-                        roleNames: this.roleNames,
-                        routers: this.userMenu,
-                        permissions: this.userPerm
-                    }
-                }
-            } */
-
             // 已有基础信息且不强制刷新 → 仅返回菜单数据
             if (this.hasUserInfo && !forceRefreshMenu) {
-                console.log('只刷新菜单。。。')
+                console.log('==================== 请求菜单，懒加载用户信息 ====================')
                 return {data: this.menuData}
             }
             
             if(forceRefreshMenu == false){
-                console.log('全量请求')
-                    // 否则全量请求
+                console.log('==================== 用户信息全量请求 ====================')
                     // t_user_request：获取用户权限请求
                 try{
                 const res = await userInfoApi()

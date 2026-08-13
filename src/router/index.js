@@ -8,26 +8,16 @@ import nprogress from 'nprogress'
 // 引入进度条样式
 import "nprogress/nprogress.css"
 import { useSettingStore } from '@/setting'
-import { clearRoute, clearUserInfo } from '@/utils/remove'
 import { add403Routes } from '@/utils/403route'
 import { add404Routes } from '@/utils/404route'
-import { useWebSocket } from '@/server/useWebSocket'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
-//路由器对象--跳转路径
-/* import { useRouter } from 'vue-router'
-const router = useRouter()
-
-//路由对象--获取路由参数
-import { useRoute } from 'vue-router'
-const route = useRoute() */
 import msg from '@/components/msg'
 
 
 
 // 路由规则
 export const routes = [
-    //{path:"",component :}
     {path:'/login',component:() => import('@/views/Login.vue')},
     { path:'/',redirect:'/index',name:'parentNode',
         meta:{
@@ -59,19 +49,7 @@ export const routes = [
                 icon: 'ri:bard-line'
             }            
         }
-    ]},
-/*     {
-    path:'/',
-    component:() => import('@/views/Layout.vue'),
-    children:[
-        {path:'/article/category',component:() =>import('@/views/article/ArticleCategory.vue')},
-        {path:'/article/manage',component:() =>import('@/views/article/ArticleManage.vue')},
-        {path:'/user/info',component:() =>import('@/views/user/userInfo.vue')},
-        {path:'/user/avatar',component:() =>import('@/views/user/userAvatar.vue')},
-        {path:'/user/resetPassword',component:() =>import('@/views/user/userResetPassword.vue')},
-    ]} */
-    /* {path:'/:pathMatch(.*)*',name:'NotFound',redirect:'/404'},
-    {path:'/404',name:'404',component:()=>import('@/views/error/404.vue')} */
+    ]}
 ]
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
@@ -122,10 +100,10 @@ function routesHandler(router,parentType=null){
                 const compName = route.component
                 // 注意：这里 component 字段存储的是相对路径，如 'config/sysConfig/list'
                 const path = `../views/${route.name}/${compName}.vue`
-                console.log('加载配置管理组件:', path)
+                // console.log('加载配置管理组件:', path)
                 route.component = modules[path]
             }}else {
-        // 如果是子路由，继承父路由的type属性
+            // 如果是子路由，继承父路由的type属性
             route.type = parentType
             // 根据父路由的type来决定使用哪个模块导入
             // const modules = parentType === 'system'?sysModules:conModules;
@@ -164,21 +142,11 @@ function routesHandler(router,parentType=null){
                 route.name = route.path
                 const compName = route.component
                 const path = `../views/${compName}.vue`
-                console.log('到底加载的是哪个组件--------')
-                console.log(modules[path])
+                // console.log('到底加载的是哪个组件--------')
+                // console.log(modules[path])
                 route.component = modules[path]
             }
         }
-        
-        //comment：历史代码
-        /* else {
-            route.name = route.path
-            const compName = route.component
-            const path = `../views/${compName}.vue`
-            route.component = modules[path]
-            console.log(modules[path])
-            // route.component = () => import(`@/views/system/${compName}.vue`)
-        } */
 
         // 处理children
         if(route.children && route.children.length > 0){
@@ -191,13 +159,8 @@ function routesHandler(router,parentType=null){
 export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     const userStore = useUserStore()
     const configStore = useConfigStore()
-    const userConfigStore = useUserConfigStore();  // 新增
-    console.log('请求菜单')
-
-    /* if(loadUserInfo){
-        userStore.setUserInfo(res.data.userInfo)
-        userStore.setRoleNames(res.data.roleNames)
-    } */
+    const userConfigStore = useUserConfigStore();
+     console.log('==================== 请求菜单 ====================')
    
     try {
         // ================= 1. 数据获取阶段 =================
@@ -228,14 +191,8 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     await configStore.loadConfig()
 
     // ================= 2. 权限校验阶段 =================
-        // 情况1：前台用户拦截
-        /* if (userStore.userInfo.type !== 0) {
-            console.log('情况1拦截')
-            return Promise.reject({ isFrontendUser: true, message: '你没有访问权限' });
-        } */
 
-
-        // 情况2：无菜单权限拦截
+        // 无菜单权限拦截
         if (menuData.routers.length === 0 ) {
             console.log('情况2拦截')
         add403Routes(router); // 确保403路由存在
@@ -246,41 +203,41 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         }
 
     // ================= 3. 路由处理阶段 =================
-    // 3.1 清除旧路由
-    // 3.1 移除现有的404路由，确保动态路由优先匹配
+    // 清除旧路由
+    // 移除现有的404路由，确保动态路由优先匹配
     // remove404Routes()
         
 
-    // 3.2 处理新路由
+    // 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
-    console.log('后端返回',menuData.routers)
-    console.log('路由数据',asyncRoutes) 
+    // console.log('后端返回',menuData.routers)
+    // console.log('路由数据',asyncRoutes) 
     asyncRoutes.forEach(route => {
         if (route._addToParentNode) {
             // 配置管理类菜单添加到 parentNode 下
             router.addRoute('parentNode', route);
-            console.log(`添加配置管理路由到 parentNode: ${route.path}`);
+            // console.log(`添加配置管理路由到 parentNode: ${route.path}`);
         } else {
             // Layout 顶层路由正常添加
             router.addRoute(route);
-            console.log(`添加普通路由: ${route.path}`);
+            // console.log(`添加普通路由: ${route.path}`);
         }
     });
 
   
 
-    // 3.3 更新Store中的菜单引用
+    // 更新Store中的菜单引用
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
-    // 3.4 确保403路由存在
+    // 确保403路由存在
     add404Routes(router)
     add403Routes(router);
 
-    console.log('动态路由更新完成', {
+    /* console.log('动态路由更新完成', {
       routes: router.getRoutes(),
       permissions: menuData.permissions
-    });
+    }); */
     
     
     // 用户菜单权限不足校验
@@ -288,65 +245,27 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         if(from.path != '/login'){
             return next('/404')
         }
-        console.log('router.getRoutes()',router.getRoutes())
-        console.log('用户菜单权限不足')
+        // console.log('router.getRoutes()',router.getRoutes())
+        // console.log('用户菜单权限不足')
         return Promise.reject({ 
             noMenuAccess: true, 
             message: '该用户无菜单权限' 
         });
     }
-   console.log('router.getRoutes()',router.getRoutes())
-   console.log('用户菜单权限充足')
+//    console.log('router.getRoutes()',router.getRoutes())
+//    console.log('用户菜单权限充足')
     return true;
     } catch (error) {
         console.log('error,',error)
-    // 情况4：请求失败（如网络错误或API错误）
+    // 请求失败（如网络错误或API错误）
     return Promise.reject(error);
     }
 
 }
 
-
-// 移除404路由的函数
-/* function remove404Routes() {
-    if (router.hasRoute('NotFound')) {
-        router.removeRoute('NotFound')
-    }
-    if (router.hasRoute('404')) {
-        router.removeRoute('404')
-    }
-} */
-
 const hasRouteByPath = (path) => {
     return router.getRoutes().some(route => route.path === path)
 }
-
-// 处理pinia菜单名字，便于用户注销时：删除动态路由操作，注意：名字要和 routesHandler方法设置的名字保持一致，否则删除失败
-function menusNameHandler(menus){
-    return menus.map(route => {
-
-        if(route.path === '/system'){
-            route.name = 'system'
-        }else if(route.path === '/content'){
-            route.name = 'content'
-        }else {
-            route.name = route.path
-        }
-
-        //comment：历史代码
-       /*  if(route.component === 'Layout'){
-            route.name = 'system'
-        }else {
-            route.name = route.path
-        } */
-
-        // 处理children
-        if(route.children && route.children.length > 0){
-            route.children = menusNameHandler(route.children)
-        }
-        return route
-    })
-} 
 
 // 创建路由对象
 
@@ -355,10 +274,6 @@ const router = createRouter({
     history:createWebHistory(import.meta.env.VITE_ROUTER_URL), //采用 html5 路由模式
     routes
 })
-
-const getToken = () => {
-    return localStorage.getItem('token')
-}
 
 let count = 1;
 
@@ -391,38 +306,36 @@ router.beforeEach((to, from, next) => {
     nprogress.start()
     const settings =  useSettingStore()
     ++count;
-    console.log('路由前置守卫执行')
-    console.log(from)
-    console.log(to.path)
-    console.log(to.fullPath)
+    console.log('==================== 路由前置守卫执行 ====================')
+    // console.log(from)
+    // console.log(to.path)
+    // console.log(to.fullPath)
     const userStore = useUserStore()
     const tokenStore = useTokenStore()
-    console.log('userStore.userMenu.length',userStore.userMenu.length )
+    // console.log('userStore.userMenu.length',userStore.userMenu.length )
 
     if(to.path === '/403' && settings.isManualTo403){
-        console.log('跳转到403 count次')
         settings.isManualTo403 = false
-        console.log('settings.isManualTo403',settings.isManualTo403)
         return next()
     }
 
 
     // 已登录不能输入登录地址回到登录页
     if(to.path === '/login' && tokenStore.token) {
-        console.log('已登录不能输入登录地址回到登录页')
+        console.log('==================== 已登录不能输入登录地址回到登录页 ====================')
         msg.warning('请先退出登录')
         return next(from.fullPath);
     }
 
     // 白名单放行
     if(whiteList.includes(to.path)){
-        console.log('白名单放行')
+        console.log('==================== 白名单放行 ====================')
       return next();
     }
 
     // 如果没有token跳转到登录页
     if(!tokenStore.token && to.path != '/login') {
-        msg.error('如果没有token跳转到登录页')
+        // msg.error('如果没有token跳转到登录页')
         // 清除主动退出标记，让 redirect 正常生效
         const settings = useSettingStore()
         settings.setLogoutIntent(false)
@@ -438,7 +351,7 @@ router.beforeEach((to, from, next) => {
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
         //放行
-        console.log('已登录，有菜单')
+        console.log('==================== 已登录，有菜单 ====================')
         return next()
     }
 
@@ -454,30 +367,17 @@ router.beforeEach((to, from, next) => {
             })
     }).catch((error) =>
         {
-            // 情况1：前台用户 -> 提示错误，并跳转login
-            /* if (error.isFrontendUser && to.path !== '/login') {
-                      msg.error(error.message)
-                      router.replace('/login')
-                      tokenStore.removeToken()
-                    //   clearUserInfo()
-                      clearRoute(userStore.userMenu)
-                      userStore.clearUserStore( )
-                      const { closeWebSocket } = useWebSocket()
-                      closeWebSocket()
-                    //   userStore.removeUserAuth()
-                      
-            }  */
-            // 情况3：无菜单权限的后台用户 -> 跳转403
+            // 无菜单权限的后台用户 -> 跳转403
             if (error.noMenuPermission) {
                 if(hasRouteByPath(to.path)){
                     next()
                 }else {
-                    console.log('拦截2')
+                    // console.log('拦截2')
                 settings.isManualTo403 = true;
                 next('/403');
                 }
             }else if(error.noMenuAccess){
-                console.log('拦截1')
+                // console.log('拦截1')
                 settings.isManualTo403 = true;
                 next('/403');   
             }else {
@@ -487,14 +387,6 @@ router.beforeEach((to, from, next) => {
                  
         }
     )
-
-        //t_handle：处理前后台用户的逻辑
-        // 后台用户，没有菜单，跳到仪表盘
-        // 前台用户，跳到404
-    /* if(to.path === '/index'){
-        console.log('放仪表盘')
-        return next()
-    } */
 });
 
 router.afterEach((to, from) => {

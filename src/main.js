@@ -45,8 +45,7 @@ app.use(pinia.use(persist)) //安装pinia插件
 const modules = import.meta.glob('./assets/iconfont/**/*.{js,css}');
 
 for (const path in modules) {
-  console.log('嘎嘎')
-  console.log(modules)
+  // console.log(modules)
   modules[path]();
 }
 

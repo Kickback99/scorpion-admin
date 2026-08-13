@@ -6,7 +6,7 @@ import { prefix as fasPrefix, icons as fasIcons } from '@iconify-json/fa-solid/i
 import { useIconStore } from '@/store/icon';
 
 export function addBatchIconList(icons) {
-    console.log('批量加载调用了');
+    // console.log('批量加载调用了');
 
     // t_store_icon：iconifyBachOffline.js(所有批量图标)
     // 存入store
@@ -28,14 +28,14 @@ export function addBatchIconList(icons) {
             const iconData = getIcon(fullName);
             if (iconData) {
                 existingIconsToAdd.push({ fullName, iconData });
-            } else {
+            } /* else {
                 console.warn(`图标 ${fullName} 已存在但获取失败`);
-            }
+            } */
         } else {
             // 新图标 -> 从本地JSON获取数据
             const iconData = getIconData(prefix, name);
             if (!iconData) {
-                console.warn(`无法获取图标数据: ${fullName}`);
+                // console.warn(`无法获取图标数据: ${fullName}`);
                 return;
             }
             
@@ -53,18 +53,18 @@ export function addBatchIconList(icons) {
     // 第二步：批量添加新图标
     Object.values(newIconsMap).forEach(group => {
         if (Object.keys(group.icons).length > 0) {
-            console.log(`批量添加前缀 ${group.prefix} 的图标集`, group);
+            // console.log(`批量添加前缀 ${group.prefix} 的图标集`, group);
             addCollection(group);
         }
     });
     
     // 第三步：单独添加已存在的图标
     existingIconsToAdd.forEach(({ fullName, iconData }) => {
-        console.log(`单独添加已存在图标 ${fullName}`);
+        // console.log(`单独添加已存在图标 ${fullName}`);
         addIcon(fullName, iconData);
     });
     
-    console.log('当前所有在线图标:', listIcons());
+    // console.log('当前所有在线图标:', listIcons());
 }
 
 // 获取图标数据的函数保持不变

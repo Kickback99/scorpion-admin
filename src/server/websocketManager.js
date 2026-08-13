@@ -61,7 +61,7 @@ class WebSocketManager {
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        console.log(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
+        // console.log(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
         this.isConnecting = false
         this.reconnectAttempts = 0
       }
@@ -149,7 +149,7 @@ class WebSocketManager {
 
       // 2. 解析 JSON 数据
       const data = JSON.parse(messageData)
-      console.log('📨 收到 WebSocket 消息:', data)
+      console.log('==================== websocket 数据 ====================', data)
 
       // 3. 处理数组格式消息（评论、任务等）
       if (Array.isArray(data)) {
@@ -272,7 +272,7 @@ class WebSocketManager {
       case 'online_users_update':
         // 缓存数据
         this.cachedOnlineUsers = data
-        console.log('缓存在线用户数据:', data)
+        // console.log('缓存在线用户数据:', data)
         // 触发全局事件
         window.dispatchEvent(new CustomEvent('online-users-update', {
             detail: data
