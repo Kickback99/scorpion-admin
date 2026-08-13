@@ -13,6 +13,7 @@ import { add404Routes } from '@/utils/404route'
 import { useConfigStore } from '@/store/config'
 import { useUserConfigStore } from '@/store/userConfig'
 import msg from '@/components/msg'
+import { isCookieMode } from '@/utils/auth'
 
 
 
@@ -321,7 +322,9 @@ router.beforeEach((to, from, next) => {
 
 
     // 已登录不能输入登录地址回到登录页
-    if(to.path === '/login' && tokenStore.token) {
+    // cookie 模式无同步 token，会话内用 hasUserInfo 判断（刷新后打回失效，可接受）
+    const isLogin = isCookieMode() ? userStore.hasUserInfo : !!tokenStore.token
+    if(to.path === '/login' && isLogin) {
         console.log('==================== 已登录不能输入登录地址回到登录页 ====================')
         msg.warning('请先退出登录')
         return next(from.fullPath);
@@ -334,7 +337,9 @@ router.beforeEach((to, from, next) => {
     }
 
     // 如果没有token跳转到登录页
-    if(!tokenStore.token && to.path != '/login') {
+    // cookie 模式无法同步判断登录态：跳过此检查，交给下方 loadMenu → userDetailInfo
+    // 200=已登录（填菜单放行）；401=未登录（request.js 拦截器兜底跳 /login）
+    if(!isCookieMode() && !tokenStore.token && to.path != '/login') {
         // msg.error('如果没有token跳转到登录页')
         // 清除主动退出标记，让 redirect 正常生效
         const settings = useSettingStore()

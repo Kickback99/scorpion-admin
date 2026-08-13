@@ -2,13 +2,14 @@
 
       <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
 
-      <el-upload 
-          v-show="!isProgressVisible" 
-          class="avatar-uploader" 
+      <el-upload
+          v-show="!isProgressVisible"
+          class="avatar-uploader"
           :class="uploaderClass"
-          :action="handleAction" 
-          name="cover" 
+          :action="handleAction"
+          name="cover"
           :headers="headers"
+          :with-credentials="isCookieMode()"
           :show-file-list="false"
           :on-success="onSuccess"
           :on-progress="handleProgress"
@@ -25,6 +26,7 @@
 import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import { useTokenStore } from '@/store/token';
+import { isCookieMode } from '@/utils/auth';
 import msg from '@/components/msg'
 const imageUrl = ref('')
 let modelValue = defineModel()
@@ -39,9 +41,9 @@ const props = defineProps({
     }
 })
 
-// 手动设置请求头
+// 手动设置请求头（cookie 模式由浏览器自动携带 HttpOnly Cookie，无需带 authorization）
 const headers = computed(() => {
-  return {
+  return isCookieMode() ? {} : {
     authorization: tokenStore.token || ''
   }
 })
