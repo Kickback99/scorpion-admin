@@ -28,18 +28,18 @@ export const useUserConfigStore = defineStore({
       const userId = userStore.userInfo?.id;
       
       if (!userId) {
-        console.warn('【userConfig】用户未登录，无法获取配置');
+        // console.warn('【userConfig】用户未登录，无法获取配置');
         return null;
       }
       
       // 如果已有配置且不强制刷新，直接返回缓存
       if (this.hasLoadedConfig && !forceRefresh) {
-        console.log('【userConfig】使用缓存配置');
+        console.log('==================== 【userConfig】使用缓存配置 ====================');
         return this.getUserConfig();
       }
       
       try {
-        console.log('【userConfig】请求后端获取配置');
+        // console.log('【userConfig】请求后端获取配置');
         const res = await getUserConfigApi(userId);
         
         if (res.code === 200 && res.data) {
@@ -47,13 +47,13 @@ export const useUserConfigStore = defineStore({
           Object.assign(this.$state, res.data);
           this.hasLoadedConfig = true;
           
-          console.log('【userConfig】配置加载完成', this.getUserConfig());
+          // console.log('【userConfig】配置加载完成', this.getUserConfig());
           return this.getUserConfig();
         }
         
         return null;
       } catch (error) {
-        console.error('【userConfig】加载配置失败', error);
+        // console.error('【userConfig】加载配置失败', error);
         return null;
       }
     },
@@ -74,10 +74,6 @@ export const useUserConfigStore = defineStore({
     async updateConfig(key, value) {
       const userStore = useUserStore();
       const userId = userStore.userInfo?.id;
-
-      console.log(`==================== value的值为：${value} ====================`)
-      console.log(`==================== userStore.userInfo?.id的值为：${userStore.userInfo?.id} ====================`)
-      
       if (!userId) return false;
       
       try {
@@ -87,13 +83,13 @@ export const useUserConfigStore = defineStore({
           // 直接更新 state 中的对应字段
           this[key] = value;
           
-          console.log(`【userConfig】${key} 更新为 ${value}`);
+          // console.log(`【userConfig】${key} 更新为 ${value}`);
           return true;
         }
         
         return false;
       } catch (error) {
-        console.error(`【userConfig】更新 ${key} 失败`, error);
+        // console.error(`【userConfig】更新 ${key} 失败`, error);
         return false;
       }
     },
@@ -148,7 +144,7 @@ export const useUserConfigStore = defineStore({
     clearUserConfig() {
       // 重置为默认值
       this.$reset()
-      console.log('【userConfig】配置缓存已清除');
+      // console.log('【userConfig】配置缓存已清除');
     },
   },
   

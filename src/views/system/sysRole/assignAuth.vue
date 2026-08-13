@@ -71,7 +71,7 @@ const render = async () => {
     sysMenuList.value = result.data;
     await nextTick()
     const checkedIds = getCheckedIds(sysMenuList.value);
-    console.log('getPermissions() checkedIds', checkedIds);
+    // console.log('getPermissions() checkedIds', checkedIds);
     treeRef.value?.setCheckedKeys(checkedIds)
 };
 
@@ -251,10 +251,10 @@ const userStore = useUserStore()
 const save = async () => {
     // 获得当前所有选中包括上级所组成的数组
     const allCheckedNodes = treeRef.value.getCheckedNodes(false, true)
-    console.log('selectedArr',allCheckedNodes)
+    // console.log('selectedArr',allCheckedNodes)
      // 获得当前所有选中包括上级所组成的ids
     let idList = allCheckedNodes.map(node => node.id);
-    console.log('selectedIds',idList)
+    // console.log('selectedIds',idList)
     let assignMenuVo = {
           roleId: route.query.id,
           menuIdList: idList
