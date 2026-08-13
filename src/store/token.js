@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import { ref } from 'vue'
 import CryptoJS from 'crypto-js'
 import { useUserStore } from './user';
+import { isCookieMode } from '@/utils/auth'
 
 // 定义store
 // defineStore('仓库的唯一标识',()=>{...})
@@ -19,7 +20,8 @@ export const useTokenStore = defineStore('token',{
     }),
     actions:{
         setToken(newToken) {
-            this.token = newToken
+            // cookie 模式：token 在 HttpOnly Cookie 中由浏览器管理，前端不存储（置空顺带覆盖历史残留）
+            this.token = isCookieMode() ? '' : (newToken || '')
         },
         removeToken(){
             this.token = ''

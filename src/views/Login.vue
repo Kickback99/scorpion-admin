@@ -29,6 +29,7 @@ import msg from '@/components/msg'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
 import {useTokenStore} from '@/store/token'
+import { isCookieMode } from '@/utils/auth'
 import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
@@ -70,6 +71,12 @@ const handleLogin = async() => {
     const res = await adminLoginApi(formModel.value)
     // console.log(res.data)
     tokenStore.setToken(res.data)
+
+    // jwt 模式下响应缺少 token 说明前后端认证模式不一致（cookie 模式的错配由 401 链路暴露）
+    if (!isCookieMode() && !res.data) {
+        msg.error('登录响应缺少令牌，请检查前后端认证模式是否一致')
+        return
+    }
 
     // 处理记住密码逻辑 - 简单判断是否勾选
     if (formModel.value.checkPwd) {
