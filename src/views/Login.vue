@@ -68,7 +68,7 @@ const handleLogin = async() => {
     loading.value = true
     try {
     const res = await adminLoginApi(formModel.value)
-    console.log(res.data)
+    // console.log(res.data)
     tokenStore.setToken(res.data)
 
     // 处理记住密码逻辑 - 简单判断是否勾选
@@ -105,13 +105,8 @@ const handleLogin = async() => {
       await nextTick()
       eventBus.emit('adjustTabScroll');
 
-    // 在路由跳转后触发调整
-    /* setTimeout(() => {
-        eventBus.emit('adjustTabScroll');
-    }, 300); */
-
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         loading.value = false
         // throw(error)
     }

@@ -37,12 +37,12 @@
       
           <menu-tree :listData="listData"></menu-tree>
 
-          			<!--多级菜单-->
+          <!--多级菜单-->
           <el-sub-menu index="/user">
                 <template #title>
                     <el-icon> <SingleIcon icon="ri:profile-fill"></SingleIcon> </el-icon> <span>个人中心</span>
                 </template>
-			   <!--展开的每一个菜单项-->
+			          <!--展开的每一个菜单项-->
                 <el-menu-item index="/user/profile">
                     <el-icon> <SingleIcon icon="ri:file-user-fill"></SingleIcon> </el-icon> <span>基本资料</span>
                 </el-menu-item>
