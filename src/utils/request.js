@@ -2,8 +2,10 @@ import axios from 'axios';
 //定义一个变量,记录公共的前缀  ,  baseURL
 //t_env：axios_baseURL
 const baseURL = import.meta.env.VITE_API;
-const instance = axios.create({baseURL,timeout:4000})
+// withCredentials：cookie 模式下跨域请求携带 HttpOnly Cookie（同源请求无影响）
+const instance = axios.create({baseURL,timeout:4000,withCredentials:true})
 import {useTokenStore} from '@/store/token'
+import { isCookieMode } from '@/utils/auth'
 import { useUserStore } from '@/store/user';
 import router from '@/router';
 import { clearRoute } from './remove';
@@ -16,13 +18,47 @@ import msg from '@/components/msg'
 
 
 
+// 认证失效统一清理：清 token/动态路由/用户信息，并跳转登录页
+// （业务码 401/215/216 与 HTTP 401 共用，cookie 模式与 jwt 模式共用）
+const handleAuthExpired = (config, message) => {
+    // 请求时已保存的路径（避免 401 到达前路由已被篡改）
+    const currentPath = config._currentPath || router.currentRoute.value.fullPath
+    // 处理token过期或者篡改
+    const tokenStore = useTokenStore()
+    const userStore = useUserStore()
+    const tabStore = useTabStore()
+    // 清空token
+    tokenStore.removeToken()
+    // 清空动态路由数据
+    clearRoute(userStore.userMenu)
+    // 清空用户信息和菜单
+    userStore.clearUserStore()
+    // 未开启保留标签时清空
+    const settingStore = useSettingStore()
+    if (!settingStore.keepTabs) {
+      tabStore.clearTabs()
+    }
+    // 暂存主题到 uiStore（登录页读取用），再清除用户配置
+    const userConfigStore = useUserConfigStore()
+    const uiStore = useUiStore()
+    uiStore.setLastTheme(userConfigStore.theme)
+    userConfigStore.clearUserConfig()
+    document.documentElement.classList.remove('dark')
+    applyTheme('default', false)
+    msg.error(message)
+    // 清除主动退出标记，携带当前页面路径以便重登后恢复
+    settingStore.setLogoutIntent(false)
+    router.replace({ path: '/login', query: { redirect: currentPath } })
+}
+
 // 添加请求拦截器
 instance.interceptors.request.use(
     config => {
         const tokenStore =  useTokenStore()
         // 请求发出时保存浏览器地址栏路径，401 响应中用于 redirect
         config._currentPath = window.location.href.replace(window.location.origin, '')
-        if(tokenStore.token){
+        // jwt 模式手动带 authorization 头；cookie 模式由浏览器自动携带 HttpOnly Cookie
+        if(!isCookieMode() && tokenStore.token){
             config.headers.authorization = tokenStore.token
         }
 
@@ -40,40 +76,14 @@ instance.interceptors.response.use(
         }
         
 
-       // 匹配状态码为40开头的正则 
+       // 匹配状态码为40开头的正则，以及认证失效码 215（token过期）/ 216（账号已退出）
        let regex = /^40[0-9]$/
 
-       if(regex.test(res.data.code)) {
+       if(regex.test(res.data.code) || res.data.code === 215 || res.data.code === 216) {
 
-            if(res.data.code === 401){
+            if(res.data.code === 401 || res.data.code === 215 || res.data.code === 216){
                 console.log('==================== 响应拦截器执行 ====================')
-                const currentPath = res.config._currentPath || router.currentRoute.value.fullPath
-                // 处理token过期或者篡改
-                const tokenStore = useTokenStore()
-                const userStore = useUserStore()
-                const tabStore = useTabStore()
-                // 清空token
-                tokenStore.removeToken()
-                // 清空动态路由数据
-                clearRoute(userStore.userMenu)    
-                // 清空用户信息和菜单
-                userStore.clearUserStore()
-                // 未开启保留标签时清空
-                const settingStore = useSettingStore()
-                if (!settingStore.keepTabs) {
-                  tabStore.clearTabs()
-                }
-                // 暂存主题到 uiStore（登录页读取用），再清除用户配置
-                const userConfigStore = useUserConfigStore()
-                const uiStore = useUiStore()
-                uiStore.setLastTheme(userConfigStore.theme)
-                userConfigStore.clearUserConfig()
-                document.documentElement.classList.remove('dark')
-                applyTheme('default', false)
-                msg.error(res.data.message)
-                // 清除主动退出标记，携带当前页面路径以便重登后恢复
-                settingStore.setLogoutIntent(false)
-                router.replace({ path: '/login', query: { redirect: currentPath } })
+                handleAuthExpired(res.config, res.data.message)
 
             }else msg.error(res.data.message)
 
@@ -86,6 +96,12 @@ instance.interceptors.response.use(
         return Promise.reject(res.data.message)
     },
     err=>{
+        // HTTP 401（cookie 模式下未登录/过期的主路径）：走与业务码一致的清理跳转，否则用户会困死在页面
+        if(err.response && err.response.status === 401){
+            handleAuthExpired(err.config, (err.response.data && err.response.data.message) || '请重新登录')
+            // 返回pending的Promise，阻止错误开始向上传递的后续执行
+            return new Promise(() => {})
+        }
         alert('服务异常');
         return Promise.reject(err); // 异步的状态转化成失败的状态
     }
