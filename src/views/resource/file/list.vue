@@ -40,7 +40,8 @@
             </div>
 
             <el-upload class="file-operate file-upload" :action="handleAction" :headers="headers"
-                name="file" :show-file-list="false" 
+                :with-credentials="isCookieMode()"
+                name="file" :show-file-list="false"
                 :on-success="onSuccess"
                 :before-upload="beforeUpload"
                 :on-error="onError">
@@ -50,7 +51,8 @@
             </el-upload>
 
             <el-upload class="file-operate" :action="handleAction" :headers="headers" name="file"
-                :show-file-list="false" :on-success="onSuccess" 
+                :with-credentials="isCookieMode()"
+                :show-file-list="false" :on-success="onSuccess"
                 :before-upload="beforeUpload"
                 :on-error="onError"
                 multiple>
@@ -130,6 +132,7 @@ import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} f
 import msg from '@/components/msg';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { useTokenStore } from '@/store/token';
+import { isCookieMode } from '@/utils/auth';
 import offlineIcon from '@/components/MyIcon/src/offlineIcon';
 const tokenStore = useTokenStore()
 const searchData = reactive({
@@ -220,9 +223,9 @@ const onReset = () => {
     render()
 }
 
-// 手动设置请求头
+// 手动设置请求头（cookie 模式由浏览器自动携带 HttpOnly Cookie，无需带 authorization）
 const headers = computed(() => {
-  return {
+  return isCookieMode() ? {} : {
     authorization: tokenStore.token || ''
   }
 })
