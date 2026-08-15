@@ -231,6 +231,9 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
+    // 将当前已注册路由持久化，供无 token 前置守卫识别菜单路径
+    localStorage.setItem(MENU_ROUTES_STORAGE_KEY, JSON.stringify(router.getRoutes().map(route => route.path)))
+
     // 确保403路由存在
     add404Routes(router)
     add403Routes(router);
@@ -301,6 +304,23 @@ const routerData = Object.entries(modules).map(([filePath, component]) => {
 
 addDynamicRoutes(routerData)
 
+const MENU_ROUTES_STORAGE_KEY = 'menuRoutes'
+
+const getPersistedMenuRoutes = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(MENU_ROUTES_STORAGE_KEY) || 'null')
+    return Array.isArray(stored) ? new Set(stored) : null
+  } catch (error) {
+    return null
+  }
+}
+
+const getStoredMenuRoutes = () => {
+  const persistedMenuRoutes = getPersistedMenuRoutes()
+  if (persistedMenuRoutes) return persistedMenuRoutes
+  return new Set(router.getRoutes().map(route => route.path))
+}
+
 const whiteList = ['/login','/register','/401']
 
 router.beforeEach((to, from, next) => {
@@ -344,6 +364,21 @@ router.beforeEach((to, from, next) => {
         // 清除主动退出标记，让 redirect 正常生效
         const settings = useSettingStore()
         settings.setLogoutIntent(false)
+    // /404 自身直接放行，避免循环重定向
+    if (to.path === '/404') {
+        if (!router.hasRoute('404')) {
+            add404Routes(router)
+            return next({ ...to, replace: true })
+        }
+        return next()
+    }
+    // JWT 模式：目标不是已注册菜单路由时进入 404
+    const menuRoutes = getStoredMenuRoutes()
+    if (!menuRoutes.has(to.path)) {
+        console.log('==================== jwt not redirect ====================')
+        add404Routes(router)
+        return next('/404')
+    }
     // 重定向到登录页面，使用原始路径避免重复编码
     return next({
         path: '/login',
@@ -358,6 +393,25 @@ router.beforeEach((to, from, next) => {
         //放行
         console.log('==================== 已登录，有菜单 ====================')
         return next()
+    }
+
+    // /404 已注册时直接放行，避免 token 仍存在时再次进入 loadMenu 或循环重定向
+    if (to.path === '/404') {
+        if (!router.hasRoute('404')) {
+            add404Routes(router)
+            return next({ ...to, replace: true })
+        }
+        return next()
+    }
+
+    // cookie 模式，或 JWT 模式已有 token 但菜单尚未加载时，优先用本地缓存识别不存在的路径
+    const persistedMenuRoutes = getPersistedMenuRoutes()
+    // 本地缓存不存在时，仅在未登录 cookie 场景下用当前已注册路由兜底，避免 401 又拉回登录页
+    const menuRoutes = persistedMenuRoutes || (!isLogin ? getStoredMenuRoutes() : null)
+    if (menuRoutes && to.path !== '/404' && !menuRoutes.has(to.path)) {
+        console.log('==================== cookie not redirect ====================')
+        add404Routes(router)
+        return next('/404')
     }
 
     // 已登录，无菜单 => 按需加载菜单
