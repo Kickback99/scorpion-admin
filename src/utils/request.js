@@ -46,9 +46,13 @@ const handleAuthExpired = (config, message) => {
     document.documentElement.classList.remove('dark')
     applyTheme('default', false)
     msg.error(message)
-    // 清除主动退出标记，携带当前页面路径以便重登后恢复
-    settingStore.setLogoutIntent(false)
-    router.replace({ path: '/login', query: { redirect: currentPath } })
+    // 404 页返回仪表盘时忽略 redirect，避免重登后回到 404
+    const shouldIgnoreRedirect = currentPath.split('?')[0] === '/404'
+    settingStore.setLogoutIntent(shouldIgnoreRedirect)
+    router.replace({
+        path: '/login',
+        query: shouldIgnoreRedirect ? {} : { redirect: currentPath }
+    })
 }
 
 // 添加请求拦截器
