@@ -27,7 +27,7 @@ const handleAuthExpired = (config, message) => {
     const tokenStore = useTokenStore()
     const userStore = useUserStore()
     const tabStore = useTabStore()
-    // 清空token
+    // 清空token（cookie 模式会自动同步清除登录标记 cookie）
     tokenStore.removeToken()
     // 清空动态路由数据
     clearRoute(userStore.userMenu)
