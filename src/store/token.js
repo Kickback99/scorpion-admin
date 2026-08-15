@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 import { ref } from 'vue'
 import CryptoJS from 'crypto-js'
 import { useUserStore } from './user';
-import { isCookieMode } from '@/utils/auth'
+import { isCookieMode, clearAdminAuthFlag } from '@/utils/auth'
 
 // 定义store
 // defineStore('仓库的唯一标识',()=>{...})
@@ -25,6 +25,8 @@ export const useTokenStore = defineStore('token',{
         },
         removeToken(){
             this.token = ''
+            // cookie 模式：同步清除登录标记 cookie（手动登出/401 自愈/强退下线统一走这里兜底）
+            if (isCookieMode()) clearAdminAuthFlag()
         },
         // 保存用户凭证
         saveCredentials(username, password) {
