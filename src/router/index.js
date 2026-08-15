@@ -246,15 +246,16 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     
     // 用户菜单权限不足校验
     if(!hasRouteByPath(to.path)){
-        if(from.path != '/login'){
-            return next('/404')
+        const menuRoutes = getStoredMenuRoutes()
+        if (menuRoutes.has(to.path)) {
+            // console.log('router.getRoutes()',router.getRoutes())
+            // console.log('用户菜单权限不足')
+            return Promise.reject({
+                noMenuAccess: true,
+                message: '该用户无菜单权限'
+            });
         }
-        // console.log('router.getRoutes()',router.getRoutes())
-        // console.log('用户菜单权限不足')
-        return Promise.reject({ 
-            noMenuAccess: true, 
-            message: '该用户无菜单权限' 
-        });
+        return next('/404')
     }
 //    console.log('router.getRoutes()',router.getRoutes())
 //    console.log('用户菜单权限充足')
@@ -406,9 +407,8 @@ router.beforeEach((to, from, next) => {
 
     // cookie 模式，或 JWT 模式已有 token 但菜单尚未加载时，优先用本地缓存识别不存在的路径
     const persistedMenuRoutes = getPersistedMenuRoutes()
-    // 本地缓存不存在时，仅在未登录 cookie 场景下用当前已注册路由兜底，避免 401 又拉回登录页
-    const menuRoutes = persistedMenuRoutes || (!isLogin ? getStoredMenuRoutes() : null)
-    if (menuRoutes && to.path !== '/404' && !menuRoutes.has(to.path)) {
+    const menuRoutes = persistedMenuRoutes || getStoredMenuRoutes()
+    if (!isLogin && menuRoutes && to.path !== '/404' && !menuRoutes.has(to.path)) {
         console.log('==================== cookie not redirect ====================')
         add404Routes(router)
         return next('/404')
