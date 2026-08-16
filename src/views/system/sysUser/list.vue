@@ -471,11 +471,13 @@ const addDialog = () =>{
  * 编辑用户：加载完整详情（含角色）后回显
  */
 const editDialog = async (row) =>{
-    dialogVisible.value = true
-    title.value = '编辑用户'
     try {
         const res = await getDetailApi(row.id)
         const user = res.data
+
+        // 详情加载成功后再打开弹窗，避免权限不足时出现空白编辑框
+        dialogVisible.value = true
+        title.value = '编辑用户'
         formData.value = {
             id: user.id,
             username: user.username || '',
@@ -501,7 +503,7 @@ const editDialog = async (row) =>{
             }
         }
     } catch (e) {
-        msg.error('获取用户详情失败')
+        // request.js 已统一提示接口错误，这里不重复弹错误
     }
     // 重置上一次的表单验证
     nextTick(()=>{
