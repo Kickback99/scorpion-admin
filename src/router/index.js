@@ -247,6 +247,11 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     }); */
     
     
+    // 仅刷新菜单的场景（loadMenu(false)）没有导航上下文，跳过守卫校验
+    if (!to || typeof next !== 'function') {
+        return true
+    }
+
     // 用户菜单权限不足校验
     if(!hasRouteByPath(to.path)){
         const menuRoutes = previousMenuRoutes || getStoredMenuRoutes()
