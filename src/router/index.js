@@ -212,7 +212,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
     // console.log('后端返回',menuData.routers)
-    // console.log('路由数据',asyncRoutes) 
+    // console.log('路由数据',asyncRoutes)
     asyncRoutes.forEach(route => {
         if (route._addToParentNode) {
             // 配置管理类菜单添加到 parentNode 下
@@ -231,6 +231,9 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
+    // 记录旧菜单路由，供权限变更后区分 403 和 404
+    const previousMenuRoutes = getPersistedMenuRoutes()
+
     // 将当前已注册路由持久化，供无 token 前置守卫识别菜单路径
     localStorage.setItem(MENU_ROUTES_STORAGE_KEY, JSON.stringify(router.getRoutes().map(route => route.path)))
 
@@ -246,7 +249,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     
     // 用户菜单权限不足校验
     if(!hasRouteByPath(to.path)){
-        const menuRoutes = getStoredMenuRoutes()
+        const menuRoutes = previousMenuRoutes || getStoredMenuRoutes()
         if (menuRoutes.has(to.path)) {
             // console.log('router.getRoutes()',router.getRoutes())
             // console.log('用户菜单权限不足')
@@ -320,6 +323,13 @@ const getStoredMenuRoutes = () => {
   const persistedMenuRoutes = getPersistedMenuRoutes()
   if (persistedMenuRoutes) return persistedMenuRoutes
   return new Set(router.getRoutes().map(route => route.path))
+}
+
+const cleanupTabsByCurrentRoutes = () => {
+  nextTick(() => {
+    const allPaths = new Set(router.getRoutes().map(route => route.path))
+    useSettingStore().cleanupTabsByMenu(allPaths)
+  })
 }
 
 const whiteList = ['/login','/register','/401']
@@ -419,11 +429,7 @@ router.beforeEach((to, from, next) => {
         ()=>{
             next({...to,replace:true})
             // 路由注册后，清理不在路由表中的标签页
-            nextTick(() => {
-                const allPaths = new Set(router.getRoutes().map(r => r.path))
-                const settingStore = useSettingStore()
-                settingStore.cleanupTabsByMenu(allPaths)
-            })
+            cleanupTabsByCurrentRoutes()
     }).catch((error) =>
         {
             // 无菜单权限的后台用户 -> 跳转403
@@ -438,7 +444,9 @@ router.beforeEach((to, from, next) => {
             }else if(error.noMenuAccess){
                 // console.log('拦截1')
                 settings.isManualTo403 = true;
-                next('/403');   
+                next('/403');
+                // 权限收回后清理不在当前路由表中的标签页
+                cleanupTabsByCurrentRoutes()
             }else {
                 msg.error(error|| '加载菜单失败');
                 next(false); // 阻止导航
