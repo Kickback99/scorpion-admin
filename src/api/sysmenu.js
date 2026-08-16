@@ -21,8 +21,8 @@ export const listApi = () => http.get(`/admin/system/menus`)
 export const statusApi = (id,status) => http.get(`/admin/system/menus/${id}`,{params:{status}})
 
 
-// 获取用户菜单数据
+// 获取角色菜单数据
 export const allocMenusApi = (roleId) => http.get(`/admin/system/menus/assign/${roleId}`)
 
-// 给用户分配菜单
+// 给角色分配菜单
 export const doAllocMenusApi = (roleMenuData) => http.post(`/admin/system/menus/assign`,roleMenuData)
