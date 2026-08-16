@@ -277,11 +277,13 @@ const onReset = () => {
  * 编辑角色：加载完整详情（含用户）后回显
  */
 const editDialog = async (row) => {
-    dialogVisible.value = true
-    title.value = '编辑角色'
     try {
         const res = await getDetailApi(row.id)
         const role = res.data
+
+        // 详情加载成功后再打开弹窗，避免权限不足时出现空白编辑框
+        dialogVisible.value = true
+        title.value = '编辑角色'
         dialogData.value = {
             id: role.id,
             roleName: role.roleName || '',
@@ -299,7 +301,7 @@ const editDialog = async (row) => {
             selectedUserNames.value = []
         }
     } catch (e) {
-        msg.error('获取角色详情失败')
+        // request.js 已统一提示接口错误，这里不重复弹错误
     }
     // 重置上一次的表单验证
     nextTick(()=>{
