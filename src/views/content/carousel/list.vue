@@ -633,6 +633,11 @@ const handleEdit = async (row) => {
 
     const savedUploadStatus =  formModel.uploadStatus
 
+    // 获取详情
+    const res = await getCarouselByIdApi(row.id)
+    const data = res.data
+
+    // 详情加载成功后再打开弹窗，避免权限不足时出现空白编辑框
     dialogVisible.value = true
     dialogTitle.value = '编辑轮播'
 
@@ -643,10 +648,6 @@ const handleEdit = async (row) => {
 
     // 重置表单
     Object.assign(formModel, defaultForm)
-
-    // 获取详情
-    const res = await getCarouselByIdApi(row.id)
-    const data = res.data
 
     // 回显
     formModel.id = data.id
