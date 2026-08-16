@@ -789,16 +789,18 @@ const handleEdit = async (row) => {
         return;
     }
 
-    dialogVisible.value = true
-    dialogTitle.value = '编辑公告'
-    isReadonly.value = false
-    await nextTick()
-    ruleFormRef.value?.resetFields()
-
     // 加载完整详情，含 pushScope 和 targetUserIds
     try {
         const res = await noticeDetailApi(row.id)
         const detail = res.data
+
+        // 详情加载成功后再打开弹窗，避免权限不足时出现空白编辑框
+        dialogVisible.value = true
+        dialogTitle.value = '编辑公告'
+        isReadonly.value = false
+        await nextTick()
+        ruleFormRef.value?.resetFields()
+
         Object.assign(formModel, {
             id: detail.id,
             title: detail.title || '',
@@ -838,7 +840,7 @@ const handleEdit = async (row) => {
             selectedRoleIds.value = []
         }
     } catch (e) {
-        msg.error('获取公告详情失败')
+        // request.js 已统一提示接口错误，这里不重复弹错误
     }
 }
 
@@ -846,15 +848,17 @@ const handleEdit = async (row) => {
 // 详情（只读查看）
 // ============================================================
 const handleDetail = async (row) => {
-  dialogVisible.value = true
-  dialogTitle.value = '公告详情'
-  isReadonly.value = true
-  await nextTick()
-  ruleFormRef.value?.resetFields()
-
   try {
     const res = await noticeDetailApi(row.id)
     const detail = res.data
+
+    // 详情加载成功后再打开弹窗，避免权限不足时出现空白编辑框
+    dialogVisible.value = true
+    dialogTitle.value = '公告详情'
+    isReadonly.value = true
+    await nextTick()
+    ruleFormRef.value?.resetFields()
+
     Object.assign(formModel, {
       id: detail.id,
       title: detail.title || '',
@@ -894,7 +898,7 @@ const handleDetail = async (row) => {
         selectedRoleIds.value = []
     }
   } catch (e) {
-    msg.error('获取详情失败')
+    // request.js 已统一提示接口错误，这里不重复弹错误
   }
 }
 
