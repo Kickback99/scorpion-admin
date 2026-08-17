@@ -278,6 +278,10 @@ class WebSocketManager {
             detail: data
         }))
         break
+      case 'permission_changed':
+        // 权限变更推送：管理员调整角色权限后，实时刷新按钮与操作列显隐
+        useUserStore().setUserPerm(data.permissions)
+        break
       default:
         // 普通任务结果消息
         if (data.message) {
