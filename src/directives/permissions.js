@@ -1,24 +1,37 @@
-import { watchEffect } from 'vue'
+import { nextTick, watchEffect } from 'vue'
 import { useConfigStore } from '@/store/config'
 import { hasPerm } from '@/utils/permissions'
 
 /**
- * v-perm 按钮权限指令
- * 用法：<el-button v-perm="'btn.xx.xx'" ...>
- * 无权限按钮的展示方式由 configStore.buttonPermissionMode 全局决定：
+ * v-perm 权限指令
+ * 用法：<el-button v-perm="'btn.xx.xx'" ...> 或 <el-form-item v-perm="'btn.xx.xx'">
+ * 无权限元素的展示方式由 configStore.buttonPermissionMode 全局决定：
  *   - 'hide'    → display:none（可逆，等价 v-show=false）
- *   - 'disable' → 原生 disabled + is-disabled class（等价 :disabled）
+ *   - 'disable' → 原生 disabled + is-disabled class（按钮、输入框等表单控件）
  * 有权限时不做任何修改；指令只撤销自己做过的事，不覆盖模板自身的 :disabled 绑定。
  */
 
 // 每个元素的指令状态（WeakMap：不污染元素、卸载后自动回收）
 const stateMap = new WeakMap()
 
+const FORM_CONTROL_SELECTOR = 'input, textarea, select'
+const NATIVE_CONTROL_SELECTOR = 'input, textarea, select, button'
+
+const isNativeControl = (el) => el.matches?.(NATIVE_CONTROL_SELECTOR)
+
+/**
+ * 收集需要禁用/恢复的控件。
+ * 按钮、输入框直接作用于自身；容器节点作用于内部表单控件。
+ */
+function collectControls(el) {
+  if (isNativeControl(el)) return [el]
+  return Array.from(el.querySelectorAll(FORM_CONTROL_SELECTOR))
+}
+
 /**
  * 应用权限展示状态。
- * el 是 el-button 根 <button>（Vue 会把组件 vnode 上的指令转移到根元素 vnode）。
- * state.baseDisabled 记录模板 :disabled 渲染出的基线（mounted/updated 时捕获），
- * 恢复时用基线还原，避免覆盖复合条件里业务部分的禁用状态。
+ * state.controlled 记录模板 :disabled 渲染出的基线，恢复时用基线还原，
+ * 避免覆盖复合条件里业务部分的禁用状态。
  */
 function apply(el, value) {
   const state = stateMap.get(el)
@@ -32,10 +45,16 @@ function apply(el, value) {
     state.hidden = false
     state.origDisplay = undefined
   }
-  if (state.disabledByPerm) {
+  if (state.controlled.length) {
+    state.controlled.forEach(({ el: control, baseDisabled }) => {
+      control.disabled = baseDisabled
+      control.classList.remove('is-disabled')
+    })
+    state.controlled = []
+  }
+  if (state.rootDisabledClass) {
     el.classList.remove('is-disabled')
-    el.disabled = state.baseDisabled
-    state.disabledByPerm = false
+    state.rootDisabledClass = false
   }
 
   if (hasPerm(value)) return // 有权限：恢复完即止
@@ -45,34 +64,48 @@ function apply(el, value) {
     state.hidden = true
     el.style.display = 'none'
   } else {
-    state.disabledByPerm = true
-    el.disabled = true
-    el.classList.add('is-disabled')
+    const controls = collectControls(el)
+    state.controlled = controls.map((control) => ({
+      el: control,
+      baseDisabled: control.disabled,
+    }))
+    controls.forEach((control) => {
+      control.disabled = true
+      control.classList.add('is-disabled')
+    })
+
+    // 容器类节点也打上禁用态，便于 el-form-item 等组件应用灰显样式
+    if (!isNativeControl(el)) {
+      el.classList.add('is-disabled')
+      state.rootDisabledClass = true
+    }
   }
 }
 
 export const setPerm = (app) => {
   app.directive('perm', {
     mounted(el, binding) {
-      // 挂载时 DOM 已按模板渲染完成，el.disabled 即模板绑定的基线值
       const state = {
-        baseDisabled: el.disabled,
         hidden: false,
-        disabledByPerm: false,
         origDisplay: undefined,
+        controlled: [],
+        rootDisabledClass: false,
         stop: null,
       }
       stateMap.set(el, state)
       // 响应式核心：userPerm 或 buttonPermissionMode 任一变化立即重算。
       // 将来 WebSocket 推送权限 → setUserPerm 写入 → 此处自动触发。
       state.stop = watchEffect(() => apply(el, binding.value))
+      nextTick(() => apply(el, binding.value))
     },
     updated(el, binding) {
       const state = stateMap.get(el)
       if (!state) return
-      // el-button 自渲染会按自身 props 重置 disabled 属性，
-      // updated 在子组件 patch 之后执行，此时 el.disabled 是模板最新渲染结果，重新捕获基线。
-      state.baseDisabled = el.disabled
+      // 子组件已按模板重新渲染，此刻控件 disabled 属性是模板最新值，刷新基线，
+      // 避免恢复时把模板业务禁用条件（复合条件）覆盖成旧值
+      state.controlled.forEach((c) => {
+        c.baseDisabled = c.el.disabled
+      })
       apply(el, binding.value)
     },
     unmounted(el) {
