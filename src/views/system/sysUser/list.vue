@@ -145,7 +145,7 @@
                 <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
             </el-form-item>
 
-            <el-form-item label="用户角色">
+            <el-form-item v-if="hasPerm('btn.sysUser.assignRole')" label="用户角色">
                 <SmartAutoComplete
                     v-model="selectedRoleName"
                     :fetch-suggestions-api="fetchRoles"
@@ -227,7 +227,7 @@
 
 <script setup>
 import {listApi,addApi,removeApi,modifyApi,statusApi,getDetailApi} from '@/api/sysuser'
-import { showPermColumn } from '@/utils/permissions'
+import { hasPerm, showPermColumn } from '@/utils/permissions'
 import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
@@ -422,7 +422,7 @@ const loadAllRoles = async () => {
  */
 const fetchRoles = async (params) => {
     const query = params.keyword || ''
-    if (roleCache.value.length === 0) {
+    if (hasPerm('btn.sysUser.assignRole') && roleCache.value.length === 0) {
         await loadAllRoles()
     }
     if (!query) return roleCache.value
@@ -447,7 +447,7 @@ watch(selectedRoleName, (names) => {
 }, { deep: true })
 
 // 预加载角色数据（供新增/编辑弹窗使用）
-loadAllRoles()
+if (hasPerm('btn.sysUser.assignRole')) loadAllRoles()
 
 //校验相关
 const ruleFormRef = ref(null)
@@ -488,7 +488,7 @@ const editDialog = async (row) =>{
             type: (user.type !== undefined ? user.type : 0).toString()
         }
         // 角色回显
-        if (roleCache.value.length === 0) await loadAllRoles()
+        if (hasPerm('btn.sysUser.assignRole') && roleCache.value.length === 0) await loadAllRoles()
         if (row.id === 1) {
             // admin 回显全部角色并禁用（对齐分配角色弹窗行为）
             selectedRoleName.value = roleCache.value.map(r => r.value)
