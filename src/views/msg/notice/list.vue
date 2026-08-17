@@ -227,7 +227,7 @@
             </el-form-item>
 
             <!-- 推送范围 -->
-            <el-form-item prop="targetType" label="推送范围">
+            <el-form-item prop="targetType" label="推送范围" v-perm.hide="'btn.sysUser.assignRole'">
                 <template #label>
                     推送范围
                     <el-tooltip content="选择公告的推送目标用户" placement="top">
@@ -242,7 +242,7 @@
             </el-form-item>
 
             <!-- 后台指定用户（推送范围=后台时显示） -->
-            <el-form-item v-if="formModel.targetType === 2" label="目标用户">
+            <el-form-item v-if="formModel.targetType === 2" label="目标用户" v-perm.hide="'btn.sysUser.assignRole'">
                 <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly || !!formModel.pushTime">
                     <el-radio value="all">所有用户</el-radio>
                     <el-radio value="role">指定角色</el-radio>
@@ -268,7 +268,7 @@
             </el-form-item>
 
             <!-- 指定角色 -->
-            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'role'" label=" " prop="specifiedRoles">
+            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'role'" label=" " prop="specifiedRoles" v-perm.hide="'btn.sysUser.assignRole'">
                 <SmartAutoComplete
                     ref="roleAutoCompleteRef"
                     v-model="selectedRoleNames"
@@ -307,7 +307,7 @@
 import { ref, reactive, nextTick, onMounted, watch, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
-import { showPermColumn } from '@/utils/permissions'
+import { hasPerm, showPermColumn } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import msg from '@/components/msg'
 import Markdown from '@/components/Markdown.vue'  // 引入 Markdown 组件
@@ -509,6 +509,7 @@ const selectedUserIds = ref([])                      // 选中的用户 ID 列�
 const userCache = ref([])                            // 用户搜索结果缓存
 const selectedRoleNames = ref([])                    // 角色 SmartAutoComplete v-model
 const selectedRoleIds = ref([])                      // 选中的角色 ID 列表
+const originalTargetRoleIds = ref([])                // 编辑回显的原角色 ID（无权限时提交兜底用）
 const roleCache = ref([])                            // 角色搜索结果缓存
 const roleAutoCompleteRef = ref(null)
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
@@ -577,6 +578,8 @@ const loadAllRoles = async () => {
  * 联想搜索角色
  */
 const fetchRoles = async (params) => {
+    // 无角色权限时不加载角色数据（不调用 getAllRolesApi）
+    if (!hasPerm('btn.sysUser.assignRole')) return []
     const query = params.keyword || ''
     if (roleCache.value.length === 0) {
         await loadAllRoles()
@@ -634,6 +637,8 @@ watch(selectedUserNames, (names) => {
 
 // 角色名称 → 角色 ID 同步
 watch(selectedRoleNames, (names) => {
+    // 无角色权限时不联动角色 ID（保留 handleEdit 回显的原角色 ID，防止提交清空角色）
+    if (!hasPerm('btn.sysUser.assignRole')) return
     selectedRoleIds.value = (names || [])
         .map(name => roleCache.value.find(r => r.value === name))
         .filter(Boolean)
@@ -672,6 +677,8 @@ const rules = {
     specifiedRoles: [
         {
             validator: (rule, value, callback) => {
+                // 无分配角色权限时跳过校验（区块已被 v-perm.hide 隐藏，提交走原角色 ID 兜底）
+                if (!hasPerm('btn.sysUser.assignRole')) { callback(); return }
                 if (targetUserType.value === 'role' && !selectedRoleNames.value?.length) {
                     callback(new Error('请至少选择一个角色'))
                 } else {
@@ -713,8 +720,8 @@ onMounted(() => {
     loadAllUsers()
 })
 
-// 预加载角色缓存（顶层立即执行）
-loadAllRoles()
+// 预加载角色缓存（顶层立即执行；无角色权限时不加载，避免越权调用 getAllRolesApi）
+if (hasPerm('btn.sysUser.assignRole')) loadAllRoles()
 
 /**
  * 每页条数变化
@@ -775,6 +782,7 @@ const handleAdd = async () => {
     selectedUserIds.value = []
     selectedRoleNames.value = []
     selectedRoleIds.value = []
+    originalTargetRoleIds.value = []
     await nextTick()
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, defaultModel)
@@ -815,14 +823,20 @@ const handleEdit = async (row) => {
         if (detail.targetRoleIds && detail.targetRoleIds.length > 0) {
             targetUserType.value = 'role'
             selectedRoleIds.value = detail.targetRoleIds
-            const res = await getAllRolesApi()
-            roleCache.value = (res.data || []).map(item => ({
-                value: item.role_name,
-                id: item.id
-            }))
-            const roleMap = {}
-            roleCache.value.forEach(r => { roleMap[r.id] = r.value })
-            selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+            originalTargetRoleIds.value = detail.targetRoleIds
+            if (hasPerm('btn.sysUser.assignRole')) {
+                const res = await getAllRolesApi()
+                roleCache.value = (res.data || []).map(item => ({
+                    value: item.role_name,
+                    id: item.id
+                }))
+                const roleMap = {}
+                roleCache.value.forEach(r => { roleMap[r.id] = r.value })
+                selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+            } else {
+                // 无角色权限：不回显角色名称、不调 getAllRolesApi，提交时兜底原角色 ID（防止清空）
+                selectedRoleNames.value = []
+            }
             selectedUserNames.value = []
             selectedUserIds.value = []
         } else if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
@@ -833,12 +847,14 @@ const handleEdit = async (row) => {
             selectedUserNames.value = detail.targetUserIds.map(id => userMap[id] || String(id))
             selectedRoleNames.value = []
             selectedRoleIds.value = []
+            originalTargetRoleIds.value = []
         } else {
             targetUserType.value = 'all'
             selectedUserNames.value = []
             selectedUserIds.value = []
             selectedRoleNames.value = []
             selectedRoleIds.value = []
+            originalTargetRoleIds.value = []
         }
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
@@ -873,14 +889,19 @@ const handleDetail = async (row) => {
     if (detail.targetRoleIds && detail.targetRoleIds.length > 0) {
         targetUserType.value = 'role'
         selectedRoleIds.value = detail.targetRoleIds
-        const res = await getAllRolesApi()
-        roleCache.value = (res.data || []).map(item => ({
-            value: item.role_name,
-            id: item.id
-        }))
-        const roleMap = {}
-        roleCache.value.forEach(r => { roleMap[r.id] = r.value })
-        selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+        if (hasPerm('btn.sysUser.assignRole')) {
+            const res = await getAllRolesApi()
+            roleCache.value = (res.data || []).map(item => ({
+                value: item.role_name,
+                id: item.id
+            }))
+            const roleMap = {}
+            roleCache.value.forEach(r => { roleMap[r.id] = r.value })
+            selectedRoleNames.value = detail.targetRoleIds.map(id => roleMap[id] || String(id))
+        } else {
+            // 无角色权限：不回显角色名称、不调 getAllRolesApi
+            selectedRoleNames.value = []
+        }
         selectedUserNames.value = []
         selectedUserIds.value = []
     } else if (detail.pushScope === 2 && detail.targetUserIds && detail.targetUserIds.length > 0) {
@@ -917,9 +938,13 @@ const handleConfirm = async () => {
         }
         // pushScope + targetUserIds + targetRoleIds（角色→用户转换由后端内部完成）
         if (formModel.targetType === 2) {
-            if (targetUserType.value === 'role' && selectedRoleIds.value.length > 0) {
-                params.pushScope = 2
-                params.targetRoleIds = selectedRoleIds.value
+            if (targetUserType.value === 'role') {
+                // 无角色权限时兜底提交原角色 ID（防止编辑公告清空指定角色）
+                const roleIds = hasPerm('btn.sysUser.assignRole') ? selectedRoleIds.value : originalTargetRoleIds.value
+                if (roleIds.length > 0) {
+                    params.pushScope = 2
+                    params.targetRoleIds = roleIds
+                }
             } else if (targetUserType.value === 'specific' && selectedUserIds.value.length > 0) {
                 params.pushScope = 2
                 params.targetUserIds = selectedUserIds.value

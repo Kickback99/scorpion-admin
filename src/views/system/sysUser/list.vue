@@ -145,7 +145,7 @@
                 <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
             </el-form-item>
 
-            <el-form-item v-perm="'btn.sysUser.assignRole'" label="用户角色">
+            <el-form-item v-perm.hide="'btn.sysUser.assignRole'" label="用户角色">
                 <SmartAutoComplete
                     v-model="selectedRoleName"
                     :fetch-suggestions-api="fetchRoles"
