@@ -39,7 +39,7 @@ const DEFAULT_NUMBER_LIMITS = {
   'article_list.pagination_page_size':        { min: 5, max: 15 },
   'storage.data_retention_days':              { min: 0, max: 100 },
   'storage.file_retention_days':              { min: 0, max: 100 },
-  'tree_cate_parent_width':                   { min: 12, max: 200 },
+  'tree.cate.parent_width':                   { min: 12, max: 200 },
 }
 
 // ============================================================
@@ -139,12 +139,18 @@ export const useConfigStore = defineStore({
       search_menu_focus: false,
       theme_layout_mode: 'inline',
       theme_dot_shape: 'circle',
-      tree_auth_line_style: 'dashed',
-      tree_cate_line_style: 'dashed',
-      tree_cate_parent_mode: 'custom',
-      tree_cate_parent_width: 75,
-      tree_cate_child_mode: 'fill',
-      tree_auth_child_mode: 'fill',
+      tree: {
+        auth: {
+          line_style: 'dashed',
+          child_mode: 'fill',
+        },
+        cate: {
+          line_style: 'dashed',
+          parent_mode: 'custom',
+          parent_width: 75,
+          child_mode: 'fill',
+        },
+      },
       notification: {
         comment_enabled: true,
       },
@@ -426,29 +432,25 @@ export const useConfigStore = defineStore({
     getThemeDotShape()             { return this.getValue('theme_dot_shape') || 'circle' },
     setThemeDotShape(v)            { this.updateConfig('theme_dot_shape', v) },
 
-    // -- tree_auth_line_style --
-    getTreeAuthLineStyle()         { return this.getValue('tree_auth_line_style') || 'dashed' },
-    setTreeAuthLineStyle(v)        { this.updateConfig('tree_auth_line_style', v) },
+    // ==================== tree ====================
 
-    // -- tree_cate_line_style --
-    getTreeCateLineStyle()         { return this.getValue('tree_cate_line_style') || 'dashed' },
-    setTreeCateLineStyle(v)        { this.updateConfig('tree_cate_line_style', v) },
+    getTreeAuthLineStyle()         { return this.getValue('tree.auth.line_style') || 'dashed' },
+    setTreeAuthLineStyle(v)        { this.updateConfig('tree.auth.line_style', v) },
 
-    // -- tree_cate_parent_mode --
-    getTreeCateParentMode()        { return this.getValue('tree_cate_parent_mode') || 'custom' },
-    setTreeCateParentMode(v)       { this.updateConfig('tree_cate_parent_mode', v) },
+    getTreeAuthChildMode()         { return this.getValue('tree.auth.child_mode') || 'fill' },
+    setTreeAuthChildMode(v)        { this.updateConfig('tree.auth.child_mode', v) },
 
-    // -- tree_cate_parent_width --
-    getTreeCateParentWidth()       { return this.getValue('tree_cate_parent_width') ?? 75 },
-    setTreeCateParentWidth(v)      { this.updateConfig('tree_cate_parent_width', v) },
+    getTreeCateLineStyle()         { return this.getValue('tree.cate.line_style') || 'dashed' },
+    setTreeCateLineStyle(v)        { this.updateConfig('tree.cate.line_style', v) },
 
-    // -- tree_cate_child_mode --
-    getTreeCateChildMode()         { return this.getValue('tree_cate_child_mode') || 'fill' },
-    setTreeCateChildMode(v)        { this.updateConfig('tree_cate_child_mode', v) },
+    getTreeCateParentMode()        { return this.getValue('tree.cate.parent_mode') || 'custom' },
+    setTreeCateParentMode(v)       { this.updateConfig('tree.cate.parent_mode', v) },
 
-    // -- tree_auth_child_mode --
-    getTreeAuthChildMode()         { return this.getValue('tree_auth_child_mode') || 'fill' },
-    setTreeAuthChildMode(v)        { this.updateConfig('tree_auth_child_mode', v) },
+    getTreeCateParentWidth()       { return this.getValue('tree.cate.parent_width') ?? 75 },
+    setTreeCateParentWidth(v)      { this.updateConfig('tree.cate.parent_width', v) },
+
+    getTreeCateChildMode()         { return this.getValue('tree.cate.child_mode') || 'fill' },
+    setTreeCateChildMode(v)        { this.updateConfig('tree.cate.child_mode', v) },
 
     // ==================== article ====================
 
@@ -606,12 +608,12 @@ export const useConfigStore = defineStore({
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
     themeDotShape()           { return this.getValue('theme_dot_shape') || 'circle' },
-    treeAuthLineStyle()       { return this.getValue('tree_auth_line_style') || 'dashed' },
-    treeCateLineStyle()       { return this.getValue('tree_cate_line_style') || 'dashed' },
-    treeCateParentMode()      { return this.getValue('tree_cate_parent_mode') || 'custom' },
-    treeCateParentWidth()     { return this.getValue('tree_cate_parent_width') ?? 75 },
-    treeCateChildMode()       { return this.getValue('tree_cate_child_mode') || 'fill' },
-    treeAuthChildMode()       { return this.getValue('tree_auth_child_mode') || 'fill' },
+    treeAuthLineStyle()       { return this.getValue('tree.auth.line_style') || 'dashed' },
+    treeCateLineStyle()       { return this.getValue('tree.cate.line_style') || 'dashed' },
+    treeCateParentMode()      { return this.getValue('tree.cate.parent_mode') || 'custom' },
+    treeCateParentWidth()     { return this.getValue('tree.cate.parent_width') ?? 75 },
+    treeCateChildMode()       { return this.getValue('tree.cate.child_mode') || 'fill' },
+    treeAuthChildMode()       { return this.getValue('tree.auth.child_mode') || 'fill' },
 
     // ===== article (admin 组) =====
     articleTopLimit()         { return this.getValue('article.top_limit') ?? 3 },
