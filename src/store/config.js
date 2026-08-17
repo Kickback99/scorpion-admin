@@ -121,6 +121,7 @@ export const useConfigStore = defineStore({
       },
       notice: {
         enabled: false,
+        sse_enabled: false,
         dismissed_level: 'session',
       },
     },
@@ -422,6 +423,9 @@ export const useConfigStore = defineStore({
     getNoticeEnabled()             { return this.getValue('notice.enabled') === true },
     toggleNoticeEnabled()          { this.updateConfig('notice.enabled', !this.getValue('notice.enabled')) },
 
+    getNoticeSseEnabled()          { return this.getValue('notice.sse_enabled') === true },
+    toggleNoticeSseEnabled()       { this.updateConfig('notice.sse_enabled', !this.getValue('notice.sse_enabled')) },
+
     getNoticeDismissedLevel()      { return this.getValue('notice.dismissed_level') || 'session' },
     setNoticeDismissedLevel(v)     { this.updateConfig('notice.dismissed_level', v) },
 
@@ -610,6 +614,7 @@ export const useConfigStore = defineStore({
     isWebsocketEnabled()        { return this.getValue('websocket.enabled') === true },
     isWebsocketBackendEnabled() { return this.getValue('websocket.backend_enabled') === true },
     isNoticeEnabled()         { return this.getValue('notice.enabled') === true },
+    isNoticeSseEnabled()      { return this.getValue('notice.sse_enabled') === true },
     noticeDismissedLevel()    { return this.getValue('notice.dismissed_level') || 'session' },
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
