@@ -5,7 +5,7 @@
         <el-button text size="small" @click="handleToggleExpand">
           <el-icon><component :is="tableExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ tableExpanded ? '全部折叠' : '全部展开' }}
         </el-button>
-        <el-button :disabled="$hasPerm('btn.config.add')" type="primary" @click="handleAddRoot" size="small" plain>
+        <el-button v-perm="'btn.config.add'" type="primary" @click="handleAddRoot" size="small" plain>
           <el-icon><Plus /></el-icon>
           新增配置
         </el-button>
@@ -123,14 +123,14 @@
             </el-button>
           </template>
           <template v-else>
-            <el-button type="warning" link size="small" plain @click="handleEdit(row)" :disabled="$hasPerm('btn.config.update') || row.isObject || row.readonly">
+            <el-button type="warning" link size="small" plain @click="handleEdit(row)" v-perm="'btn.config.update'" :disabled="row.isObject || row.readonly">
               <el-icon><Edit /></el-icon> 编辑
             </el-button>
             <!-- 删除按钮：对象有子节点 或 系统预设配置 时禁用 -->
-            <el-button type="danger" link size="small" plain @click="handleDelete(row)" :disabled="(row.isObject && hasChildren(row)) || $hasPerm('btn.config.remove') || row.isSystem">
+            <el-button type="danger" link size="small" plain @click="handleDelete(row)" v-perm="'btn.config.remove'" :disabled="(row.isObject && hasChildren(row)) || row.isSystem">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
-            <el-button :disabled="$hasPerm('btn.config.add')" type="primary" link size="small" plain @click="handleAddChild(row)" v-if="row.isObject">
+            <el-button v-perm="'btn.config.add'" type="primary" link size="small" plain @click="handleAddChild(row)" v-if="row.isObject">
               <el-icon><Plus /></el-icon> 新增子项
             </el-button>
           </template>

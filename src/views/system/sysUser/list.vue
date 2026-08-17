@@ -64,8 +64,8 @@
                     </el-form-item>
                 </el-form>
                 <div class="right">
-                    <el-button size="small" type="danger" @click="deleteSelectRows()" :disabled="$hasPerm('btn.sysUser.remove')" icon="Delete" plain>批量删除</el-button>
-                    <el-button size="small" type="primary" @click="addDialog" :disabled="$hasPerm('btn.sysUser.add')" icon="Plus" plain>新增</el-button>
+                    <el-button size="small" type="danger" @click="deleteSelectRows()" v-perm="'btn.sysUser.remove'" icon="Delete" plain>批量删除</el-button>
+                    <el-button size="small" type="primary" @click="addDialog" v-perm="'btn.sysUser.add'" icon="Plus" plain>新增</el-button>
                 </div>
             </div>
         </el-collapse-item>
@@ -110,13 +110,13 @@
         <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
         <el-table-column label="操作" width="200" align="center" >
             <template #default="{row,$index}">
-            <el-button size="small" type="warning" :disabled="$hasPerm('btn.sysUser.update')" @click="editDialog(row)" plain>编辑</el-button>
+            <el-button size="small" type="warning" v-perm="'btn.sysUser.update'" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button size="small" type="danger" :disabled="$hasPerm('btn.sysUser.remove')" plain>删除</el-button>
+                    <el-button size="small" type="danger" v-perm="'btn.sysUser.remove'" plain>删除</el-button>
                 </template>
             </el-popconfirm>
-            <el-button size="small" type="success" :disabled="$hasPerm('btn.sysUser.assignRole')" @click="showAllocRoles(row)" plain>分配</el-button>
+            <el-button size="small" type="success" v-perm="'btn.sysUser.assignRole'" @click="showAllocRoles(row)" plain>分配</el-button>
             </template>
         </el-table-column>
     </el-table>

@@ -61,7 +61,7 @@
 
         <!-- 顶部操作栏：新增「回复」按钮 -->
         <div class="top-action-bar">
-            <el-button :disabled="$hasPerm('btn.comment.add')" size="small" type="primary" @click="handleTopReply" plain>
+            <el-button v-perm="'btn.comment.add'" size="small" type="primary" @click="handleTopReply" plain>
                 回复
             </el-button>
         </div>
@@ -70,9 +70,9 @@
 
     <div class="action-bar">
         <div class="action-buttons">
-            <el-button :disabled="$hasPerm('btn.comment.audit')" size="small" type="primary" @click="batchApproveRows()"  plain>批量通过</el-button>
-            <el-button :disabled="$hasPerm('btn.comment.audit')" size="small" type="danger" @click="batchRejectRows()"  plain>批量驳回</el-button>
-            <el-button :disabled="$hasPerm('btn.comment.audit')" size="small" type="danger" @click="batchDeleteRows()"  plain>批量删除</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="primary" @click="batchApproveRows()"  plain>批量通过</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="danger" @click="batchRejectRows()"  plain>批量驳回</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="danger" @click="batchDeleteRows()"  plain>批量删除</el-button>
         </div>
 
         <!-- 统计区域：按钮显示状态文字，数字单独显示 -->
@@ -190,13 +190,13 @@
 
                 <!-- 正常模式/挑拣模式：显示 回复/挑拣/删除/详情 -->
                 <template v-else>
-                    <el-button :disabled="$hasPerm('btn.comment.add')" size="small" type="primary" @click="handleReply(row)" plain>回复</el-button>
+                    <el-button v-perm="'btn.comment.add'" size="small" type="primary" @click="handleReply(row)" plain>回复</el-button>
                     <el-button size="small" type="success" @click="row.rootId === -1 ? handleSelectChildren(row) : handleSelectParent(row)" plain>
                         挑拣
                     </el-button>
                     <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
-                            <el-button :disabled="$hasPerm('btn.comment.remove')" size="small" type="danger" plain>删除</el-button>
+                            <el-button v-perm="'btn.comment.remove'" size="small" type="danger" plain>删除</el-button>
                         </template>
                     </el-popconfirm>
                     <el-button size="small" type="info" @click="handleInfo(row)" plain>详情</el-button>

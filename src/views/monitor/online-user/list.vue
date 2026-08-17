@@ -16,7 +16,7 @@
                 </el-form-item>
             </el-form>
             <div>
-                <el-button :disabled="$hasPerm('btn.onlineuser.execute')" size="small" type="primary" @click="cleanZombieUsers" plain>清理僵尸用户</el-button>
+                <el-button v-perm="'btn.onlineuser.execute'" size="small" type="primary" @click="cleanZombieUsers" plain>清理僵尸用户</el-button>
             </div>
         </div>
 
@@ -52,7 +52,7 @@
                             size="small"
                             type="primary"
                             :loading="kickingMap[row.userId + '_' + row.role]"
-                            :disabled="$hasPerm('btn.onlineuser.execute') || kickingMap[row.userId + '_' + row.role]"
+                            v-perm="'btn.onlineuser.execute'" :disabled="kickingMap[row.userId + '_' + row.role]"
                             plain
                             >
                             {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }}
