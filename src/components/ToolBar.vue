@@ -149,7 +149,7 @@ const configStore = useConfigStore()
 // 响应式中屏幕检测
 // ============================================================
 const isMediumDown = ref(false)
-const mediaQuery = window.matchMedia('(max-width: 991px)')
+const mediaQuery = window.matchMedia('(max-width: 1250px)')
 
 function handleMediaChange(e) {
   isMediumDown.value = e.matches
@@ -476,7 +476,7 @@ const onTextColorModeChange = (mode) => {
 }
 
 // 中屏幕以下压缩搜索框宽度，防止断行
-@media (max-width: 991px) {
+@media (max-width: 1250px) {
   :deep(.smart-menu-search .search-input-row) {
     width: 130px;
   }
