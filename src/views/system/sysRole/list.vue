@@ -37,7 +37,7 @@
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="200">
+        <el-table-column v-if="showPermColumn(['btn.sysRole.update', 'btn.sysRole.remove', 'btn.sysRole.assignAuth'])" label="操作" width="200">
             <template #default="{row,$index}">
             <el-button size="small" type="warning" v-perm="'btn.sysRole.update'" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
@@ -113,6 +113,7 @@
 <script setup>
 import { nextTick, ref, watch } from 'vue';
 import {listApi,addApi,modifyApi,removeApi,getDetailApi} from '@/api/sysrole'
+import { showPermColumn } from '@/utils/permissions'
 import { ElMessageBox } from 'element-plus';
 import router, { loadMenu } from '@/router';
 import msg from '@/components/msg'

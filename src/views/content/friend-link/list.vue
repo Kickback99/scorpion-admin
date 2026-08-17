@@ -39,7 +39,7 @@
             </template>
         </el-table-column>
 
-        <el-table-column label="操作">
+        <el-table-column v-if="showPermColumn(['btn.friendlink.update', 'btn.friendlink.remove'])" label="操作">
             <template #default="{row}">
                 <el-button v-perm="'btn.friendlink.update'" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
@@ -103,6 +103,7 @@
 
 <script setup>
 import { friendLinkAddApi, friendLinkListApi, friendLinkModifyApi, friendLinkRemoveApi } from '@/api/friendlink';
+import { showPermColumn } from '@/utils/permissions';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import msg from '@/components/msg';
 import { reactive, ref } from 'vue';
