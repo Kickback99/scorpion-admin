@@ -146,7 +146,7 @@
             </el-form-item>
 
             <!-- 关联文章 - 文章选择（仅新增时显示） -->
-            <el-form-item v-if="!formModel.id && formModel.carouselType === 0 && hasPerm('btn.article.list')" label="选择文章" prop="articleId">
+            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" v-perm="'btn.article.list'" label="选择文章" prop="articleId">
                 <SmartAutoComplete
                     v-model="selectedArticles"
                     :fetch-suggestions-api="fetchArticles"
