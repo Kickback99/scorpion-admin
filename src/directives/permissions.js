@@ -8,12 +8,19 @@ import { hasPerm } from '@/utils/permissions'
  * 无权限元素的展示方式由 configStore.buttonPermissionMode 全局决定：
  *   - 'hide'    → display:none（可逆，等价 v-show=false）
  *   - 'disable' → 原生 disabled + is-disabled class（按钮、输入框等表单控件）
- * 修饰符：v-perm.hide 强制隐藏（覆盖全局 buttonPermissionMode 配置）
+ * 修饰符：v-perm.hide / v-perm.disable 强制隐藏/禁用（覆盖全局 buttonPermissionMode 配置，hide 优先）
  * 有权限时不做任何修改；指令只撤销自己做过的事，不覆盖模板自身的 :disabled 绑定。
  */
 
 // 每个元素的指令状态（WeakMap：不污染元素、卸载后自动回收）
 const stateMap = new WeakMap()
+
+/** 修饰符强制模式：.hide → 'hide'，.disable → 'disable'，未指定 → null（跟随全局配置） */
+const getForcedMode = (binding) => {
+  if (binding.modifiers?.hide) return 'hide'
+  if (binding.modifiers?.disable) return 'disable'
+  return null
+}
 
 const FORM_CONTROL_SELECTOR = 'input, textarea, select'
 const NATIVE_CONTROL_SELECTOR = 'input, textarea, select, button'
@@ -38,8 +45,8 @@ function apply(el, value) {
   const state = stateMap.get(el)
   if (!state) return // 已卸载
 
-  // .hide 修饰符：强制隐藏，覆盖全局 buttonPermissionMode 配置
-  const mode = state.forceHide ? 'hide' : (useConfigStore().buttonPermissionMode || 'hide')
+  // 修饰符强制模式优先（.hide / .disable），否则跟随全局 buttonPermissionMode 配置
+  const mode = state.forcedMode || (useConfigStore().buttonPermissionMode || 'hide')
 
   // 先撤销指令上一轮的修改（隐藏/禁用互切、权限恢复都靠这里）
   if (state.hidden) {
@@ -92,7 +99,7 @@ export const setPerm = (app) => {
         origDisplay: undefined,
         controlled: [],
         rootDisabledClass: false,
-        forceHide: !!binding.modifiers?.hide,
+        forcedMode: getForcedMode(binding),
         stop: null,
       }
       stateMap.set(el, state)
@@ -105,7 +112,7 @@ export const setPerm = (app) => {
       const state = stateMap.get(el)
       if (!state) return
       // 修饰符可能随模板更新变化，同步刷新
-      state.forceHide = !!binding.modifiers?.hide
+      state.forcedMode = getForcedMode(binding)
       // 子组件已按模板重新渲染，此刻控件 disabled 属性是模板最新值，刷新基线，
       // 避免恢复时把模板业务禁用条件（复合条件）覆盖成旧值
       state.controlled.forEach((c) => {
