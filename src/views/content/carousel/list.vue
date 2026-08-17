@@ -10,7 +10,7 @@
             </el-form-item>
         </el-form>
         <div>
-            <el-button :disabled="$hasPerm('btn.carousel.add')"  size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
+            <el-button v-perm="'btn.carousel.add'"  size="small" type="primary" icon="Plus" @click="handleAdd" plain>新增轮播</el-button>
         </div>
     </div>
 
@@ -111,10 +111,10 @@
                     plain
                 >
                 </el-button>
-                <el-button v-else :disabled="$hasPerm('btn.carousel.update')" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain />
+                <el-button v-else v-perm="'btn.carousel.update'" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain />
                 <el-popconfirm :title="`你确定要删除「${row.articleTitle}」的轮播吗？`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button :disabled="$hasPerm('btn.carousel.remove')" size="small" type="danger" icon="Delete" circle plain />
+                        <el-button v-perm="'btn.carousel.remove'" size="small" type="danger" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
             </template>
