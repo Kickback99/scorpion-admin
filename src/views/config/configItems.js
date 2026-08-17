@@ -63,6 +63,7 @@ export function useConfigItems() {
         { key: 'websocket.backend_enabled',      type: 'switch', label: '后端 WebSocket', desc: '后端 WebSocket 连接状态（只读）',          icon: Connection,     get: () => config.getValue('websocket.backend_enabled'), readonly: true },
         // ===== notice =====
         { key: 'notice.enabled',                 type: 'switch', label: '公告通知',       desc: '控制前台公告通知的开启与关闭',            icon: Bell,         get: () => config.getValue('notice.enabled'),              set: (v) => config.updateConfig('notice.enabled', v) },
+        { key: 'notice.sse_enabled',             type: 'switch', label: '公告实时连接',   desc: '控制前台公告 SSE 实时推送连接',           icon: Connection,   get: () => config.getValue('notice.sse_enabled'),          set: (v) => config.updateConfig('notice.sse_enabled', v) },
         { key: 'notice.dismissed_level',         type: 'radio',  label: '公告生效级别',   desc: '公告不再提示的生效级别',                  icon: Bell,         get: () => config.getValue('notice.dismissed_level'),      set: (v) => config.updateConfig('notice.dismissed_level', v),     options: [{ value: 'permanent', label: '永久' }, { value: 'session', label: '会话' }] },
       ]
     },
