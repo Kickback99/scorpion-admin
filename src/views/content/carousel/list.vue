@@ -146,7 +146,7 @@
             </el-form-item>
 
             <!-- 关联文章 - 文章选择（仅新增时显示） -->
-            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" label="选择文章" prop="articleId">
+            <el-form-item v-if="!formModel.id && formModel.carouselType === 0 && hasPerm('btn.article.list')" label="选择文章" prop="articleId">
                 <SmartAutoComplete
                     v-model="selectedArticles"
                     :fetch-suggestions-api="fetchArticles"
@@ -323,6 +323,7 @@ import msg from '@/components/msg'
 import { Plus, QuestionFilled } from '@element-plus/icons-vue'
 import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarouselApi, addCarouselApi } from '@/api/article'
 import { getAllArticlesApi } from '@/api/business'
+import { hasPerm } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import PinyinMatch from 'pinyin-match'
 import SmartUpload from '@/views/components/SmartUpload.vue'
@@ -523,7 +524,7 @@ const fetchArticles = async (params) => {
     const query = params.keyword || ''
     
     // 如果还没有加载文章列表，先加载
-    if (articleList.value.length === 0) {
+    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
         await loadAllArticles()
     }
     
@@ -616,7 +617,7 @@ const handleAdd = async () => {
     selectedArticles.value = []
 
     // 预加载文章列表
-    if (articleList.value.length === 0) {
+    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
         await loadAllArticles()
     }
 

@@ -232,7 +232,7 @@
                 </el-form-item>
                 
                 <!-- 文章评论时显示文章选择 -->
-                <el-form-item v-if="replyModel.type === '0'" label="选择文章" prop="articleId">
+                <el-form-item v-if="replyModel.type === '0' && hasPerm('btn.article.list')" label="选择文章" prop="articleId">
                     <SmartAutoComplete
                         ref="articleAutoCompleteRef"
                         v-model="selectedArticles"
@@ -323,6 +323,7 @@ import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
 import PinyinMatch from 'pinyin-match'
 import { getAllArticlesApi } from '@/api/business';
+import { hasPerm } from '@/utils/permissions';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import msg from '@/components/msg'
 
@@ -596,7 +597,7 @@ const loadAllArticles = async () => {
 const fetchArticles = async (params) => {
     const query = params.keyword || ''
     
-    if (articleList.value.length === 0) {
+    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
         await loadAllArticles()
     }
     
