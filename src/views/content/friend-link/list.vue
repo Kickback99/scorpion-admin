@@ -15,8 +15,8 @@
         </el-form>
 
         <div>
-            <el-button size="small" :disabled="$hasPerm('btn.friendlink.add')" type="primary" icon="Plus" @click="handleAdd" plain>新增友链</el-button>
-            <el-button size="small" :disabled="$hasPerm('btn.friendlink.remove')" type="danger" icon="Delete" :dark="isDark" @click="handleBatchDelete()" plain>批量删除</el-button>
+            <el-button size="small" v-perm="'btn.friendlink.add'" type="primary" icon="Plus" @click="handleAdd" plain>新增友链</el-button>
+            <el-button size="small" v-perm="'btn.friendlink.remove'" type="danger" icon="Delete" :dark="isDark" @click="handleBatchDelete()" plain>批量删除</el-button>
         </div>
     </div>
 
@@ -41,10 +41,10 @@
 
         <el-table-column label="操作">
             <template #default="{row}">
-                <el-button :disabled="$hasPerm('btn.friendlink.update')" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
+                <el-button v-perm="'btn.friendlink.update'" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button :disabled="$hasPerm('btn.friendlink.remove')" size="small" type="danger" icon="Delete" circle plain ></el-button>
+                        <el-button v-perm="'btn.friendlink.remove'" size="small" type="danger" icon="Delete" circle plain ></el-button>
                     </template>
                 </el-popconfirm>
             </template>

@@ -64,21 +64,15 @@ import {
   app.component("SingleIcon", SingleIcon);
   app.component("IconFont", IconFont);
 
-// 使用自定义指定来控制按钮权限的移除
-// import {directiveList} from '@/directives'
+// 按钮权限指令：按 configStore.buttonPermissionMode 动态隐藏/禁用无权限按钮
+import {directiveList} from '@/directives'
 
-// directiveList(app)
+directiveList(app)
 // import elementIcons from './data/elementIcons'
 // 注册图标组件
 // app.use(elementIcons)
 import { registerIcons } from '@/data/elementIcons'
 registerIcons(app)
-
-// 使用全局属性注入来控制按钮权限的禁用
-
-import { hasPermissions } from '@/utils/permissions'
-
-app.config.globalProperties.$hasPerm =  hasPermissions
 
 import { addBatchIconList } from './components/MyIcon/src/iconifyBachOffline'
 addBatchIconList([

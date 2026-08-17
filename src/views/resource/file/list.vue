@@ -23,19 +23,19 @@
         </el-form>
         <div class="bottom" style="margin-bottom: 20px;">
             <div class="file-operate">
-                <el-button size="small" type="danger" :disabled="$hasPerm('btn.file.remove')" @click="deleteSelectRows()" plain>
+                <el-button size="small" type="danger" v-perm="'btn.file.remove'" @click="deleteSelectRows()" plain>
                     <offlineIcon icon="ri:delete-bin-3-fill"></offlineIcon>批量删除
                 </el-button>
             </div>
 
             <div class="file-operate">
-                <el-button size="small" type="danger" :disabled="$hasPerm('btn.file.remove')" @click="handleSyncDelete()" plain>
+                <el-button size="small" type="danger" v-perm="'btn.file.remove'" @click="handleSyncDelete()" plain>
                     <OfflineIcon icon="ri:delete-bin-fill"></OfflineIcon>同步删除
                 </el-button>
             </div>
 
             <div class="file-operate">
-                <el-button size="small" type="primary" :disabled="$hasPerm('btn.file.update')" @click="handleUpdateRecords" plain>
+                <el-button size="small" type="primary" v-perm="'btn.file.update'" @click="handleUpdateRecords" plain>
                     <offlineIcon icon="ri:database-2-line"></offlineIcon>更新数据库</el-button>
             </div>
 
@@ -45,7 +45,7 @@
                 :on-success="onSuccess"
                 :before-upload="beforeUpload"
                 :on-error="onError">
-                <el-button size="small" type="primary" :disabled="$hasPerm('btn.file.add')" plain>
+                <el-button size="small" type="primary" v-perm="'btn.file.add'" plain>
                     <offlineIcon icon="ri:add-fill"></offlineIcon>文件上传
                 </el-button>
             </el-upload>
@@ -56,7 +56,7 @@
                 :before-upload="beforeUpload"
                 :on-error="onError"
                 multiple>
-                <el-button size="small" type="primary" :disabled="$hasPerm('btn.file.add')" plain>
+                <el-button size="small" type="primary" v-perm="'btn.file.add'" plain>
                     <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
                 </el-button>
             </el-upload>
@@ -82,11 +82,11 @@
         <el-table-column prop="createTime" label="创建日期"></el-table-column>
         <el-table-column label="操作" width="150">
             <template #default="{row}">
-                <el-button size="small" type="warning" :disabled="$hasPerm('btn.file.update')" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
+                <el-button size="small" type="warning" v-perm="'btn.file.update'" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"
                     icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button size="small" type="danger" :disabled="$hasPerm('btn.file.remove')" icon="Delete" circle plain />
+                        <el-button size="small" type="danger" v-perm="'btn.file.remove'" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
                 <el-button size="small" type="success" icon="Download" @click="handleDownload(row)" circle plain></el-button>

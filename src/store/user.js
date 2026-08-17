@@ -61,6 +61,7 @@ export const useUserStore = defineStore({
         setUserMenu(menuData){
             this.userMenu = menuData
         },
+        // WebSocket 权限推送预留写入入口（permission_changed → setUserPerm）
         setUserPerm(menuData){
             this.userPerm = menuData
         },

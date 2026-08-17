@@ -7,7 +7,7 @@
       </el-input>
       <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
       <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-      <el-button size="small" type="primary" :disabled="$hasPerm('btn.tag.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
+      <el-button size="small" type="primary" v-perm="'btn.tag.add'" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
     </div>
 
     <div class="tcl-cloud">
@@ -21,10 +21,10 @@
         </el-tooltip>
         <span class="tcl-bubble-count">{{ tag.articleCount }}</span>
         <div class="tcl-bubble-actions">
-          <el-button size="small" type="warning" :disabled="$hasPerm('btn.tag.update')" @click.stop="handleEdit(tag)" icon="Edit" circle plain />
+          <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click.stop="handleEdit(tag)" icon="Edit" circle plain />
           <el-popconfirm :title="`确定删除「${tag.name}」？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
             <template #reference>
-              <el-button size="small" type="danger" :disabled="$hasPerm('btn.tag.remove')" icon="Delete" @click.stop circle plain />
+              <el-button size="small" type="danger" v-perm="'btn.tag.remove'" icon="Delete" @click.stop circle plain />
             </template>
           </el-popconfirm>
         </div>
