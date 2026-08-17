@@ -41,7 +41,7 @@
       </el-table-column>
       
       <!-- ==================== 操作栏 ==================== -->
-      <el-table-column label="操作" width="350" fixed="right" align="center">
+      <el-table-column v-if="showPermColumn(['btn.task.update', 'btn.task.execute', 'btn.task.remove'])" label="操作" width="350" fixed="right" align="center">
         <template #default="{ row }">
           <!-- 编辑任务 -->
           <el-button v-perm="'btn.task.update'" size="small" type="warning" @click="editTask(row)" plain>编辑</el-button>
@@ -147,6 +147,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
+import { showPermColumn } from '@/utils/permissions'
 import { listApi, addApi, updateApi, executeApi, refreshAllApi, refreshTaskApi, deleteApi } from '@/api/sysTask'
 import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
