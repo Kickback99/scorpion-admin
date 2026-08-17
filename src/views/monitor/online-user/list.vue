@@ -44,7 +44,7 @@
             <el-table-column prop="browser" label="浏览器" min-width="100" />
             <el-table-column prop="location" label="登录地点" min-width="100" />
             <el-table-column prop="loginTime" label="登录时间" min-width="160" />
-            <el-table-column label="操作" fixed="right">
+            <el-table-column v-if="showPermColumn(['btn.onlineuser.execute'])" label="操作" fixed="right">
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
@@ -82,6 +82,7 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import msg from '@/components/msg'
 import SmartSelector from '@/views/components/SmartSelector.vue'
+import { showPermColumn } from '@/utils/permissions'
 import { cleanZombieApi, getOnlineListApi, kickUserApi } from '@/api/onlineUser'
 import websocketManager from '@/server/websocketManager'
 import avatar from '@/assets/images/avatar-circle.png'

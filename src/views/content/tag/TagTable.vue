@@ -19,7 +19,7 @@
       <el-table-column prop="name" label="标签名" width="200" />
       <el-table-column prop="articleCount" label="文章数量" width="80" align="center" />
       <el-table-column prop="remark" label="备注" width="200" />
-      <el-table-column label="操作" width="150">
+      <el-table-column v-if="showPermColumn(['btn.tag.update', 'btn.tag.remove'])" label="操作" width="150">
         <template #default="{row}">
           <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click="handleEdit(row)" icon="Edit" circle plain />
           <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
@@ -51,6 +51,7 @@
 // 表格布局 — 传统 CRUD 表格 + 居中搜索栏
 // ============================================================
 import { useTagList } from './useTagList'
+import { showPermColumn } from '@/utils/permissions'
 
 const {
   searchData, tableData, params, total,
