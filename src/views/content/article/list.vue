@@ -85,7 +85,7 @@
                 </el-form-item>
 
                 <el-form-item style="margin-left:auto">
-                    <el-button size="small" type="primary" :disabled="$hasPerm('btn.article.add')" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
+                    <el-button size="small" type="primary" v-perm="'btn.article.add'" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
                 </el-form-item>
             </template>
         </el-form>
@@ -118,10 +118,10 @@
         <el-table-column label="操作" width="270">
             <template #default="{row}">
                 <el-button size="small" type="info" @click="handlePreview(row)" plain>预览</el-button>
-                <el-button size="small" type="warning" :disabled="$hasPerm('btn.article.update')" @click="handleEdit(row)" plain>编辑</el-button>
+                <el-button size="small" type="warning" v-perm="'btn.article.update'" @click="handleEdit(row)" plain>编辑</el-button>
                 <el-popconfirm :title="`你确定要删除 ${row.title} 吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                     <template #reference>
-                        <el-button size="small" type="danger" :disabled="$hasPerm('btn.article.remove')" plain>删除</el-button>
+                        <el-button size="small" type="danger" v-perm="'btn.article.remove'" plain>删除</el-button>
                     </template>
                 </el-popconfirm>
                 <el-button size="small" type="success" @click="handleDownload(row)" plain>下载</el-button>
