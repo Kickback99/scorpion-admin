@@ -227,7 +227,7 @@
             </el-form-item>
 
             <!-- 推送范围 -->
-            <el-form-item prop="targetType" label="推送范围" v-perm.hide="'btn.sysUser.assignRole'">
+            <el-form-item prop="targetType" label="推送范围">
                 <template #label>
                     推送范围
                     <el-tooltip content="选择公告的推送目标用户" placement="top">
@@ -242,7 +242,7 @@
             </el-form-item>
 
             <!-- 后台指定用户（推送范围=后台时显示） -->
-            <el-form-item v-if="formModel.targetType === 2" label="目标用户" v-perm.hide="'btn.sysUser.assignRole'">
+            <el-form-item v-if="formModel.targetType === 2" label="目标用户">
                 <el-radio-group v-model="targetUserType" @change="handleTargetUserTypeChange" :disabled="isReadonly || !!formModel.pushTime">
                     <el-radio value="all">所有用户</el-radio>
                     <el-radio value="role">指定角色</el-radio>
@@ -268,19 +268,19 @@
             </el-form-item>
 
             <!-- 指定角色 -->
-            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'role'" label=" " prop="specifiedRoles" v-perm.hide="'btn.sysUser.assignRole'">
+            <el-form-item v-if="formModel.targetType === 2 && targetUserType === 'role'" label=" " prop="specifiedRoles" v-perm.disable="'btn.sysUser.assignRole'">
                 <SmartAutoComplete
                     ref="roleAutoCompleteRef"
                     v-model="selectedRoleNames"
                     :fetch-suggestions-api="fetchRoles"
-                    placeholder="请输入角色名称搜索"
+                    :placeholder="hasPerm('btn.sysUser.assignRole') ? '请输入角色名称搜索' : '无操作权限'"
                     :max="10"
                     :debounce-delay="300"
                     :min-search-length="1"
                     :allow-custom="false"
                     custom-disabled-message="请输入已存在的角色"
                     :auto-search-on-enter="true"
-                    :disabled="isReadonly || !!formModel.pushTime"
+                    :disabled="isReadonly || !!formModel.pushTime || !hasPerm('btn.sysUser.assignRole')"
                     :locked-tags="formModel.pushTime ? selectedRoleNames : []"
                     style="width: 100%"
                 />
