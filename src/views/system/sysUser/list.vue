@@ -145,18 +145,18 @@
                 <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
             </el-form-item>
 
-            <el-form-item v-perm.hide="'btn.sysUser.assignRole'" label="用户角色">
+            <el-form-item v-perm="'btn.sysUser.assignRole'" label="用户角色">
                 <SmartAutoComplete
                     v-model="selectedRoleName"
                     :fetch-suggestions-api="fetchRoles"
-                    placeholder="请输入角色名搜索"
+                    :placeholder="hasPerm('btn.sysUser.assignRole') ? '请输入角色名搜索' : '无操作权限'"
                     :max="10"
                     :debounce-delay="300"
                     :min-search-length="1"
                     :allow-custom="false"
                     custom-disabled-message="请选择已存在的角色"
                     :auto-search-on-enter="true"
-                    :disabled="formData.id === 1"
+                    :disabled="formData.id === 1 || !hasPerm('btn.sysUser.assignRole')"
                     style="width: 100%"
                 />
             </el-form-item>
