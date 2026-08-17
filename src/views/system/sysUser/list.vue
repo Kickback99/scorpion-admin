@@ -145,7 +145,7 @@
                 <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
             </el-form-item>
 
-            <el-form-item v-if="hasPerm('btn.sysUser.assignRole')" label="用户角色">
+            <el-form-item v-perm="'btn.sysUser.assignRole'" label="用户角色">
                 <SmartAutoComplete
                     v-model="selectedRoleName"
                     :fetch-suggestions-api="fetchRoles"
@@ -440,6 +440,8 @@ const fetchRoles = async (params) => {
  * 监听选中角色名变化 -> 反查 roleCache 同步所有角色 ID
  */
 watch(selectedRoleName, (names) => {
+    // 无分配角色权限时不联动角色 ID（保留 editDialog 回显的原角色 ID，防止提交清空角色）
+    if (!hasPerm('btn.sysUser.assignRole')) return
     selectedRoleIds.value = (names || [])
         .map(name => roleCache.value.find(r => r.value === name))
         .filter(Boolean)
@@ -488,20 +490,26 @@ const editDialog = async (row) =>{
             type: (user.type !== undefined ? user.type : 0).toString()
         }
         // 角色回显
-        if (hasPerm('btn.sysUser.assignRole') && roleCache.value.length === 0) await loadAllRoles()
-        if (row.id === 1) {
-            // admin 回显全部角色并禁用（对齐分配角色弹窗行为）
-            selectedRoleName.value = roleCache.value.map(r => r.value)
-        } else {
-            const roleIds = user.roleIdList || []
-            if (roleIds.length > 0) {
-                selectedRoleName.value = roleIds
-                    .map(id => roleCache.value.find(r => r.id === id))
-                    .filter(Boolean)
-                    .map(r => r.value)
+        if (hasPerm('btn.sysUser.assignRole')) {
+            if (roleCache.value.length === 0) await loadAllRoles()
+            if (row.id === 1) {
+                // admin 回显全部角色并禁用（对齐分配角色弹窗行为）
+                selectedRoleName.value = roleCache.value.map(r => r.value)
             } else {
-                selectedRoleName.value = []
+                const roleIds = user.roleIdList || []
+                if (roleIds.length > 0) {
+                    selectedRoleName.value = roleIds
+                        .map(id => roleCache.value.find(r => r.id === id))
+                        .filter(Boolean)
+                        .map(r => r.value)
+                } else {
+                    selectedRoleName.value = []
+                }
             }
+        } else {
+            // 无分配角色权限：不回显角色名称，仅保留原角色 ID 原样提交（防止提交空角色清空用户角色）
+            selectedRoleName.value = []
+            selectedRoleIds.value = user.roleIdList || []
         }
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
