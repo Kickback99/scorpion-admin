@@ -232,7 +232,7 @@
                 </el-form-item>
                 
                 <!-- 文章评论时显示文章选择 -->
-                <el-form-item v-if="replyModel.type === '0'" v-perm="'btn.article.list'" label="选择文章" prop="articleId">
+                <el-form-item v-if="replyModel.type === '0'" label="选择文章" prop="articleId">
                     <SmartAutoComplete
                         ref="articleAutoCompleteRef"
                         v-model="selectedArticles"
@@ -597,7 +597,7 @@ const loadAllArticles = async () => {
 const fetchArticles = async (params) => {
     const query = params.keyword || ''
     
-    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
+    if (hasPerm('btn.comment.add') && articleList.value.length === 0) {
         await loadAllArticles()
     }
     
