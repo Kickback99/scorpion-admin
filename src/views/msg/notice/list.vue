@@ -103,7 +103,7 @@
         <el-table-column prop="createTime" label="创建时间" width="200" />
         <el-table-column prop="updateTime" label="更新时间" width="200" />
 
-        <el-table-column label="操作" width="320" fixed="right">
+        <el-table-column v-if="showPermColumn(['btn.notice.execute', 'btn.notice.update', 'btn.notice.list', 'btn.notice.remove'])" label="操作" width="320" fixed="right">
             <template #default="{ row }">
                 <!-- 推送按钮 -->
                 <el-button
@@ -307,6 +307,7 @@
 import { ref, reactive, nextTick, onMounted, watch, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
+import { showPermColumn } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import msg from '@/components/msg'
 import Markdown from '@/components/Markdown.vue'  // 引入 Markdown 组件

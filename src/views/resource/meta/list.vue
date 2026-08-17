@@ -166,7 +166,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" width="100" align="center" fixed="right">
+            <el-table-column v-if="showPermColumn(['btn.meta.update'])" label="操作" width="100" align="center" fixed="right">
                 <template #default="{ row }">
                     <el-popconfirm
                         title="确认恢复吗？恢复后正常访问"
@@ -209,6 +209,7 @@
 
 <script setup>
 import { fileMetaListApi, recoverFileMetaApi } from '@/api/filemeta'
+import { showPermColumn } from '@/utils/permissions'
 import { getAllBusinessDataApi } from '@/api/business'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted, watch } from 'vue';

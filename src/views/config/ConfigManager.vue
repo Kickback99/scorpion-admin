@@ -112,7 +112,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column v-if="showPermColumn(['btn.config.update', 'btn.config.remove', 'btn.config.add'])" label="操作" width="200" fixed="right">
         <template #default="{ row }">
           <template v-if="row.isEditing">
             <el-button type="primary" link size="small" @click="handleSave(row)">
@@ -214,6 +214,7 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
+import { showPermColumn } from '@/utils/permissions'
 import { Plus, Edit, Delete, Check, Close, Document, Folder, RefreshRight } from '@element-plus/icons-vue'
 import SmartConfigSearch from '@/views/components/SmartConfigSearch.vue'
 import { useConfigStore } from '@/store/config'
