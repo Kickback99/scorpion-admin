@@ -146,7 +146,7 @@
             </el-form-item>
 
             <!-- 关联文章 - 文章选择（仅新增时显示） -->
-            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" v-perm="'btn.article.list'" label="选择文章" prop="articleId">
+            <el-form-item v-if="!formModel.id && formModel.carouselType === 0" label="选择文章" prop="articleId">
                 <SmartAutoComplete
                     v-model="selectedArticles"
                     :fetch-suggestions-api="fetchArticles"
@@ -524,7 +524,7 @@ const fetchArticles = async (params) => {
     const query = params.keyword || ''
     
     // 如果还没有加载文章列表，先加载
-    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
+    if (hasPerm('btn.carousel.add') && articleList.value.length === 0) {
         await loadAllArticles()
     }
     
@@ -615,11 +615,6 @@ const handleAdd = async () => {
     })
     
     selectedArticles.value = []
-
-    // 预加载文章列表
-    if (hasPerm('btn.article.list') && articleList.value.length === 0) {
-        await loadAllArticles()
-    }
 
     if(formModel.imgOption === 1){
         // 清空上传组件
