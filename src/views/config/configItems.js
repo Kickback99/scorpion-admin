@@ -11,7 +11,7 @@ import { useRenderIcon } from '@/components/MyIcon/src/hook'
 import { useConfigStore, registerItems } from '@/store/config'
 import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
-  Aim, Star, ChatDotRound, List, Document, Postcard, Comment, Collection,
+  Aim, Star, ChatDotRound, List, Document, Message, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
   PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort
 } from '@element-plus/icons-vue'
@@ -44,6 +44,7 @@ export function useConfigItems() {
         { key: 'user.login_enabled',                 type: 'switch', label: '前端登录',       sys: true,       desc: '控制前台登录功能的开启与关闭',           icon: "Lock",         get: () => config.getValue('user.login_enabled'),          set: (v) => config.updateConfig('user.login_enabled', v) },
         { key: 'user.other_login_enabled',           type: 'switch', label: '其他登录',       desc: '允许第三方登录方式',                      icon: Key,            get: () => config.getValue('user.other_login_enabled'),      set: (v) => config.updateConfig('user.other_login_enabled', v) },
         // ===== profile =====
+        { key: 'profile.my_feedback_enabled',        type: 'switch', label: '我的反馈',       desc: '个人中心显示反馈入口',                    icon: Message,        get: () => config.getValue('profile.my_feedback_enabled'),          set: (v) => config.updateConfig('profile.my_feedback_enabled', v) },
         { key: 'profile.my_publishes_enabled',       type: 'switch', label: '我的发布',       desc: '个人中心显示发布内容入口',                icon: Postcard,       get: () => config.getValue('profile.my_publishes_enabled'),         set: (v) => config.updateConfig('profile.my_publishes_enabled', v) },
         { key: 'profile.my_comments_enabled',        type: 'switch', label: '我的评论',       desc: '个人中心显示评论入口',                    icon: Comment,        get: () => config.getValue('profile.my_comments_enabled'),          set: (v) => config.updateConfig('profile.my_comments_enabled', v) },
         { key: 'profile.my_favorites_enabled',       type: 'switch', label: '我的收藏',       desc: '个人中心显示收藏入口',                    icon: Collection,     get: () => config.getValue('profile.my_favorites_enabled'),         set: (v) => config.updateConfig('profile.my_favorites_enabled', v) },

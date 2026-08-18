@@ -98,6 +98,7 @@ export const useConfigStore = defineStore({
         other_login_enabled: false,
       },
       profile: {
+        my_feedback_enabled: false,
         my_publishes_enabled: false,
         my_comments_enabled: true,
         my_favorites_enabled: true,
@@ -504,6 +505,9 @@ export const useConfigStore = defineStore({
 
     // ==================== profile ====================
 
+    getMyFeedbackEnabled()         { return this.getValue('profile.my_feedback_enabled') ?? true },
+    toggleMyFeedbackEnabled()      { this.updateConfig('profile.my_feedback_enabled', !this.getValue('profile.my_feedback_enabled')) },
+
     getMyPublishesEnabled()        { return this.getValue('profile.my_publishes_enabled') ?? true },
     toggleMyPublishesEnabled()     { this.updateConfig('profile.my_publishes_enabled', !this.getValue('profile.my_publishes_enabled')) },
 
@@ -640,6 +644,7 @@ export const useConfigStore = defineStore({
     isUserOtherLoginEnabled() { return this.getValue('user.other_login_enabled') === true },
 
     // ===== profile (client 组) =====
+    isMyFeedbackEnabled()     { return this.getValue('profile.my_feedback_enabled') ?? true },
     isMyPublishesEnabled()    { return this.getValue('profile.my_publishes_enabled') ?? true },
     isMyCommentsEnabled()     { return this.getValue('profile.my_comments_enabled') ?? true },
     isMyFavoritesEnabled()    { return this.getValue('profile.my_favorites_enabled') ?? true },
