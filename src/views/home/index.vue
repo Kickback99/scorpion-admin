@@ -124,7 +124,7 @@
               <span>近7天文章访问趋势</span>
               <WeekArrows
                 :period-label="areaChart.periodLabel"
-                :left-disabled="areaOffset >= areaChart.maxOffset"
+                :left-disabled="areaOffset >= areaChart.maxOffset || !areaChart.hasPrev"
                 :right-disabled="areaStack.length === 0"
                 :loading="areaLoading"
                 :offset="areaOffset"
@@ -149,7 +149,7 @@
               <span>近7天文章数据趋势</span>
               <WeekArrows
                 :period-label="lineChart.periodLabel"
-                :left-disabled="lineOffset >= lineChart.maxOffset"
+                :left-disabled="lineOffset >= lineChart.maxOffset || !lineChart.hasPrev"
                 :right-disabled="prevStack.length === 0"
                 :loading="lineLoading"
                 :offset="lineOffset"
@@ -201,10 +201,10 @@ const initialOffset = ref(null)
 const prevStack = ref([])
 const lineLoading = ref(false)
 const fallbackMaxOffset = configStore.getDashboardLineChartWeekOffset() || 12
-const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset })
+const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset, hasPrev: true })
 const pieChart = reactive({ legendData: [], seriesData: [] })
 const gaugeData = ref([])
-const areaChart = reactive({ xData: [], y1: [], periodLabel: '', hasData: false, maxOffset: 12 })
+const areaChart = reactive({ xData: [], y1: [], periodLabel: '', hasData: false, maxOffset: 12, hasPrev: true })
 const areaOffset = ref(0)
 const areaStack = ref([])
 const areaLoading = ref(false)
@@ -291,6 +291,7 @@ const fetchLineChart = async (direction = 'prev') => {
     }
     const max = res.data?.maxOffset ?? 0
     lineChart.maxOffset = max
+    lineChart.hasPrev = res.data?.hasPrev ?? true
     lineChart.isLatest = actual <= 0 || actual === initialOffset.value
   } catch { /* keep defaults */ }
   lineLoading.value = false
@@ -332,8 +333,8 @@ const onKey = (e) => {
     }
     const area = hoverArea.value
     if (e.key === 'ArrowLeft') {
-      if (area && areaOffset.value < areaChart.maxOffset)  handleAreaPrev()
-      else if (lineOffset.value < lineChart.maxOffset)     handleWeekPrev()
+      if (area && areaChart.hasPrev && areaOffset.value < areaChart.maxOffset) handleAreaPrev()
+      else if (lineChart.hasPrev && lineOffset.value < lineChart.maxOffset) handleWeekPrev()
     } else {
       if (area && areaStack.value.length > 0)              handleAreaNext()
       else if (prevStack.value.length > 0)                 handleWeekNext()
@@ -375,6 +376,7 @@ const fetchAreaChart = async (direction = 'prev') => {
       periodLabel: res.data?.periodLabel || '',
       hasData: res.data?.hasData || false,
       maxOffset: res.data?.maxOffset || 12,
+      hasPrev: res.data?.hasPrev ?? true,
     })
     areaOffset.value = res.data?.offset ?? areaOffset.value
     if (areaInitialOffset.value === null) {
