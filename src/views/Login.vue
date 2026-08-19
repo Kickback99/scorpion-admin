@@ -102,6 +102,11 @@ const handleLogin = async() => {
         if (redirect) {
             try { redirect = decodeURIComponent(redirect) } catch (e) {}
         }
+        // 生产环境路由带 base 前缀(/admin/)，redirect 可能携带完整 URL 路径，剥离为内部路径
+        const routerBase = import.meta.env.VITE_ROUTER_URL
+        if (redirect && routerBase && redirect.startsWith(routerBase)) {
+            redirect = redirect.slice(routerBase.length - 1) || '/'
+        }
         if (redirect && redirect !== '/' && redirect !== '/index') {
             router.push(redirect)
         } else {
