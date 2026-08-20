@@ -92,6 +92,7 @@ export const useConfigStore = defineStore({
       },
       nav: {
         friend_link_enabled: false,
+        about_enabled: false,
       },
       user: {
         login_enabled: true,
@@ -494,6 +495,9 @@ export const useConfigStore = defineStore({
 
     getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
     toggleFriendLinkEnabled()      { this.updateConfig('nav.friend_link_enabled', !this.getValue('nav.friend_link_enabled')) },
+
+    getAboutEnabled()              { return this.getValue('nav.about_enabled') === true },
+    toggleAboutEnabled()           { this.updateConfig('nav.about_enabled', !this.getValue('nav.about_enabled')) },
 
     // ==================== user（前台认证） ====================
 
