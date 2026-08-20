@@ -130,15 +130,15 @@
             </el-form-item>
 
             <el-form-item label="呢称" prop="nickname">
-                <el-input prefix-icon="User" placeholder="请输入呢称" v-model="formData.nickname" />
+                <el-input prefix-icon="UserFilled" placeholder="请输入呢称" v-model="formData.nickname" />
             </el-form-item>
 
             <el-form-item label="手机号" prop="phone">
-                <el-input prefix-icon="User" placeholder="请输入手机号" v-model="formData.phone" />
+                <el-input prefix-icon="Iphone" placeholder="请输入手机号" v-model="formData.phone" />
             </el-form-item>
 
             <el-form-item label="邮箱" prop="email">
-                <el-input prefix-icon="User" placeholder="请输入邮箱" v-model="formData.email" />
+                <el-input prefix-icon="Message" placeholder="请输入邮箱" v-model="formData.email" />
             </el-form-item>
 
             <el-form-item label="用户类型">
