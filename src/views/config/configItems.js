@@ -11,7 +11,7 @@ import { useRenderIcon } from '@/components/MyIcon/src/hook'
 import { useConfigStore, registerItems } from '@/store/config'
 import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
-  Aim, Star, ChatDotRound, List, Document, Message, Postcard, Comment, Collection,
+  Aim, Star, ChatDotRound, List, Document, Message, InfoFilled, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
   PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort
 } from '@element-plus/icons-vue'
@@ -40,6 +40,7 @@ export function useConfigItems() {
         { key: 'comment.parent_page_size',           type: 'number', label: '父评论分页大小', desc: '每次滚动加载父评论的分页大小',          icon: Document,       get: () => config.getValue('comment.parent_page_size'),             set: (v) => config.updateConfig('comment.parent_page_size', v),          min: () => getMin('comment.parent_page_size'),    max: () => getMax('comment.parent_page_size') },
         // ===== nav =====
         { key: 'nav.friend_link_enabled',            type: 'switch', label: '前端友链',       desc: '控制前台友链模块的显示',                icon: Link,           get: () => config.getValue('nav.friend_link_enabled'),         set: (v) => config.updateConfig('nav.friend_link_enabled', v) },
+        { key: 'nav.about_enabled',                  type: 'switch', label: '关于页面',       desc: '控制前台关于页面入口的显示',            icon: InfoFilled,     get: () => config.getValue('nav.about_enabled'),               set: (v) => config.updateConfig('nav.about_enabled', v) },
         // ===== user =====
         { key: 'user.login_enabled',                 type: 'switch', label: '前端登录',       sys: true,       desc: '控制前台登录功能的开启与关闭',           icon: "Lock",         get: () => config.getValue('user.login_enabled'),          set: (v) => config.updateConfig('user.login_enabled', v) },
         { key: 'user.other_login_enabled',           type: 'switch', label: '其他登录',       desc: '允许第三方登录方式',                      icon: Key,            get: () => config.getValue('user.other_login_enabled'),      set: (v) => config.updateConfig('user.other_login_enabled', v) },
