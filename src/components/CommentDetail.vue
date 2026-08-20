@@ -48,6 +48,11 @@
         </div>
         <div v-if="children.length === 0" class="empty-tip">暂无子评论</div>
       </div>
+      <!-- 滚动到底自动加载更多子评论 -->
+      <div ref="loadMoreRef" v-if="hasMoreChildren" class="load-more-tip">
+        {{ childrenLoading ? '加载中...' : '下滑加载更多' }}
+      </div>
+      <div v-else-if="children.length > 0" class="load-more-tip">没有更多了</div>
     </div>
 
     <!-- 情况2：子评论（直接回复父评论）- 展示父评论 + 当前子评论（当前高亮） -->
@@ -182,9 +187,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { getCommentsApi, getCommentByIdApi } from '@/api/comment'
 import { Loading } from '@element-plus/icons-vue'
+
+// 子评论滚动分页：每页条数
+const CHILDREN_PAGE_SIZE = 10
 
 // Props
 const props = defineProps({
@@ -214,6 +222,11 @@ const emit = defineEmits(['loaded', 'error'])
 const loading = ref(false)
 const detailMode = ref(null)  // 'parent', 'childReply', 'nestedReply'
 const children = ref([])      // 子评论列表（情况1使用）
+// 子评论滚动分页状态
+const childrenPage = ref(0)          // 已加载页码
+const childrenLoading = ref(false)   // 加载中
+const hasMoreChildren = ref(true)    // 是否还有更多
+const loadMoreRef = ref(null)        // 滚动触底哨兵元素
 const parentComment = ref(null)  // 父评论信息（情况2、3使用）
 const replyToComment = ref(null)  // 被回复的评论（情况3使用）
 // 谁回复了我
@@ -232,6 +245,48 @@ const fallbackComment = (comment) => {
     }
 }
 
+
+/**
+ * 加载子评论（滚动分页：每次请求 CHILDREN_PAGE_SIZE 条，滚动到底自动加载下一页）
+ * @param {Number} page 页码（从 1 开始）
+ */
+const loadChildren = async (page) => {
+  if (childrenLoading.value) return
+  childrenLoading.value = true
+  try {
+    const res = await getCommentsApi(page, CHILDREN_PAGE_SIZE, {
+      rootId: props.comment.id,
+      sortField: props.sortField,
+      sortOrder: props.sortOrder
+    })
+    // 后端第一页会把父评论放在首位，需过滤掉
+    const items = (res.data.items || []).filter(item => item.id !== props.comment.id)
+    children.value = page === 1 ? items : [...children.value, ...items]
+    childrenPage.value = page
+    // 返回数量不足一页说明已全部加载完
+    hasMoreChildren.value = items.length === CHILDREN_PAGE_SIZE
+  } finally {
+    childrenLoading.value = false
+  }
+}
+
+// 滚动到底自动加载更多子评论（哨兵元素进入视口即触发）
+let loadMoreObserver = null
+watch(loadMoreRef, (el) => {
+  loadMoreObserver?.disconnect()
+  if (el) {
+    loadMoreObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMoreChildren.value && !childrenLoading.value) {
+        loadChildren(childrenPage.value + 1)
+      }
+    })
+    loadMoreObserver.observe(el)
+  }
+}, { flush: 'post' })
+
+onBeforeUnmount(() => {
+  loadMoreObserver?.disconnect()
+})
 
 /**
  * 加载详情
@@ -254,14 +309,9 @@ const loadDetail = async () => {
     // 3. toCommentUserId !== -1 && toCommentId !== rootId : 嵌套评论（回复子评论）
 
     if (comment.rootId === -1) {
-      // 情况1：根评论 - 查询子评论列表
+      // 情况1：根评论 - 查询子评论列表（滚动分页）
       detailMode.value = 'parent'
-      const res = await getCommentsApi(1, 999, { 
-        rootId: comment.id,
-        sortField: props.sortField,
-        sortOrder: props.sortOrder
-      })
-      children.value = (res.data.items || []).filter(item => item.id !== comment.id)
+      await loadChildren(1)
     } else {
         // 情况2和3：先查询父评论
         let parentData = null
@@ -310,6 +360,9 @@ const loadDetail = async () => {
 const resetState = () => {
   detailMode.value = null
   children.value = []
+  childrenPage.value = 0
+  childrenLoading.value = false
+  hasMoreChildren.value = true
   parentComment.value = null
   replyToComment.value = null
   whoRepliedToMe.value = []
@@ -425,6 +478,13 @@ defineExpose({
   padding: 32px;
   color: var(--el-text-color-secondary);
   font-size: 14px;
+}
+
+.load-more-tip {
+  text-align: center;
+  padding: 8px 0;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
 }
 
 .loading-box {
