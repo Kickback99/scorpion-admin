@@ -307,8 +307,9 @@ export const useConfigStore = defineStore({
      * 更新单个配置项
      * @param {string} key 配置 key（configItems 中定义的 key，如 'comment.article_comment_enabled'）
      * @param {any} value 新值
+     * @param {boolean} silent 静默模式，不显示提示消息（程序化联动场景用）
      */
-    async updateConfig(key, value) {
+    async updateConfig(key, value, silent = false) {
       let item = _itemMap[key] || {}
       if (!item.type) {
         // _itemMap 未填充时，回退到遍历 group 查找并补全 item
@@ -333,7 +334,7 @@ export const useConfigStore = defineStore({
         if (res.code === 200) {
           // 本地更新
           deepSet(this, [item.group, ...key.split('.')], value)
-          this.showMessage(key, value)
+          if (!silent) this.showMessage(key, value)
           this.executeInit()
         } else {
           await this.loadConfig()
@@ -582,7 +583,7 @@ export const useConfigStore = defineStore({
     // ==================== logo ====================
 
     getLogoAnimationStyle()        { return this.getValue('logo.animation_style') || 'neon' },
-    setLogoAnimationStyle(v)       { this.updateConfig('logo.animation_style', v) },
+    setLogoAnimationStyle(v, silent = false) { this.updateConfig('logo.animation_style', v, silent) },
 
     getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
     toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },

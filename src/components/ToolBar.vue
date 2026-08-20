@@ -313,13 +313,14 @@ const handleCommand = async (key) => {
     }
 }
 
-// 管理员：同步 Logo 动画样式（menuThemeColor > dark > adminLightLogo）
+// 管理员：同步 Logo 动画样式（menuThemeColor > dark > adminLightLogo），程序化联动静默不提示
 const syncAdminLogoStyle = () => {
     if (!userStore.isAdmin) return
     configStore.setLogoAnimationStyle(
         stringStore.menuThemeColor ? 'neon'
             : userConfigStore.isDarkEnabled ? 'neon'
-            : configStore.getAdminLightLogo()
+            : configStore.getAdminLightLogo(),
+        true
     )
 }
 
