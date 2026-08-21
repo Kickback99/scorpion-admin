@@ -519,6 +519,14 @@ const roleCache = ref([])                            // 角色搜索结果缓存
 const roleAutoCompleteRef = ref(null)
 const isReadonly = ref(false)                        // 只读模式（详情查看时）
 
+// 推送范围/目标用户切换缓存：编辑只保留回显原类型的值，其余切换即清空
+const originalTargetType = ref(null)         // 回显时的推送范围（新增为 null）
+const originalTargetUserType = ref(null)     // 回显时的目标用户类型（新增为 null）
+const targetCache = ref(null)                // 离开「后台管理员」时缓存的选择状态
+const targetUserCache = ref(null)            // 离开原目标用户类型时缓存的选择
+const prevTargetType = ref(null)             // 切换前的推送范围
+const prevTargetUserType = ref(null)         // 切换前的目标用户类型
+
 const userConfigStore = useUserConfigStore()
 const configStore = useConfigStore()
 const tabStore = useTabStore()
@@ -600,22 +608,72 @@ const fetchRoles = async (params) => {
     })
 }
 
-const handleTargetTypeChange = (val) => {
-    if (val !== 2) {
-        targetUserType.value = 'all'
-        selectedUserNames.value = []
-        selectedUserIds.value = []
-        selectedRoleNames.value = []
-        selectedRoleIds.value = []
-        nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers', 'specifiedRoles']))
-    }
-}
-
-const handleTargetUserTypeChange = (val) => {
+/**
+ * 清空目标用户选择（回到「所有用户」）
+ */
+const clearTargetSelections = () => {
+    targetUserType.value = 'all'
     selectedUserNames.value = []
     selectedUserIds.value = []
     selectedRoleNames.value = []
     selectedRoleIds.value = []
+}
+
+const handleTargetTypeChange = (val) => {
+    const leftType = prevTargetType.value
+    // 离开「后台管理员」：回显原范围为后台时缓存其选择状态，其余切换即清空
+    if (leftType === 2) {
+        if (leftType === originalTargetType.value) {
+            targetCache.value = {
+                targetUserType: targetUserType.value,
+                roleNames: [...selectedRoleNames.value],
+                userNames: [...selectedUserNames.value]
+            }
+        }
+        clearTargetSelections()
+        prevTargetUserType.value = 'all'
+    }
+    // 进入「后台管理员」：缓存命中则恢复，否则从默认状态开始
+    if (val === 2) {
+        if (targetCache.value) {
+            targetUserType.value = targetCache.value.targetUserType
+            selectedRoleNames.value = [...targetCache.value.roleNames]
+            selectedUserNames.value = [...targetCache.value.userNames]
+        } else {
+            clearTargetSelections()
+        }
+        prevTargetUserType.value = targetUserType.value
+    }
+    prevTargetType.value = val
+    nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers', 'specifiedRoles']))
+}
+
+const handleTargetUserTypeChange = (val) => {
+    const leftType = prevTargetUserType.value
+    // 编辑：离开回显原目标用户类型时保留其选择；新增及其他类型的选择切换即清空
+    if (leftType === originalTargetUserType.value && leftType !== 'all') {
+        targetUserCache.value = {
+            type: leftType,
+            names: [...(leftType === 'role' ? selectedRoleNames.value : selectedUserNames.value)]
+        }
+    }
+    // 进入新类型：缓存命中则恢复，否则清空（all 无选择区，直接清空两侧）
+    const hit = targetUserCache.value?.type === val && val !== 'all'
+    if (val === 'role') {
+        selectedRoleNames.value = hit ? [...targetUserCache.value.names] : []
+        selectedUserNames.value = []
+        selectedUserIds.value = []
+    } else if (val === 'specific') {
+        selectedUserNames.value = hit ? [...targetUserCache.value.names] : []
+        selectedRoleNames.value = []
+        selectedRoleIds.value = []
+    } else {
+        selectedUserNames.value = []
+        selectedUserIds.value = []
+        selectedRoleNames.value = []
+        selectedRoleIds.value = []
+    }
+    prevTargetUserType.value = val
     // 清除校验
     nextTick(() => ruleFormRef.value?.clearValidate(['specifiedUsers', 'specifiedRoles']))
     if (val === 'specific') {
@@ -802,6 +860,13 @@ const handleAdd = async () => {
     await nextTick()
     ruleFormRef.value?.resetFields()
     Object.assign(formModel, defaultModel)
+    // 新增：无回显原类型，切换推送范围/目标用户即清空之前的值
+    originalTargetType.value = null
+    originalTargetUserType.value = null
+    targetCache.value = null
+    targetUserCache.value = null
+    prevTargetType.value = formModel.targetType
+    prevTargetUserType.value = targetUserType.value
 }
 
 // ============================================================
@@ -876,6 +941,13 @@ const handleEdit = async (row) => {
             selectedRoleIds.value = []
             originalTargetRoleIds.value = []
         }
+        // 记录回显的原推送范围/目标用户类型：切换时只保留原类型的值
+        originalTargetType.value = formModel.targetType
+        originalTargetUserType.value = targetUserType.value
+        targetCache.value = null
+        targetUserCache.value = null
+        prevTargetType.value = formModel.targetType
+        prevTargetUserType.value = targetUserType.value
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
     }
