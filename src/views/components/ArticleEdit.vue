@@ -331,8 +331,12 @@ const validateCover = (rule, value, callback) => {
 /** 校验封面 — 自定义链接模式 */
 const validateCustomCoverLink = (rule, value, callback) => {
   if (formModel.coverOption === 'custom') {
-    if (!value || !value.trim()) {
+    const link = value ? value.trim() : ''
+    if (!link) {
       callback(new Error('请输入图片链接地址'))
+    } else if (!/^(http|https):\/\/.*$/.test(link)) {
+      // 对齐后端 SystemConstants.URL_PATTERN = "^(http|https)://.*$"
+      callback(new Error('请输入以 http:// 或 https:// 开头的图片链接地址'))
     } else {
       callback()
     }
