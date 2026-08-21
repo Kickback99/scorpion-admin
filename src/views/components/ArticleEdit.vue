@@ -287,6 +287,11 @@ const defaultModel = {
 
 const formModel = reactive({ ...defaultModel })
 
+// 封面模式切换缓存：编辑只保留回显的原模式值，其余切换即清空
+const originalCoverOption = ref(null)   // 回显时的封面模式（新增为 null）
+const coverCache = ref(null)            // 离开原模式时缓存的值
+const prevCoverOption = ref(null)       // 切换前的封面模式
+
 const carouselData = ref({
   isCarousel: false,
   sort: null,
@@ -468,6 +473,10 @@ const handleToggle = async (param) => {
       Object.assign(formModel, defaultModel)
       resetCarouselData()
     }
+    // 新增：无回显原模式，切换封面模式即清空之前的值
+    originalCoverOption.value = null
+    coverCache.value = null
+    prevCoverOption.value = formModel.coverOption
     focusTitle()
   } else {
     // 回显
@@ -513,6 +522,11 @@ const handleToggle = async (param) => {
       }
       formModel.cover = null
     }
+
+    // 记录回显的原封面模式：切换时只保留该模式的值
+    originalCoverOption.value = formModel.coverOption
+    coverCache.value = null
+    prevCoverOption.value = formModel.coverOption
 
     // 查询轮播信息并回显到 carouselData
     try {
@@ -820,28 +834,61 @@ const handleCoverArticleRemoved = () => {
 }
 
 /**
- * 封面选项切换时，清空另一个字段的值
+ * 缓存当前封面模式的值 — 用于编辑时保留回显的原模式值
+ */
+const cacheCoverValue = (option) => {
+  coverCache.value = {
+    option,
+    cover: formModel.cover,
+    customCoverLink: formModel.customCoverLink,
+    refCover: formModel.refCover,
+    refCoverUuid: formModel.refCoverUuid,
+    selectedCoverArticle: [...selectedCoverArticle.value]
+  }
+}
+
+/**
+ * 恢复缓存中指定模式的值（仅缓存模式匹配时生效）
+ */
+const restoreCoverValue = (option) => {
+  if (!coverCache.value || coverCache.value.option !== option) return false
+  const cache = coverCache.value
+  formModel.cover = cache.cover
+  formModel.customCoverLink = cache.customCoverLink
+  formModel.refCover = cache.refCover
+  formModel.refCoverUuid = cache.refCoverUuid
+  selectedCoverArticle.value = [...cache.selectedCoverArticle]
+  return true
+}
+
+/**
+ * 清空当前封面模式的值
+ */
+const clearCoverValue = () => {
+  formModel.cover = null
+  formModel.customCoverLink = ''
+  formModel.refCover = null
+  formModel.refCoverUuid = null
+  selectedCoverArticle.value = []
+}
+
+/**
+ * 封面选项切换
+ * 编辑：离开回显的原模式时保留其值（切回自动恢复）；新增及其他模式的值切换即清空
  */
 const handleCoverOptionChange = (val) => {
+  // 离开回显的原模式 → 缓存当前值
+  if (originalCoverOption.value !== null && prevCoverOption.value === originalCoverOption.value) {
+    cacheCoverValue(prevCoverOption.value)
+  }
+  // 进入新模式：缓存命中则恢复，否则清空
+  if (!restoreCoverValue(val)) {
+    clearCoverValue()
+  }
+  prevCoverOption.value = val
+  // 文件上传模式：重建 SmartUpload 内部状态
   if (val === 'upload') {
-    formModel.customCoverLink = ''
-    formModel.refCover = null
-    formModel.refCoverUuid = null
-    selectedCoverArticle.value = []
     nextTick(() => uploadRef.value?.handleImage(formModel.cover))
-  } else if (val === 'custom') {
-    formModel.refCover = null
-    formModel.refCoverUuid = null
-    selectedCoverArticle.value = []
-    if (!formModel.id) {
-      formModel.cover = null
-    }
-  } else if (val === 'ref') {
-    formModel.customCoverLink = ''
-    formModel.cover = null
-    formModel.refCover = null
-    formModel.refCoverUuid = null
-    selectedCoverArticle.value = []
   }
   // 切换封面模式时清除相关字段的校验状态
   formRef.value?.clearValidate(['cover', 'customCoverLink', 'refCover'])
