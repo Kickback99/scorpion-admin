@@ -445,6 +445,11 @@ const defaultModel = {
 
 const formModel = reactive({ ...defaultModel })
 
+// 消息类型切换的内容缓存：新增清空之前内容；编辑保留原始类型的内容
+const originalType = ref(null)    // 弹窗打开时的消息类型（新增为 null）
+const inactiveType = ref(null)    // 缓存内容所属的消息类型
+const inactiveContent = ref('')   // 离开编辑器时缓存的内容
+
 const ruleFormRef = ref(null)
 const multipleTableRef = ref(null)
 const selectedRows = ref([])
@@ -690,7 +695,15 @@ const rules = {
     ]
 }
 
-const handleTypeChange = () => {
+const handleTypeChange = (val) => {
+    const leftType = val === 0 ? 1 : 0 // 离开的编辑器类型
+    // 编辑：离开原始类型的编辑器时保留其内容；新增及其他情况清空之前的内容
+    if (leftType === originalType.value) {
+        inactiveType.value = leftType
+        inactiveContent.value = formModel.content
+    }
+    // 切回缓存类型的编辑器时恢复内容，否则从空内容开始
+    formModel.content = inactiveType.value === val ? inactiveContent.value : ''
     // 切换消息类型时，重置 content 字段的校验状态
     nextTick(() => {
         ruleFormRef.value?.clearValidate(['content'])
@@ -777,6 +790,9 @@ const handleAdd = async () => {
     dialogVisible.value = true
     dialogTitle.value = '新增公告'
     isReadonly.value = false
+    originalType.value = null
+    inactiveType.value = null
+    inactiveContent.value = ''
     targetUserType.value = 'all'
     selectedUserNames.value = []
     selectedUserIds.value = []
@@ -819,6 +835,10 @@ const handleEdit = async (row) => {
             status: detail.status !== undefined ? detail.status : 0,
             pushTime: detail.pushTime || null
         })
+        // 记录原始消息类型，切换时保留原类型内容
+        originalType.value = formModel.type
+        inactiveType.value = null
+        inactiveContent.value = ''
         // 回显角色
         if (detail.targetRoleIds && detail.targetRoleIds.length > 0) {
             targetUserType.value = 'role'
