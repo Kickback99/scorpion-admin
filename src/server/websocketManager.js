@@ -18,10 +18,10 @@ class WebSocketManager {
     this.cachedOnlineUsers = null  // 缓存在线用户
   }
 
-  // 拼接 WebSocket 地址：优先用 VITE_WS_URL，否则按当前页面主机名 + 8800 端口
+  // 拼接 WebSocket 地址：优先用 VITE_WS_URL（生产经 nginx 注入真实 IP 头），否则按当前页面主机名 + 8800 端口（本地 dev 直连）
   getWsUrl(role, userId) {
     const wsHost = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:8800`
-    return `${wsHost}/websocket/${role}/${userId}?ip=127.0.0.1`
+    return `${wsHost}/websocket/${role}/${userId}`
   }
 
   // 清除待执行的重连定时器
