@@ -20,7 +20,17 @@
                         style="width: 260px"
                     />
                 </el-form-item>
-                
+
+                <el-form-item>
+                    <el-input
+                        v-model="searchModel.targetId"
+                        placeholder="业务ID搜索"
+                        clearable
+                        @input="handleTargetIdInput"
+                        style="width: 200px"
+                    />
+                </el-form-item>
+
                 <el-form-item label="文件类型">
                     <SmartSelector 
                         v-model="searchModel.fileType" 
@@ -278,6 +288,7 @@ const searchModel = reactive({
     uuid: '',
     fileType: '',
     targetIds: '',
+    targetId: '',
     isDeleted: null,
     sortField: 'create_time',
     sortOrder: 'DESC',
@@ -471,7 +482,6 @@ watch(selectedTargetId, (newVal) => {
         }
     } else {
         // 清空时重置
-        searchModel.targetId = null;
         selectedIds.value = [];
     }
 }, { deep: true });
@@ -581,6 +591,7 @@ const renderFileMeta = async () => {
         if (searchModel.uuid) params.uuid = searchModel.uuid;
         if (searchModel.fileType) params.fileType = searchModel.fileType;
         if (searchModel.targetIds) params.targetIds = searchModel.targetIds;
+        if (searchModel.targetId) params.targetId = searchModel.targetId;
         if (searchModel.isDeleted !== null && searchModel.isDeleted !== '') {
             params.isDeleted = searchModel.isDeleted;
         }
@@ -626,6 +637,11 @@ onMounted(() => {
 
 // ==================== 事件处理 ====================
 
+// 业务ID搜索框：仅允许输入数字
+const handleTargetIdInput = () => {
+    searchModel.targetId = searchModel.targetId.replace(/\D/g, '')
+}
+
 /**
  * 页码变化
  */
@@ -662,6 +678,7 @@ const onReset = () => {
         uuid: '',
         fileType: '',
         targetIds: '',
+        targetId: '',
         isDeleted: null,
         sortField: 'create_time',
         sortOrder: 'DESC',
