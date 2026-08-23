@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:cookie": "vite --mode local-cookie",
     "build": "vite build",
-    "preview": "vite preview",
-    "test": "vite --mode test"
+    "build:test": "vite build --mode test",
+    "build:prod": "vite build --mode production", 
+    "preview": "vite preview"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
