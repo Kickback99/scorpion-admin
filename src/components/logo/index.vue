@@ -6,7 +6,7 @@
   <LogoStrokeScan v-else-if="animStyle === 'stroke-scan'" :hide-image="hideImage" @click="handleLogoClick" />
   <LogoGlitch v-else-if="animStyle === 'glitch'" :hide-image="hideImage" @click="handleLogoClick" />
   <div v-else class="logo logo-plain" @click="handleLogoClick">
-    <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}">
+    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
     <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
@@ -70,12 +70,6 @@ const handleLogoClick = () => {
   height: $base-menu-logo-height;
   padding: 5px 0;
   gap: 10px;
-
-  img {
-    width: 50px;
-    border-radius: 50%;
-    z-index: 1;
-  }
 
   p {
     font-size: 17px;
