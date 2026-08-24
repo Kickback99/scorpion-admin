@@ -3,8 +3,8 @@
   <SvgIcon
     v-if="!hideImage"
     name="scorpioncode"
-    width="28"
-    height="28"
+    width="33"
+    height="33"
     fill="var(--el-color-primary)"
     :style="{ marginLeft: userConfigStore.getCollapseEnabled() ? '27px' : '0' }"
   />
