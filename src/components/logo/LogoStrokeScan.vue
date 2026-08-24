@@ -1,7 +1,7 @@
 <!-- LogoStrokeScan — 镂空扫描描边，mask 从左到右流动 -->
 <template>
   <div class="logo logo-tech-stroke">
-    <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">
+    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
     <p
       :data-text="settingStore.title"
       :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}"
@@ -20,7 +20,6 @@ defineProps({
 
 const settingStore = useSettingStore()
 const userConfigStore = useUserConfigStore()
-const collapse = userConfigStore.getCollapseEnabled()
 </script>
 
 <style scoped lang="scss">
@@ -31,12 +30,6 @@ const collapse = userConfigStore.getCollapseEnabled()
   height: $base-menu-logo-height;
   padding: 5px 0;
   gap: 10px;
-
-  img {
-    width: 50px;
-    border-radius: 50%;
-    z-index: 1;
-  }
 
   p {
     font-size: 17px;
