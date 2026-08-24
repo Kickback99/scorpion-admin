@@ -1,7 +1,7 @@
 <!-- LogoGlitch — 故障扫描线，竖条形扫描带主题色边 -->
 <template>
   <div class="logo logo-glitch-scan">
-    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
+    <LogoIcon :hide-image="hideImage" />
     <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
@@ -9,14 +9,13 @@
 <script setup>
 // 故障扫描线 — 竖条形扫描线带 R/B 色边 + 白芯，mix-blend-mode 叠加文字
 import { useSettingStore } from '@/setting'
-import { useUserConfigStore } from '@/store/userConfig'
+import LogoIcon from './LogoIcon.vue'
 
 defineProps({
   hideImage: { type: Boolean, default: false }
 })
 
 const settingStore = useSettingStore()
-const userConfigStore = useUserConfigStore()
 </script>
 
 <style scoped lang="scss">
