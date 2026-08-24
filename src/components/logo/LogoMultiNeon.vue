@@ -14,7 +14,7 @@
         </feMerge>
       </filter>
     </svg>
-    <img v-if="!hideImage" :src="settingStore.logo" alt="" :style="{marginLeft:collapse?27+'px':'0'}">
+    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
     <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
@@ -30,7 +30,6 @@ defineProps({
 
 const settingStore = useSettingStore()
 const userConfigStore = useUserConfigStore()
-const collapse = userConfigStore.getCollapseEnabled()
 </script>
 
 <style scoped lang="scss">
@@ -41,12 +40,6 @@ const collapse = userConfigStore.getCollapseEnabled()
   height: $base-menu-logo-height;
   padding: 5px 0;
   gap: 10px;
-
-  img {
-    width: 50px;
-    border-radius: 50%;
-    z-index: 1;
-  }
 
   p {
     font-size: 17px;
