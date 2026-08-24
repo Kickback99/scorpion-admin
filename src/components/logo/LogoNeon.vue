@@ -1,7 +1,7 @@
 <!-- LogoNeon — 霓虹灯管多层光晕呼吸 -->
 <template>
   <div class="logo logo-neon">
-    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
+    <LogoIcon :hide-image="hideImage" />
     <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
@@ -9,14 +9,13 @@
 <script setup>
 // 霓虹灯管 — 4 层 text-shadow 叠加（白芯→主题色→深色光晕），不同频率微呼吸
 import { useSettingStore } from '@/setting'
-import { useUserConfigStore } from '@/store/userConfig'
+import LogoIcon from './LogoIcon.vue'
 
 defineProps({
   hideImage: { type: Boolean, default: false }
 })
 
 const settingStore = useSettingStore()
-const userConfigStore = useUserConfigStore()
 </script>
 
 <style scoped lang="scss">
