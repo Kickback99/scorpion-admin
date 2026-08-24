@@ -1,7 +1,7 @@
 <!-- LogoStrokeScan — 镂空扫描描边，mask 从左到右流动 -->
 <template>
   <div class="logo logo-tech-stroke">
-    <SvgIcon v-if="!hideImage" name="scorpioncode" width="28" height="28" fill="var(--el-color-primary)" :style="{marginLeft:userConfigStore.getCollapseEnabled()?27+'px':'0'}"></SvgIcon>
+    <LogoIcon :hide-image="hideImage" />
     <p
       :data-text="settingStore.title"
       :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}"
@@ -12,14 +12,13 @@
 <script setup>
 // 全镂空 + 单组主题色流动描边 — mask 控制描边显隐从左到右扫描
 import { useSettingStore } from '@/setting'
-import { useUserConfigStore } from '@/store/userConfig'
+import LogoIcon from './LogoIcon.vue'
 
 defineProps({
   hideImage: { type: Boolean, default: false }
 })
 
 const settingStore = useSettingStore()
-const userConfigStore = useUserConfigStore()
 </script>
 
 <style scoped lang="scss">
