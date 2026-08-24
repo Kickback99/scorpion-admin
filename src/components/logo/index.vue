@@ -70,7 +70,7 @@ const handleLogoClick = () => {
   margin: 20px 0;
   height: $base-menu-logo-height;
   padding: 5px 0;
-  gap: 10px;
+  gap: $base-logo-gap;
 
   p {
     font-size: 17px;
