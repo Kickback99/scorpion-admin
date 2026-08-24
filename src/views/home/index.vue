@@ -50,8 +50,8 @@
               <span class="today-val">今日 {{ dashboard.todayViewCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.viewsGrowth)">
                 <el-icon v-if="growthArrow(dashboard.viewsGrowth)"><CaretTop /></el-icon>
-                <el-icon v-else><CaretBottom /></el-icon>
-                {{ growthValue(dashboard.viewsGrowth) }}%
+                <el-icon v-else-if="growthArrowDown(dashboard.viewsGrowth)"><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.viewsGrowth) }}
               </span>
             </div>
           </div>
@@ -84,8 +84,8 @@
               <span class="today-val">今日 {{ dashboard.todayCommentCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.commentsGrowth)">
                 <el-icon v-if="growthArrow(dashboard.commentsGrowth)"><CaretTop /></el-icon>
-                <el-icon v-else><CaretBottom /></el-icon>
-                {{ growthValue(dashboard.commentsGrowth) }}%
+                <el-icon v-else-if="growthArrowDown(dashboard.commentsGrowth)"><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.commentsGrowth) }}
               </span>
             </div>
           </div>
@@ -103,8 +103,8 @@
               <span class="today-val">今日 {{ dashboard.todayUserCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.usersGrowth)">
                 <el-icon v-if="growthArrow(dashboard.usersGrowth)"><CaretTop /></el-icon>
-                <el-icon v-else><CaretBottom /></el-icon>
-                {{ growthValue(dashboard.usersGrowth) }}%
+                <el-icon v-else-if="growthArrowDown(dashboard.usersGrowth)"><CaretBottom /></el-icon>
+                {{ growthValue(dashboard.usersGrowth) }}
               </span>
             </div>
           </div>
@@ -237,9 +237,16 @@ const greeting = computed(() => {
 // ============================================================
 const pct = (part, total) => total > 0 ? (part / total * 100).toFixed(1) : '0'
 const articlePct = computed(() => pct(dashboard.publishedCount, dashboard.articleCount))
-const growthClass = (v) => v > 50 ? 'positive' : 'negative'
-const growthArrow = (v) => v > 50
-const growthValue = (v) => v > 50 ? v : 100 - v
+const growthClass = (v) => {
+  if (v == null) return 'neutral'
+  const n = Number(v)
+  if (n > 0) return 'positive'
+  if (n < 0) return 'negative'
+  return 'neutral'
+}
+const growthArrow = (v) => v != null && Number(v) > 0
+const growthArrowDown = (v) => v != null && Number(v) < 0
+const growthValue = (v) => v == null ? '--' : `${Number(v).toFixed(2)}%`
 
 // ============================================================
 // 工具函数
