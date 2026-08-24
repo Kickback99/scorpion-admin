@@ -59,6 +59,25 @@
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
         <el-card class="overview-card" shadow="hover">
+          <div class="card-icon icon-success">
+            <el-icon><Connection /></el-icon>
+          </div>
+          <div class="card-body">
+            <div class="card-label">在线总人数</div>
+            <div class="card-value">{{ formatNumber(onlineTotal) }}</div>
+            <div class="card-stats">
+              <span class="today-val">今日 {{ onlineTodayCount }}</span>
+              <span class="growth" :class="growthClass(onlineGrowth)">
+                <el-icon v-if="growthArrow(onlineGrowth)"><CaretTop /></el-icon>
+                <el-icon v-else-if="growthArrowDown(onlineGrowth)"><CaretBottom /></el-icon>
+                {{ growthValue(onlineGrowth) }}
+              </span>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :sm="12" :md="6">
+        <el-card class="overview-card" shadow="hover">
           <div class="card-icon icon-danger">
             <el-icon><TrendCharts /></el-icon>
           </div>
@@ -67,7 +86,7 @@
             <div class="card-value">{{ formatNumber(dashboard.articleCount ?? 0) }}</div>
             <div class="card-stats">
               <span class="today-val">已发布 {{ dashboard.publishedCount ?? 0 }}</span>
-              <span class="growth neutral">已发布率 {{ articlePct }}%</span>
+              <span class="growth neutral"><SingleIcon icon="ri:pulse-fill"></SingleIcon>{{ articlePct }}%</span>
             </div>
           </div>
         </el-card>
@@ -180,7 +199,7 @@
 // 依赖导入
 // ============================================================
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { View, TrendCharts, ChatDotRound, UserFilled, CaretTop, CaretBottom } from '@element-plus/icons-vue'
+import { View, TrendCharts, ChatDotRound, UserFilled, CaretTop, CaretBottom, Connection } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
 import LineChart from './charts/LineChart.vue'
@@ -189,6 +208,7 @@ import GaugeGroup from './charts/GaugeGroup.vue'
 import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
 import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartAreaApi } from '@/api/dashboard'
+import websocketManager from '@/server/websocketManager'
 
 // ============================================================
 // 数据
@@ -196,6 +216,9 @@ import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, ge
 const userStore = useUserStore()
 const configStore = useConfigStore()
 const dashboard = reactive({})
+const onlineTotal = ref(0)
+const onlineTodayCount = ref(0)
+const onlineGrowth = ref(null)
 const lineOffset = ref(0)
 const initialOffset = ref(null)
 const prevStack = ref([])
@@ -256,6 +279,18 @@ const formatNumber = (num) => {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
   if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
   return num.toString()
+}
+
+// ============================================================
+// 在线用户实时数据（websocket online_users_update）
+// ============================================================
+const handleOnlineUsersUpdate = (event) => {
+  const data = event.detail
+  if (data && data.type === 'online_users_update') {
+    onlineTotal.value = data.total ?? 0
+    onlineTodayCount.value = data.todayOnlineCount ?? 0
+    onlineGrowth.value = data.onlineGrowth ?? null
+  }
 }
 
 // ============================================================
@@ -359,9 +394,17 @@ onMounted(() => {
   fetchGauge()
   fetchAreaChart()
   window.addEventListener('keydown', onKey)
+
+  // 在线用户：取缓存（解决刷新）+ 监听后续推送（解决实时）
+  const cached = websocketManager.getCachedOnlineUsers()
+  if (cached) handleOnlineUsersUpdate({ detail: cached })
+  window.addEventListener('online-users-update', handleOnlineUsersUpdate)
 })
 
-onUnmounted(() => window.removeEventListener('keydown', onKey))
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKey)
+  window.removeEventListener('online-users-update', handleOnlineUsersUpdate)
+})
 
 // ============================================================
 // Gauge + Area
@@ -473,6 +516,14 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
   // ===== 概览卡片 =====
   .overview-cards {
     margin-bottom: 14px;
+
+    // 5 张卡在 md+ 均分一行（覆盖 el-col 默认 4 列 25% 宽度，改为 20%）
+    @media (min-width: 992px) {
+      :deep(.el-col) {
+        flex: 0 0 20%;
+        max-width: 20%;
+      }
+    }
 
     .overview-card {
       border-radius: 10px;
