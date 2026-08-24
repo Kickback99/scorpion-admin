@@ -57,12 +57,14 @@ import {
   OfflineIcon,
   OnlineIcon,
   SingleIcon,
-  IconFont
+  IconFont,
+  SvgIcon
   } from "./components/MyIcon";
   app.component("OfflineIcon",OfflineIcon)
   app.component("OnlineIcon", OnlineIcon);
   app.component("SingleIcon", SingleIcon);
   app.component("IconFont", IconFont);
+  app.component("SvgIcon", SvgIcon);
 
 // 按钮权限指令：按 configStore.buttonPermissionMode 动态隐藏/禁用无权限按钮
 import {directiveList} from '@/directives'
