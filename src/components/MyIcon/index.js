@@ -8,5 +8,7 @@ import OnlineIcon from "./src/onlineIcon";
 import IconFont from "./src/iconfont"
 // 图标选择器
 import IconSelect from "./src/Select.vue"
+// svg图标
+import SvgIcon from './src/SvgIcon.vue';
 
-export {OfflineIcon,OnlineIcon,SingleIcon,IconFont,IconSelect}
+export {OfflineIcon,OnlineIcon,SingleIcon,IconFont,IconSelect,SvgIcon}
