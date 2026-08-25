@@ -49,8 +49,8 @@ const close = () => {
     position: absolute;
     left: 0;
     top: 0;
+    bottom: 0;
     width: 100%;
-    height: calc(100vh - 70px);
     overflow-y: auto;
     // min-height: 100%;
     z-index: 10;
