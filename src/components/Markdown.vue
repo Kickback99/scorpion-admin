@@ -144,7 +144,7 @@ const handleUploadImage = async (event, insertImage, files) => {
     .v-md-editor__toolbar-left-wrapper li{
            color: var(--toolbar-text);
     }
-    .v-md-editor__toolbar-left-wrapper .v-md-editor__toolbar-item:hover{
+    .v-md-editor__toolbar-item:hover{
            color: var(--toolbar-text) !important;
            background-color: var(--el-fill-color-light) !important;
     }
