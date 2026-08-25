@@ -8,7 +8,7 @@
     "dev:cookie": "vite --mode local-cookie",
     "build": "vite build",
     "build:test": "vite build --mode test",
-    "build:prod": "vite build --mode production", 
+    "build:prod": "vite build --mode production",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -42,6 +42,7 @@
     "postcss": "^8.4.47",
     "sass": "^1.70.0",
     "tailwindcss": "^3.4.14",
+    "terser": "^5.50.0",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-icons": "^0.19.3",
     "unplugin-vue-components": "^0.27.4",
