@@ -51,6 +51,7 @@ const close = () => {
     top: 0;
     width: 100%;
     height: calc(100vh - 70px);
+    overflow-y: auto;
     // min-height: 100%;
     z-index: 10;
 }
@@ -67,9 +68,14 @@ const close = () => {
 }
 
 .content {
-    height: calc(100vh - 250px);
+    // 高度自适应，让 footer 按钮始终贴合在编辑器下方
     // overflow-y: auto;
-    padding: 10px;
+    padding: 10px 10px 0;
+
+    // 抵消最后一个表单字段的默认下边距，间距统一由 footer margin-top 控制
+    :deep(.el-form-item:last-child) {
+        margin-bottom: 0;
+    }
 }
 
 .footer {
@@ -77,7 +83,8 @@ const close = () => {
     // background: coral;
     // line-height: 50px;
     .el-row {
-        margin-top: 95px;
+        // 编辑器和按钮的间距，想调就改这个值
+        margin-top: 14px;
     }
 
     // background-color: deeppink;
