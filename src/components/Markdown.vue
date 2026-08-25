@@ -163,6 +163,11 @@ const handleUploadImage = async (event, insertImage, files) => {
     background-color: var(--el-fill-color-light) !important;
     color: var(--toolbar-text) !important;
 }
+/* 工具栏文字提示（tooltip）背景对齐下拉面板，深浅色自动适配 */
+:deep(.v-md-editor__tooltip) {
+    background-color: var(--el-bg-color-overlay) !important;
+    color: var(--el-text-color-primary) !important;
+}
 
  /* v-md-editor-左边的编辑器 */
 :deep(.v-md-editor__editor-wrapper textarea){
