@@ -2,9 +2,8 @@
   <div class="change-password-container">
     <el-card class="password-card">
       <template #header>
-        <div class="card-header">
+        <div>
           <span class="title">修改密码</span>
-          <el-text type="info">请定期修改密码以保证账户安全</el-text>
         </div>
       </template>
 
@@ -82,19 +81,6 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
-
-    <!-- 安全提示 -->
-    <el-card class="tips-card">
-      <template #header>
-        <span style="font-size: 15px;">安全提示</span>
-      </template>
-      <ul class="security-tips">
-        <li>密码应包含大小写字母、数字和特殊字符</li>
-        <li>不要使用与个人信息相关的密码</li>
-        <li>建议定期更换密码</li>
-        <li>不要在多个平台使用相同密码</li>
-      </ul>
     </el-card>
   </div>
 </template>
@@ -285,12 +271,6 @@ const handleReset = () => {
 
 .password-card {
   margin-bottom: 20px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .card-header .title {
