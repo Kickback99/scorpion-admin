@@ -109,13 +109,6 @@ const handleUploadImage = async (event, insertImage, files) => {
 
 <style lang="scss" scoped>
 
-:root {
-    --editor-bg: #fff;
-    --editor-text: #000;
-    --toolbar-bg: #f5f5f5;
-    --toolbar-text: #333;
-}
-
 .dark-mode {
     --editor-bg: #000;
     --editor-text: #fff;
@@ -225,6 +218,14 @@ const handleUploadImage = async (event, insertImage, files) => {
 </style>
 
 <style lang="scss">
+/* 浅色模式变量定义放在非 scoped 块，避免 :root 被编译成 [data-v]:root 而失效 */
+/* :root {
+    --editor-bg: #fff;
+    --editor-text: #000;
+    --toolbar-bg: #f5f5f5;
+    --toolbar-text: #333;
+} */
+
 /* v-md-editor 全屏时压低 tags-view 层叠上下文 */
 body:has(.v-md-editor--fullscreen) .tags-view {
   z-index: 0 !important;
