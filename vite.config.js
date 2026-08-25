@@ -20,6 +20,18 @@ export default defineConfig(({mode}) => {
           drop_debugger: isProd,
         },
       },
+      // 手动拆包：把稳定第三方库拆成独立 chunk，配合 nginx immutable 缓存，发版后回访只重下变化的 app 包
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vue: ['vue', 'vue-router', 'pinia', 'pinia-plugin-persistedstate'],
+            'element-plus': ['element-plus', '@element-plus/icons-vue'],
+            echarts: ['echarts'],
+            editor: ['@kangc/v-md-editor', 'prismjs', 'markdown-it', 'highlight.js'],
+            utils: ['axios', 'crypto-js', 'cronstrue', 'pinyin-match', 'nprogress', 'mitt'],
+          },
+        },
+      },
     },
     resolve: {
       alias: {
