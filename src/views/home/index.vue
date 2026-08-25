@@ -516,6 +516,7 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
   // ===== 概览卡片 =====
   .overview-cards {
     margin-bottom: 14px;
+    row-gap: 14px; // 移动端卡片上下堆叠时的间距（桌面单行时无影响）
 
     // 5 张卡在 md+ 均分一行（覆盖 el-col 默认 4 列 25% 宽度，改为 20%）
     @media (min-width: 992px) {
