@@ -84,7 +84,7 @@
                         <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
                 </el-form-item>
 
-                <el-form-item style="margin-left:auto">
+                <el-form-item style="margin-left:auto; margin-right:0">
                     <el-button size="small" type="primary" v-perm="'btn.article.add'" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
                 </el-form-item>
             </template>
@@ -444,7 +444,11 @@ const handleCopyCodeSuccess = (e) => {
 
 <style lang="scss" scoped>
 .layout {
-    @include flex(space-between,null,null)
+    @include flex(space-between,null,null);
+
+    :deep(.el-form) {
+        width: 100%;
+    }
 }
 
 /* 预览弹窗暗黑模式 — 参考 Markdown.vue */
