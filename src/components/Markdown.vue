@@ -145,8 +145,23 @@ const handleUploadImage = async (event, insertImage, files) => {
            color: var(--toolbar-text);
     }
     .v-md-editor__toolbar-left-wrapper .v-md-editor__toolbar-item:hover{
-           color: var(--editor-bg) !important;
+           color: var(--toolbar-text) !important;
+           background-color: var(--el-fill-color-light) !important;
     }
+}
+
+ /* v-md-editor-工具栏下拉菜单（标题/插入图片）深色面板，避免白底浅字反色 */
+.dark-mode :deep(.v-md-editor__menu) {
+    background-color: var(--el-bg-color-overlay) !important;
+}
+.dark-mode :deep(.v-md-editor__menu-item:hover) {
+    background-color: var(--el-fill-color-light) !important;
+}
+/* 深色模式下工具栏激活态（如标题按钮 H）背景深色化，避免浅灰底浅字反色 */
+.dark-mode :deep(.v-md-editor__toolbar-item--active),
+.dark-mode :deep(.v-md-editor__toolbar-item--active:hover) {
+    background-color: var(--el-fill-color-light) !important;
+    color: var(--toolbar-text) !important;
 }
 
  /* v-md-editor-左边的编辑器 */
