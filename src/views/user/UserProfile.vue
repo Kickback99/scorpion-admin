@@ -91,26 +91,6 @@
               </el-form-item>
             </el-col>
 
-            <el-col :xs="24" :sm="12">
-              <el-form-item label="部门">
-                <el-input 
-                  v-model="userInfo.department" 
-                  :disabled="!editMode"
-                  placeholder="请输入部门"
-                />
-              </el-form-item>
-            </el-col>
-
-            <el-col :xs="24" :sm="12">
-              <el-form-item label="职位">
-                <el-input 
-                  v-model="userInfo.position" 
-                  :disabled="!editMode"
-                  placeholder="请输入职位"
-                />
-              </el-form-item>
-            </el-col>
-
             <el-col :span="24">
               <el-form-item label="个人简介">
                 <el-input
