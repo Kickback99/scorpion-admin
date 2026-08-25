@@ -45,7 +45,7 @@
           </div>
           <div class="card-body">
             <div class="card-label">总访问数</div>
-            <div class="card-value">{{ formatNumber(dashboard.totalViewCount ?? 0) }}</div>
+            <div class="card-value"><CountTo :end-val="dashboard.totalViewCount ?? 0" /></div>
             <div class="card-stats">
               <span class="today-val">今日 {{ dashboard.todayViewCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.viewsGrowth)">
@@ -64,7 +64,7 @@
           </div>
           <div class="card-body">
             <div class="card-label">在线总人数</div>
-            <div class="card-value">{{ formatNumber(onlineTotal) }}</div>
+            <div class="card-value"><CountTo :end-val="onlineTotal" /></div>
             <div class="card-stats">
               <span class="today-val">今日 {{ onlineTodayCount }}</span>
               <span class="growth" :class="growthClass(onlineGrowth)">
@@ -83,7 +83,7 @@
           </div>
           <div class="card-body">
             <div class="card-label">总文章数</div>
-            <div class="card-value">{{ formatNumber(dashboard.articleCount ?? 0) }}</div>
+            <div class="card-value"><CountTo :end-val="dashboard.articleCount ?? 0" /></div>
             <div class="card-stats">
               <span class="today-val">已发布 {{ dashboard.publishedCount ?? 0 }}</span>
               <span class="growth neutral"><SingleIcon icon="ri:pulse-fill"></SingleIcon>{{ articlePct }}%</span>
@@ -98,7 +98,7 @@
           </div>
           <div class="card-body">
             <div class="card-label">总评论数</div>
-            <div class="card-value">{{ formatNumber(dashboard.commentCount ?? 0) }}</div>
+            <div class="card-value"><CountTo :end-val="dashboard.commentCount ?? 0" /></div>
             <div class="card-stats">
               <span class="today-val">今日 {{ dashboard.todayCommentCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.commentsGrowth)">
@@ -117,7 +117,7 @@
           </div>
           <div class="card-body">
             <div class="card-label">用户总数</div>
-            <div class="card-value">{{ formatNumber(dashboard.userCount ?? 0) }}</div>
+            <div class="card-value"><CountTo :end-val="dashboard.userCount ?? 0" /></div>
             <div class="card-stats">
               <span class="today-val">今日 {{ dashboard.todayUserCount ?? 0 }}</span>
               <span class="growth" :class="growthClass(dashboard.usersGrowth)">
@@ -207,6 +207,7 @@ import PieChart from './charts/PieChart.vue'
 import GaugeGroup from './charts/GaugeGroup.vue'
 import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
+import CountTo from '@/components/CountTo/index.vue'
 import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartAreaApi } from '@/api/dashboard'
 import websocketManager from '@/server/websocketManager'
 
@@ -270,16 +271,6 @@ const growthClass = (v) => {
 const growthArrow = (v) => v != null && Number(v) > 0
 const growthArrowDown = (v) => v != null && Number(v) < 0
 const growthValue = (v) => v == null ? '--' : `${Number(v).toFixed(2)}%`
-
-// ============================================================
-// 工具函数
-// ============================================================
-const formatNumber = (num) => {
-  if (num == null) return '0'
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
-  return num.toString()
-}
 
 // ============================================================
 // 在线用户实时数据（websocket online_users_update）
