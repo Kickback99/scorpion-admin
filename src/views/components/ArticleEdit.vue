@@ -38,19 +38,7 @@
             </div>
 
             <el-form-item prop="content">
-
-                <!-- attention -->
-                <!-- 老罗使用的是 -->
-            <!--1. 老罗使用的数据库字段是content，markdownContent
-                2. content字段是 html 格式(监听事件：htmlContent，用于展示端显示)
-                3. markdownContent字段是 md 格式(监听事件：update:modelValue，用于编辑数据时，v-md-editor回显) -->
-                <!-- <EditorMarkdown :height="mdHeight" v-model="blogData.MarkdownContent"></EditorMarkdown> -->
-
-                <!-- 我使用的是 -->
-                <!-- md格式到数据库content -->
-                <!-- 后期如何将md格式展示到前端，可以看 obsidian笔记 ➟ 12、富文本编辑器 -->
                 <Markdown :height="395" v-model="blogData.content"></Markdown>
-                <!-- {{ blogData.content }} -->
             </el-form-item>
         </el-form>
 
