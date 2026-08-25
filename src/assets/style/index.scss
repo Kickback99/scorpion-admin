@@ -82,6 +82,21 @@ html:not(.dark) {
   }
 }
 
+// ============================================================
+// 深色模式 pagination 输入框/选择器/页码/翻页按钮背景统一为 fill-light
+// ============================================================
+html:not(.light) {
+  .el-pagination:not(.notice-pagination .el-pagination) {
+    .el-input__wrapper,
+    .el-pager li,
+    .btn-prev,
+    .btn-next,
+    .btn-prev:disabled,
+    .btn-next:disabled {
+      background-color: var(--el-fill-light);
+    }
+  }
+}
 
 // ============================================================
 // config 模块使用内部滚动，隐藏外层 el-scrollbar
