@@ -2,7 +2,7 @@
   <!-- 固定右下角铃铛按钮 -->
   <div class="notice-bell-wrapper">
     <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
-      <el-button type="primary" circle :icon="Bell" size="medium" @click="handleTogglePopover" />
+      <el-button size="small" circle :icon="Bell" plain @click="handleTogglePopover" />
     </el-badge>
   </div>
 
