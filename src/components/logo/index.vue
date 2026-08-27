@@ -1,13 +1,13 @@
 <template>
   <!-- ===== Logo：按 logo.admin_dark_logo 渲染对应动画 ===== -->
-  <LogoNeon v-if="animStyle === 'neon'" :hide-image="hideImage" @click="handleLogoClick" />
-  <LogoMultiNeon v-else-if="animStyle === 'multi-neon'" :hide-image="hideImage" @click="handleLogoClick" />
-  <LogoEnergyPulse v-else-if="animStyle === 'energy-pulse'" :hide-image="hideImage" @click="handleLogoClick" />
-  <LogoStrokeScan v-else-if="animStyle === 'stroke-scan'" :hide-image="hideImage" @click="handleLogoClick" />
-  <LogoGlitch v-else-if="animStyle === 'glitch'" :hide-image="hideImage" @click="handleLogoClick" />
+  <LogoNeon v-if="animStyle === 'neon'" :hide-image="hideImage" :hide-text="hideText" @click="handleLogoClick" />
+  <LogoMultiNeon v-else-if="animStyle === 'multi-neon'" :hide-image="hideImage" :hide-text="hideText" @click="handleLogoClick" />
+  <LogoEnergyPulse v-else-if="animStyle === 'energy-pulse'" :hide-image="hideImage" :hide-text="hideText" @click="handleLogoClick" />
+  <LogoStrokeScan v-else-if="animStyle === 'stroke-scan'" :hide-image="hideImage" :hide-text="hideText" @click="handleLogoClick" />
+  <LogoGlitch v-else-if="animStyle === 'glitch'" :hide-image="hideImage" :hide-text="hideText" @click="handleLogoClick" />
   <div v-else class="logo logo-plain" @click="handleLogoClick">
     <LogoIcon :hide-image="hideImage" />
-    <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
+    <p v-if="!hideText" :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
 
@@ -50,6 +50,10 @@ const animStyle = computed(() => {
   return configStore.getUserLightLogo()
 })
 const hideImage = computed(() => configStore.getLogoHideImage())
+// 菜单折叠状态（与 ToolBar.vue 的 userConfigStore.getCollapseEnabled() 同源）
+const collapsed = computed(() => userConfigStore.getCollapseEnabled())
+// 折叠且未隐藏图标时，隐藏标题文字（只保留图标）
+const hideText = computed(() => collapsed.value && !hideImage.value)
 
 // ============================================================
 // 事件

@@ -3,6 +3,7 @@
   <div class="logo logo-tech-stroke">
     <LogoIcon :hide-image="hideImage" />
     <p
+      v-if="!hideText"
       :data-text="settingStore.title"
       :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}"
     >{{ settingStore.title }}</p>
@@ -15,7 +16,8 @@ import { useSettingStore } from '@/setting'
 import LogoIcon from './LogoIcon.vue'
 
 defineProps({
-  hideImage: { type: Boolean, default: false }
+  hideImage: { type: Boolean, default: false },
+  hideText: { type: Boolean, default: false }
 })
 
 const settingStore = useSettingStore()
