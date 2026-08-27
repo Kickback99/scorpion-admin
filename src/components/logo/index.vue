@@ -39,8 +39,11 @@ const route = useRoute()
 const router = useRouter()
 
 const animStyle = computed(() => {
-  // 管理员：按 configStore 全局配置走，覆盖一切
-  if (userStore.isAdmin) return configStore.getLogoAnimationStyle()
+  // 管理员：深色/主题色菜单 → 配置的动画样式；浅色 → 管理员浅色 Logo 配置
+  if (userStore.isAdmin) {
+    if (userConfigStore.isDarkEnabled || settingStore.menuThemeColor) return configStore.getLogoAnimationStyle()
+    return configStore.getAdminLightLogo()
+  }
 
   // 非管理员：深色或主题色菜单 → 霓虹；浅色 → 用户浅色 Logo 配置
   if (userConfigStore.isDarkEnabled || settingStore.menuThemeColor) return 'neon'
