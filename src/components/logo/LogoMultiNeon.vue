@@ -15,7 +15,7 @@
       </filter>
     </svg>
     <LogoIcon :hide-image="hideImage" />
-    <p :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
+    <p v-if="!hideText" :style="hideImage ? {flex:'1', textAlign:'center', fontSize:'22px'} : {}">{{ settingStore.title }}</p>
   </div>
 </template>
 
@@ -25,7 +25,8 @@ import { useSettingStore } from '@/setting'
 import LogoIcon from './LogoIcon.vue'
 
 defineProps({
-  hideImage: { type: Boolean, default: false }
+  hideImage: { type: Boolean, default: false },
+  hideText: { type: Boolean, default: false }
 })
 
 const settingStore = useSettingStore()
