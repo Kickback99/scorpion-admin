@@ -164,7 +164,7 @@ export const useConfigStore = defineStore({
         log_retention_days: 7,
       },
       logo: {
-        animation_style: 'neon',
+        admin_dark_logo: 'neon',
         hide_image: false,
         user_light_logo: 'stroke-scan',
         admin_light_logo: 'stroke-scan',
@@ -582,8 +582,8 @@ export const useConfigStore = defineStore({
 
     // ==================== logo ====================
 
-    getLogoAnimationStyle()        { return this.getValue('logo.animation_style') || 'neon' },
-    setLogoAnimationStyle(v, silent = false) { this.updateConfig('logo.animation_style', v, silent) },
+    getAdminDarkLogo()             { return this.getValue('logo.admin_dark_logo') || 'neon' },
+    setAdminDarkLogo(v, silent = false) { this.updateConfig('logo.admin_dark_logo', v, silent) },
 
     getLogoHideImage()             { return this.getValue('logo.hide_image') === true },
     toggleLogoHideImage()          { this.updateConfig('logo.hide_image', !this.getValue('logo.hide_image')) },
@@ -673,7 +673,7 @@ export const useConfigStore = defineStore({
     userConfigTheme()         { return this.getValue('theme') || 'default' },
 
     // ===== logo (admin 组) =====
-    logoAnimationStyle()      { return this.getValue('logo.animation_style') || 'neon' },
+    adminDarkLogo()           { return this.getValue('logo.admin_dark_logo') || 'neon' },
     isLogoImageHidden()       { return this.getValue('logo.hide_image') === true },
     userLightLogo()           { return this.getValue('logo.user_light_logo') || 'stroke-scan' },
     adminLightLogo()          { return this.getValue('logo.admin_light_logo') || 'stroke-scan' },
