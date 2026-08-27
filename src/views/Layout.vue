@@ -419,4 +419,10 @@ html:not(.dark) .el-aside.menu-theme-off .logo-neon p,
 html:not(.dark) .el-aside.menu-theme-off .logo-multi-neon p {
   --logo-text-color: var(--el-text-color-placeholder);
 }
+
+/* 禁用 el-menu 子菜单展开/收起的上下动画（pc + 移动端） */
+.el-menu .el-collapse-transition-enter-active,
+.el-menu .el-collapse-transition-leave-active {
+  transition: none !important;
+}
 </style>
