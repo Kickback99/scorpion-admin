@@ -6,7 +6,6 @@
     width="33"
     height="33"
     fill="var(--el-color-primary)"
-    :style="{ marginLeft: userConfigStore.getCollapseEnabled() ? '27px' : '0' }"
   />
 </template>
 
