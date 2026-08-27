@@ -1,12 +1,5 @@
 <template>
     <div :class="{'dark-mode': userConfigStore.isDarkEnabled}" style="width: 100%;">
-        <!-- <v-md-editor :modelValue="modelValue"
-            :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
-            @change="onChange"
-            :config="{mode:'markdown'}"
-            @upload-image="handleUploadImage">
-        </v-md-editor> -->
-
         <component 
         :is="MarkdownPreview" 
         :modelValue="modelValue"
@@ -32,8 +25,6 @@ const MarkdownPreview = computed(() => {
   console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
   return createMarkdownPreview(userConfigStore.isDarkEnabled?"vuepress":"github")
 })
-
-// import { uploadImgService } from '@/api/article'
 
 const props = defineProps({
     modelValue: {
