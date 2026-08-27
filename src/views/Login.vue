@@ -17,7 +17,7 @@
         </el-form>
         <!--  底部  -->
         <div class="el-login-footer">
-            <span>Copyright © 2012-2024 <a href="http://www.scorpioncode.vip" target="_blank">scorpioncode.vip</a> 版权所有.</span>
+            <span>Copyright © 2021 <a href="https://www.scorpioncode.cn" target="_blank">scorpioncode.cn</a> 版权所有.</span>
         </div>
     </div>
 </template>
