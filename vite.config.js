@@ -7,9 +7,20 @@ import { getPlugins } from './plugins'
 export default defineConfig(({mode}) => {
   // 获取各种环境下的对应的变量
   let env = loadEnv(mode,process.cwd())
+  // 生产环境用 terser 剔除 console/debugger，其余环境（dev/local-cookie/test）保留日志
+  const isProd = mode === 'production'
   return {
     //t_env：base
     base: env.VITE_BASE_URL,
+    build: {
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: isProd,
+          drop_debugger: isProd,
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
