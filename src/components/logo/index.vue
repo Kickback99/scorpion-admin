@@ -1,5 +1,5 @@
 <template>
-  <!-- ===== Logo：按 logo.animation_style 渲染对应动画 ===== -->
+  <!-- ===== Logo：按 logo.admin_dark_logo 渲染对应动画 ===== -->
   <LogoNeon v-if="animStyle === 'neon'" :hide-image="hideImage" @click="handleLogoClick" />
   <LogoMultiNeon v-else-if="animStyle === 'multi-neon'" :hide-image="hideImage" @click="handleLogoClick" />
   <LogoEnergyPulse v-else-if="animStyle === 'energy-pulse'" :hide-image="hideImage" @click="handleLogoClick" />
@@ -41,7 +41,7 @@ const router = useRouter()
 const animStyle = computed(() => {
   // 管理员：深色/主题色菜单 → 配置的动画样式；浅色 → 管理员浅色 Logo 配置
   if (userStore.isAdmin) {
-    if (userConfigStore.isDarkEnabled || settingStore.menuThemeColor) return configStore.getLogoAnimationStyle()
+    if (userConfigStore.isDarkEnabled || settingStore.menuThemeColor) return configStore.getAdminDarkLogo()
     return configStore.getAdminLightLogo()
   }
 
