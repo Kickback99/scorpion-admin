@@ -1,5 +1,5 @@
 <template>
-    <div class="login">
+    <div class="login" :style="loginBgStyle">
         <el-form ref="loginRef" :model="formModel" :rules="rules" class="login-form">
             <h3 class="title">蝎子编程-后台管理系统</h3>
             <el-form-item prop="username">
@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { nextTick, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import msg from '@/components/msg'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
@@ -43,6 +43,15 @@ const route = useRoute()
 
 const loginRef = ref(null)
 const loading = ref(false)
+
+// 响应式移动端检测：移动端背景图居中，露出中间细节
+const isMobile = ref(false)
+const mediaQuery = window.matchMedia('(max-width: 768px)')
+const loginBgStyle = computed(() => isMobile.value ? { backgroundPosition: 'center' } : {})
+
+function handleMediaChange(e) {
+    isMobile.value = e.matches
+}
 
   // 绑定表单数据
   const formModel = ref({
@@ -138,11 +147,18 @@ const handleCheckbox = async() => {
 }
 
 onMounted(()=>{
+    isMobile.value = mediaQuery.matches
+    mediaQuery.addEventListener('change', handleMediaChange)
+
     if (tokenStore.hasSavedCredentials()) {
         formModel.value.username = tokenStore.savedUsername
         formModel.value.password = tokenStore.getDecryptedPassword()
         formModel.value.checkPwd = true
     }
+})
+
+onUnmounted(() => {
+    mediaQuery.removeEventListener('change', handleMediaChange)
 })
 
 </script>
