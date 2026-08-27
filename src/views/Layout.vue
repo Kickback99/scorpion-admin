@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}" :class="{ 'menu-theme-off': !settingStore.menuThemeColor }">
+      <el-aside :style="{backgroundColor: 'var(--sidebar-bg)'}" :class="{ 'menu-theme-off': !settingStore.menuThemeColor, 'mobile-sidebar': isMobile, 'is-collapsed': userConfigStore.collapse_enabled }">
           <Logo></Logo>
           <el-scrollbar class=scrollbar>
         <el-menu router
@@ -57,6 +57,8 @@
         </el-menu>
       </el-scrollbar>
       </el-aside>
+      <!-- 移动端展开时遮罩，点击遮罩收起 -->
+      <div v-if="isMobile && !userConfigStore.collapse_enabled" class="sidebar-mask" @click="userConfigStore.toggleCollapse" />
       <el-container>
         <el-header :class="{ 'page-theme': settingStore.pageTheme }">
             <ToolBar></ToolBar>
@@ -81,7 +83,7 @@
 import MenuTree from '@/components/MenuTree.vue';
 import ToolBar from '@/components/ToolBar.vue';
 import {useUserStore} from '@/store/user'
-import { computed, nextTick, onMounted, ref,watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref,watch } from 'vue';
 import {useSettingStore} from '@/setting'
 //路由对象--获取路由参数
 import { useRoute } from 'vue-router'
@@ -102,6 +104,22 @@ const listData = computed(()=>
 const userConfigStore = useUserConfigStore()
 
 const route = useRoute()
+
+// ============================================================
+// 移动端响应式：≤768px 侧边栏切换为浮层
+// ============================================================
+const isMobile = ref(false)
+const mobileQuery = window.matchMedia('(max-width: 768px)')
+function handleMobileChange(e) {
+  isMobile.value = e.matches
+}
+onMounted(() => {
+  isMobile.value = mobileQuery.matches
+  mobileQuery.addEventListener('change', handleMobileChange)
+})
+onUnmounted(() => {
+  mobileQuery.removeEventListener('change', handleMobileChange)
+})
 
 // config 模块自己管理滚动，不需要外层 el-scrollbar
 const isConfigRoute = computed(() => route.path.startsWith('/config'))
@@ -332,6 +350,34 @@ html.dark .main-container:not(.page-theme) {
 
 .main-scrollbar--plain {
   overflow: hidden;
+}
+
+// ============================================================
+// 移动端（≤768px）：侧边栏切换为浮层
+// ============================================================
+@media (max-width: 768px) {
+  // 侧边栏脱离文档流，主容器自动占满全宽，无需避让
+  .el-aside.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 2001;
+    width: 220px !important; // 折叠态覆盖 `.el-aside:has(...)` 的 60px，保证整体平移
+  }
+
+  // 折叠：整体向左平移隐藏（而非收缩成 60px 小栏）
+  .el-aside.mobile-sidebar.is-collapsed {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+// 移动端展开时的半透明遮罩（低于侧边栏 2001，高于内容区）
+.sidebar-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.3);
 }
 </style>
 
