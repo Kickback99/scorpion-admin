@@ -621,12 +621,12 @@ const handleDelete = async (row) => {
     return
   }
 
-  // 检查是否为已定义的配置项（存在于 CONFIG_DEFINITIONS）
+  // 检查是否为已定义的配置项（存在于 configItems.js，注入到 _itemMap）
   const isDefined = !!configStore.getConfigDefinition(row.key)
 
   let confirmMessage = ''
   if (isDefined) {
-    confirmMessage = `配置项 "${row.displayKey}" 是已定义的配置项，删除后需要在 CONFIG_DEFINITIONS 源码中删除该项。确定要删除吗？`
+    confirmMessage = `配置项 "${row.displayKey}" 已在 configItems.js 源码中定义，删除后需同步移除源码定义。确定要删除吗？`
   } else {
     confirmMessage = `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`
   }
@@ -704,10 +704,10 @@ const handleConfirmAdd = async () => {
         const fullKey = addForm.parentPath ? `${addForm.parentPath}.${addForm.key}` : addForm.key
 
         // 检查是否在 CONFIG_DEFINITIONS 中已存在
-        if (configStore.getConfigDefinition(fullKey)) {
+        /* if (configStore.getConfigDefinition(fullKey)) {
           msg.warning(`配置项 "${addForm.key}" 已在 CONFIG_DEFINITIONS 源码中定义，不能重复添加`)
           return
-        }
+        } */
         
         const fullConfig = buildFullConfig()
         
@@ -730,8 +730,6 @@ const handleConfirmAdd = async () => {
             ensureNestedPath(fullConfig, pathParts)
             targetObj = getNestedObject(fullConfig, pathParts)
           }
-          // 更新 addForm.parentPath 为完整路径
-          addForm.parentPath = pathParts.join('.')
         }
         
         // 检查key是否已存在
@@ -746,15 +744,29 @@ const handleConfirmAdd = async () => {
         if (addForm.type === 'number') {
           value = Number(value)
 
-          // 只有在用户启用了阈值设置且设置了有效值时，才保存到 numberLimits
+          // 未勾选阈值开关 → 放行，不保存限制（使用 configItems 源码配置）
           if (addForm.enableThreshold) {
             const minToSave = addForm.min !== null ? addForm.min : undefined
             const maxToSave = addForm.max !== null ? addForm.max : undefined
+
+            // 源码默认阈值校验：该 key 已在 DEFAULT_NUMBER_LIMITS 中定义时，
+            // 勾选的阈值必须与源码一致，否则报错
+            const def = configStore.getDefaultNumberLimit(fullKey)
+            if (def) {
+              if (minToSave !== undefined && def.min !== minToSave) {
+                msg.error(`最小值与源码定义不一致（源码为 ${def.min}）`)
+                return
+              }
+              if (maxToSave !== undefined && def.max !== maxToSave) {
+                msg.error(`最大值与源码定义不一致（源码为 ${def.max}）`)
+                return
+              }
+            }
+
             if (minToSave !== undefined || maxToSave !== undefined) {
               configStore.setNumberLimit(fullKey, minToSave, maxToSave)
             }
           }
-          // 如果用户没有启用阈值设置，不保存任何限制（使用 CONFIG_DEFINITIONS 的配置）
         } else if (addForm.type === 'boolean') {
           value = Boolean(value)
         } else if (addForm.type === 'object') {
@@ -763,10 +775,6 @@ const handleConfirmAdd = async () => {
         
         targetObj[addForm.key] = value
         
-        console.log('=== handleConfirmAdd BEFORE ===', JSON.stringify(fullConfig))
-        console.log('parentPath:', addForm.parentPath, 'key:', addForm.key, 'value:', value)
-        console.log('targetObj keys:', Object.keys(targetObj))
-        console.log('=== handleConfirmAdd AFTER ===', JSON.stringify(fullConfig))
         const res = await updateAllConfigApi(fullConfig)
         if (res.code === 200) {
           msg.primary('新增成功')

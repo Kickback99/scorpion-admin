@@ -224,6 +224,11 @@ export const useConfigStore = defineStore({
       return this.numberLimits[key] || { min: undefined, max: undefined }
     },
 
+    /** 获取源码默认阈值（DEFAULT_NUMBER_LIMITS 中定义，未定义返回 undefined） */
+    getDefaultNumberLimit(key) {
+      return DEFAULT_NUMBER_LIMITS[key]
+    },
+
     /** 删除数字配置项的限制范围 */
     removeNumberLimit(key) {
       delete this.numberLimits[key]
