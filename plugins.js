@@ -31,7 +31,7 @@ export function getPlugins(){
         }),
         svgLoader(),  // 添加 SVG 加载器
         prismjs({
-          languages:['json','js','java','xml']
+          languages:['json','js','java','xml','html','css','bash','ts', 'sql', 'yaml', 'nginx','markdown','nginx','docker','shell']
         }),
         //element plus 自动导入插件
         AutoImport({
