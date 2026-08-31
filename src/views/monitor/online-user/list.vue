@@ -21,7 +21,7 @@
         </div>
 
         <!-- 表格 -->
-        <el-table :data="filteredTableData" style="width: 100%" stripe align="center">
+        <el-table :data="filteredTableData" style="width: 100%" stripe align="center" max-height="500">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
                     <el-avatar 

@@ -66,29 +66,29 @@
         </el-form>
             </el-collapse-item>
         </el-collapse>
-        <el-table :data="tableData" :style="{ width: '100%' }" @selection-change="removeMultiple">
+        <el-table :data="tableData" :style="{ width: '100%' }" max-height="500" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" />
             <el-table-column type="index" label="序号"  width="60"/>
-            <el-table-column prop="username" label="操作用户"  />
-            <el-table-column  label="操作模块">
+            <el-table-column prop="username" label="操作用户" min-width="110" />
+            <el-table-column  label="操作模块" min-width="110">
                 <template #default="{row}">
                     {{ displayMode === 'label' ? row.moduleLabel : row.module }}
                 </template>
             </el-table-column>
-            <el-table-column label="操作类型">
+            <el-table-column label="操作类型" min-width="100">
                 <template #default="{row}">
                     <el-tag :type="getTagType(row.type)" size="small">
                          {{ displayMode === 'label' ? row.typeLabel : row.type  }}
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column  label="请求方式">
+            <el-table-column  label="请求方式" min-width="100">
                 <template #default="{row}">
                        <el-tag :type="getTagType(row.reqMode)" size="small">{{ row.reqMode }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="操作时间" />
-            <el-table-column width="150">
+            <el-table-column prop="createTime" label="操作时间" min-width="180" />
+            <el-table-column width="150" fixed="right">
                 <template #default="{row}">
                     <el-button size="small" type="info" @click="onDetail(row)" icon="MoreFilled" circle plain/>
                     <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">

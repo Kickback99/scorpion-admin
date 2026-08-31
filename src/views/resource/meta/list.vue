@@ -124,6 +124,7 @@
             :data="tableData" 
             style="width: 100%" 
             border
+            max-height="500"
             v-loading="loading"
         >
             <el-table-column prop="id" label="ID" width="80" align="center" />

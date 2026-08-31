@@ -207,6 +207,10 @@ html.dark .auth-header:not(.page-theme) {
   --el-collapse-header-bg-color: transparent;
   --el-collapse-content-bg-color: transparent;
   border: none;
+  // 页面滚动时钉在顶部，不随内容滚走（与表格内部滚动互不干扰）
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .el-collapse.search-collapse .el-collapse-item__header {
   min-height: 26px;

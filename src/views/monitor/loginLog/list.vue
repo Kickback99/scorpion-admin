@@ -63,16 +63,16 @@
         </el-form>
     </div>
 
-    <el-table :data="tableData" :style="{ width: '100%' }"  @selection-change="removeMultiple">
+    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="username" label="用户名"  />
-        <el-table-column  label="用户类型">
+        <el-table-column prop="username" label="用户名" min-width="110" />
+        <el-table-column  label="用户类型" min-width="100">
             <template #default="{row}">
                 {{ row.type === 0 ? '后台用户':'前台用户' }}
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="登录状态">
+        <el-table-column prop="status" label="登录状态" min-width="100">
             <template #default="{row}">
                 <el-tag type="success" size="small" v-if="row.status === 0">{{ statusMap[row.status] || '未知状态' }}</el-tag>
                 <el-tag type="primary" size="small" v-if="row.status === 1">{{ statusMap[row.status] || '未知状态' }}</el-tag>
@@ -80,7 +80,7 @@
                 <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column label="token" >
+        <el-table-column label="token" min-width="150" >
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
                     <span style="overflow: hidden; text-overflow: ellipsis">
@@ -106,8 +106,8 @@
                 </div>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="操作日期"  />
-        <el-table-column  label="操作" width="150">
+        <el-table-column prop="createTime" label="操作日期" min-width="180" />
+        <el-table-column  label="操作" width="150" fixed="right">
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>

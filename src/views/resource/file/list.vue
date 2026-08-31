@@ -64,23 +64,23 @@
         </div>
     </div>
 
-    <el-table :data="tableData" :style="{ width: '100%' }"   @selection-change="removeMultiple">
+    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500"   @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="name" label="文件名称" />
-        <el-table-column label="图片">
+        <el-table-column prop="name" label="文件名称" min-width="150" />
+        <el-table-column label="图片" min-width="120">
             <template #default="{ row }">
                 <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="row.url" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[row.url]" />
                 <span v-else>-</span>
             </template>
         </el-table-column>
-        <el-table-column prop="ext" label="扩展名" />
-        <el-table-column prop="size" label="文件大小" />
+        <el-table-column prop="ext" label="扩展名" min-width="90" />
+        <el-table-column prop="size" label="文件大小" min-width="100" />
         <!-- <el-table-column prop="url" label="文件链接" /> -->
-        <el-table-column prop="md5" label="文件md5" />
-        <el-table-column prop="status" label="文件状态"></el-table-column>
-        <el-table-column prop="createTime" label="创建日期"></el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column prop="md5" label="文件md5" min-width="130" />
+        <el-table-column prop="status" label="文件状态" min-width="100"></el-table-column>
+        <el-table-column prop="createTime" label="创建日期" min-width="180"></el-table-column>
+        <el-table-column label="操作" width="150" fixed="right">
             <template #default="{row}">
                 <el-button size="small" type="warning" v-perm="'btn.file.update'" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"

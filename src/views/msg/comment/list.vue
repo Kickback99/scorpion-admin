@@ -115,35 +115,35 @@
     </el-collapse>
 
 
-    <el-table :data="tableData" style="width: 100%"
+    <el-table :data="tableData" style="width: 100%" max-height="500"
     v-loading="loading"
     ref="multipleTableRef"
     @selection-change="handleMultiple"
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column prop="title" label="标题" show-overflow-tooltip />
-        <el-table-column label="评论类型" >
+        <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
+        <el-table-column label="评论类型" min-width="100" >
             <template #default="{row}">
                 {{ row.type === '0' ? '文章评论':'友链评论' }}
             </template>
         </el-table-column>
-        <el-table-column label="评论层级">
+        <el-table-column label="评论层级" min-width="100">
             <template #default="{row}">
                 {{ row.rootId === -1 ? '根评论':'子评论' }}
             </template>
         </el-table-column>
-        <el-table-column prop="content" label="评论内容" show-overflow-tooltip />
-        <el-table-column prop ="status" label="评论状态">
+        <el-table-column prop="content" label="评论内容" min-width="150" show-overflow-tooltip />
+        <el-table-column prop ="status" label="评论状态" min-width="100">
             <template #default="{row}">
                 <el-button size="small" type="success" v-if="row.status === 0" plain>已通过</el-button>
                 <el-button size="small" type="danger" v-if="row.status === 1" plain>已驳回</el-button>
                 <el-button size="small" type="warning" v-if="row.status === 2" plain>待审核</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="创建者" />
+        <el-table-column prop="username" label="创建者" min-width="110" />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
         <!-- 操作列 - 根据模式动态显示不同按钮 -->
-        <el-table-column label="操作" width="280" >
+        <el-table-column label="操作" width="280" fixed="right" >
             <template #default="{ row }">
                 <!--  审核模式：显示 通过/驳回/删除/详情 -->
                 <template v-if="viewMode === 'audit'">

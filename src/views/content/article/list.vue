@@ -93,21 +93,21 @@
         </el-collapse-item>
     </el-collapse>
 
-    <el-table :data="tableData" :style="{ width: '100%' }" >
+    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500">
         <el-table-column type="index" label="序号" width="55"></el-table-column>
-        <el-table-column prop="title" label="标题" show-overflow-tooltip/>
+        <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip/>
         <el-table-column label="封面" width="100px">
             <template #default="{row}">
                 <el-image style="width: 100px; height: 56px"  :src="handleImage(row)" :fit="fit" preview-teleported :preview-src-list="[handleImage(row)]"/>
             </template>
         </el-table-column>
-        <el-table-column prop="cateName" label="分类" align="center"/>
-        <el-table-column label="置顶">
+        <el-table-column prop="cateName" label="分类" min-width="100" align="center"/>
+        <el-table-column label="置顶" min-width="90">
             <template #default="{row}">
                 <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
-        <el-table-column label="状态" >
+        <el-table-column label="状态" min-width="90">
               <template #default="{row}">
                  <el-button size="small" type="success" v-if="row.status === '0'" plain>已发布</el-button>
                  <el-button size="small" type="info" v-else plain>草稿</el-button>
@@ -115,7 +115,7 @@
         </el-table-column>
         <el-table-column prop="createTime" label="创建日期" width="185" />
         <el-table-column prop="updateTime" label="修改日期" width="185" />
-        <el-table-column label="操作" width="270">
+        <el-table-column label="操作" width="270" fixed="right">
             <template #default="{row}">
                 <el-button size="small" type="info" @click="handlePreview(row)" plain>预览</el-button>
                 <el-button size="small" type="warning" v-perm="'btn.article.update'" @click="handleEdit(row)" plain>编辑</el-button>

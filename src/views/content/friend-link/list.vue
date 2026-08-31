@@ -21,17 +21,17 @@
     </div>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange">
+    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column prop="name" label="名字" />
-        <el-table-column label="logo">
+        <el-table-column prop="name" label="名字" min-width="130" />
+        <el-table-column label="logo" min-width="120">
             <template #default="{row}">
                 <el-image style="width: 100px; height: 100px" :src="handleImage(row)" :fit="fit" />
             </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" show-overflow-tooltip />
-        <el-table-column prop="address" label="地址" />
-        <el-table-column label="状态">
+        <el-table-column prop="description" label="描述" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="address" label="地址" min-width="180" />
+        <el-table-column label="状态" min-width="100">
             <template #default="{row}">
                 <el-button size="small" type="primary" plain v-if="row.status === '0'">已通过</el-button>
                 <el-button size="small" type="danger"  plain v-if="row.status === '1'">已驳回</el-button>
@@ -39,7 +39,7 @@
             </template>
         </el-table-column>
 
-        <el-table-column v-if="showPermColumn(['btn.friendlink.update', 'btn.friendlink.remove'])" label="操作">
+        <el-table-column v-if="showPermColumn(['btn.friendlink.update', 'btn.friendlink.remove'])" label="操作" width="150" fixed="right">
             <template #default="{row}">
                 <el-button v-perm="'btn.friendlink.update'" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
