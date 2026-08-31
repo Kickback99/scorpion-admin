@@ -22,32 +22,10 @@ ElDialog.props.closeOnClickModal.default = false
 // ECharts 按需注册
 import './plugins/echarts'
 
-
-// 完整导入
-/* import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs' */
-
-
 const app = createApp(App)
 app.use(router)
-const pinia = createPinia() //创建Pinia实例
-app.use(pinia.use(persist)) //安装pinia插件
-/* app.use(ElementPlus,{
-    locale:zhCn
-}) */
-
-//导入字体图标
-// import "./assets/Iconfont/demo/iconfont.css"
-// import "./assets/Iconfont/demo/iconfont.js"
-
-// 动态导入iconfont目录下的所有字体图标
-const modules = import.meta.glob('./assets/iconfont/**/*.{js,css}');
-
-for (const path in modules) {
-  // console.log(modules)
-  modules[path]();
-}
+const pinia = createPinia() // 创建Pinia实例
+app.use(pinia.use(persist)) // 安装pinia插件
 
 // 引入svg脚本
 import 'virtual:svg-icons-register'
@@ -68,11 +46,9 @@ import {
 
 // 按钮权限指令：按 configStore.buttonPermissionMode 动态隐藏/禁用无权限按钮
 import {directiveList} from '@/directives'
-
 directiveList(app)
-// import elementIcons from './data/elementIcons'
+
 // 注册图标组件
-// app.use(elementIcons)
 import { registerIcons } from '@/data/elementIcons'
 registerIcons(app)
 
