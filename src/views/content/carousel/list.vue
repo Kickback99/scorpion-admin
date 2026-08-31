@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple">
+    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple" max-height="500">
         <el-table-column prop="id" label="轮播ID" width="80" />
 
         <el-table-column label="轮播图" width="120">
@@ -98,7 +98,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="200" />
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
                 <!-- 失败状态显示重试按钮 -->
                 <el-button
