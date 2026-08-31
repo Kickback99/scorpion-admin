@@ -159,7 +159,7 @@
           <div class="info-list">
             <div class="info-item">
               <span class="label">登录次数：</span>
-              <span class="value">{{ profileStats.loginCount }} 次次</span>
+              <span class="value">{{ profileStats.loginCount }} 次</span>
             </div>
             <div class="info-item">
               <span class="label">账号状态：</span>
