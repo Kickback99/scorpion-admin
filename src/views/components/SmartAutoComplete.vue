@@ -56,8 +56,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import msg from '@/components/msg'
+
+// 懒加载 pinyin-match 模块（首次输入时异步加载，加载完成触发高亮重算）
+const PinyinMatch = ref(null)
+async function ensurePinyinMatch() {
+  if (!PinyinMatch.value) PinyinMatch.value = await loadPinyinMatch()
+}
 
 // ==================== 双向绑定 ====================
 const modelValue = defineModel({
@@ -235,7 +241,7 @@ const highlightMatch = (text) => {
   }
   
   // 2. PinyinMatch（中文拼音）— 返回 [startIndex, endIndex]
-  const pinyinResult = PinyinMatch.match(text, query)
+  const pinyinResult = PinyinMatch.value?.match(text, query)
   if (pinyinResult && pinyinResult.length >= 2) {
     const from = pinyinResult[0], to = pinyinResult[1] + 1
     return text.substring(0, from) + '<strong>' + text.substring(from, to) + '</strong>' + text.substring(to)
@@ -309,7 +315,8 @@ const updateCurrentInput = () => {
   const inputValue = getCurrentInputValue()
   currentInput.value = inputValue
   // emit('input-change', inputValue)
-  
+  if (inputValue) ensurePinyinMatch()
+
   // 🔥 如果输入框为空，立即清空所有状态
   if (!inputValue || inputValue.length === 0) {
     showDropdown.value = false

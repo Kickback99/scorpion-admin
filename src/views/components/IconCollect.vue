@@ -144,6 +144,8 @@ const userConfigStore = useUserConfigStore()
 const loading = ref(false)
 onMounted(async () => {
   loading.value = true // 开始加载
+  // 后台延迟执行「收集全站路由组件」扫描，让图标页首屏（online 等 tab）先渲染，不阻塞主线程
+  setTimeout(async () => {
   try {
     // 获取所有路由组件 (本地 + 动态)
     const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
@@ -235,6 +237,7 @@ onMounted(async () => {
   } finally {
     loading.value = false // 结束加载
   }
+  }, 0)
 })
 /* onMounted(async () => {
 

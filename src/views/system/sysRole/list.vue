@@ -119,7 +119,7 @@ import router, { loadMenu } from '@/router';
 import msg from '@/components/msg'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { getAllUsersApi } from '@/api/business'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 const tableData = ref([])
 
 const searchData = ref({})
@@ -167,6 +167,7 @@ const fetchUsers = async (params) => {
     if (userCache.value.length === 0) await loadAllUsers()
     if (!query) return userCache.value
     const lowerQuery = query.toLowerCase()
+    const PinyinMatch = await loadPinyinMatch()
     return userCache.value.filter(item => {
         const text = item.value
         if (text.toLowerCase().includes(lowerQuery)) return true

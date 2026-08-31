@@ -131,7 +131,7 @@
 import { ref, watch, computed } from 'vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { Check, Plus, Loading, Picture, InfoFilled } from '@element-plus/icons-vue';
-import PinyinMatch from 'pinyin-match';
+import { loadPinyinMatch } from '@/utils/pinyinMatch';
 import msg from '@/components/msg'
 import { useUserConfigStore } from '@/store/userConfig';
 const userConfigStore = useUserConfigStore()
@@ -283,6 +283,7 @@ const fetchArticleForImage = async (params) => {
     }
 
     const lowerQuery = query.toLowerCase();
+    const PinyinMatch = await loadPinyinMatch();
     return data.filter(item => {
       const text = item.value;
       const lowerText = text.toLowerCase();

@@ -325,7 +325,7 @@ import { getCarouselListApi, getCarouselByIdApi, updateCarouselApi, removeCarous
 import { getAllArticlesApi } from '@/api/business'
 import { hasPerm } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import SmartUpload from '@/views/components/SmartUpload.vue'
 
 // ==================== 数据 ====================
@@ -537,7 +537,8 @@ const fetchArticles = async (params) => {
     }
     
     const lowerQuery = query.toLowerCase()
-    
+    const PinyinMatch = await loadPinyinMatch()
+
     const matched = articleList.value.filter(item => {
         const text = item.value
         const lowerText = text.toLowerCase()

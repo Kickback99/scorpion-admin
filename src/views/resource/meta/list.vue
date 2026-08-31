@@ -228,7 +228,7 @@ import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { dayjs } from 'element-plus'
 
 const configStore = useConfigStore()
@@ -388,6 +388,7 @@ const fetchBusinessData = async (params) => {
     
     const lowerQuery = query.toLowerCase();
     
+    const PinyinMatch = await loadPinyinMatch();
     const matched = businessDataCache.value.filter(item => {
         const text = item.value;
         const lowerText = text.toLowerCase();

@@ -304,13 +304,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch, computed } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { hasPerm, showPermColumn } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import msg from '@/components/msg'
-import Markdown from '@/components/Markdown.vue'  // 引入 Markdown 组件
+// 懒加载 Markdown 富文本编辑器，仅在编辑公告时加载
+const Markdown = defineAsyncComponent(() => import('@/components/Markdown.vue'))
 import {
     noticeListApi,
     noticeAddApi,
@@ -323,12 +324,11 @@ import {
 } from '@/api/notice'
 import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi, getAllRolesApi } from '@/api/business'
-import { createMarkdownPreview } from '@/utils/markdown-config'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
 import { useTabStore } from '@/store/tabs'
 import { useRoute } from 'vue-router'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import dayjs from 'dayjs'
 
 // ============================================================
@@ -541,9 +541,12 @@ watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
 
-const MarkdownPreview = computed(() => {
-  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
-})
+// 懒加载 markdown 预览组件，仅在打开富文本公告详情时加载
+const MarkdownPreview = defineAsyncComponent(() =>
+  import('@/utils/markdown-config').then((m) =>
+    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+  ),
+)
 
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -568,6 +571,7 @@ const fetchUsers = async (params) => {
     if (!query) return userCache.value
 
     const lowerQuery = query.toLowerCase()
+    const PinyinMatch = await loadPinyinMatch()
     return userCache.value.filter(item => {
         const text = item.value
         const lowerText = text.toLowerCase()
@@ -600,6 +604,7 @@ const fetchRoles = async (params) => {
     if (!query) return roleCache.value
 
     const lowerQuery = query.toLowerCase()
+    const PinyinMatch = await loadPinyinMatch()
     return roleCache.value.filter(item => {
         const text = item.value
         if (text.toLowerCase().includes(lowerQuery)) return true

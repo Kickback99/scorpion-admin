@@ -206,7 +206,7 @@ import { useArticleDraftStore } from '@/store/articleDraft'
 import { useConfigStore } from '@/store/config'
 
 // 第三方
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 
 // API / 工具
 import { addApi, findApi, getCarouselByArticleApi, modifyApi, uploadCoverApi } from '@/api/article.js'
@@ -683,6 +683,7 @@ const fetchTags = async (params) => {
   }
 
   const lowerQuery = query.toLowerCase()
+  const PinyinMatch = await loadPinyinMatch()
 
   const matched = tagList.value.filter(item => {
     const text = item.value
@@ -755,6 +756,7 @@ const fetchArticleForCover = async (params) => {
       }
 
       const lowerQuery = query.toLowerCase()
+      const PinyinMatch = await loadPinyinMatch()
       return data.filter(item => {
         const text = item.value
         const lowerText = text.toLowerCase()
