@@ -193,12 +193,14 @@
 
 <script setup>
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
-import { reactive, ref,computed,watch } from 'vue';
+import { reactive, ref, computed, watch, shallowRef } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
-import { createMarkdownPreview } from '@/utils/markdown-config'
+// 懒加载 markdown 预览函数（避免首屏同步加载 v-md-editor / prismjs）
+const createMarkdownPreviewFn = shallowRef(null)
+import('@/utils/markdown-config').then((m) => { createMarkdownPreviewFn.value = m.createMarkdownPreview })
 import msg from '@/components/msg'
 const userConfigStore = useUserConfigStore()
 const configStore = useConfigStore()
@@ -213,10 +215,11 @@ const searchActiveNames = ref(
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
-// 使用 computed 每次重新创建组件
+// 使用 computed 每次重新创建组件（懒加载函数就绪前返回 null，主题切换仍会重建）
 const MarkdownPreview = computed(() => {
   console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
-  return createMarkdownPreview(userConfigStore.isDarkEnabled?"vuepress":"github")
+  if (!createMarkdownPreviewFn.value) return null
+  return createMarkdownPreviewFn.value(userConfigStore.isDarkEnabled?"vuepress":"github")
 })
 
 const tableData = ref([])

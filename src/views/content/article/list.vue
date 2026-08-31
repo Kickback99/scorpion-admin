@@ -156,18 +156,18 @@
 <script setup>
 import { isTopApi, listApi, removeApi } from '@/api/article';
 import CateSelect from '@/views/components/CateSelect.vue';
-import { ref, watch, computed } from 'vue';
-import ArticleEdit from '@/views/components/ArticleEdit.vue';
+import { ref, watch, defineAsyncComponent } from 'vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs, ElMessageBox } from 'element-plus';
 import msg from '@/components/msg';
-import { createMarkdownPreview } from '@/utils/markdown-config';
 import { useUserConfigStore } from '@/store/userConfig';
 import { useArticleDraftStore } from '@/store/articleDraft';
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
 const userConfigStore = useUserConfigStore()
+// 懒加载文章编辑器（完整 markdown 编辑器），仅打开新增/编辑弹窗时加载
+const ArticleEdit = defineAsyncComponent(() => import('@/views/components/ArticleEdit.vue'))
 const draftStore = useArticleDraftStore()
 const configStore = useConfigStore()
 const tabStore = useTabStore()
@@ -411,9 +411,12 @@ const previewVisible = ref(false)
 const previewTitle = ref('')
 const previewContent = ref('')
 
-const MarkdownPreview = computed(() => {
-  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
-})
+// 懒加载 markdown 预览组件，仅在打开预览弹窗时加载
+const MarkdownPreview = defineAsyncComponent(() =>
+  import('@/utils/markdown-config').then((m) =>
+    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+  ),
+)
 
 const handlePreview = (row) => {
   previewTitle.value = row.title
