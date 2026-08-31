@@ -8,7 +8,10 @@
             <el-form-item prop="password">
                 <el-input v-model="formModel.password" :prefix-icon="Lock" size="large" auto-complete="off" placeholder="密码" @keyup.enter="handleLogin" show-password></el-input>
             </el-form-item>
-            <el-checkbox v-model="formModel.checkPwd" style="margin:0px 0px 25px 0px;" @click="handleCheckbox">记住密码</el-checkbox>
+            <div class="remember-row">
+                <el-checkbox v-model="formModel.checkPwd" @click="handleCheckbox">记住密码</el-checkbox>
+                <span v-if="showAdminHint" class="admin-hint">管理员账号：admin，密码: 1234</span>
+            </div>
             <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
                     <span>登 录</span>
@@ -48,6 +51,9 @@ const loading = ref(false)
 const isMobile = ref(false)
 const mediaQuery = window.matchMedia('(max-width: 768px)')
 const loginBgStyle = computed(() => isMobile.value ? { backgroundPosition: 'center' } : {})
+
+// 管理员账密提示：仅本地开发环境（development / local-cookie）显示，test/prod 不显示
+const showAdminHint = ['development', 'local-cookie'].includes(import.meta.env.MODE)
 
 function handleMediaChange(e) {
     isMobile.value = e.matches
@@ -210,6 +216,18 @@ a {
     font-size: 13px;
     text-align: center;
     color: #bfbfbf;
+}
+
+.remember-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.admin-hint {
+    font-size: 12px;
+    color: var(--el-text-color-regular);
 }
 
 .login-code {
