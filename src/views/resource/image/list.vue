@@ -153,7 +153,7 @@ import msg from '@/components/msg'
 import { Picture, CopyDocument } from '@element-plus/icons-vue'
 
 // 4. 第三方插件
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 
 // 5. API
 import { fileMetaListApi } from '@/api/filemeta'
@@ -319,6 +319,7 @@ const fetchBusinessData = async (params) => {
   }
   
   const lowerQuery = query.toLowerCase();
+  const PinyinMatch = await loadPinyinMatch();
   return businessDataCache.value.filter(item => {
     const text = item.value;
     const lowerText = text.toLowerCase();

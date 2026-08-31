@@ -95,16 +95,18 @@
 // ============================================================
 // 导入
 // ============================================================
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, defineAsyncComponent } from 'vue'
 import { Bell, Close } from '@element-plus/icons-vue'
 import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
-import { createMarkdownPreview } from '@/utils/markdown-config'
 import { useUserConfigStore } from '@/store/userConfig'
 
 const userConfigStore = useUserConfigStore()
-const MarkdownPreview = computed(() => {
-  return createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true)
-})
+// 懒加载 markdown 预览组件：仅在打开 markdown 类型公告详情弹窗时才加载 v-md-editor / prismjs
+const MarkdownPreview = defineAsyncComponent(() =>
+  import('@/utils/markdown-config').then((m) =>
+    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+  ),
+)
 
 // ============================================================
 // 状态

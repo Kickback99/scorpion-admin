@@ -48,11 +48,17 @@ import { useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 
 const router = useRouter()
 const userStore = useUserStore()
 const configStore = useConfigStore()
+
+// 懒加载 pinyin-match 模块（首次搜索输入时异步加载，加载完成触发依赖 computed 重算）
+const PinyinMatch = ref(null)
+async function ensurePinyinMatch() {
+  if (!PinyinMatch.value) PinyinMatch.value = await loadPinyinMatch()
+}
 
 // ============================================================
 // Props
@@ -169,7 +175,7 @@ const filteredItems = computed(() => {
     const lowerText = text.toLowerCase()
 
     if (lowerText.includes(lowerQ)) return true
-    if (PinyinMatch.match(text, q)) return true
+    if (PinyinMatch.value?.match(text, q)) return true
 
     return false
   })
@@ -199,7 +205,7 @@ const highlight = (text) => {
   }
 
   // 2. PinyinMatch（中文拼音）— 返回 [startIndex, endIndex]
-  const pinyinResult = PinyinMatch.match(text, q)
+  const pinyinResult = PinyinMatch.value?.match(text, q)
   if (pinyinResult && pinyinResult.length >= 2) {
     const from = pinyinResult[0], to = pinyinResult[1] + 1
     return text.substring(0, from) + '<strong>' + text.substring(from, to) + '</strong>' + text.substring(to)
@@ -350,7 +356,10 @@ const handleKeydown = (e) => {
   }
 }
 
-watch(query, () => { activeIndex.value = 0 })
+watch(query, (val) => {
+  activeIndex.value = 0
+  if (val) ensurePinyinMatch()
+})
 
 const handleClickOutside = (e) => {
   if (containerRef.value && !containerRef.value.contains(e.target)) {

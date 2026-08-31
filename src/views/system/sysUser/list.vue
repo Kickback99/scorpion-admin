@@ -232,7 +232,7 @@ import {allocRolesApi,doAllocRolesApi} from '@/api/sysrole'
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { getAllRolesApi } from '@/api/business'
-import PinyinMatch from 'pinyin-match'
+import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { nextTick, ref, watch } from 'vue';
 import msg from '@/components/msg';
 // 按钮级别权限控制
@@ -428,6 +428,7 @@ const fetchRoles = async (params) => {
     if (!query) return roleCache.value
 
     const lowerQuery = query.toLowerCase()
+    const PinyinMatch = await loadPinyinMatch()
     return roleCache.value.filter(item => {
         const text = item.value
         if (text.toLowerCase().includes(lowerQuery)) return true
