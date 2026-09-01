@@ -177,6 +177,13 @@ export const useConfigStore = defineStore({
           week_offset: 12,
         },
       },
+      captcha: {
+        client_enabled: true,
+        admin_enabled: true,
+        client_register_type: 'default',
+        client_login_type: 'slider',
+        admin_login_type: 'slider',
+      },
     },
 
     // ===== user_config 用户配置 =====

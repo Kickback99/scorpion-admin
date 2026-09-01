@@ -8,6 +8,9 @@
             <el-form-item prop="password">
                 <el-input v-model="formModel.password" :prefix-icon="Lock" size="large" auto-complete="off" placeholder="密码" @keyup.enter="handleLogin" show-password></el-input>
             </el-form-item>
+            <el-form-item>
+                <SmartCaptcha type="slider" @success="formModel.captchaVerifyToken = $event" />
+            </el-form-item>
             <div class="remember-row">
                 <el-checkbox v-model="formModel.checkPwd" @click="handleCheckbox">记住密码</el-checkbox>
                 <span v-if="showAdminHint" class="admin-hint">管理员账号：admin，密码: 1234</span>
@@ -27,7 +30,7 @@
 
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import msg from '@/components/msg'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
@@ -36,6 +39,8 @@ import { isCookieMode } from '@/utils/auth'
 import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
+// 验证码组件懒加载（管理端强制按需加载，仅登录页用到）
+const SmartCaptcha = defineAsyncComponent(() => import('@/views/components/SmartCaptcha.vue'))
 import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
 import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
