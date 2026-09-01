@@ -201,16 +201,25 @@ html.dark .auth-header:not(.page-theme) {
 }
 
 // ============================================================
-// 搜索面板折叠条 — 透明背景、图标居中、保持最低高度
+// 搜索面板折叠条 — 背景跟随主题、图标居中、保持最低高度
 // ============================================================
 .el-collapse.search-collapse {
-  --el-collapse-header-bg-color: transparent;
-  --el-collapse-content-bg-color: transparent;
+  --el-collapse-header-bg-color: var(--el-fill-color-light);
+  --el-collapse-content-bg-color: var(--el-fill-color-light);
   border: none;
   // 页面滚动时钉在顶部，不随内容滚走（与表格内部滚动互不干扰）
   position: sticky;
   top: 0;
   z-index: 10;
+}
+// 背景跟随主题（深浅 / pageTheme 自适应）：pageTheme 类在 .main-container 祖先上，故用祖先选择器
+html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
+  --el-collapse-header-bg-color: var(--el-color-black);
+  --el-collapse-content-bg-color: var(--el-color-black);
+}
+.main-container.page-theme .el-collapse.search-collapse {
+  --el-collapse-header-bg-color: var(--page-theme-bg);
+  --el-collapse-content-bg-color: var(--page-theme-bg);
 }
 .el-collapse.search-collapse .el-collapse-item__header {
   min-height: 26px;
