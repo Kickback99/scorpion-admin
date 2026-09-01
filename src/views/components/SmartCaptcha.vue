@@ -24,6 +24,31 @@
             </el-input>
         </template>
 
+        <!-- ===== 点选验证码 ===== -->
+        <template v-else-if="isClickType">
+            <div class="captcha-click-box">
+                <img v-if="vo.templateImage" :src="vo.templateImage" class="captcha-tip-img" alt="点选提示">
+                <div ref="boxRef" class="captcha-click-bg">
+                    <img
+                        v-if="vo.backgroundImage"
+                        :src="vo.backgroundImage"
+                        class="captcha-click-bg-img"
+                        :style="{ height: vo.backgroundImageHeight * scale + 'px' }"
+                        alt="点选背景"
+                        @click="onClickCaptcha"
+                    >
+                    <span
+                        v-for="(p, i) in clickPoints"
+                        :key="i"
+                        class="captcha-click-dot"
+                        :style="{ left: p.x * scale + 'px', top: p.y * scale + 'px' }"
+                    >{{ i + 1 }}</span>
+                </div>
+                <el-button text size="small" class="captcha-click-refresh" :icon="Refresh" @click="generate"></el-button>
+                <div class="captcha-click-hint">请在图中依次点击提示文字（{{ clickPoints.length }}/{{ CLICK_COUNT }}）</div>
+            </div>
+        </template>
+
         <!-- ===== 滑块验证码 ===== -->
         <template v-else>
             <div ref="boxRef" class="captcha-slider-box">
@@ -83,6 +108,10 @@ const emit = defineEmits(['success', 'fail'])
 
 const TEXT_TYPES = ['default', 'chinese', 'english', 'number', 'mixed', 'gif']
 const isTextType = computed(() => TEXT_TYPES.includes(props.type))
+const isClickType = computed(() => props.type === 'click')
+
+// 点选验证码需要点击的字符数（对应后端 StandardWordClickImageCaptchaGenerator.checkClickCount 默认值）
+const CLICK_COUNT = 4
 
 const vo = reactive({
     id: '',
@@ -99,17 +128,18 @@ const verifying = ref(false)
 const verified = ref(false)
 
 // ============================================================
-// 滑块：拖拽 + 轨迹采集
+// 展示缩放（背景图按容器宽度等比缩放，轨迹/点选坐标换算回自然像素）
 // ============================================================
 
 const boxRef = ref(null)
 const { width: boxWidth } = useElementSize(boxRef)
-// 展示缩放系数：背景图按容器宽度等比缩放，轨迹需换算回自然像素（未测量到宽度时兜底为 1）
 const scale = computed(() => (vo.backgroundImageWidth && boxWidth.value ? boxWidth.value / vo.backgroundImageWidth : 1))
-// 滑块最大可拖动的相对偏移（渲染像素）
-const maxDrag = computed(() => Math.max(0, boxWidth.value - vo.templateImageWidth * scale.value))
 
-// 相对拖动偏移（渲染像素，起点为 0）
+// ============================================================
+// 滑块：拖拽 + 轨迹采集
+// ============================================================
+
+const maxDrag = computed(() => Math.max(0, boxWidth.value - vo.templateImageWidth * scale.value))
 const dragX = ref(0)
 const isDragging = ref(false)
 const trackList = ref([])
@@ -147,6 +177,22 @@ useEventListener(window, 'pointermove', onPointerMove)
 useEventListener(window, 'pointerup', onPointerUp)
 
 // ============================================================
+// 点选：点击采集
+// ============================================================
+
+const clickPoints = ref([])
+
+const onClickCaptcha = (e) => {
+    if (verified.value || clickPoints.value.length >= CLICK_COUNT) return
+    const naturalX = Math.round(e.offsetX / scale.value)
+    const naturalY = Math.round(e.offsetY / scale.value)
+    clickPoints.value.push({ x: naturalX, y: naturalY })
+    if (clickPoints.value.length >= CLICK_COUNT) {
+        handleClickVerify()
+    }
+}
+
+// ============================================================
 // 生成
 // ============================================================
 
@@ -160,6 +206,7 @@ const generate = async () => {
         }
         dragX.value = 0
         trackList.value = []
+        clickPoints.value = []
     } catch (e) {
         console.error('生成验证码失败:', e)
     } finally {
@@ -213,6 +260,32 @@ const handleSliderVerify = async () => {
             emit('success', res.data)
         }
     } catch (e) {
+        generate()
+        emit('fail')
+    } finally {
+        verifying.value = false
+    }
+}
+
+const handleClickVerify = async () => {
+    verifying.value = true
+    try {
+        const track = {
+            bgImageWidth: vo.backgroundImageWidth,
+            bgImageHeight: vo.backgroundImageHeight,
+            templateImageWidth: vo.templateImageWidth,
+            templateImageHeight: vo.templateImageHeight,
+            startTime: Date.now(),
+            stopTime: Date.now(),
+            trackList: clickPoints.value.map((p) => ({ x: p.x, y: p.y, t: 0, type: 'CLICK' }))
+        }
+        const res = await captchaVerifyApi({ id: vo.id, type: props.type, track })
+        if (res.code === 200 && res.data) {
+            verified.value = true
+            emit('success', res.data)
+        }
+    } catch (e) {
+        clickPoints.value = []
         generate()
         emit('fail')
     } finally {
@@ -279,6 +352,56 @@ const handleSliderVerify = async () => {
         }
     }
 
+    .captcha-click-box {
+        position: relative;
+        width: 100%;
+
+        .captcha-tip-img {
+            display: block;
+            height: 40px;
+            margin-bottom: 4px;
+        }
+
+        .captcha-click-bg {
+            position: relative;
+            width: 100%;
+            cursor: pointer;
+
+            .captcha-click-bg-img {
+                width: 100%;
+                display: block;
+            }
+
+            .captcha-click-dot {
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                line-height: 18px;
+                margin-left: -9px;
+                margin-top: -9px;
+                text-align: center;
+                font-size: 12px;
+                color: #fff;
+                background: #f56c6c;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+        }
+
+        .captcha-click-refresh {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            z-index: 10;
+        }
+
+        .captcha-click-hint {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--el-text-color-regular);
+        }
+    }
+
     .captcha-success {
         position: absolute;
         inset: 0;
@@ -288,7 +411,7 @@ const handleSliderVerify = async () => {
         gap: 6px;
         background: rgba(255, 255, 255, 0.75);
         font-size: 14px;
-        color: var(--el-color-success);
+        color: #67c23a;
         z-index: 20;
         border-radius: 4px;
         pointer-events: none;
