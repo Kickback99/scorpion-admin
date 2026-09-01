@@ -8,8 +8,8 @@
             <el-form-item prop="password">
                 <el-input v-model="formModel.password" :prefix-icon="Lock" size="large" auto-complete="off" placeholder="密码" @keyup.enter="handleLogin" show-password></el-input>
             </el-form-item>
-            <el-form-item>
-                <SmartCaptcha type="slider" @success="formModel.captchaVerifyToken = $event" />
+            <el-form-item v-if="captchaEnabled">
+                <SmartCaptcha :type="captchaType" @success="formModel.captchaVerifyToken = $event" />
             </el-form-item>
             <div class="remember-row">
                 <el-checkbox v-model="formModel.checkPwd" @click="handleCheckbox">记住密码</el-checkbox>
@@ -34,6 +34,7 @@ import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref }
 import msg from '@/components/msg'
 import {User,Lock} from '@element-plus/icons-vue'
 import {adminLoginApi} from '@/api/admin'
+import {getAdminCaptchaConfigApi} from '@/api/captcha'
 import {useTokenStore} from '@/store/token'
 import { isCookieMode } from '@/utils/auth'
 import { useUserStore } from '@/store/user';
@@ -51,6 +52,10 @@ const route = useRoute()
 
 const loginRef = ref(null)
 const loading = ref(false)
+
+// 管理端验证码配置（匿名接口动态读取；默认关闭，等配置确认开关后再决定是否渲染/生成）
+const captchaEnabled = ref(false)
+const captchaType = ref('slider')
 
 // 响应式移动端检测：移动端背景图居中，露出中间细节
 const isMobile = ref(false)
@@ -157,9 +162,28 @@ const handleCheckbox = async() => {
     }
 }
 
+// 拉取管理端验证码配置（类型 + 总开关），动态决定是否展示与类型
+const loadCaptchaConfig = async () => {
+    try {
+        const res = await getAdminCaptchaConfigApi()
+        if (res.code === 200 && res.data) {
+            captchaEnabled.value = res.data.enabled === true
+            captchaType.value = res.data.type || 'slider'
+        } else {
+            // 响应异常时兜底开启，避免后端必填验证码但前端不展示导致无法登录
+            captchaEnabled.value = true
+        }
+    } catch (e) {
+        console.error('加载验证码配置失败:', e)
+        // 网络异常时兜底开启
+        captchaEnabled.value = true
+    }
+}
+
 onMounted(()=>{
     isMobile.value = mediaQuery.matches
     mediaQuery.addEventListener('change', handleMediaChange)
+    loadCaptchaConfig()
 
     if (tokenStore.hasSavedCredentials()) {
         formModel.value.username = tokenStore.savedUsername
