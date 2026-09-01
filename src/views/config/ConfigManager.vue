@@ -141,7 +141,7 @@
     <!-- 新增配置对话框 -->
     <el-dialog
       v-model="addDialogVisible"
-      title="新增配置"
+      :title="addDialogTitle"
       width="400px"
       :close-on-click-modal="false"
     >
@@ -211,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
 import { showPermColumn } from '@/utils/permissions'
@@ -679,6 +679,11 @@ const resetAddForm = () => {
     addFormRef.value.resetFields()
   }
 }
+
+// 新增对话框标题：有父路径显示「新增 xxx 配置」，顶层显示「新增配置」
+const addDialogTitle = computed(() => {
+  return addForm.parentPath ? `新增 ${addForm.parentPath} 配置` : '新增配置'
+})
 
 // 新增根配置
 const handleAddRoot = () => {
