@@ -28,6 +28,18 @@ export function useConfigItems() {
     return limit !== undefined ? limit : Infinity
   }
 
+  // 验证码类型 options（文本类走 easy-captcha，滑块/点选走 tianai-captcha）
+  const CAPTCHA_OPTIONS = [
+    { value: 'default', label: '算术' },
+    { value: 'chinese', label: '中文' },
+    { value: 'english', label: '英文' },
+    { value: 'number', label: '数字' },
+    { value: 'mixed', label: '混合' },
+    { value: 'gif', label: 'GIF' },
+    { value: 'slider', label: '滑块' },
+    { value: 'click', label: '点选' },
+  ]
+
   const groups = [
     {
       key: 'client', label: '前台', icon: useRenderIcon('ri:xbox-fill'),
@@ -109,6 +121,12 @@ export function useConfigItems() {
         { key: 'dashboard.line_chart.y_valid_field', type:'radio', label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: SemiSelect,       get: () => config.getValue('dashboard.line_chart.y_valid_field'), set: (v) => config.updateConfig('dashboard.line_chart.y_valid_field', v), options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
         { key: 'dashboard.line_chart.priority',      type:'radio', label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: Sort,         get: () => config.getValue('dashboard.line_chart.priority'),      set: (v) => config.updateConfig('dashboard.line_chart.priority', v),        options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
         { key: 'dashboard.line_chart.week_offset',   type:'number',label: '周偏移',       desc: '近 7 天趋势图可回滚的周偏移',             icon: "Refresh",      get: () => config.getValue('dashboard.line_chart.week_offset'),   set: (v) => config.updateConfig('dashboard.line_chart.week_offset', v),     min: () => 0, max: () => 52 },
+        // ===== captcha =====
+        { key: 'captcha.client_enabled',        type: 'switch', label: '用户端验证码',   desc: '用户端注册/登录的验证码总开关',            icon: "Lock",        get: () => config.getValue('captcha.client_enabled'),         set: (v) => config.updateConfig('captcha.client_enabled', v) },
+        { key: 'captcha.admin_enabled',         type: 'switch', label: '管理端验证码',   desc: '管理端登录的验证码总开关',                  icon: "Lock",        get: () => config.getValue('captcha.admin_enabled'),          set: (v) => config.updateConfig('captcha.admin_enabled', v) },
+        { key: 'captcha.client_register_type',  type: 'radio',  label: '注册验证码类型', desc: '用户端注册使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.client_register_type'),   set: (v) => config.updateConfig('captcha.client_register_type', v), options: CAPTCHA_OPTIONS },
+        { key: 'captcha.client_login_type',     type: 'radio',  label: '用户登录验证码类型', desc: '用户端登录锁定后使用的验证码类型',         icon: "Refresh",     get: () => config.getValue('captcha.client_login_type'),      set: (v) => config.updateConfig('captcha.client_login_type', v), options: CAPTCHA_OPTIONS },
+        { key: 'captcha.admin_login_type',      type: 'radio',  label: '管理登录验证码类型', desc: '管理端登录使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.admin_login_type'),       set: (v) => config.updateConfig('captcha.admin_login_type', v), options: CAPTCHA_OPTIONS },
       ]
     },
     {
