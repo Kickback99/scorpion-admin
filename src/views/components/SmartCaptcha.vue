@@ -13,15 +13,20 @@
                 >
                 <el-button text :icon="Refresh" @click="generate" :disabled="verified"></el-button>
             </div>
-            <el-input
-                v-model="answer"
-                placeholder="请输入验证码"
-                clearable
-                :disabled="verified"
-                @keyup.enter="handleTextVerify"
-            >
-                <template #prefix><el-icon><Key /></el-icon></template>
-            </el-input>
+            <el-form ref="answerFormRef" :model="answerModel" :rules="answerRules" @submit.prevent>
+                <el-form-item prop="answer">
+                    <el-input
+                        v-model="answerModel.answer"
+                        placeholder="请输入验证码"
+                        clearable
+                        :maxlength="answerMaxLength"
+                        :disabled="verified"
+                        @keyup.enter="handleTextVerify"
+                    >
+                        <template #prefix><el-icon><Key /></el-icon></template>
+                    </el-input>
+                </el-form-item>
+            </el-form>
         </template>
 
         <!-- ===== 点选验证码 ===== -->
@@ -98,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useEventListener, useElementSize } from '@vueuse/core'
 import { Refresh, Key, SuccessFilled, Right } from '@element-plus/icons-vue'
 import { captchaGenerateApi, captchaVerifyApi } from '@/api/captcha'
@@ -241,19 +246,61 @@ onMounted(() => {
 // 校验
 // ============================================================
 
-const answer = ref('')
+const answerModel = reactive({ answer: '' })
+const answerFormRef = ref(null)
+// 算术类型答案长度可变（如 8 / -6 / 15），其余文本类型固定 4 位
+const isArithmeticType = computed(() => props.type === 'default')
+const answerMaxLength = computed(() => (isArithmeticType.value ? 3 : 4))
+
+// 低代码校验规则（el-form 内置）
+const answerRules = computed(() => {
+    const rules = [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+    if (!isArithmeticType.value) {
+        rules.push({
+            validator: (_rule, value, callback) => {
+                if (value && value.length === 4) callback()
+                else callback(new Error('验证码必须是 4 个字符'))
+            },
+            trigger: 'blur'
+        })
+    }
+    return { answer: rules }
+})
+
+let verifyTimer = null
+// 输入自动校验：字符类满 4 位立即校验；算术类防抖 800ms 校验（无需手动按回车）
+watch(() => answerModel.answer, (val) => {
+    if (verified.value || verifying.value) return
+    const v = (val || '').trim()
+    if (!v) return
+    if (isArithmeticType.value) {
+        clearTimeout(verifyTimer)
+        verifyTimer = setTimeout(() => handleTextVerify(), 800)
+    } else if (v.length === 4) {
+        handleTextVerify()
+    }
+})
+
+onUnmounted(() => {
+    if (verifyTimer) clearTimeout(verifyTimer)
+})
 
 const handleTextVerify = async () => {
-    if (!answer.value || verified.value) return
+    if (verified.value || verifying.value) return
+    const v = (answerModel.answer || '').trim()
+    if (!v) return
+    if (!isArithmeticType.value && v.length !== 4) return
+    // 触发表单校验（低代码）
+    try { await answerFormRef.value.validate() } catch (e) { return }
     verifying.value = true
     try {
-        const res = await captchaVerifyApi({ id: vo.id, type: props.type, answer: answer.value })
+        const res = await captchaVerifyApi({ id: vo.id, type: props.type, answer: v })
         if (res.code === 200 && res.data) {
             verified.value = true
             emit('success', res.data)
         }
     } catch (e) {
-        answer.value = ''
+        answerModel.answer = ''
         generate()
         emit('fail')
     } finally {
