@@ -11,7 +11,7 @@
                     title="点击刷新"
                     @click="generate"
                 >
-                <el-button text :icon="Refresh" @click="generate" :disabled="verified"></el-button>
+                <el-button text circle size="small" icon="Refresh" @click="generate" :disabled="verified"></el-button>
             </div>
             <el-form ref="answerFormRef" :model="answerModel" :rules="answerRules" @submit.prevent>
                 <el-form-item prop="answer">
@@ -48,7 +48,7 @@
                     >{{ i + 1 }}</span>
                 </div>
                 <img v-if="vo.templateImage" :src="vo.templateImage" class="captcha-tip-img" alt="点选提示">
-                <el-button text size="small" class="captcha-click-refresh" :icon="Refresh" @click="generate"></el-button>
+                <el-button text circle size="small" class="captcha-click-refresh" icon="Refresh" @click="generate"></el-button>
                 <div class="captcha-click-hint">请在图中依次点击提示文字（{{ clickPoints.length }}/{{ CLICK_COUNT }}）</div>
             </div>
         </template>
@@ -73,9 +73,10 @@
                 >
                 <el-button
                     text
+                    circle
                     size="small"
                     class="captcha-refresh"
-                    :icon="Refresh"
+                    icon="Refresh"
                     @click="generate"
                 ></el-button>
                 <div v-if="!vo.backgroundImage" class="captcha-placeholder">加载中…</div>
@@ -84,7 +85,7 @@
                 <div class="captcha-slider-track">
                     <div class="captcha-slider-fill" :style="{ width: fillWidth + 'px' }"></div>
                     <span class="captcha-slider-hint" :class="{ 'is-success': verified }">
-                        {{ verified ? '验证成功!' : (isDragging ? '' : '按住滑块，拖动到最右侧') }}
+                        {{ verified ? '验证成功!' : (isDragging ? '' : '拖动滑块完成拼图') }}
                     </span>
                     <div class="captcha-slider-btn" :style="{ left: btnLeft + 'px' }" @pointerdown="onPointerDown">
                         <el-icon><Right /></el-icon>
@@ -104,7 +105,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useEventListener, useElementSize } from '@vueuse/core'
-import { Refresh, Key, SuccessFilled, Right } from '@element-plus/icons-vue'
+import { Key, SuccessFilled } from '@element-plus/icons-vue'
 import { captchaGenerateApi, captchaVerifyApi } from '@/api/captcha'
 
 // ============================================================
@@ -490,7 +491,7 @@ const handleClickVerify = async () => {
                 text-align: center;
                 font-size: 12px;
                 color: #fff;
-                background: #f56c6c;
+                background: var(--el-color-primary);
                 border-radius: 50%;
                 pointer-events: none;
             }
