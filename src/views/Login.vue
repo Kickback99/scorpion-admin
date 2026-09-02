@@ -9,7 +9,7 @@
                 <el-input v-model="formModel.password" :prefix-icon="Lock" size="large" auto-complete="off" placeholder="密码" @keyup.enter="handleLogin" show-password></el-input>
             </el-form-item>
             <el-form-item v-if="captchaEnabled">
-                <SmartCaptcha :type="captchaType" @success="formModel.captchaVerifyToken = $event" />
+                <SmartCaptcha ref="captchaRef" :type="captchaType" />
             </el-form-item>
             <div class="remember-row">
                 <el-checkbox v-model="formModel.checkPwd" @click="handleCheckbox">记住密码</el-checkbox>
@@ -56,6 +56,7 @@ const loading = ref(false)
 // 管理端验证码配置（匿名接口动态读取；默认关闭，等配置确认开关后再决定是否渲染/生成）
 const captchaEnabled = ref(false)
 const captchaType = ref('slider')
+const captchaRef = ref(null)
 
 // 响应式移动端检测：移动端背景图居中，露出中间细节
 const isMobile = ref(false)
@@ -93,6 +94,10 @@ const handleLogin = async() => {
     await loginRef.value.validate()
     loading.value = true
     try {
+    // 管理端验证码必填：提交前统一校验 + 后端验证，拿到一次性 token 再登录
+    if (captchaEnabled.value) {
+        formModel.value.captchaVerifyToken = await captchaRef.value.verify()
+    }
     const res = await adminLoginApi(formModel.value)
     // console.log(res.data)
     tokenStore.setToken(res.data)
