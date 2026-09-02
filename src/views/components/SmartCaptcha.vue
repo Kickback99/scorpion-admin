@@ -21,7 +21,6 @@
                         clearable
                         :maxlength="answerMaxLength"
                         :disabled="verified"
-                        @keyup.enter="handleTextVerify"
                     >
                         <template #prefix><el-icon><Key /></el-icon></template>
                     </el-input>
@@ -103,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useEventListener, useElementSize } from '@vueuse/core'
 import { Refresh, Key, SuccessFilled, Right } from '@element-plus/icons-vue'
 import { captchaGenerateApi, captchaVerifyApi } from '@/api/captcha'
@@ -118,8 +117,6 @@ const props = defineProps({
         default: 'slider'
     }
 })
-
-const emit = defineEmits(['success', 'fail'])
 
 const TEXT_TYPES = ['default', 'chinese', 'english', 'number', 'mixed', 'gif']
 const isTextType = computed(() => TEXT_TYPES.includes(props.type))
@@ -142,6 +139,8 @@ const vo = reactive({
 
 const verifying = ref(false)
 const verified = ref(false)
+// 校验通过后签发的一次性 verifyToken（提交登录 / 注册时消费）
+const verifyToken = ref('')
 
 // ============================================================
 // 展示缩放（背景图按容器宽度等比缩放，轨迹/点选坐标换算回自然像素）
@@ -231,6 +230,7 @@ const generate = async () => {
         dragX.value = 0
         trackList.value = []
         clickPoints.value = []
+        verifyToken.value = ''
     } catch (e) {
         console.error('生成验证码失败:', e)
     } finally {
@@ -248,65 +248,44 @@ onMounted(() => {
 
 const answerModel = reactive({ answer: '' })
 const answerFormRef = ref(null)
-// 算术类型答案长度可变（如 8 / -6 / 15），其余文本类型固定 4 位
-const isArithmeticType = computed(() => props.type === 'default')
-const answerMaxLength = computed(() => (isArithmeticType.value ? 3 : 4))
+// 文本答案最多 6 位，长度交给注册 / 登录接口拦截
+const answerMaxLength = 6
 
-// 低代码校验规则（el-form 内置）
-const answerRules = computed(() => {
-    const rules = [{ required: true, message: '请输入验证码', trigger: 'blur' }]
-    if (!isArithmeticType.value) {
-        rules.push({
-            validator: (_rule, value, callback) => {
-                if (value && value.length === 4) callback()
-                else callback(new Error('验证码必须是 4 个字符'))
-            },
-            trigger: 'blur'
-        })
+// 低代码校验规则（el-form 内置，仅必填）
+const answerRules = { answer: [{ required: true, message: '请输入验证码', trigger: 'blur' }] }
+
+// 对外暴露：提交登录 / 注册前调用，返回一次性 verifyToken；失败抛错（阻止提交）
+const verify = async () => {
+    // 已通过验证则复用缓存 token，避免重复后端校验（答案 key 校验成功后已删，重试会误报过期）
+    if (verifyToken.value) return verifyToken.value
+    // 行为类：未完成动作则拦截
+    if (!isTextType.value) {
+        throw new Error('请先完成验证码验证')
     }
-    return { answer: rules }
-})
-
-let verifyTimer = null
-// 输入自动校验：字符类满 4 位立即校验；算术类防抖 800ms 校验（无需手动按回车）
-watch(() => answerModel.answer, (val) => {
-    if (verified.value || verifying.value) return
-    const v = (val || '').trim()
-    if (!v) return
-    if (isArithmeticType.value) {
-        clearTimeout(verifyTimer)
-        verifyTimer = setTimeout(() => handleTextVerify(), 800)
-    } else if (v.length === 4) {
-        handleTextVerify()
+    // 文本类：先触发 el-form 前端校验（必填）
+    try {
+        await answerFormRef.value.validate()
+    } catch (e) {
+        throw new Error('请输入正确的验证码')
     }
-})
-
-onUnmounted(() => {
-    if (verifyTimer) clearTimeout(verifyTimer)
-})
-
-const handleTextVerify = async () => {
-    if (verified.value || verifying.value) return
     const v = (answerModel.answer || '').trim()
-    if (!v) return
-    if (!isArithmeticType.value && v.length !== 4) return
-    // 触发表单校验（低代码）
-    try { await answerFormRef.value.validate() } catch (e) { return }
     verifying.value = true
     try {
         const res = await captchaVerifyApi({ id: vo.id, type: props.type, answer: v })
-        if (res.code === 200 && res.data) {
-            verified.value = true
-            emit('success', res.data)
-        }
+        verifyToken.value = res.data
+        verified.value = true
+        return res.data
     } catch (e) {
+        // 后端校验失败：清空答案 + 刷新，提示交由拦截器
         answerModel.answer = ''
+        verifyToken.value = ''
         generate()
-        emit('fail')
+        throw e
     } finally {
         verifying.value = false
     }
 }
+defineExpose({ verify })
 
 const handleSliderVerify = async () => {
     verifying.value = true
@@ -323,11 +302,10 @@ const handleSliderVerify = async () => {
         const res = await captchaVerifyApi({ id: vo.id, type: props.type, track })
         if (res.code === 200 && res.data) {
             verified.value = true
-            emit('success', res.data)
+            verifyToken.value = res.data
         }
     } catch (e) {
         generate()
-        emit('fail')
     } finally {
         verifying.value = false
     }
@@ -348,12 +326,11 @@ const handleClickVerify = async () => {
         const res = await captchaVerifyApi({ id: vo.id, type: props.type, track })
         if (res.code === 200 && res.data) {
             verified.value = true
-            emit('success', res.data)
+            verifyToken.value = res.data
         }
     } catch (e) {
         clickPoints.value = []
         generate()
-        emit('fail')
     } finally {
         verifying.value = false
     }
