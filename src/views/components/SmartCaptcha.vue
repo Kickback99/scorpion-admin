@@ -64,9 +64,8 @@
                     :src="vo.templateImage"
                     class="captcha-piece"
                     draggable="false"
-                    :style="{ left: dragX + 'px', width: vo.templateImageWidth * scale + 'px', height: vo.templateImageHeight * scale + 'px' }"
+                    :style="{ left: pieceX + 'px', width: vo.templateImageWidth * scale + 'px', height: vo.templateImageHeight * scale + 'px' }"
                     alt="滑块"
-                    @pointerdown="onPointerDown"
                 >
                 <el-button
                     text
@@ -76,11 +75,22 @@
                     @click="generate"
                 ></el-button>
                 <div v-if="!vo.backgroundImage" class="captcha-placeholder">加载中…</div>
+
+                <!-- 底部滑块轨道 -->
+                <div class="captcha-slider-track">
+                    <div class="captcha-slider-fill" :style="{ width: fillWidth + 'px' }"></div>
+                    <span class="captcha-slider-hint" :class="{ 'is-success': verified }">
+                        {{ verified ? '验证成功!' : (isDragging ? '' : '按住滑块，拖动到最右侧') }}
+                    </span>
+                    <div class="captcha-slider-btn" :style="{ left: btnLeft + 'px' }" @pointerdown="onPointerDown">
+                        <el-icon><Right /></el-icon>
+                    </div>
+                </div>
             </div>
         </template>
 
-        <!-- ===== 验证通过遮罩 ===== -->
-        <div v-if="verified" class="captcha-success">
+        <!-- ===== 验证通过遮罩（文本/点选类型） ===== -->
+        <div v-if="verified && !isSliderType" class="captcha-success">
             <el-icon color="#67c23a" :size="20"><SuccessFilled /></el-icon>
             <span>验证通过</span>
         </div>
@@ -90,7 +100,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useEventListener, useElementSize } from '@vueuse/core'
-import { Refresh, Key, SuccessFilled } from '@element-plus/icons-vue'
+import { Refresh, Key, SuccessFilled, Right } from '@element-plus/icons-vue'
 import { captchaGenerateApi, captchaVerifyApi } from '@/api/captcha'
 
 // ============================================================
@@ -109,6 +119,7 @@ const emit = defineEmits(['success', 'fail'])
 const TEXT_TYPES = ['default', 'chinese', 'english', 'number', 'mixed', 'gif']
 const isTextType = computed(() => TEXT_TYPES.includes(props.type))
 const isClickType = computed(() => props.type === 'click')
+const isSliderType = computed(() => !isTextType.value && !isClickType.value)
 
 // 点选验证码需要点击的字符数（对应后端 StandardWordClickImageCaptchaGenerator.checkClickCount 默认值）
 const CLICK_COUNT = 4
@@ -144,6 +155,14 @@ const dragX = ref(0)
 const isDragging = ref(false)
 const trackList = ref([])
 const dragStartTime = ref(0)
+
+// 底部滑块轨道：按钮在轨道内拖动，拼图块按比例联动到 maxDrag
+const btnWidth = 40
+const maxHandleDrag = computed(() => Math.max(0, boxWidth.value - btnWidth))
+const pieceX = computed(() => (maxHandleDrag.value && maxDrag.value ? (dragX.value * maxDrag.value) / maxHandleDrag.value : 0))
+const fillWidth = computed(() => (verified.value ? boxWidth.value : dragX.value + btnWidth))
+const btnLeft = computed(() => (verified.value ? maxHandleDrag.value : dragX.value))
+
 let startClientX = 0
 let lastSampleAt = 0
 
@@ -158,18 +177,18 @@ const onPointerDown = (e) => {
 
 const onPointerMove = (e) => {
     if (!isDragging.value) return
-    dragX.value = Math.max(0, Math.min(e.clientX - startClientX, maxDrag.value))
+    dragX.value = Math.max(0, Math.min(e.clientX - startClientX, maxHandleDrag.value))
     const t = Date.now() - dragStartTime.value
     if (t - lastSampleAt < 8) return
     lastSampleAt = t
-    trackList.value.push({ x: Math.round(dragX.value / scale.value), y: 0, t })
+    trackList.value.push({ x: Math.round(pieceX.value / scale.value), y: 0, t })
 }
 
 const onPointerUp = () => {
     if (!isDragging.value) return
     isDragging.value = false
     const t = Date.now() - dragStartTime.value
-    trackList.value.push({ x: Math.round(dragX.value / scale.value), y: 0, t })
+    trackList.value.push({ x: Math.round(pieceX.value / scale.value), y: 0, t })
     if (trackList.value.length > 1) handleSliderVerify()
 }
 
@@ -349,6 +368,71 @@ const handleClickVerify = async () => {
             justify-content: center;
             color: var(--el-text-color-secondary);
             font-size: 12px;
+        }
+
+        .captcha-slider-track {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            margin-top: 6px;
+            background: var(--el-fill-color-light);
+            border-radius: 4px;
+            overflow: hidden;
+
+            .captcha-slider-fill {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                background: var(--el-color-success-light-8);
+                z-index: 1;
+            }
+
+            .captcha-slider-hint {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                color: var(--el-text-color-secondary);
+                pointer-events: none;
+                z-index: 2;
+
+                &.is-success {
+                    justify-content: flex-start;
+                    padding-left: 12px;
+                    color: var(--el-color-success);
+                    font-weight: 500;
+                }
+            }
+
+            .captcha-slider-btn {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+                background: #fff;
+                border: 1px solid var(--el-border-color);
+                border-radius: 4px;
+                color: var(--el-color-success);
+                cursor: grab;
+                touch-action: none;
+                user-select: none;
+                z-index: 3;
+
+                &:active {
+                    cursor: grabbing;
+                }
+            }
         }
     }
 
