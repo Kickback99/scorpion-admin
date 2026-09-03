@@ -3,15 +3,18 @@
         <!-- ===== 文本验证码（算术/中文/英文/数字/混合/GIF） ===== -->
         <template v-if="isTextType">
             <div class="captcha-text-row">
-                <img
-                    v-if="vo.backgroundImage"
-                    :src="vo.backgroundImage"
-                    class="captcha-text-img"
-                    alt="验证码"
-                    title="点击刷新"
-                    @click="generate"
-                >
-                <el-button text circle size="small" icon="Refresh" @click="generate" :disabled="verified"></el-button>
+                <div class="captcha-text-img-box" v-loading="!backgroundLoaded">
+                    <img
+                        v-if="vo.backgroundImage"
+                        :src="vo.backgroundImage"
+                        class="captcha-text-img"
+                        alt="验证码"
+                        title="点击刷新"
+                        @load="backgroundLoaded = true"
+                        @click="generate"
+                    >
+                </div>
+                <el-button v-if="backgroundLoaded" text circle size="small" icon="Refresh" @click="generate" :disabled="verified"></el-button>
             </div>
             <el-form ref="answerFormRef" :model="answerModel" :rules="answerRules" @submit.prevent>
                 <el-form-item prop="answer">
@@ -30,7 +33,7 @@
 
         <!-- ===== 点选验证码 ===== -->
         <template v-else-if="isClickType">
-            <div class="captcha-click-box">
+            <div class="captcha-click-box" v-loading="!backgroundLoaded">
                 <div ref="boxRef" class="captcha-click-bg">
                     <img
                         v-if="vo.backgroundImage"
@@ -38,6 +41,7 @@
                         class="captcha-click-bg-img"
                         :style="{ height: vo.backgroundImageHeight * scale + 'px' }"
                         alt="点选背景"
+                        @load="backgroundLoaded = true"
                         @click="onClickCaptcha"
                     >
                     <span
@@ -47,22 +51,24 @@
                         :style="{ left: p.x * scale + 'px', top: p.y * scale + 'px' }"
                     >{{ i + 1 }}</span>
                 </div>
-                <img v-if="vo.templateImage" :src="vo.templateImage" class="captcha-tip-img" alt="点选提示">
-                <el-button text circle size="small" class="captcha-click-refresh" icon="Refresh" @click="generate"></el-button>
-                <div class="captcha-click-hint">请在图中依次点击提示文字（{{ clickPoints.length }}/{{ CLICK_COUNT }}）</div>
+                <img v-if="vo.templateImage && backgroundLoaded" :src="vo.templateImage" class="captcha-tip-img" alt="点选提示">
+                <el-button v-if="backgroundLoaded" text circle size="small" class="captcha-click-refresh" icon="Refresh" @click="generate"></el-button>
+                <div v-if="backgroundLoaded" class="captcha-click-hint">请在图中依次点击提示文字（{{ clickPoints.length }}/{{ CLICK_COUNT }}）</div>
             </div>
         </template>
 
         <!-- ===== 滑块验证码 ===== -->
         <template v-else>
-            <div ref="boxRef" class="captcha-slider-box">
+            <div ref="boxRef" class="captcha-slider-box" v-loading="!backgroundLoaded">
                 <img
                     v-if="vo.backgroundImage"
                     :src="vo.backgroundImage"
                     class="captcha-bg"
                     :style="{ height: vo.backgroundImageHeight * scale + 'px' }"
                     alt="滑块背景"
+                    @load="backgroundLoaded = true"
                 >
+                <div v-if="!vo.backgroundImage" class="captcha-bg-placeholder"></div>
                 <img
                     v-if="vo.templateImage"
                     :src="vo.templateImage"
@@ -72,6 +78,7 @@
                     alt="滑块"
                 >
                 <el-button
+                    v-if="backgroundLoaded"
                     text
                     circle
                     size="small"
@@ -79,10 +86,8 @@
                     icon="Refresh"
                     @click="generate"
                 ></el-button>
-                <div v-if="!vo.backgroundImage" class="captcha-placeholder">加载中…</div>
-
                 <!-- 底部滑块轨道 -->
-                <div class="captcha-slider-track">
+                <div v-if="backgroundLoaded" class="captcha-slider-track">
                     <div class="captcha-slider-fill" :style="{ width: fillWidth + 'px' }"></div>
                     <span class="captcha-slider-hint" :class="{ 'is-success': verified }">
                         {{ verified ? '验证成功!' : (isDragging ? '' : '拖动滑块完成拼图') }}
@@ -142,6 +147,8 @@ const verifying = ref(false)
 const verified = ref(false)
 // 校验通过后签发的一次性 verifyToken（提交登录 / 注册时消费）
 const verifyToken = ref('')
+// 背景图加载状态：generate 时置 false，背景图 onload 置 true（驱动 v-loading 与行为类交互显隐）
+const backgroundLoaded = ref(false)
 
 // ============================================================
 // 展示缩放（背景图按容器宽度等比缩放，轨迹/点选坐标换算回自然像素）
@@ -223,6 +230,7 @@ const onClickCaptcha = (e) => {
 const generate = async () => {
     verified.value = false
     verifying.value = true
+    backgroundLoaded.value = false
     try {
         const res = await captchaGenerateApi(props.type)
         if (res.code === 200 && res.data) {
@@ -234,6 +242,8 @@ const generate = async () => {
         verifyToken.value = ''
     } catch (e) {
         console.error('生成验证码失败:', e)
+        // 失败时保留旧图：恢复已加载状态，避免 loading 卡住
+        backgroundLoaded.value = true
     } finally {
         verifying.value = false
     }
@@ -347,12 +357,20 @@ const handleClickVerify = async () => {
         display: flex;
         align-items: center;
         gap: 4px;
-        margin-bottom: 4px;
+        margin-bottom: 10px;
+
+        .captcha-text-img-box {
+            min-width: 100px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
         .captcha-text-img {
             height: 40px;
             cursor: pointer;
-            border: 1px solid var(--el-border-color);
             border-radius: 4px;
         }
     }
@@ -369,6 +387,11 @@ const handleClickVerify = async () => {
             display: block;
         }
 
+        .captcha-bg-placeholder {
+            width: 100%;
+            aspect-ratio: 600 / 240;
+        }
+
         .captcha-piece {
             position: absolute;
             top: 0;
@@ -383,16 +406,6 @@ const handleClickVerify = async () => {
             top: 2px;
             right: 2px;
             z-index: 10;
-        }
-
-        .captcha-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--el-text-color-secondary);
-            font-size: 12px;
         }
 
         .captcha-slider-track {
@@ -474,6 +487,7 @@ const handleClickVerify = async () => {
         .captcha-click-bg {
             position: relative;
             width: 100%;
+            aspect-ratio: 600 / 240;
             cursor: pointer;
 
             .captcha-click-bg-img {
@@ -524,6 +538,14 @@ const handleClickVerify = async () => {
         z-index: 20;
         border-radius: 4px;
         pointer-events: none;
+    }
+
+    // 加载态：浅白背景降低不透明度 + spinner 尺寸缩小（改 CSS 变量，尺寸与垂直居中同时生效）
+    :deep(.el-loading-mask) {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    :deep(.el-loading-spinner) {
+        --el-loading-spinner-size: 24px;
     }
 }
 </style>
