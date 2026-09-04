@@ -108,6 +108,7 @@ export const useConfigStore = defineStore({
         theme: 0,
         anchor_enabled: true,
         favorite_count_enabled: true,
+        toc_position: 'outer'
       },
       article_list: {
         view_enabled: true,
@@ -545,6 +546,9 @@ export const useConfigStore = defineStore({
     getFavoriteCountEnabled()      { return this.getValue('article_detail.favorite_count_enabled') ?? true },
     toggleFavoriteCountEnabled()   { this.updateConfig('article_detail.favorite_count_enabled', !this.getValue('article_detail.favorite_count_enabled')) },
 
+    getTocPosition()               { return this.getValue('article_detail.toc_position') || 'outer'},
+    setTocPosition(v)              { this.updateConfig('article_detail.toc_position', v) },
+
     // ==================== article_list ====================
 
     getListViewEnabled()           { return this.getValue('article_list.view_enabled') ?? true },
@@ -670,6 +674,7 @@ export const useConfigStore = defineStore({
     currentArticleTheme()     { const v = this.getValue('article_detail.theme'); return v === 0 ? 'github' : 'vuepress' },
     isAnchorEnabled()         { return this.getValue('article_detail.anchor_enabled') ?? true },
     isFavoriteCountEnabled()  { return this.getValue('article_detail.favorite_count_enabled') ?? true },
+    isTocPosition()           { return this.getValue('article_detail.toc_position') || 'outer'},
 
     // ===== article_list (client 组) =====
     isListViewEnabled()       { return this.getValue('article_list.view_enabled') ?? true },
