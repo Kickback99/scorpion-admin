@@ -229,6 +229,9 @@ const tagOnClick = (item) => {
 
 // 删除单个标签页
 const removeTab = (targetName) => {
+  // 仪表盘标签不可关闭
+  if (targetName === '/index') return
+
   const currentTabs = tabs.value
   let activeName = activeTab.value
 
@@ -446,6 +449,8 @@ const closeRightTabs = (currentTab) => {
 const closeOtherTabs = (currentTab) => {
   // 获取仪表盘标签（路径为 '/index'）
   const homeTab = tabs.value.find(tab => tab.path === '/index')
+  // 下拉菜单传入的 currentTab 只有 path，需取回完整标签数据（含 title/fullPath）
+  const targetTab = tabs.value.find(tab => tab.path === currentTab.path) || currentTab
 
   // 确保保留仪表盘和当前标签页
   const tabsToKeep = []
@@ -456,12 +461,12 @@ const closeOtherTabs = (currentTab) => {
   }
 
   // 添加当前标签页（如果不是仪表盘）
-  if (currentTab.path !== '/index') {
-    tabsToKeep.push(currentTab)
+  if (targetTab.path !== '/index') {
+    tabsToKeep.push(targetTab)
   }
 
   // 如果仪表盘不存在，创建仪表盘标签
-  if (!homeTab && currentTab.path !== '/index') {
+  if (!homeTab && targetTab.path !== '/index') {
     tabsToKeep.unshift({
       path: '/index',
       fullPath: '/index',
@@ -473,9 +478,9 @@ const closeOtherTabs = (currentTab) => {
   tabStore.tabList = tabsToKeep
 
   // 路由跳转
-  if (route.path !== currentTab.path && currentTab.path !== '/index') {
-    router.push(currentTab.fullPath || currentTab.path)
-  } else if (route.path !== '/index' && currentTab.path === '/index') {
+  if (route.path !== targetTab.path && targetTab.path !== '/index') {
+    router.push(targetTab.fullPath || targetTab.path)
+  } else if (route.path !== '/index' && targetTab.path === '/index') {
     router.push('/index')
   }
 
