@@ -207,6 +207,9 @@ const ensureHomeTabExists = () => {
       fullPath: '/index',
       title: '仪表盘'
     })
+  } else if (homeTab.title !== '仪表盘') {
+    // 修正旧版本遗留的「首页」标题，统一为「仪表盘」
+    homeTab.title = '仪表盘'
   }
 }
 
