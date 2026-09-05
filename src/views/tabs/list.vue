@@ -115,6 +115,7 @@
 import { useTabStore } from '@/store/tabs';
 import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { cleanupTabsByCurrentRoutes } from '@/router';
 import { onClickOutside } from '@vueuse/core';
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
@@ -383,10 +384,10 @@ const handleContextMenu = (command) => {
   
   switch (command) {
     case 'refresh':
-      /* router.replace({
-        path: '/redirect' + route.fullPath
-      }) */
-      window.location.reload()
+      // 仅重载当前标签页（销毁重建 router-view，非整页刷新）
+      settingStore.refresh = !settingStore.refresh
+      // 清理不在当前路由表中的无权限标签页
+      cleanupTabsByCurrentRoutes()
       break
     case 'closeCurrent':
       removeTab(currentContextMenuTab.value.path)
@@ -409,10 +410,10 @@ const handleContextMenu = (command) => {
 const handleCommand = (command) => {
   switch (command) {
     case 'refresh':
-      /* router.replace({
-        path: '/redirect' + route.fullPath
-      }) */
-      window.location.reload()
+      // 仅重载当前标签页（销毁重建 router-view，非整页刷新）
+      settingStore.refresh = !settingStore.refresh
+      // 清理不在当前路由表中的无权限标签页
+      cleanupTabsByCurrentRoutes()
       break
     case 'closeCurrent':
       removeTab(route.path)
