@@ -487,12 +487,14 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
           font-size: 13px;
           color: var(--el-text-color-secondary);
           margin-bottom: 4px;
+          white-space: nowrap;
         }
 
         .stat-chip-value {
           font-size: 26px;
           font-weight: 700;
           color: var(--el-text-color-primary);
+          white-space: nowrap;
         }
       }
 
@@ -582,6 +584,7 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
   // ===== 图表 =====
   .section-row, .charts-row {
     margin-bottom: 14px;
+    row-gap: 14px; // 移动端图表上下堆叠时的间距（桌面单行时无影响）
 
     :deep(.el-card) { height: 100%; border-radius: 10px; border: none; }
 
@@ -600,7 +603,29 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
 @media (max-width: 991px) {
   .dashboard .top-card .top-content {
     flex-direction: column;
+    align-items: stretch; // 替代桌面端的 center
     gap: 16px;
+  }
+}
+
+// 移动端（≤768px）：图表头部换行，日期范围下移一行，避免与箭头按钮拥挤
+@media (max-width: 768px) {
+  .dashboard .section-row .chart-header {
+    flex-wrap: wrap;
+
+    // 日期范围排到箭头之后（order:2），超出第一行宽度即自动换到第二行，保持自然宽度
+    :deep(.chart-period) {
+      order: 2;
+    }
+  }
+
+  // 顶部卡片标题与正文在移动端缩小字号
+  .dashboard .top-card .profile-section .greeting {
+    font-size: 16px;
+  }
+
+  .dashboard .top-card .profile-section .hitokoto {
+    font-size: 13px;
   }
 }
 </style>
