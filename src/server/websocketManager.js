@@ -1,8 +1,11 @@
 import { ElMessageBox } from 'element-plus'
 import { useTokenStore } from '@/store/token'
 import { useUserStore } from '@/store/user'
+import { useUserConfigStore } from '@/store/userConfig'
+import { useUiStore } from '@/store/ui'
 import router from '@/router';
 import { useConfigStore } from '@/store/config';
+import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 
 class WebSocketManager {
@@ -337,12 +340,19 @@ class WebSocketManager {
   // 统一的退出和跳转
   logoutAndRedirect() {
     this.close()
-    
+
     const tokenStore = useTokenStore()
     const userStore = useUserStore()
-    
+    const userConfigStore = useUserConfigStore()
+    const uiStore = useUiStore()
+
     tokenStore.removeToken()
     userStore.clearUserStore()
+    // 暂存主题到 uiStore（登录页读取用），再清除用户配置
+    uiStore.setLastTheme(userConfigStore.theme)
+    userConfigStore.clearUserConfig()
+    document.documentElement.classList.remove('dark')
+    applyTheme('default', false)
     router.push('/login')
   }
 
