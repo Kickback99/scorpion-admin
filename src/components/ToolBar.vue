@@ -27,7 +27,7 @@
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
                 <el-avatar :src="handleAvatar"/>
-                {{ userStore.userInfo.nickname || userStore.userInfo.username }}
+                <span class="user-name">{{ userStore.userInfo.nickname || userStore.userInfo.username }}</span>
                 <el-icon><component is="ArrowDown"></component></el-icon>
             </span>
             <template #dropdown>
@@ -463,6 +463,23 @@ const onTextColorModeChange = (mode) => {
 @media (max-width: 1250px) {
   :deep(.smart-menu-search .search-input-row) {
     width: 130px;
+  }
+}
+
+// 移动端（≤768px）隐藏用户名，防止搜索框断行
+@media (max-width: 768px) {
+  .user-name {
+    display: none;
+  }
+
+  .el-dropdown_box .el-avatar {
+    --el-avatar-size: 32px;
+    margin-right: 3px;
+  }
+
+  // 进一步压缩搜索框宽度，避免与刷新/全屏按钮拥挤断行
+  :deep(.smart-menu-search .search-input-row) {
+    width: 110px;
   }
 }
 
