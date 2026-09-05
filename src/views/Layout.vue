@@ -356,6 +356,11 @@ html.dark .main-container:not(.page-theme) {
 // 移动端（≤768px）：侧边栏切换为浮层
 // ============================================================
 @media (max-width: 768px) {
+  // 压缩顶部工具栏左右内边距，避免搜索框被挤出换行
+  .el-header {
+    padding: 0 12px;
+  }
+
   // 侧边栏脱离文档流，主容器自动占满全宽，无需避让
   .el-aside.mobile-sidebar {
     position: fixed;
