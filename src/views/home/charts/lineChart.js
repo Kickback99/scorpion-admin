@@ -36,6 +36,7 @@ export const createLineChart = (props = {}) => {
       cssVar('--el-color-warning'),
     ],
     tooltip: {
+      trigger: 'axis',
       axisPointer: { type: 'cross' },
       backgroundColor: cssVar('--el-bg-color-overlay'),
       textStyle:{
@@ -45,7 +46,6 @@ export const createLineChart = (props = {}) => {
       },
       borderWidth: 0,
       extraCssText: 'font-size:12px;',
-      formatter: '{a}: {c}'
     },
     legend: {
       right: 10,
