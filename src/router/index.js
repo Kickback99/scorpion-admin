@@ -330,7 +330,7 @@ const getStoredMenuRoutes = () => {
   return new Set(router.getRoutes().map(route => route.path))
 }
 
-const cleanupTabsByCurrentRoutes = () => {
+export const cleanupTabsByCurrentRoutes = () => {
   nextTick(() => {
     const allPaths = new Set(router.getRoutes().map(route => route.path))
     useSettingStore().cleanupTabsByMenu(allPaths)
