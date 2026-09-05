@@ -21,57 +21,62 @@ let themeObserver = null
 const cssVar = (name) => getComputedStyle(document.documentElement)
   .getPropertyValue(name).trim()
 
-const buildOption = () => ({
-  color: [
-    cssVar('--el-color-chart-0'),
-    cssVar('--el-color-chart-1'),
-    cssVar('--el-color-chart-2'),
-    cssVar('--el-color-chart-3'),
-    cssVar('--el-color-chart-4'),
-    cssVar('--el-color-chart-5'),
-    cssVar('--el-color-chart-6'),
-    cssVar('--el-color-chart-7'),
-    cssVar('--el-color-chart-8'),
-    cssVar('--el-color-chart-9'),
-  ],
-  tooltip: {
-    trigger: 'item',
-    borderWidth: 0,
-    borderRadius: 8,
-    padding: [8, 12],
-    backgroundColor: cssVar('--el-bg-color-overlay'),
-    textStyle:{
-      color: cssVar('--el-text-color-regular'),
+const buildOption = () => {
+  const isMobile = window.innerWidth < 768
+  const isMedium = window.innerWidth < 992
+
+  return {
+    color: [
+      cssVar('--el-color-chart-0'),
+      cssVar('--el-color-chart-1'),
+      cssVar('--el-color-chart-2'),
+      cssVar('--el-color-chart-3'),
+      cssVar('--el-color-chart-4'),
+      cssVar('--el-color-chart-5'),
+      cssVar('--el-color-chart-6'),
+      cssVar('--el-color-chart-7'),
+      cssVar('--el-color-chart-8'),
+      cssVar('--el-color-chart-9'),
+    ],
+    tooltip: {
+      trigger: 'item',
+      borderWidth: 0,
+      borderRadius: 8,
+      padding: [8, 12],
+      backgroundColor: cssVar('--el-bg-color-overlay'),
+      textStyle:{
+        color: cssVar('--el-text-color-regular'),
+      },
+      extraCssText: 'font-size:12px;',
+      formatter: '{b}: {c} ({d}%)',
     },
-    extraCssText: 'font-size:12px;',
-    formatter: '{b}: {c} ({d}%)',
-  },
-  legend: {
-    orient: 'vertical',
-    right: 10,
-    top: 'center',
-    textStyle: { color: cssVar('--el-text-color-regular'), fontSize: 12 },
-    formatter: (name) => {
-      const item = props.seriesData.find((d) => d.name === name)
-      return `${name}  ${item?.value ?? 0}`
+    legend: {
+      // 移动端图例下移，避免与饼图主体左右拥挤
+      orient: isMobile ? 'horizontal' : 'vertical',
+      ...(isMobile ? { left: 'center', bottom: 0 } : { right: 10, top: 'center' }),
+      textStyle: { color: cssVar('--el-text-color-regular'), fontSize: isMobile ? 11 : 12 },
+      formatter: (name) => {
+        const item = props.seriesData.find((d) => d.name === name)
+        return `${name}  ${item?.value ?? 0}`
+      },
     },
-  },
-  series: [{
-    name: '分类统计',
-    type: 'pie',
-    radius: window.innerWidth < 992 ? ['30%', '55%'] : ['40%', '70%'],
-    center: window.innerWidth < 992 ? ['32%', '50%'] : ['40%', '50%'],
-    avoidLabelOverlap: false,
-    padAngle: 2,
-    itemStyle: {
-      borderRadius: 10,
-      borderColor: 'transparent',
-      borderWidth: 2,
-    },
-    label: { show: false },
-    data: props.seriesData.map(({ name, value }) => ({ name, value })),
-  }],
-})
+    series: [{
+      name: '分类统计',
+      type: 'pie',
+      radius: isMobile ? ['30%', '58%'] : isMedium ? ['28%', '52%'] : ['40%', '70%'],
+      center: isMobile ? ['50%', '42%'] : isMedium ? ['28%', '50%'] : ['40%', '50%'],
+      avoidLabelOverlap: false,
+      padAngle: 2,
+      itemStyle: {
+        borderRadius: 10,
+        borderColor: 'transparent',
+        borderWidth: 2,
+      },
+      label: { show: false },
+      data: props.seriesData.map(({ name, value }) => ({ name, value })),
+    }],
+  }
+}
 
 // ============================================================
 // 渲染

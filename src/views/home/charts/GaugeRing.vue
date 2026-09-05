@@ -26,6 +26,7 @@ const props = defineProps({
 const chartRef = ref(null)
 let chartInstance = null
 let themeObserver = null
+let resizeObserver = null
 
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 
@@ -63,12 +64,15 @@ const renderChart = () => {
 onMounted(() => {
   renderChart()
   window.addEventListener('resize', () => chartInstance?.resize())
+  resizeObserver = new ResizeObserver(() => chartInstance?.resize())
+  resizeObserver.observe(chartRef.value)
   themeObserver = new MutationObserver(renderChart)
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', () => chartInstance?.resize())
+  resizeObserver?.disconnect()
   themeObserver?.disconnect()
   chartInstance?.dispose()
   chartInstance = null
@@ -101,5 +105,12 @@ onUnmounted(() => {
 
 .gauge-label {
   margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--el-text-color-regular);
+}
+
+// 移动端（≤768px）：缩小仪表盘主体，避免 3 个并排溢出
+@media (max-width: 768px) {
+  .gauge-chart { width: 80px; height: 80px; }
+  .gauge-center { width: 48px; height: 48px; }
+  .gauge-value { font-size: 14px; }
 }
 </style>

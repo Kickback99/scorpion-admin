@@ -24,6 +24,6 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-.gauge-title { font-size: 15px; font-weight: 500; color: var(--el-text-color-primary); }
+.gauge-title { font-size: 15px; font-weight: 600; color: var(--el-text-color-primary); }
 .gauge-row { display: flex; justify-content: space-around; align-items: flex-start; padding: 12px 0; }
 </style>
