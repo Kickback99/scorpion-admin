@@ -80,6 +80,11 @@ instance.interceptors.request.use(
 // 添加响应拦截器
 instance.interceptors.response.use(
     res=>{
+        // 文件下载等 blob 响应没有 code/message 结构，直接透传，避免被下方业务码判断误伤
+        if (res.config.responseType === 'blob' || res.data instanceof Blob) {
+            return res.data
+        }
+
         if(res.data.code === 0 || res.data.code === 200){
             return res.data
         }
