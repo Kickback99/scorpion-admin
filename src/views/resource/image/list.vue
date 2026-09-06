@@ -98,10 +98,10 @@
           <div v-show="hoveredId === img.id" class="image-footer-actions">
             <el-button size="small" type="primary" @click.stop="openPreview(index)" plain>预览</el-button>
             <el-button size="small" type="warning" @click.stop="handleCopy(img)" plain>复制</el-button>
-            <!-- 占位：下载 -->
+            <!-- 下载 -->
             <el-button size="small" type="success" @click.stop="handleDownload(img)" plain>下载</el-button>
-            <!-- 占位：删除 -->
-            <el-button size="small" type="danger" plain>删除</el-button>
+            <!-- 设为登录页背景 -->
+            <el-button size="small" type="info" @click.stop="handleSetBackground(img)" plain>背景</el-button>
           </div>
           <el-tag :type="getFileTypeTag(img.fileType)" size="small">
             {{ getFileTypeLabel(img.fileType) }}
@@ -158,6 +158,7 @@ import { loadPinyinMatch } from '@/utils/pinyinMatch'
 // 5. API
 import { fileMetaListApi } from '@/api/filemeta'
 import { getAllBusinessDataApi } from '@/api/business'
+import { useSettingStore } from '@/setting'
 
 // ============================================================
 // 数据
@@ -170,6 +171,7 @@ const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(24)
 const hoveredId = ref(null)
+const settingStore = useSettingStore()
 
 // 筛选条件
 const currentImageType = ref('all')
@@ -421,6 +423,15 @@ const handleDownload = async (img) => {
   } catch {
     window.open(img.img, '_blank')
   }
+}
+
+// ============================================================
+// 设置登录页背景
+// ============================================================
+
+const handleSetBackground = (img) => {
+  settingStore.setLoginBgUrl(img.img)
+  msg.primary('已设为登录页背景')
 }
 
 // ============================================================

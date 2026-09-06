@@ -82,9 +82,11 @@
         </el-table-column>
         <el-table-column prop="ext" label="扩展名" min-width="90" />
         <el-table-column prop="size" label="文件大小" min-width="100" />
-        <!-- <el-table-column prop="url" label="文件链接" /> -->
-        <el-table-column prop="md5" label="文件md5" min-width="130" />
-        <el-table-column prop="status" label="文件状态" min-width="100"></el-table-column>
+        <el-table-column label="文件UUID" min-width="230" show-overflow-tooltip>
+            <template #default="{ row }">
+                {{ getFileUUID(row.url).replace(/\.[^.]+$/, '') }}
+            </template>
+        </el-table-column>
         <el-table-column prop="createTime" label="创建日期" min-width="180"></el-table-column>
         <el-table-column label="操作" width="190" fixed="right">
             <template #default="{row}">
@@ -249,11 +251,11 @@ const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/resource/file/upload`
 })
 
+// 从存储的完整 URL 中提取文件 UUID（末段，如 f7439983...jpg）
+const getFileUUID = (url) => url.substring(url.lastIndexOf('/') + 1)
+
 // 图片预览地址：公开只读接口（顶级路径 /resource/file/preview），两模式统一走 preview + 可长缓存
-const resolvePreviewUrl = (url) => {
-  const fileUUID = url.substring(url.lastIndexOf('/') + 1)
-  return `/resource/file/preview/${fileUUID}`
-}
+const resolvePreviewUrl = (url) => `/resource/file/preview/${getFileUUID(url)}`
 
 // t_file_request：设置登录页背景（把当前图片设为登录页动态背景）
 const handleSetBackground = (row) => {
@@ -264,7 +266,7 @@ const handleSetBackground = (row) => {
 // t_file_request：文件下载请求
 const handleDownload = async(row) => {
     // 取 URL 末段作为 fileUUID（url 形如 http://host/resource/file/download/{uuid}.{ext}）
-    const fileUUID = row.url.substring(row.url.lastIndexOf('/') + 1)
+    const fileUUID = getFileUUID(row.url)
     // 走 axios 下载：jwt 模式自动带 authorization 头，cookie 模式自动带 HttpOnly Cookie
     const blob = await downloadApi(fileUUID)
     const href = URL.createObjectURL(blob)
