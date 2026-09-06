@@ -128,7 +128,7 @@
 
 <script setup>
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi} from '@/api/file';
+import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi, downloadApi} from '@/api/file';
 import msg from '@/components/msg';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { useTokenStore } from '@/store/token';
@@ -239,9 +239,18 @@ const handleAction = computed(()=>{
 
 // t_file_request：文件下载请求
 const handleDownload = async(row) => {
-    console.log(row.url)
-    // const url = row.url.substring(row.url.lastIndexOf('/')+1)
-    window.open(row.url)
+    // 取 URL 末段作为 fileUUID（url 形如 http://host/resource/file/download/{uuid}.{ext}）
+    const fileUUID = row.url.substring(row.url.lastIndexOf('/') + 1)
+    // 走 axios 下载：jwt 模式自动带 authorization 头，cookie 模式自动带 HttpOnly Cookie
+    const blob = await downloadApi(fileUUID)
+    const href = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = href
+    a.download = row.name ? `${row.name}.${row.ext}` : fileUUID
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(href)
 }
 
 // 文件预检查

@@ -13,7 +13,7 @@ const API = {
 
 export const listApi = (pageNum,pageSize,searchData) => request.get(`${API.FILE_PAGE}/${pageNum}/${pageSize}`,{params:searchData})
 export const extsApi = () => request.get(API.FILE_EXTS)
-// export const downloadApi = (fileUUID) => request.get(`${API.FILE_DOWNLOAD}/${fileUUID}`)
+export const downloadApi = (fileUUID) => request.get(`${API.FILE_DOWNLOAD}/${fileUUID}`, { responseType: 'blob' })
 export const syncDeleteApi = () => request.delete(`${API.FILE_SYNC_DELETE}`)
 export const removeApi = (ids) => request.delete(`${API.FILE_DELETE}/${ids}`)
 export const updateRecordApi = () => request.post(API.FILE_UPDATE_RECORDS)
