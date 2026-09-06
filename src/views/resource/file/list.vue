@@ -76,7 +76,7 @@
         <el-table-column prop="name" label="文件名称" min-width="150" />
         <el-table-column label="图片" min-width="120">
             <template #default="{ row }">
-                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolveFileUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolveFileUrl(row.url)]" />
+                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolvePreviewUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolvePreviewUrl(row.url)]" />
                 <span v-else>-</span>
             </template>
         </el-table-column>
@@ -86,7 +86,7 @@
         <el-table-column prop="md5" label="文件md5" min-width="130" />
         <el-table-column prop="status" label="文件状态" min-width="100"></el-table-column>
         <el-table-column prop="createTime" label="创建日期" min-width="180"></el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="190" fixed="right">
             <template #default="{row}">
                 <el-button size="small" type="warning" v-perm="'btn.file.update'" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"
@@ -95,6 +95,7 @@
                         <el-button size="small" type="danger" v-perm="'btn.file.remove'" icon="Delete" circle plain />
                     </template>
                 </el-popconfirm>
+                <el-button size="small" type="info" icon="FullScreen" @click="handleSetBackground(row)" circle plain :disabled="!IMAGE_EXTS.includes(row.ext)"></el-button>
                 <el-button size="small" type="success" icon="Download" @click="handleDownload(row)" circle plain></el-button>
             </template>
         </el-table-column>
@@ -138,9 +139,11 @@ import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi, d
 import msg from '@/components/msg';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { useTokenStore } from '@/store/token';
+import { useSettingStore } from '@/setting';
 import { isCookieMode } from '@/utils/auth';
 import offlineIcon from '@/components/MyIcon/src/offlineIcon';
 const tokenStore = useTokenStore()
+const settingStore = useSettingStore()
 const searchData = reactive({
         sortField: 'create_time',  // 保留默认排序字段
         sortOrder: 'DESC'           // 保留默认排序方向
@@ -246,10 +249,16 @@ const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/resource/file/upload`
 })
 
-// 图片预览地址：走内部代理接口（/back 前缀），避免硬编码 localhost:8800 导致 host 不一致（127.0.0.1 vs localhost）
-const resolveFileUrl = (url) => {
+// 图片预览地址：公开只读接口（顶级路径 /resource/file/preview），两模式统一走 preview + 可长缓存
+const resolvePreviewUrl = (url) => {
   const fileUUID = url.substring(url.lastIndexOf('/') + 1)
-  return `${import.meta.env.VITE_API}/resource/file/download/${fileUUID}`
+  return `/resource/file/preview/${fileUUID}`
+}
+
+// t_file_request：设置登录页背景（把当前图片设为登录页动态背景）
+const handleSetBackground = (row) => {
+  settingStore.setLoginBgUrl(resolvePreviewUrl(row.url))
+  msg.primary('已设为登录页背景')
 }
 
 // t_file_request：文件下载请求
