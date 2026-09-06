@@ -8,6 +8,12 @@
                 <SmartSelector v-model="searchData.ext" :data="exts" style="width: 200px;" placeholder="请选择扩展名">
                 </SmartSelector>
             </el-form-item>
+            <el-form-item label="下载模式">
+                <el-radio-group v-model="downloadMode" size="small">
+                    <el-radio label="uuid">UUID模式</el-radio>
+                    <el-radio label="name">原始名称</el-radio>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item>
                 <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序">
                 </SmartSelector>
@@ -70,7 +76,7 @@
         <el-table-column prop="name" label="文件名称" min-width="150" />
         <el-table-column label="图片" min-width="120">
             <template #default="{ row }">
-                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="row.url" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[row.url]" />
+                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolveFileUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolveFileUrl(row.url)]" />
                 <span v-else>-</span>
             </template>
         </el-table-column>
@@ -169,6 +175,9 @@ const setSortOrder = (order) => {
 
 const IMAGE_EXTS = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"]
 
+// 下载文件名模式：uuid（存储的 UUID 文件名）/ name（上传时的原始名称），默认 uuid
+const downloadMode = ref('uuid')
+
 const exts = ref([])
 
 // t_file_request：文件列表请求
@@ -237,6 +246,12 @@ const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/resource/file/upload`
 })
 
+// 图片预览地址：走内部代理接口（/back 前缀），避免硬编码 localhost:8800 导致 host 不一致（127.0.0.1 vs localhost）
+const resolveFileUrl = (url) => {
+  const fileUUID = url.substring(url.lastIndexOf('/') + 1)
+  return `${import.meta.env.VITE_API}/resource/file/download/${fileUUID}`
+}
+
 // t_file_request：文件下载请求
 const handleDownload = async(row) => {
     // 取 URL 末段作为 fileUUID（url 形如 http://host/resource/file/download/{uuid}.{ext}）
@@ -246,7 +261,8 @@ const handleDownload = async(row) => {
     const href = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = href
-    a.download = row.name ? `${row.name}.${row.ext}` : fileUUID
+    // 下载文件名：uuid 模式用存储的文件名，name 模式用上传时的原始名称
+    a.download = downloadMode.value === 'name' && row.name ? `${row.name}.${row.ext}` : fileUUID
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
