@@ -22,6 +22,8 @@ export const useSettingStore = defineStore({
         pageTheme: false,
         /** 灵动模式：标签主题+菜单主题+深色plain，统一跟随 */
         dynamicMode: false,
+        /** 登录页动态背景（图片预览 URL，空则回退 $login-bg 默认背景） */
+        loginBgUrl: '',
     }),
     actions:{
         setMenuTextColor(data){
@@ -29,6 +31,9 @@ export const useSettingStore = defineStore({
         },
         setLogoutIntent(val) {
             this.logoutIntent = val
+        },
+        setLoginBgUrl(val) {
+            this.loginBgUrl = val
         },
         /** 根据已注册路由移除不存在的标签页（由 router/index.js 传入路径集合） */
         cleanupTabsByMenu(routePaths) {
@@ -42,7 +47,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuAccordion', 'menuThemeColor', 'pageTheme', 'dynamicMode'],
+        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuAccordion', 'menuThemeColor', 'pageTheme', 'dynamicMode', 'loginBgUrl'],
     },
 })
 
