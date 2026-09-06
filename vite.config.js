@@ -52,6 +52,11 @@ export default defineConfig(({mode}) => {
             });
           } */
         },
+        // 文件图片预览（公开只读，顶级路径），本地开发直达后端
+        '/resource/file/preview': {
+          target: env.VITE_HOST,
+          changeOrigin: true,
+        },
         [env.VITE_API]: {
           target: env.VITE_HOST, // 后端服务器地址
           changeOrigin: true, // 是否改变请求域名
