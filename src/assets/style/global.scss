@@ -36,14 +36,6 @@ $code-color:var(--el-text-color-regular);
   transform: none !important;
 }
 
-// 移动端：消息提示显示在顶部中间
-@media (max-width: 768px) {
-  .message-right-top {
-    inset: 30px auto auto 50% !important;
-    transform: translateX(-50%) !important;
-  }
-}
-
 
 // flex函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
