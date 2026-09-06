@@ -374,6 +374,7 @@ onMounted(async() => {
 .additional-info {
   margin-top: 20px;
   font-size: 12px;
+  row-gap: 20px; /* 移动端卡片上下堆叠时的间距，与个人信息卡片间距一致（桌面单行时无影响） */
 }
 
 .info-list {
