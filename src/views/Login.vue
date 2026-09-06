@@ -61,7 +61,16 @@ const captchaRef = ref(null)
 // 响应式移动端检测：移动端背景图居中，露出中间细节
 const isMobile = ref(false)
 const mediaQuery = window.matchMedia('(max-width: 768px)')
-const loginBgStyle = computed(() => isMobile.value ? { backgroundPosition: 'center' } : {})
+// 动态登录页背景：读 settingStore 的 loginBgUrl，预加载成功才覆盖，失败/限流回退 $login-bg
+const settingStore = useSettingStore()
+const loginBgImage = ref('')
+const loginBgStyle = computed(() => {
+    const style = isMobile.value ? { backgroundPosition: 'center' } : {}
+    if (loginBgImage.value) {
+        style.backgroundImage = `url(${loginBgImage.value})`
+    }
+    return style
+})
 
 // 管理员账密提示：仅本地开发环境（development / local-cookie）显示，test/prod 不显示
 const showAdminHint = ['development', 'local-cookie'].includes(import.meta.env.MODE)
@@ -123,7 +132,6 @@ const handleLogin = async() => {
         msg.primary('登录成功')
     }
     // 处理重定向：主动退出 → 仪表盘；越权拦截 → 跟随 redirect
-    const settingStore = useSettingStore()
     if (settingStore.logoutIntent) {
         settingStore.setLogoutIntent(false)
         router.push('/')
@@ -189,6 +197,15 @@ onMounted(()=>{
     isMobile.value = mediaQuery.matches
     mediaQuery.addEventListener('change', handleMediaChange)
     loadCaptchaConfig()
+
+    // 动态背景预加载：加载成功才生效，失败/读不到图回退 $login-bg
+    const bgUrl = settingStore.loginBgUrl
+    if (bgUrl) {
+        const img = new Image()
+        img.onload = () => { loginBgImage.value = bgUrl }
+        img.onerror = () => { loginBgImage.value = '' }
+        img.src = bgUrl
+    }
 
     if (tokenStore.hasSavedCredentials()) {
         formModel.value.username = tokenStore.savedUsername
