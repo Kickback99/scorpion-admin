@@ -299,7 +299,7 @@ function addDynamicRoutes(routerData){
 
 const modules = import.meta.glob('../views/temp/*.vue')
 
-const routerData = Object.entries(modules).map(([filePath, component]) => {
+export const tempRoutes = Object.entries(modules).map(([filePath, component]) => {
     // 提取文件名（不含扩展名）
     const fileName = filePath.split('/').pop().replace('.vue', '')
     
@@ -311,7 +311,7 @@ const routerData = Object.entries(modules).map(([filePath, component]) => {
     }
 })
 
-addDynamicRoutes(routerData)
+addDynamicRoutes(tempRoutes)
 
 const MENU_ROUTES_STORAGE_KEY = 'menuRoutes'
 
