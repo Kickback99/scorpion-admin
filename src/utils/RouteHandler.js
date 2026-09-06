@@ -1,4 +1,4 @@
-import { routes } from "@/router"
+import { routes, tempRoutes } from "@/router"
 import { useUserStore } from "@/store/user"
 
 // 获取动态路由组件 (重构后的版本)
@@ -90,6 +90,32 @@ export function getLocalRouteComponents(excludes = []) {
 
 
 
+
+// 获取本地可导航菜单项（供菜单搜索使用，仅含 title/icon/path）
+// 边界：/login 无 meta.title、404/403 不在 routes/tempRoutes 数据源中，均天然排除
+export function getLocalRouteMenuItems() {
+  const items = []
+
+  const pushItem = (route) => {
+    if (!route.meta?.title) return
+    items.push({
+      title: route.meta.title,
+      icon: route.meta?.icon || 'ep:menu',
+      path: route.path,
+    })
+  }
+
+  // 1. 静态本地路由（仪表盘/基本资料/重置密码/测试）
+  routes.forEach(route => {
+    pushItem(route)
+    if (route.children) route.children.forEach(pushItem)
+  })
+
+  // 2. temp 测试页（temp1~temp10）
+  tempRoutes.forEach(pushItem)
+
+  return items
+}
 
 export function generateNameFromPath(path) {
   // 去掉首尾斜杠
