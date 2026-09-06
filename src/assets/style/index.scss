@@ -200,6 +200,13 @@ html.dark .auth-header:not(.page-theme) {
   padding: 5px 11px;
 }
 
+// 弹窗（el-dialog / el-drawer / el-message-box 等）打开时压低标签栏层级，避免 backdrop-filter 盖住弹窗遮罩
+// 用 el-popup-parent--hidden（弹窗打开时挂到 body 的锁屏类）判断，而非 .el-overlay（v-show 常驻 DOM）
+body.el-popup-parent--hidden .tags-view {
+  z-index: 0 !important;
+  backdrop-filter: none !important;
+}
+
 // ============================================================
 // 搜索面板折叠条 — 背景跟随主题、图标居中、保持最低高度
 // ============================================================
