@@ -49,6 +49,7 @@ import { Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { useConfigStore } from '@/store/config'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
+import { getLocalRouteMenuItems } from '@/utils/RouteHandler'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -159,7 +160,19 @@ const resolveChildPath = (menu, typePrefix, parentPath) => {
   return `/${typePrefix}/${menu.path}`
 }
 
-const allMenuItems = computed(() => flattenMenu(userStore.userMenu))
+// 本地静态路由菜单项（仪表盘/基本资料/重置密码/测试/temp1-10），扁平化后无层级，面包屑即自身标题
+const localMenuItems = getLocalRouteMenuItems().map(item => ({
+  ...item,
+  breadcrumb: [item.title],
+}))
+
+const allMenuItems = computed(() => {
+  const menuItems = flattenMenu(userStore.userMenu)
+  // 仅 navigate 模式补充本地路由；expand 模式只作用于后端菜单树，本地路由无对应节点
+  return props.actionMode === 'navigate'
+    ? [...menuItems, ...localMenuItems]
+    : menuItems
+})
 
 // ============================================================
 // 搜索
