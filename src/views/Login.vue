@@ -117,6 +117,12 @@ const handleLogin = async() => {
         return
     }
 
+    // cookie 模式 返回 token 说明前后端认证模式不一致（jwt 模式的错配由 401 链路暴露）
+    if (isCookieMode() && res.data) {
+        msg.error('登录响应缺少令牌，请检查前后端认证模式是否一致')
+        return
+    }
+
     // 处理记住密码逻辑 - 简单判断是否勾选
     if (formModel.value.checkPwd) {
         // 用户勾选了记住密码，保存凭证
