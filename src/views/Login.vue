@@ -98,6 +98,9 @@ function handleMediaChange(e) {
       ],
     }
 
+// 认证模式错配提示：生产环境对网友降级为通用错误（避免暴露前后端配置细节），其余环境保留具体原因便于排查
+const authMismatchTip = (detail) => import.meta.env.PROD ? '服务异常，请稍后重试' : detail
+
 //t_user_request：用户登录请求
 const handleLogin = async() => {
     await loginRef.value.validate()
@@ -113,13 +116,13 @@ const handleLogin = async() => {
 
     // jwt 模式下响应缺少 token 说明前后端认证模式不一致（cookie 模式的错配由 401 链路暴露）
     if (!isCookieMode() && !res.data) {
-        msg.error('登录响应缺少令牌，请检查前后端认证模式是否一致')
+        msg.error(authMismatchTip('登录响应缺少令牌，请检查前后端认证模式是否一致'))
         return
     }
 
     // cookie 模式 返回 token 说明前后端认证模式不一致（jwt 模式的错配由 401 链路暴露）
     if (isCookieMode() && res.data) {
-        msg.error('登录响应缺少令牌，请检查前后端认证模式是否一致')
+        msg.error(authMismatchTip('登录响应缺少令牌，请检查前后端认证模式是否一致'))
         return
     }
 
