@@ -156,13 +156,12 @@
                     @copy-code-success="handleCopySuccess"
                 /> -->
 
-                    <component 
-                    :is="MarkdownPreview" 
-                    :model-value="formatJson(formModel.reqParam)"
-                     mode="preview"
+                    <component
+                    :is="MarkdownPreview"
+                    :text="formatJson(formModel.reqParam)"
                     @copy-code-success="handleCopySuccess"
                     :key="userConfigStore.isDarkEnabled"
-                      />  
+                      />
                 </el-tab-pane>
 
                 <!-- 响应数据 -->
@@ -174,13 +173,12 @@
                     @copy-code-success="handleCopySuccess"
                 /> -->
 
-                    <component 
-                    :is="MarkdownPreview" 
-                    :model-value="formatJson(formModel.resData)"
-                     mode="preview"
+                    <component
+                    :is="MarkdownPreview"
+                    :text="formatJson(formModel.resData)"
                     @copy-code-success="handleCopySuccess"
                     :key="userConfigStore.isDarkEnabled"
-                      /> 
+                      />
                 </el-tab-pane>
             </el-tabs>
             <template #footer>
@@ -193,14 +191,11 @@
 
 <script setup>
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
-import { reactive, ref, computed, watch, shallowRef } from 'vue';
+import { reactive, ref, computed, watch, defineAsyncComponent } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
-// 懒加载 markdown 预览函数（避免首屏同步加载 v-md-editor / prismjs）
-const createMarkdownPreviewFn = shallowRef(null)
-import('@/utils/markdown-config').then((m) => { createMarkdownPreviewFn.value = m.createMarkdownPreview })
 import msg from '@/components/msg'
 const userConfigStore = useUserConfigStore()
 const configStore = useConfigStore()
@@ -215,12 +210,14 @@ const searchActiveNames = ref(
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
-// 使用 computed 每次重新创建组件（懒加载函数就绪前返回 null，主题切换仍会重建）
-const MarkdownPreview = computed(() => {
-  console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
-  if (!createMarkdownPreviewFn.value) return null
-  return createMarkdownPreviewFn.value(userConfigStore.isDarkEnabled?"vuepress":"github")
-})
+// Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
+const MarkdownPreview = computed(() =>
+  defineAsyncComponent(() =>
+    import('@/utils/markdown-config').then((m) =>
+      m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+    ),
+  ),
+)
 
 const tableData = ref([])
 
@@ -451,36 +448,7 @@ onMounted(() => {
   margin-top: 10px;
 }
 
-:deep(.v-md-copy-code-btn.copied svg) {
-  display: none;
-}
-
-:deep(.v-md-copy-code-btn.copied::after) {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  width: 8px;
-  height: 14px;
-  border-right: 2.5px solid var(--el-color-white);
-  border-bottom: 2.5px solid var(--el-color-white);
-  transform: translate(-50%, -50%) rotate(45deg);
-  border-radius: 1px;
-}
-
 :deep(.v-md-editor-preview .vuepress-markdown-body){
   background: black !important;
-}
-
-// vuepress主题下的v-md-editor-右边的预览区 代码块颜色
-:deep(.v-md-editor__preview-wrapper .vuepress-markdown-body code){
-    color: $code-color !important;
-    .token .operator{
-        background-color: transparent !important;
-    }
-
-    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string{
-        background-color: transparent !important;
-    }
 }
 </style>
