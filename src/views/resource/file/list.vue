@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500"   @selection-change="removeMultiple">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"   @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="name" label="文件名称" min-width="150" />
@@ -166,6 +166,9 @@ const params = reactive({
 
 const total = ref(null)
 
+// 默认关闭loading
+const loading = ref(false)
+
 const fields = ref([
     {label:'请选择排序',value:'',disabled: true},
     {label:'文件名',value:'name'},
@@ -187,10 +190,18 @@ const exts = ref([])
 
 // t_file_request：文件列表请求
 const render = async() => {
-    const res = await listApi(params.pageNum,params.pageSize,searchData)
-    tableData.value = res.data.items
-    console.log(res.data.items)
-    total.value = res.data.total
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await listApi(params.pageNum,params.pageSize,searchData)
+        tableData.value = res.data.items
+        console.log(res.data.items)
+        total.value = res.data.total
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 render()
