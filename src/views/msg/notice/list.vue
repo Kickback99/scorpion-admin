@@ -72,7 +72,7 @@
     </el-collapse>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
@@ -347,6 +347,9 @@ const quickDateOptions = [
 // ============================================================
 const tableData = ref([])
 const totalCount = ref(0)
+
+// 默认关闭loading
+const loading = ref(false)
 
 const pagination = reactive({
     pageNum: 1,
@@ -783,6 +786,8 @@ const handleTypeChange = (val) => {
  * 获取公告列表（后端分页）
  */
 const fetchNotices = async () => {
+    // 开启loading动效
+    loading.value = true
     try {
         const res = await noticeListApi(pagination.pageNum, pagination.pageSize, searchModel)
         tableData.value = res.data.items || []
@@ -791,6 +796,9 @@ const fetchNotices = async () => {
         console.error('获取公告列表失败:', error)
         tableData.value = []
         totalCount.value = 0
+    } finally {
+        // 关闭loading动效
+        loading.value = false
     }
 }
 

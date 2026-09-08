@@ -11,7 +11,7 @@
     </div>
 
     <!-- ==================== 任务表格 ==================== -->
-    <el-table :data="tableData" style="width: 100%" border>
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" border>
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="taskCode" label="任务编码" width="180" align="center">
         <template #default="{ row }">
@@ -155,6 +155,9 @@ import 'cronstrue/locales/zh_CN'
 // ==================== 表格数据 ====================
 const tableData = ref([])
 
+// 默认关闭loading
+const loading = ref(false)
+
 // ==================== 弹窗相关 ====================
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -185,6 +188,8 @@ const formRules = {
 
 // ==================== 加载任务列表 ====================
 const loadTaskList = async () => {
+  // 开启loading动效
+  loading.value = true
   try {
     const res = await listApi()
     tableData.value = res.data || res
@@ -192,6 +197,9 @@ const loadTaskList = async () => {
   } catch (error) {
     msg.error('加载任务列表失败')
     console.error(error)
+  } finally {
+    // 关闭loading动效
+    loading.value = false
   }
 }
 

@@ -21,7 +21,7 @@
     </div>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column prop="name" label="名字" min-width="130" />
         <el-table-column label="logo" min-width="120">
@@ -116,6 +116,9 @@ const tableData = ref([])
 
 const totalCount = ref(null)
 
+// 默认关闭loading
+const loading = ref(false)
+
 const pagination = reactive({
     pageNum:1,
     pageSize:5
@@ -152,9 +155,17 @@ const handleImage = (row) => {
  * 请求后端分页数据并刷新表格
  */
 const fetchFriendLinks = async() => {
-    const res = await friendLinkListApi(pagination.pageNum,pagination.pageSize,searchModel)
-    tableData.value = res.data.items
-    totalCount.value = res.data.total
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await friendLinkListApi(pagination.pageNum,pagination.pageSize,searchModel)
+        tableData.value = res.data.items
+        totalCount.value = res.data.total
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 fetchFriendLinks()
