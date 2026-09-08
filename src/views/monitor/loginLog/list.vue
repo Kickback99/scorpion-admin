@@ -63,7 +63,7 @@
         </el-form>
     </div>
 
-    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="removeMultiple">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="username" label="用户名" min-width="110" />
@@ -151,11 +151,22 @@ const params = ref({
 
 const total = ref(null)
 
+// 默认关闭loading
+const loading = ref(false)
+
 // t_log_request：日志列表请求
 const render = async() => {
-    const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
-    tableData.value = res.data.items
-    total.value = res.data.total
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
+        tableData.value = res.data.items
+        total.value = res.data.total
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 render()
