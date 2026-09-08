@@ -24,7 +24,7 @@ export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_
 
 //t_upload_api
 export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData,{
-    timeout: 15000 //本次内容图上传请求超时15秒
+    timeout: 35000 //本次内容图上传请求超时35秒
 })
 
 //t_upload_api
@@ -32,7 +32,7 @@ export const uploadCoverApi = (articleId,cover) => {
     const formData = new FormData()
     formData.append('articleId', articleId)
     formData.append('cover', cover)
-    http.post(API.UPLOAD_COVER_URL,formData)
+    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) //封面上传超时35秒
 }
 
 // 修改文章置顶
