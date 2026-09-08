@@ -211,13 +211,14 @@ watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
 // Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
-const MarkdownPreview = computed(() =>
-  defineAsyncComponent(() =>
+const MarkdownPreview = computed(() => {
+  const theme = userConfigStore.isDarkEnabled ? 'vuepress' : 'github'
+  return defineAsyncComponent(() =>
     import('@/utils/markdown-config').then((m) =>
-      m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+      m.createMarkdownPreview(theme, true),
     ),
-  ),
-)
+  )
+})
 
 const tableData = ref([])
 
