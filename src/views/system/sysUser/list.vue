@@ -299,13 +299,18 @@ const render = async(pager = 1) =>{
     // 开启loading动效
     loading.value = true
     params.value.pageNum =  pager
-    const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    console.log('请求用户列表-------------------------------------------')
-    console.log(res.data)
-    tableData.value = res.data.items
-    total.value = res.data.total
-    // 关闭loading动效
-    loading.value = false
+    try {
+        const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
+        console.log('请求用户列表-------------------------------------------')
+        console.log(res.data)
+        tableData.value = res.data.items
+        total.value = res.data.total
+    } catch (e) {
+        // request.js 已统一提示接口错误，这里不重复弹错误
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 render()

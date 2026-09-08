@@ -101,9 +101,8 @@ instance.interceptors.response.use(
 
             }else msg.error(res.data.message)
 
-            // return Promise.reject(res.data.message)
-            // 关键：返回pending的Promise，阻止错误开始向上传递的后续执行
-             return new Promise(() => {})
+            // 关键：返回 rejected Promise，阻止后续业务代码执行，同时让调用方的 finally 能正常复位 loading
+            return Promise.reject(res.data.message)
        }
 
         msg.error(res.data.message || '业务失败')
@@ -113,8 +112,8 @@ instance.interceptors.response.use(
         // HTTP 401（cookie 模式下未登录/过期的主路径）：走与业务码一致的清理跳转，否则用户会困死在页面
         if(err.response && err.response.status === 401){
             handleAuthExpired(err.config, (err.response.data && err.response.data.message) || '请重新登录')
-            // 返回pending的Promise，阻止错误开始向上传递的后续执行
-            return new Promise(() => {})
+            // 关键：返回 rejected Promise，阻止后续业务代码执行，同时让调用方的 finally 能正常复位 loading
+            return Promise.reject(err)
         }
         alert('服务异常');
         return Promise.reject(err); // 异步的状态转化成失败的状态
