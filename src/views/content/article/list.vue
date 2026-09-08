@@ -93,7 +93,7 @@
         </el-collapse-item>
     </el-collapse>
 
-    <el-table :data="tableData" :style="{ width: '100%' }" max-height="500">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500">
         <el-table-column type="index" label="序号" width="55"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip/>
         <el-table-column label="封面" width="100px">
@@ -204,16 +204,27 @@ const total = ref(null)
 
 const tableData = ref([])
 
+// 默认关闭loading
+const loading = ref(false)
+
 // 独立的开始和结束时间
 const startTime = ref('')
 const endTime = ref('')
 
 // t_article_request：文章列表请求
 const render = async() => {
-    const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    console.log(res)
-    tableData.value = res.data.items
-    total.value = res.data.total
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
+        console.log(res)
+        tableData.value = res.data.items
+        total.value = res.data.total
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 render()

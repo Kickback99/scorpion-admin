@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <el-table :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple" max-height="500">
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple" max-height="500">
         <el-table-column prop="id" label="轮播ID" width="80" />
 
         <el-table-column label="轮播图" width="120">
@@ -333,6 +333,9 @@ import SmartUpload from '@/views/components/SmartUpload.vue'
 const tableData = ref([])
 const total = ref(0)
 
+// 默认关闭loading
+const loading = ref(false)
+
 const pagination = reactive({
     pageNum: 1,
     pageSize: 10
@@ -363,9 +366,17 @@ const loadAllArticles = async () => {
 }
 
 const renderCarouselList = async () => {
-    const res = await getCarouselListApi(pagination.pageNum, pagination.pageSize, searchModel)
-    tableData.value = res.data.items || []
-    total.value = res.data.total || 0
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await getCarouselListApi(pagination.pageNum, pagination.pageSize, searchModel)
+        tableData.value = res.data.items || []
+        total.value = res.data.total || 0
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
 }
 
 // ==================== 分页 ====================
