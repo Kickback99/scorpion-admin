@@ -159,7 +159,7 @@
                     <component
                     :is="MarkdownPreview"
                     :text="formatJson(formModel.reqParam)"
-                    @copy-code-success="handleCopySuccess"
+                    @click="handleCopyCodeSuccess"
                     :key="userConfigStore.isDarkEnabled"
                       />
                 </el-tab-pane>
@@ -176,7 +176,7 @@
                     <component
                     :is="MarkdownPreview"
                     :text="formatJson(formModel.resData)"
-                    @copy-code-success="handleCopySuccess"
+                    @click="handleCopyCodeSuccess"
                     :key="userConfigStore.isDarkEnabled"
                       />
                 </el-tab-pane>
@@ -416,19 +416,12 @@ watch(() => searchData.module, (newModule) => {
   searchData.type = ''; // 清空已选类型
 });
 
-// 处理用户选择复制回调
-const handleCopySuccess = () => {
-  const copyButtons = document.querySelectorAll('.v-md-copy-code-btn')
-  
-  copyButtons.forEach(btn => {
-    // 添加copied类
-    btn.classList.add('copied')
-    
-    // 1.5秒后移除
-    setTimeout(() => {
-      btn.classList.remove('copied')
-    }, 1500)
-  })
+/** copy-code 插件复制成功后显示 ✓ — click 事件委托只标记被点击的按钮 */
+const handleCopyCodeSuccess = (e) => {
+  const btn = e.target.closest('.v-md-copy-code-btn')
+  if (!btn) return
+  btn.classList.add('copied')
+  setTimeout(() => btn.classList.remove('copied'), 1500)
 }
 
 // 确保预览组件渲染完成后监听
