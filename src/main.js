@@ -1,4 +1,5 @@
 import './assets/style/index.scss'
+import './assets/style/markdown.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'

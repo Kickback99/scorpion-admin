@@ -222,7 +222,7 @@
                 />
                 <!-- 富文本模式（只读 → MarkdownPreview） -->
                 <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
-                    <component :is="MarkdownPreview" :text="formModel.content" @click="handleCopyCodeSuccess" />
+                    <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="formModel.content" @click="handleCopyCodeSuccess" />
                 </div>
             </el-form-item>
 
@@ -304,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { hasPerm, showPermColumn } from '@/utils/permissions'
@@ -541,10 +541,12 @@ watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
 
-// 懒加载 markdown 预览组件，仅在打开富文本公告详情时加载
-const MarkdownPreview = defineAsyncComponent(() =>
-  import('@/utils/markdown-config').then((m) =>
-    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+// Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
+const MarkdownPreview = computed(() =>
+  defineAsyncComponent(() =>
+    import('@/utils/markdown-config').then((m) =>
+      m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+    ),
   ),
 )
 
@@ -1172,60 +1174,12 @@ const handlePush = async (row) => {
   border-radius: 4px;
 }
 
-/* 暗黑模式 — 参考 article/list.vue */
-.dark-mode.detail-panel {
-  :deep(.v-md-editor) {
-    background-color: var(--el-bg-color) !important;
-  }
-  :deep(.v-md-editor__preview-wrapper) {
-    background: var(--el-bg-color) !important;
-  }
-  :deep(.vuepress-markdown-body) {
-    color: #fff;
-    background: var(--el-bg-color) !important;
-  }
-}
-
+/* 公告图片样式（公告详情弹窗专用，不抽取到公共样式） */
 .detail-panel {
-  :deep(.github-markdown-body),
-  :deep(.vuepress-markdown-body) {
-    padding: 0 !important;
-  }
-}
-
-/* 代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
-.detail-panel {
-  :deep(.vuepress-markdown-body code) {
-    color: $code-color !important;
-    .token .operator {
-      background-color: transparent !important;
-    }
-    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
-      background-color: transparent !important;
-    }
-  }
-  :deep(.vuepress-markdown-body tr:nth-child(2n)) {
-    color: black;
-  }
   :deep(.v-md-editor-preview img) {
     display: block !important;
     width: $notice-img !important;
     margin: auto !important;
-  }
-  :deep(.v-md-copy-code-btn.copied svg) {
-    display: none;
-  }
-  :deep(.v-md-copy-code-btn.copied::after) {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 45%;
-    width: 8px;
-    height: 14px;
-    border-right: 2.5px solid var(--el-color-white);
-    border-bottom: 2.5px solid var(--el-color-white);
-    transform: translate(-50%, -50%) rotate(45deg);
-    border-radius: 1px;
   }
 }
 </style>

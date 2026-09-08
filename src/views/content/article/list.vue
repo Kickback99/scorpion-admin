@@ -147,7 +147,7 @@
     <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" top="2vh" destroy-on-close
         class="preview-dialog">
         <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
-            <component :is="MarkdownPreview" :text="previewContent" @click="handleCopyCodeSuccess" />
+            <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
         </div>
     </el-dialog>
    
@@ -156,7 +156,7 @@
 <script setup>
 import { isTopApi, listApi, removeApi } from '@/api/article';
 import CateSelect from '@/views/components/CateSelect.vue';
-import { ref, watch, defineAsyncComponent } from 'vue';
+import { ref, watch, defineAsyncComponent, computed } from 'vue';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs, ElMessageBox } from 'element-plus';
 import msg from '@/components/msg';
@@ -411,10 +411,12 @@ const previewVisible = ref(false)
 const previewTitle = ref('')
 const previewContent = ref('')
 
-// 懒加载 markdown 预览组件，仅在打开预览弹窗时加载
-const MarkdownPreview = defineAsyncComponent(() =>
-  import('@/utils/markdown-config').then((m) =>
-    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+// Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
+const MarkdownPreview = computed(() =>
+  defineAsyncComponent(() =>
+    import('@/utils/markdown-config').then((m) =>
+      m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+    ),
   ),
 )
 
@@ -453,22 +455,6 @@ const handleCopyCodeSuccess = (e) => {
         width: 100%;
     }
 }
-
-/* 预览弹窗暗黑模式 — 参考 Markdown.vue */
-.dark-mode {
-  :deep(.v-md-editor) {
-    background-color: #000 !important;
-  }
-
-  :deep(.v-md-editor__preview-wrapper) {
-    background: black !important;
-  }
-
-  :deep(.vuepress-markdown-body) {
-    color: #fff;
-    background: black !important;
-  }
-}
 </style>
 
 <style lang="scss">
@@ -477,24 +463,6 @@ const handleCopyCodeSuccess = (e) => {
   background-color: rgba(255, 255, 255, 0.3) !important;
   backdrop-filter: blur(15px) !important;
   -webkit-backdrop-filter: blur(15px) !important;
-}
-
-/* 代码块复制成功 ✓ 反馈 — CSS border 画立体对勾 */
-.preview-dialog .v-md-copy-code-btn.copied svg {
-  display: none;
-}
-
-.preview-dialog .v-md-copy-code-btn.copied::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  width: 8px;
-  height: 14px;
-  border-right: 2.5px solid var(--el-color-white);
-  border-bottom: 2.5px solid var(--el-color-white);
-  transform: translate(-50%, -50%) rotate(45deg);
-  border-radius: 1px;
 }
 
 /* 预览弹窗滚动条 — 半透明模拟 config 模块风格 */
@@ -514,22 +482,5 @@ const handleCopyCodeSuccess = (e) => {
 
 .el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
   background: transparent;
-}
-
-/* 预览弹窗代码高亮 + 表格样式（同步 Markdown.vue scoped 块） */
-.preview-dialog {
-  .vuepress-markdown-body code {
-    color: $code-color !important;
-    .token .operator {
-      background-color: transparent !important;
-    }
-    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
-      background-color: transparent !important;
-    }
-  }
-
-  .vuepress-markdown-body tr:nth-child(2n) {
-    color: black;
-  }
 }
 </style>
