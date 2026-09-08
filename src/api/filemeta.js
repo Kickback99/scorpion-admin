@@ -14,7 +14,7 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
             pageSize,
             ...searchData
         },
-        timeout: 15000
+        timeout: 35000
     })
 
 
