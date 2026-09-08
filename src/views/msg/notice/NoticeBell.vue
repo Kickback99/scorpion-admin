@@ -86,7 +86,7 @@
     <el-divider />
     <div v-if="currentNotice?.type === 0" class="notice-body">{{ currentNotice?.content || '' }}</div>
     <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
-      <component :is="MarkdownPreview" :text="currentNotice?.content || ''" @click="handleCopyCodeSuccess" />
+      <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="currentNotice?.content || ''" @click="handleCopyCodeSuccess" />
     </div>
   </el-dialog>
 </template>
@@ -101,10 +101,12 @@ import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeRea
 import { useUserConfigStore } from '@/store/userConfig'
 
 const userConfigStore = useUserConfigStore()
-// 懒加载 markdown 预览组件：仅在打开 markdown 类型公告详情弹窗时才加载 v-md-editor / prismjs
-const MarkdownPreview = defineAsyncComponent(() =>
-  import('@/utils/markdown-config').then((m) =>
-    m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+// Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
+const MarkdownPreview = computed(() =>
+  defineAsyncComponent(() =>
+    import('@/utils/markdown-config').then((m) =>
+      m.createMarkdownPreview(userConfigStore.isDarkEnabled ? 'vuepress' : 'github', true),
+    ),
   ),
 )
 
@@ -418,59 +420,12 @@ defineExpose({})
   margin: 0;
 }
 
-.dark-mode {
-  :deep(.v-md-editor) {
-    background-color: var(--el-bg-color) !important;
-  }
-  :deep(.v-md-editor__preview-wrapper) {
-    background: var(--el-bg-color) !important;
-  }
-  :deep(.vuepress-markdown-body) {
-    color: #fff;
-    background: var(--el-bg-color) !important;
-  }
-}
-
+/* 公告图片样式（公告详情弹窗专用，不抽取到公共样式） */
 .detail-panel {
-  :deep(.github-markdown-body),
-  :deep(.vuepress-markdown-body) {
-    padding: 0 !important;
-  }
-}
-
-/* 代码高亮 + 表格样式 + 图片（同步 Markdown.vue scoped 块） */
-.detail-panel {
-  :deep(.vuepress-markdown-body code) {
-    color: $code-color !important;
-    .token .operator {
-      background-color: transparent !important;
-    }
-    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
-      background-color: transparent !important;
-    }
-  }
-  :deep(.vuepress-markdown-body tr:nth-child(2n)) {
-    color: black;
-  }
   :deep(.v-md-editor-preview img) {
     display: block !important;
     width: $notice-img !important;
     margin: auto !important;
-  }
-  :deep(.v-md-copy-code-btn.copied svg) {
-    display: none;
-  }
-  :deep(.v-md-copy-code-btn.copied::after) {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 45%;
-    width: 8px;
-    height: 14px;
-    border-right: 2.5px solid var(--el-color-white);
-    border-bottom: 2.5px solid var(--el-color-white);
-    transform: translate(-50%, -50%) rotate(45deg);
-    border-radius: 1px;
   }
 }
 </style>
