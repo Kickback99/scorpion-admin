@@ -482,6 +482,15 @@ const handleToggle = async (param) => {
     blogData.value = { title, content }
 
     Object.assign(formModel, rest)
+
+    // 重置封面相关前端字段：切换编辑不同文章时，避免残留上一篇文章的封面状态
+    // coverMode 为空（无封面）时默认回显「文件上传」模式
+    formModel.coverOption = 'upload'
+    formModel.customCoverLink = ''
+    formModel.refCover = null
+    formModel.refCoverUuid = null
+    selectedCoverArticle.value = []
+
     if (res.data.isAutoDescription === 0) {
       formModel.descriptionType = 'auto'
     } else if (res.data.isAutoDescription === 1) {
