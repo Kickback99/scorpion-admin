@@ -90,7 +90,7 @@
 
               <!-- 文件上传模式 -->
               <el-form-item v-if="formModel.coverOption === 'upload'" label=" " prop="cover">
-                  <SmartUpload ref="uploadRef" v-model="formModel.cover" :onValidate="handleCoverValidate"></SmartUpload>
+                  <SmartUpload ref="uploadRef" v-model="formModel.cover"></SmartUpload>
               </el-form-item>
 
               <!-- 自定义链接模式 -->
@@ -303,19 +303,6 @@ const rules = {
 // 弹窗表单校验
 // ============================================================
 
-/** 校验封面 — 文件上传模式 */
-const validateCover = (rule, value, callback) => {
-  if (formModel.coverOption === 'upload') {
-    if (!formModel.cover) {
-      callback(new Error('请上传文章封面'))
-    } else {
-      callback()
-    }
-    return
-  }
-  callback()
-}
-
 /** 校验封面 — 自定义链接模式 */
 const validateCustomCoverLink = (rule, value, callback) => {
   if (formModel.coverOption === 'custom') {
@@ -343,9 +330,6 @@ const validateCoverReference = (rule, value, callback) => {
 }
 
 const dialogRules = {
-  cover: [
-    { required: true, validator: validateCover, trigger: 'change'  }
-  ],
   customCoverLink: [
     { required: true, validator: validateCustomCoverLink, trigger: 'blur'  }
   ],
@@ -585,7 +569,9 @@ const handlePublish = async (status) => {
     },
     tagNames: formModel.tagNames,
     isCarousel: carouselData.value.isCarousel,
-    sort: carouselData.value.sort || 0
+    sort: carouselData.value.sort || 0,
+    // 本次保存后是否会紧接着上传新封面（仅 upload 模式 + 选中新文件为 true，后端据此校验 OSS）
+    coverNeedUpload: formModel.coverOption === 'upload' && formModel.cover instanceof File
   }
 
   // 移除临时字段
@@ -895,13 +881,6 @@ const handleCoverOptionChange = (val) => {
   }
   // 切换封面模式时清除相关字段的校验状态
   formRef.value?.clearValidate(['cover', 'customCoverLink', 'refCover'])
-}
-
-/** SmartUpload 图片变更时触发封面校验 */
-const handleCoverValidate = () => {
-  nextTick(() => {
-    formRef.value?.validateField('cover')
-  })
 }
 
 // ============================================================
