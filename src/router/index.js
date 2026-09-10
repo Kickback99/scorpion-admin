@@ -437,6 +437,11 @@ router.beforeEach((to, from, next) => {
             cleanupTabsByCurrentRoutes()
     }).catch((error) =>
         {
+            // 认证过期已由 handleAuthExpired 清理+弹窗+跳转，这里静默阻止导航，避免重复弹窗
+            if (error && error.__authExpired) {
+                next(false)
+                return
+            }
             // 无菜单权限的后台用户 -> 跳转403
             if (error.noMenuPermission) {
                 if(hasRouteByPath(to.path)){
