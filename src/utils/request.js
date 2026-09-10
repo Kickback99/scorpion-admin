@@ -98,6 +98,8 @@ instance.interceptors.response.use(
             if(res.data.code === 401 || res.data.code === 215 || res.data.code === 216){
                 console.log('==================== 响应拦截器执行 ====================')
                 handleAuthExpired(res.config, res.data.message)
+                // 认证已由 handleAuthExpired 处理：带标记 reject，避免下游（loadMenu catch）重复弹窗
+                return Promise.reject({ __authExpired: true, message: res.data.message })
 
             }else msg.error(res.data.message)
 
@@ -112,8 +114,8 @@ instance.interceptors.response.use(
         // HTTP 401（cookie 模式下未登录/过期的主路径）：走与业务码一致的清理跳转，否则用户会困死在页面
         if(err.response && err.response.status === 401){
             handleAuthExpired(err.config, (err.response.data && err.response.data.message) || '请重新登录')
-            // 关键：返回 rejected Promise，阻止后续业务代码执行，同时让调用方的 finally 能正常复位 loading
-            return Promise.reject(err)
+            // 认证已由 handleAuthExpired 处理：带标记 reject，避免下游（loadMenu catch）重复弹窗
+            return Promise.reject({ __authExpired: true, message: (err.response.data && err.response.data.message) || '请重新登录' })
         }
         alert('服务异常');
         return Promise.reject(err); // 异步的状态转化成失败的状态
