@@ -178,6 +178,7 @@ export const useConfigStore = defineStore({
           week_offset: 12,
         },
       },
+      notice_load_mode: 'scroll',
       captcha: {
         client_enabled: true,
         admin_enabled: true,
@@ -457,6 +458,10 @@ export const useConfigStore = defineStore({
     getThemeDotShape()             { return this.getValue('theme_dot_shape') || 'circle' },
     setThemeDotShape(v)            { this.updateConfig('theme_dot_shape', v) },
 
+    // -- notice_load_mode --
+    getNoticeLoadMode()            { return this.getValue('notice_load_mode') || 'scroll' },
+    setNoticeLoadMode(v)           { this.updateConfig('notice_load_mode', v) },
+
     // ==================== tree ====================
 
     getTreeAuthLineStyle()         { return this.getValue('tree.auth.line_style') || 'dashed' },
@@ -644,6 +649,7 @@ export const useConfigStore = defineStore({
     isSearchMenuFocus()       { return this.getValue('search_menu_focus') === true },
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
     themeDotShape()           { return this.getValue('theme_dot_shape') || 'circle' },
+    noticeLoadMode()          { return this.getValue('notice_load_mode') || 'scroll' },
     treeAuthLineStyle()       { return this.getValue('tree.auth.line_style') || 'dashed' },
     treeCateLineStyle()       { return this.getValue('tree.cate.line_style') || 'dashed' },
     treeCateParentMode()      { return this.getValue('tree.cate.parent_mode') || 'custom' },
