@@ -931,7 +931,6 @@ watch(() => addForm.enableThreshold, (enabled) => {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--el-bg-color);
   margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
