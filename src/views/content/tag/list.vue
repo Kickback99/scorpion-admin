@@ -29,7 +29,7 @@
 // ============================================================
 import { computed } from 'vue'
 import { useConfigStore } from '@/store/config'
-import { useTagList } from './useTagList'
+import { useTagEditor } from './useTagEditor'
 import TagTable from './TagTable.vue'
 import TagCard from './TagCard.vue'
 import TagCloud from './TagCloud.vue'
@@ -42,8 +42,8 @@ const configStore = useConfigStore()
 /** 当前标签管理界面样式：table | card（默认）| cloud */
 const mode = computed(() => configStore.getTagViewMode())
 
-// 弹窗状态来自 useTagList（模块单例，与变体组件共享）
-const { dialogVisible, title, ruleFormRef, formModel, rules, confirm } = useTagList()
+// 弹窗状态来自 useTagEditor（模块单例，与变体组件共享）
+const { dialogVisible, title, ruleFormRef, formModel, rules, confirm } = useTagEditor()
 </script>
 
 <style scoped>
