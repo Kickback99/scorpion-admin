@@ -59,7 +59,7 @@
     width="30%"
     @close="onCancel"
   >
-  <el-form ref="dataForm" :model="formModel" label-width="150px" size="small" style="padding-right: 40px;">
+  <el-form ref="dataForm" :model="formModel" label-width="auto" size="small">
           <el-form-item label="所属上级" v-if="formModel.parentName">
             <el-input v-model="formModel.parentName" disabled="true"/>
           </el-form-item>
