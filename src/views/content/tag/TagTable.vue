@@ -67,12 +67,20 @@ const { handleAdd, handleEdit, removeRole } = useTagEditor()
 // ============================================================
 // 表格
 // ============================================================
-.tt-page {
-  padding-top: 16px;
-}
-
 .tt-toolbar {
-  @include flex(center, center, null)
+  @include flex(center, center, null);
+  // 上留白由 .tags-view 的 margin-bottom（20px）提供，此处只补下留白，保证上下间距一致
+  padding: 0 0 20px;
+
+  // el-form 默认以 inline-block 排布，行盒基线会多出约 2px 间隙；改 flex 排布消除
+  :deep(.el-form) {
+    display: flex;
+  }
+
+  // 抵消 el-form-item 默认的 18px 下外边距，避免与工具栏 padding 叠加
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
 }
 
 .tt-pagination {
