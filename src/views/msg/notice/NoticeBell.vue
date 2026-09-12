@@ -107,11 +107,12 @@
 // ============================================================
 // 导入
 // ============================================================
-import { ref, onMounted, onUnmounted, computed, watch, defineAsyncComponent } from 'vue'
+import { ref, onMounted, onUnmounted, computed, defineAsyncComponent } from 'vue'
 import { Bell, Close, Loading } from '@element-plus/icons-vue'
 import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
+import { useNoticeList } from './useNoticeList'
 
 const userConfigStore = useUserConfigStore()
 const configStore = useConfigStore()
@@ -151,75 +152,8 @@ function handleMediaChange(e) {
 }
 
 // ============================================================
-// 公告列表 — 未读 / 已读 共用同一套「滚动加载 / 分页加载」逻辑
+// 公告列表 — 未读 / 已读 各一套状态（加载逻辑见 useNoticeList）
 // ============================================================
-
-/**
- * 创建一套公告列表状态与加载器（未读 / 已读 各持有一个独立实例）
- * @param {Function} fetchApi 列表接口，(pageNum, pageSize) => Promise
- * @param {string} label 日志标签
- * @returns {Object} 列表状态、滚动容器/哨兵引用、加载方法
- */
-const createNoticeList = (fetchApi, label) => {
-  const list = ref([])
-  const total = ref(0)
-  const pageNum = ref(1)
-  const loading = ref(false)      // 首次 / 重置加载
-  const loadingMore = ref(false)  // 触底加载更多
-  const hasMore = computed(() => list.value.length < total.value)
-  const containerRef = ref(null)  // 滚动容器（同时作为 IntersectionObserver 的 root）
-  const sentinelRef = ref(null)   // 触底哨兵
-
-  /** 重置加载：回到第 1 页并替换列表 */
-  const load = async () => {
-    // 滚动模式的页码由本函数维护，重置时必须归 1；
-    // 分页模式的页码由 el-pagination 维护，不能覆盖
-    if (isScrollMode.value) pageNum.value = 1
-    loading.value = true
-    try {
-      const res = await fetchApi(pageNum.value, pageSize.value)
-      list.value = res.data?.items || []
-      total.value = res.data?.total || 0
-    } catch (e) {
-      console.error(`获取${label}公告列表失败:`, e)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /** 触底加载：取下一页并追加到列表末尾 */
-  const loadMore = async () => {
-    if (loading.value || loadingMore.value || !hasMore.value) return
-    loadingMore.value = true
-    try {
-      const nextPage = pageNum.value + 1
-      const res = await fetchApi(nextPage, pageSize.value)
-      list.value = [...list.value, ...(res.data?.items || [])]
-      total.value = res.data?.total || 0
-      pageNum.value = nextPage
-    } catch (e) {
-      console.error(`加载更多${label}公告失败:`, e)
-    } finally {
-      loadingMore.value = false
-    }
-  }
-
-  // 哨兵进入滚动容器视口即加载下一页；哨兵为 v-if 渲染，出现 / 消失时重建观察器
-  let observer = null
-  watch([sentinelRef, containerRef], ([sentinel, root]) => {
-    observer?.disconnect()
-    observer = null
-    if (!sentinel || !root) return
-    observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) loadMore()
-    }, { root })
-    observer.observe(sentinel)
-  }, { flush: 'post' })
-
-  onUnmounted(() => observer?.disconnect())
-
-  return { list, total, pageNum, loading, loadingMore, hasMore, containerRef, sentinelRef, load, loadMore }
-}
 
 // 未读列表
 const {
@@ -227,7 +161,7 @@ const {
   loadingMore: unreadLoadingMore, hasMore: unreadHasMore,
   containerRef: unreadListRef, sentinelRef: unreadSentinelRef,
   load: fetchUnreadList,
-} = createNoticeList(noticeUnreadListApi, '未读')
+} = useNoticeList({ fetchApi: noticeUnreadListApi, label: '未读', isScrollMode, pageSize })
 
 // 已读列表
 const {
@@ -235,7 +169,7 @@ const {
   loadingMore: readLoadingMore, hasMore: readHasMore,
   containerRef: readListRef, sentinelRef: readSentinelRef,
   load: fetchReadList,
-} = createNoticeList(noticeReadListApi, '已读')
+} = useNoticeList({ fetchApi: noticeReadListApi, label: '已读', isScrollMode, pageSize })
 
 // ============================================================
 // 数据获取
