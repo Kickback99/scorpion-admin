@@ -59,10 +59,10 @@
         <!-- 弹层内容 -->
         <el-form 
         :model="dialogData" 
-        label-width="120px" 
+        label-width="auto" 
         ref="ruleFormRef"
         size="small"  
-        :rules="rules" style="padding-right: 40px;">
+        :rules="rules">
             <el-form-item label="角色名称" prop="roleName">
                 <el-input v-model="dialogData.roleName" placeholder="请输入角色名称"/>
             </el-form-item>
