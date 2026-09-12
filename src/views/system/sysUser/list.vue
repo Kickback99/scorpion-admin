@@ -125,7 +125,7 @@
     <!-- 用户新增和修改弹层 -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
         <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
-            size="small" status-icon label-width="100px" style="padding-right: 35px;">
+            size="small" status-icon label-width="auto">
             <el-form-item label="用户名" prop="username">
                 <el-input prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
             </el-form-item>
