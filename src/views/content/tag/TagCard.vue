@@ -1,5 +1,5 @@
 <template>
-  <!-- ===== 卡片网格：搜索栏 + 卡片网格 + 分页 ===== -->
+  <!-- ===== 卡片网格：搜索栏 + 卡片网格 + 滚动加载 ===== -->
   <div class="tc-page">
     <div class="tc-toolbar">
       <el-input size="small" v-model="searchData.keyword" placeholder="请输入标签名/备注" clearable class="tc-search" @keyup.enter="onSearch">
@@ -32,52 +32,53 @@
       <div v-if="!tableData.length" class="tc-empty">暂无标签数据</div>
     </div>
 
-    <div class="tc-pagination">
-      <el-pagination
-        size="small"
-        v-model:current-page="params.pageNum"
-        v-model:page-size="params.pageSize"
-        :page-sizes="[2, 5, 7, 10]"
-        layout="total, sizes, prev, pager, next"
-        :total="total"
-        @size-change="onSizeChange"
-        @current-change="onCurrentChange"
-      />
+    <div ref="loadMoreRef" v-if="hasMore" class="tc-load-more">
+      {{ loading ? '加载中...' : '下滑加载更多' }}
     </div>
+    <div v-else-if="tableData.length" class="tc-load-more">没有更多了</div>
   </div>
 </template>
 
 <script setup>
 // ============================================================
-// 卡片网格 — 标签以卡片形式排列，hover 浮起
+// 卡片网格 — 标签以卡片形式排列，hover 浮起，滚动分页
 // ============================================================
 import { Search } from '@element-plus/icons-vue'
-import { useTagList } from './useTagList'
+import { useTagScroll } from './useTagScroll'
+import { useTagEditor } from './useTagEditor'
 
 const {
-  searchData, tableData, params, total,
-  onSizeChange, onCurrentChange,
+  searchData, tableData,
+  loading, hasMore, loadMoreRef,
   onSearch, onReset,
-  handleAdd, handleEdit,
-  removeRole,
-} = useTagList()
+} = useTagScroll()
+
+const { handleAdd, handleEdit, removeRole } = useTagEditor()
 </script>
 
 <style lang="scss" scoped>
 // ============================================================
 // 卡片网格
 // ============================================================
-.tc-page {
-  padding-top: 16px;
-}
-
 .tc-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10; // 低于 tags-view 的 11，避免盖住标签栏
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  padding: 16px 0;
   margin-bottom: 24px;
   flex-wrap: wrap;
+  background: var(--el-fill-color-light);
+}
+// 背景跟随主题（深浅 / pageTheme 自适应），与 .main-container 保持一致
+html.dark .main-container:not(.page-theme) .tc-toolbar {
+  background: var(--el-color-black);
+}
+.main-container.page-theme .tc-toolbar {
+  background: var(--page-theme-bg);
 }
 
 .tc-search {
@@ -152,9 +153,12 @@ const {
   font-size: 14px;
 }
 
-.tc-pagination {
+.tc-load-more {
   display: flex;
   justify-content: center;
   margin-top: 24px;
+  padding-bottom: 24px;
+  font-size: 13px;
+  color: var(--el-text-color-placeholder);
 }
 </style>

@@ -50,16 +50,17 @@
 // ============================================================
 // 表格布局 — 传统 CRUD 表格 + 居中搜索栏
 // ============================================================
-import { useTagList } from './useTagList'
+import { useTagTable } from './useTagTable'
+import { useTagEditor } from './useTagEditor'
 import { showPermColumn } from '@/utils/permissions'
 
 const {
   searchData, tableData, params, total,
   onSizeChange, onCurrentChange,
   onSearch, onReset,
-  handleAdd, handleEdit,
-  removeRole,
-} = useTagList()
+} = useTagTable()
+
+const { handleAdd, handleEdit, removeRole } = useTagEditor()
 </script>
 
 <style lang="scss" scoped>
