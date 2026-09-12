@@ -116,7 +116,7 @@
     />
 
     <el-dialog v-model="dialogVisible" title="修改文件名" width="30%" :close-on-click-modal="false">
-        <el-form ref="ruleFormRef"  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm" size="small"
+        <el-form ref="ruleFormRef"  :model="formModel" :rules="rules" label-width="auto" class="demo-ruleForm" size="small"
             status-icon>
             <el-form-item label="文件名称" prop="name">
                 <el-input placeholder="请输入文件名称" v-model="formModel.name" />
