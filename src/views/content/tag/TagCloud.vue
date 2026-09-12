@@ -68,8 +68,8 @@ const { handleAdd, handleEdit, removeRole } = useTagEditor()
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 16px 0;
-  margin-bottom: 32px;
+  // 上留白由 .tags-view 的 margin-bottom（20px）提供，此处只补下留白，保证上下间距一致
+  padding: 0 0 20px;
   flex-wrap: wrap;
   background: var(--el-fill-color-light);
 }
@@ -90,7 +90,8 @@ html.dark .main-container:not(.page-theme) .tcl-toolbar {
   grid-template-columns: repeat(auto-fit, 100px);
   gap: 20px;
   justify-content: center;
-  padding: 32px 20px;
+  // 顶部留白由上方的 .tcl-toolbar 提供，避免与工具栏 padding 叠加
+  padding: 0 20px 32px;
   min-height: 200px;
 }
 
