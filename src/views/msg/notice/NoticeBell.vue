@@ -29,7 +29,7 @@
 
     <el-tabs v-model="activeTab" @tab-change="handleTabChange">
       <el-tab-pane label="未读" name="unread">
-        <div v-loading="loading" class="notice-list">
+        <div ref="unreadListRef" v-loading="loading" class="notice-list">
           <div v-for="item in unreadList" :key="item.id" class="notice-item">
             <span class="notice-title">{{ item.title  || '公告消息' }}</span>
             <div class="notice-actions">
@@ -37,10 +37,16 @@
               <el-button type="success" link size="small" @click="handleMarkRead(item.id)">已读</el-button>
             </div>
           </div>
+          <!-- 滚动加载：哨兵进入列表视口即加载下一页 -->
+          <div v-if="isScrollMode && unreadHasMore" ref="unreadSentinelRef" class="load-more-tip">
+            <el-icon v-if="unreadLoadingMore" class="is-loading"><Loading /></el-icon>
+            <span>{{ unreadLoadingMore ? '加载中...' : '下滑加载更多' }}</span>
+          </div>
+          <div v-else-if="isScrollMode && unreadList.length > 0" class="load-more-tip">没有更多了</div>
           <el-empty v-if="!loading && unreadList.length === 0" description="暂无未读公告" :image-size="0" class="empty-no-icon"/>
         </div>
-        <!-- 分页 -->
-        <div v-if="unreadTotal > pageSize" class="notice-pagination">
+        <!-- 分页（仅分页加载模式） -->
+        <div v-if="!isScrollMode && unreadTotal > pageSize" class="notice-pagination">
           <el-pagination
             v-model:current-page="pageNum"
             :page-size="pageSize"
@@ -53,17 +59,23 @@
       </el-tab-pane>
 
       <el-tab-pane label="已读" name="read">
-        <div v-loading="readLoading" class="notice-list">
+        <div ref="readListRef" v-loading="readLoading" class="notice-list">
           <div v-for="item in readList" :key="item.id" class="notice-item">
             <span class="notice-title">{{ item.title || '公告消息' }}</span>
             <div class="notice-actions">
               <el-button type="primary" link size="small" @click="handleViewDetail(item)">查看详情</el-button>
             </div>
           </div>
+          <!-- 滚动加载：哨兵进入列表视口即加载下一页 -->
+          <div v-if="isScrollMode && readHasMore" ref="readSentinelRef" class="load-more-tip">
+            <el-icon v-if="readLoadingMore" class="is-loading"><Loading /></el-icon>
+            <span>{{ readLoadingMore ? '加载中...' : '下滑加载更多' }}</span>
+          </div>
+          <div v-else-if="isScrollMode && readList.length > 0" class="load-more-tip">没有更多了</div>
           <el-empty v-if="!readLoading && readList.length === 0" description="暂无已读公告" :image-size="0" />
         </div>
-        <!-- 分页 -->
-        <div v-if="readTotal > pageSize" class="notice-pagination">
+        <!-- 分页（仅分页加载模式） -->
+        <div v-if="!isScrollMode && readTotal > pageSize" class="notice-pagination">
           <el-pagination
             v-model:current-page="readPageNum"
             :page-size="pageSize"
@@ -95,12 +107,14 @@
 // ============================================================
 // 导入
 // ============================================================
-import { ref, onMounted, onUnmounted, computed, defineAsyncComponent } from 'vue'
-import { Bell, Close } from '@element-plus/icons-vue'
+import { ref, onMounted, onUnmounted, computed, watch, defineAsyncComponent } from 'vue'
+import { Bell, Close, Loading } from '@element-plus/icons-vue'
 import { noticeUnreadListApi, noticeUnreadCountApi, noticeMarkReadApi, noticeReadListApi, noticeMarkAllReadApi } from '@/api/notice'
 import { useUserConfigStore } from '@/store/userConfig'
+import { useConfigStore } from '@/store/config'
 
 const userConfigStore = useUserConfigStore()
+const configStore = useConfigStore()
 // Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
 const MarkdownPreview = computed(() => {
   const theme = userConfigStore.isDarkEnabled ? 'vuepress' : 'github'
@@ -116,11 +130,13 @@ const MarkdownPreview = computed(() => {
 // ============================================================
 const popoverVisible = ref(false)
 const activeTab = ref('unread')
-const unreadList = ref([])
 const unreadCount = ref(0)
-const unreadTotal = ref(0)
-const pageNum = ref(1)
 const pageSize = ref(10)
+const detailVisible = ref(false)
+const currentNotice = ref(null)
+
+// 加载方式（配置项 notice_load_mode）：scroll=滚动加载，pagination=分页加载
+const isScrollMode = computed(() => configStore.getNoticeLoadMode() === 'scroll')
 
 // ============================================================
 // 响应式中屏幕检测
@@ -134,13 +150,92 @@ function handleMediaChange(e) {
   isMediumDown.value = e.matches
 }
 
-const loading = ref(false)
-const readList = ref([])
-const readTotal = ref(0)
-const readPageNum = ref(1)
-const readLoading = ref(false)
-const detailVisible = ref(false)
-const currentNotice = ref(null)
+// ============================================================
+// 公告列表 — 未读 / 已读 共用同一套「滚动加载 / 分页加载」逻辑
+// ============================================================
+
+/**
+ * 创建一套公告列表状态与加载器（未读 / 已读 各持有一个独立实例）
+ * @param {Function} fetchApi 列表接口，(pageNum, pageSize) => Promise
+ * @param {string} label 日志标签
+ * @returns {Object} 列表状态、滚动容器/哨兵引用、加载方法
+ */
+const createNoticeList = (fetchApi, label) => {
+  const list = ref([])
+  const total = ref(0)
+  const pageNum = ref(1)
+  const loading = ref(false)      // 首次 / 重置加载
+  const loadingMore = ref(false)  // 触底加载更多
+  const hasMore = computed(() => list.value.length < total.value)
+  const containerRef = ref(null)  // 滚动容器（同时作为 IntersectionObserver 的 root）
+  const sentinelRef = ref(null)   // 触底哨兵
+
+  /** 重置加载：回到第 1 页并替换列表 */
+  const load = async () => {
+    // 滚动模式的页码由本函数维护，重置时必须归 1；
+    // 分页模式的页码由 el-pagination 维护，不能覆盖
+    if (isScrollMode.value) pageNum.value = 1
+    loading.value = true
+    try {
+      const res = await fetchApi(pageNum.value, pageSize.value)
+      list.value = res.data?.items || []
+      total.value = res.data?.total || 0
+    } catch (e) {
+      console.error(`获取${label}公告列表失败:`, e)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /** 触底加载：取下一页并追加到列表末尾 */
+  const loadMore = async () => {
+    if (loading.value || loadingMore.value || !hasMore.value) return
+    loadingMore.value = true
+    try {
+      const nextPage = pageNum.value + 1
+      const res = await fetchApi(nextPage, pageSize.value)
+      list.value = [...list.value, ...(res.data?.items || [])]
+      total.value = res.data?.total || 0
+      pageNum.value = nextPage
+    } catch (e) {
+      console.error(`加载更多${label}公告失败:`, e)
+    } finally {
+      loadingMore.value = false
+    }
+  }
+
+  // 哨兵进入滚动容器视口即加载下一页；哨兵为 v-if 渲染，出现 / 消失时重建观察器
+  let observer = null
+  watch([sentinelRef, containerRef], ([sentinel, root]) => {
+    observer?.disconnect()
+    observer = null
+    if (!sentinel || !root) return
+    observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) loadMore()
+    }, { root })
+    observer.observe(sentinel)
+  }, { flush: 'post' })
+
+  onUnmounted(() => observer?.disconnect())
+
+  return { list, total, pageNum, loading, loadingMore, hasMore, containerRef, sentinelRef, load, loadMore }
+}
+
+// 未读列表
+const {
+  list: unreadList, total: unreadTotal, pageNum, loading,
+  loadingMore: unreadLoadingMore, hasMore: unreadHasMore,
+  containerRef: unreadListRef, sentinelRef: unreadSentinelRef,
+  load: fetchUnreadList,
+} = createNoticeList(noticeUnreadListApi, '未读')
+
+// 已读列表
+const {
+  list: readList, total: readTotal, pageNum: readPageNum, loading: readLoading,
+  loadingMore: readLoadingMore, hasMore: readHasMore,
+  containerRef: readListRef, sentinelRef: readSentinelRef,
+  load: fetchReadList,
+} = createNoticeList(noticeReadListApi, '已读')
 
 // ============================================================
 // 数据获取
@@ -151,32 +246,6 @@ const fetchUnreadCount = async () => {
     unreadCount.value = res.data || 0
   } catch (e) {
     console.error('获取未读数量失败:', e)
-  }
-}
-
-const fetchUnreadList = async () => {
-  loading.value = true
-  try {
-    const res = await noticeUnreadListApi(pageNum.value, pageSize.value)
-    unreadList.value = res.data?.items || []
-    unreadTotal.value = res.data?.total || 0
-  } catch (e) {
-    console.error('获取未读列表失败:', e)
-  } finally {
-    loading.value = false
-  }
-}
-
-const fetchReadList = async () => {
-  readLoading.value = true
-  try {
-    const res = await noticeReadListApi(readPageNum.value, pageSize.value)
-    readList.value = res.data?.items || []
-    readTotal.value = res.data?.total || 0
-  } catch (e) {
-    console.error('获取已读列表失败:', e)
-  } finally {
-    readLoading.value = false
   }
 }
 
@@ -217,7 +286,13 @@ const handleMarkRead = async (noticeId) => {
   try {
     await noticeMarkReadApi(noticeId)
     fetchUnreadCount()
-    fetchUnreadList()
+    if (isScrollMode.value) {
+      // 滚动模式：本地移除已读项，保留已加载的分页与滚动位置
+      unreadList.value = unreadList.value.filter(item => item.id !== noticeId)
+      unreadTotal.value = Math.max(0, unreadTotal.value - 1)
+    } else {
+      fetchUnreadList()
+    }
     // 已读 Tab 已有数据时刷新
     if (readList.value.length > 0) {
       readPageNum.value = 1
@@ -328,6 +403,9 @@ defineExpose({})
 }
 
 .notice-list {
+  // 纵向弹性布局：列表未撑满容器时，剩余的空白交给哨兵吸收（见 .load-more-tip）
+  display: flex;
+  flex-direction: column;
   min-height: 200px;
   max-height: 360px;
   overflow-y: auto;
@@ -348,14 +426,33 @@ defineExpose({})
   }
 }
 
+.load-more-tip {
+  // 列表未撑满容器时吸收剩余空间，文字在其中垂直居中 → 上下间距始终相等
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 0;
+  color: var(--el-text-color-secondary);
+  font-size: 11px;
+}
+
 .notice-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
+  flex-shrink: 0;   // 列表撑满容器时保持行高，避免被压扁
 
   &:last-child {
+    border-bottom: none;
+  }
+
+  // 后面紧跟哨兵时，下间距完全交给哨兵，保证其上下等距
+  &:has(+ .load-more-tip) {
+    padding-bottom: 0;
     border-bottom: none;
   }
 
