@@ -37,12 +37,12 @@
               <el-button type="success" link size="small" @click="handleMarkRead(item.id)">已读</el-button>
             </div>
           </div>
-          <!-- 滚动加载：哨兵进入列表视口即加载下一页 -->
+          <!-- 滚动加载：哨兵进入列表视口即加载下一页（哨兵不能加 scrollable 判定，否则撑不满一屏时取不到后续数据） -->
           <div v-if="isScrollMode && unreadHasMore" ref="unreadSentinelRef" class="load-more-tip">
             <el-icon v-if="unreadLoadingMore" class="is-loading"><Loading /></el-icon>
             <span>{{ unreadLoadingMore ? '加载中...' : '下滑加载更多' }}</span>
           </div>
-          <div v-else-if="isScrollMode && unreadList.length > 0" class="load-more-tip">没有更多了</div>
+          <div v-else-if="isScrollMode && unreadScrollable && unreadList.length > 0" class="load-more-tip">没有更多了</div>
           <el-empty v-if="!loading && unreadList.length === 0" description="暂无未读公告" :image-size="0" class="empty-no-icon"/>
         </div>
         <!-- 分页（仅分页加载模式） -->
@@ -66,12 +66,12 @@
               <el-button type="primary" link size="small" @click="handleViewDetail(item)">查看详情</el-button>
             </div>
           </div>
-          <!-- 滚动加载：哨兵进入列表视口即加载下一页 -->
+          <!-- 滚动加载：哨兵进入列表视口即加载下一页（哨兵不能加 scrollable 判定，否则撑不满一屏时取不到后续数据） -->
           <div v-if="isScrollMode && readHasMore" ref="readSentinelRef" class="load-more-tip">
             <el-icon v-if="readLoadingMore" class="is-loading"><Loading /></el-icon>
             <span>{{ readLoadingMore ? '加载中...' : '下滑加载更多' }}</span>
           </div>
-          <div v-else-if="isScrollMode && readList.length > 0" class="load-more-tip">没有更多了</div>
+          <div v-else-if="isScrollMode && readScrollable && readList.length > 0" class="load-more-tip">没有更多了</div>
           <el-empty v-if="!readLoading && readList.length === 0" description="暂无已读公告" :image-size="0" />
         </div>
         <!-- 分页（仅分页加载模式） -->
@@ -158,7 +158,7 @@ function handleMediaChange(e) {
 // 未读列表
 const {
   list: unreadList, total: unreadTotal, pageNum, loading,
-  loadingMore: unreadLoadingMore, hasMore: unreadHasMore,
+  loadingMore: unreadLoadingMore, hasMore: unreadHasMore, scrollable: unreadScrollable,
   containerRef: unreadListRef, sentinelRef: unreadSentinelRef,
   load: fetchUnreadList,
 } = useNoticeList({ fetchApi: noticeUnreadListApi, label: '未读', isScrollMode, pageSize })
@@ -166,7 +166,7 @@ const {
 // 已读列表
 const {
   list: readList, total: readTotal, pageNum: readPageNum, loading: readLoading,
-  loadingMore: readLoadingMore, hasMore: readHasMore,
+  loadingMore: readLoadingMore, hasMore: readHasMore, scrollable: readScrollable,
   containerRef: readListRef, sentinelRef: readSentinelRef,
   load: fetchReadList,
 } = useNoticeList({ fetchApi: noticeReadListApi, label: '已读', isScrollMode, pageSize })
@@ -340,8 +340,8 @@ defineExpose({})
   // 纵向弹性布局：列表未撑满容器时，剩余的空白交给哨兵吸收（见 .load-more-tip）
   display: flex;
   flex-direction: column;
-  min-height: 200px;
-  max-height: 360px;
+  // 未读 / 已读 固定同一高度，切换 tab 时弹窗不会上下跳动
+  height: 250px;
   overflow-y: auto;
 
   &::-webkit-scrollbar {

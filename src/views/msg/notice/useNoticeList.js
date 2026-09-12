@@ -25,6 +25,7 @@ export function useNoticeList({ fetchApi, label, isScrollMode, pageSize }) {
   const hasMore = computed(() => list.value.length < total.value)
   const containerRef = ref(null)  // 滚动容器（同时作为 IntersectionObserver 的 root）
   const sentinelRef = ref(null)   // 触底哨兵
+  const scrollable = ref(false)   // 列表是否超出容器（供模板判断要不要显示滚动提示）
 
   // ============================================================
   // 渲染
@@ -66,6 +67,14 @@ export function useNoticeList({ fetchApi, label, isScrollMode, pageSize }) {
   // ============================================================
   // 滚动加载
   // ============================================================
+  /** 测量列表是否超出容器：一屏就放得下时，「没有更多了」纯属多余 */
+  const checkScrollable = () => {
+    const el = containerRef.value
+    if (el) scrollable.value = el.scrollHeight > el.clientHeight
+  }
+
+  watch(list, checkScrollable, { flush: 'post' })
+
   // 哨兵进入滚动容器视口即加载下一页；哨兵为 v-if 渲染，出现 / 消失时重建观察器
   let observer = null
   watch([sentinelRef, containerRef], ([sentinel, root]) => {
@@ -80,5 +89,5 @@ export function useNoticeList({ fetchApi, label, isScrollMode, pageSize }) {
 
   onUnmounted(() => observer?.disconnect())
 
-  return { list, total, pageNum, loading, loadingMore, hasMore, containerRef, sentinelRef, load }
+  return { list, total, pageNum, loading, loadingMore, hasMore, scrollable, containerRef, sentinelRef, load }
 }
