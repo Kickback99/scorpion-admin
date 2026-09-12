@@ -32,18 +32,10 @@
       <div v-if="!tableData.length" class="tcl-empty">暂无标签，点击「新增」创建一个吧</div>
     </div>
 
-    <div class="tcl-pagination">
-      <el-pagination
-        size="small"
-        v-model:current-page="params.pageNum"
-        v-model:page-size="params.pageSize"
-        :page-sizes="[2, 5, 7, 10]"
-        layout="total, sizes, prev, pager, next"
-        :total="total"
-        @size-change="onSizeChange"
-        @current-change="onCurrentChange"
-      />
+    <div ref="loadMoreRef" v-if="hasMore" class="tcl-load-more">
+      {{ loading ? '加载中...' : '下滑加载更多' }}
     </div>
+    <div v-else-if="tableData.length" class="tcl-load-more">没有更多了</div>
   </div>
 </template>
 
@@ -52,32 +44,41 @@
 // 标签云 — 圆形气泡展示，按文章数分档大小，hover 露出操作按钮
 // ============================================================
 import { Search } from '@element-plus/icons-vue'
-import { useTagList } from './useTagList'
+import { useTagScroll } from './useTagScroll'
+import { useTagEditor } from './useTagEditor'
 
 const {
-  searchData, tableData, params, total,
-  onSizeChange, onCurrentChange,
+  searchData, tableData,
+  loading, hasMore, loadMoreRef,
   onSearch, onReset,
-  handleAdd, handleEdit,
-  removeRole,
-} = useTagList()
+} = useTagScroll()
+
+const { handleAdd, handleEdit, removeRole } = useTagEditor()
 </script>
 
 <style lang="scss" scoped>
 // ============================================================
 // 标签云
 // ============================================================
-.tcl-page {
-  padding-top: 16px;
-}
-
 .tcl-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10; // 低于 tags-view 的 11，避免盖住标签栏
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  padding: 16px 0;
   margin-bottom: 32px;
   flex-wrap: wrap;
+  background: var(--el-fill-color-light);
+}
+// 背景跟随主题（深浅 / pageTheme 自适应），与 .main-container 保持一致
+html.dark .main-container:not(.page-theme) .tcl-toolbar {
+  background: var(--el-color-black);
+}
+.main-container.page-theme .tcl-toolbar {
+  background: var(--page-theme-bg);
 }
 
 .tcl-search {
@@ -85,8 +86,8 @@ const {
 }
 
 .tcl-cloud {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 100px);
   gap: 20px;
   justify-content: center;
   padding: 32px 20px;
@@ -180,6 +181,7 @@ const {
 }
 
 .tcl-empty {
+  grid-column: 1 / -1;
   width: 100%;
   text-align: center;
   padding: 60px 0;
@@ -187,9 +189,12 @@ const {
   font-size: 14px;
 }
 
-.tcl-pagination {
+.tcl-load-more {
   display: flex;
   justify-content: center;
   margin-top: 24px;
+  padding-bottom: 24px;
+  font-size: 13px;
+  color: var(--el-text-color-placeholder);
 }
 </style>
