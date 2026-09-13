@@ -25,9 +25,11 @@ export function createMarkdownPreview(theme = 'github', isPreview = false) {
   const base = isPreview ? VMdPreview : VMdEditor;
 
   if (theme === 'github') {
-    base.use(githubTheme, { Hljs: hljs });
+    // hljs 没有 vue 语言，借道 xml：其语法内置了 script/style 子语言，SFC 三段都能着色
+    base.use(githubTheme, { Hljs: hljs, codeHighlightExtensionMap: { vue: 'xml' } });
   } else if (theme === 'vuepress') {
-    base.use(vuepressTheme, { Prism });
+    // Prism 没有 vue 语言，借道 markup（xml/html 的别名本体），仅能着色 template 段
+    base.use(vuepressTheme, { Prism, codeHighlightExtensionMap: { vue: 'markup' } });
   }
 
   return base

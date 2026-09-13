@@ -31,7 +31,8 @@ export function getPlugins(){
         }),
         svgLoader(),  // 添加 SVG 加载器
         prismjs({
-          languages:['json','js','java','xml','html','css','bash','ts', 'sql', 'yaml', 'nginx','markdown','nginx','docker','shell']
+          // 只列本体名，别名由组件文件自行注册：js←javascript、html/xml←markup、ts←typescript、shell/sh←bash
+          languages:['json','javascript','java','markup','css','bash','typescript','sql','yaml','nginx','markdown','docker']
         }),
         //element plus 自动导入插件
         AutoImport({
