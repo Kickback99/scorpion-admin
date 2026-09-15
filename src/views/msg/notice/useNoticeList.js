@@ -2,7 +2,7 @@
  * 公告列表逻辑 — 滚动加载（哨兵触底追加）/ 分页加载（el-pagination）
  *
  * 未读 / 已读各调用一次 useNoticeList，得到两套互相独立的列表状态。
- * 加载方式由调用方传入 isScrollMode（配置项 notice_load_mode）决定，
+ * 加载方式由调用方传入 isScrollMode（配置项 notice.load_mode）决定，
  * 分页模式下哨兵不渲染，观察器自然不会建立。
  */
 import { computed, onUnmounted, ref, watch } from 'vue'
