@@ -1,24 +1,22 @@
 <template>
-  <!-- 固定右下角铃铛按钮 -->
-  <div class="notice-bell-wrapper">
-    <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
-      <el-button size="small" circle :icon="Bell" plain @click="handleTogglePopover" />
-    </el-badge>
-  </div>
-
-  <!-- 弹出列表卡片 -->
+  <!-- 铃铛按钮：top 模式由 ToolBar 内联渲染，其余情况由 Layout 渲染成固定右下角 -->
   <el-popover
     :visible="popoverVisible"
-    placement="top-end"
+    :placement="isTopPosition ? 'bottom-end' : 'top-end'"
     :width="popoverWidth"
     trigger="manual"
     :hide-on-click="false"
     @hide="popoverVisible = false"
   >
     <template #reference>
-      <div style="position: fixed; bottom: 20px; right: 20px; width: 0; height: 0;" />
+      <div class="notice-bell-wrapper" :class="{ 'is-inline': isTopPosition }">
+        <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
+          <el-button size="small" circle :icon="Bell" plain @click="handleTogglePopover" />
+        </el-badge>
+      </div>
     </template>
 
+    <!-- 弹出列表卡片 -->
     <div class="popover-header">
       <span class="popover-title">公告通知</span>
       <div class="popover-header-actions">
@@ -138,6 +136,9 @@ const currentNotice = ref(null)
 
 // 加载方式（配置项 notice.load_mode）：scroll=滚动加载，pagination=分页加载
 const isScrollMode = computed(() => configStore.getNoticeLoadMode() === 'scroll')
+
+// 铃铛位置（配置项 notice.bell.position）：top=内联进顶栏，bottom=固定右下角
+const isTopPosition = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 // ============================================================
 // 响应式中屏幕检测
@@ -309,6 +310,14 @@ defineExpose({})
   bottom: 20px;
   right: 20px;
   z-index: 2000;
+
+  // 顶栏内联模式：跟随按钮组排布，取消固定定位（间距与 el-button 兄弟元素一致）
+  &.is-inline {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 12px;
+  }
 
   :deep(.el-badge__content) {
     background-color: var(--el-color-danger);
