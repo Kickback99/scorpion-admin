@@ -136,7 +136,7 @@ const pageSize = ref(10)
 const detailVisible = ref(false)
 const currentNotice = ref(null)
 
-// 加载方式（配置项 notice_load_mode）：scroll=滚动加载，pagination=分页加载
+// 加载方式（配置项 notice.load_mode）：scroll=滚动加载，pagination=分页加载
 const isScrollMode = computed(() => configStore.getNoticeLoadMode() === 'scroll')
 
 // ============================================================
