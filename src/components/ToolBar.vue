@@ -441,16 +441,24 @@ const onTextColorModeChange = (mode) => {
     // 解开 flex item 默认的 min-width:auto，空间不足时允许收缩，避免把顶栏顶出横向滚动
     min-width: 0;
 
+    // 顶栏按钮「视觉间距」——每个设备档位一个单旋钮，两者互不影响：
+    //   --btn-visual-gap     PC / 平板（>480px，当前 16px）
+    //   --btn-visual-gap-xs  ≤480px 移动端（当前 12px，由下方媒体查询切过去）
+    // 依据：图标按钮去掉圆圈底后，24px 盒内只剩 12px 图标、两侧各 6px 空白，
+    // 所以 图标之间盒间距 = 本值 - 12，紧贴图标单侧空白元素的边距 = 本值 - 6（详见下方各处注释）
+    --btn-visual-gap: 16px;
+    --btn-visual-gap-xs: 12px;
+
     .buttons {
         display: flex;
         align-items: center;
         // 同上：按钮组可收缩，收缩压力才会传导到可收缩的搜索框上
         min-width: 0;
+        // 按钮组与头像之间不跟旋钮走：PC 原设计就比按钮之间更宽（20px），移动端的值见下方媒体查询
         margin-right: 20px;
 
-        // 图标按钮去掉圆圈底后，24px 盒内只剩 12px 图标、两侧各 6px 空白，视觉间距 = 盒间距 + 12，
-        // 比带圆圈时大一圈。故 gap 取 0 并用外边距把这段空白补回来，还原圆圈版的 12px 视觉间距
-        gap: 0;
+        // 图标之间：左右各带 6px 空白，故盒间距 = 视觉间距 - 12
+        gap: calc(var(--btn-visual-gap) - 12px);
 
         > .el-button + .el-button {
             margin-left: 0;
@@ -462,16 +470,16 @@ const onTextColorModeChange = (mode) => {
             margin-left: 0;
         }
 
-        // 搜索框左侧补 6px：铃铛图标右侧 6px 空白 + 这里 6px = 12px 视觉间距
+        // 搜索框左侧：铃铛图标右侧 6px 空白 + gap + 这里 6px = 视觉间距，故这里恒为 6px，与旋钮无关
         > .smart-menu-search {
             margin-left: 6px;
         }
     }
 
     // 设置按钮（原为内联 style，移入此处以便最小屏幕下用媒体查询收紧间距）
-    // 同样补掉图标左侧 6px 空白，保持圆圈版的 12px 视觉间距
+    // 左侧是箭头图标（无空白），只贴到设置图标自身左侧 6px 空白，故边距 = 视觉间距 - 6
     > .el-button {
-        margin-left: 6px;
+        margin-left: calc(var(--btn-visual-gap) - 6px);
     }
 }
 
@@ -548,11 +556,15 @@ const onTextColorModeChange = (mode) => {
 
 // 最小屏幕（≤480px）：顶栏到这里才真的放不下，此时才开始「腾空间」并开放搜索框「兜底收缩」
 @media (max-width: 480px) {
-  // 只额外收紧按钮组右边距 20→12px，腾出空间让搜索框保持 110px 不被压缩；
-  // 图标空白的补偿已在基础样式里统一处理，此处不重复
+  // 切到移动端旋钮 --btn-visual-gap-xs（默认 12px）：按钮间距与按钮组右边距都由它一个值控制，
+  // 改这一个值即可单独调移动端的整排节奏，不影响 PC
   // 选择器带 .right 前缀是为了压过基础样式里的 `.right .buttons` 声明
-  .right .buttons {
-    margin-right: 12px;
+  .right {
+    --btn-visual-gap: var(--btn-visual-gap-xs);
+
+    .buttons {
+      margin-right: var(--btn-visual-gap-xs);
+    }
   }
 
   // 兜底：只有最小屏幕才重新开放搜索框收缩（下限 64px 由组件自身声明）
