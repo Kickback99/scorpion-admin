@@ -393,6 +393,12 @@ onUnmounted(() => {
 .smart-menu-search {
   position: relative;
   display: inline-flex;
+  // 作为 flex item 参与父级工具栏布局：宽 200px，空间不足时可收缩而不是换行（下限 64px）
+  // 注意用 width 而非 flex-basis：flex-basis 不参与 max-content 计算，会因下方 width:100% 退化成
+  // 输入框固有宽度（约 195px），在空间充足时也会触发假性收缩
+  flex: 0 1 auto;
+  width: 200px;
+  min-width: 64px;
   vertical-align: middle;
   margin-left: 12px;
 }
@@ -404,7 +410,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   height: 24px;
-  width: 200px;
+  // 宽度由 .smart-menu-search 的 width 决定，这里只负责填满
+  width: 100%;
   border: 1px solid var(--el-border-color);
   border-radius: 6px;
   background: var(--el-bg-color);
@@ -429,6 +436,8 @@ onUnmounted(() => {
 
 .search-input-field {
   flex: 1;
+  // 覆盖 flex item 默认的 min-width:auto，否则输入框不肯小于自身固有宽度（约 168px）而撑出边框
+  min-width: 0;
   height: 100%;
   border: none;
   outline: none;
@@ -537,6 +546,14 @@ onUnmounted(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+// xs（≤768px）顶栏把搜索框压窄到 110px，下拉面板若跟随父容器 100% 只剩 110px，
+// 标题会被折行（「用户管理」拆成两行），故改用与桌面一致的固定宽度
+@media (max-width: 768px) {
+  .search-results {
+    width: 200px;
   }
 }
 </style>
