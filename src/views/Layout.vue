@@ -75,7 +75,7 @@
         <!-- <el-footer>Footer</el-footer> -->
       </el-container>
     </el-container>
-    <NoticeBell />
+    <NoticeBell v-if="!isNoticeBellTop" />
   </div>
 </template>
 
@@ -91,6 +91,7 @@ import Logo from '@/components/logo/index.vue';
 import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
 import { useUserConfigStore } from '@/store/userConfig';
+import { useConfigStore } from '@/store/config';
 import singleIcon from '@/components/MyIcon/src/singleIcon';
 import NoticeBell from '@/views/msg/notice/NoticeBell.vue';
 
@@ -102,6 +103,10 @@ const listData = computed(()=>
 
 // 配置存储
 const userConfigStore = useUserConfigStore()
+const configStore = useConfigStore()
+
+// 铃铛位置（配置项 notice.bell.position）：top 交给 ToolBar 内联渲染
+const isNoticeBellTop = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 const route = useRoute()
 

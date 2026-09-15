@@ -21,6 +21,8 @@
         <div class="buttons">
             <el-button size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
             <el-button size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
+            <!-- 铃铛位置为 top 时内联进按钮组（bottom 时由 Layout 渲染成固定右下角） -->
+            <NoticeBell v-if="isNoticeBellTop" />
             <SmartMenuSearch />
         </div>
 
@@ -124,6 +126,7 @@ import { adminLogoutApi } from '@/api/admin'
 import { clearRoute } from '@/utils/remove';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
+import NoticeBell from '@/views/msg/notice/NoticeBell.vue'
 import UiStyleSettings from '@/components/UiStyleSettings.vue'
 import UiSlider from '@/components/UiSlider.vue'
 import ThemeSwitcher from '@/components/theme/index.vue'
@@ -142,6 +145,9 @@ const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
 const configStore = useConfigStore()
+
+// 铃铛位置（配置项 notice.bell.position）：top 内联进按钮组，bottom 留在右下角
+const isNoticeBellTop = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 // ============================================================
 // 响应式中屏幕检测
