@@ -19,8 +19,8 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button v-show="!isMinScreenHidden('Refresh')" size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
-            <el-button v-show="!isMinScreenHidden('FullScreen')" size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
+            <el-button class="toolbar-btn-anim" v-show="!isMinScreenHidden('Refresh')" size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
+            <el-button class="toolbar-btn-anim" v-show="!isMinScreenHidden('FullScreen')" size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
             <!-- 铃铛位置为 top 时内联进按钮组（bottom 时由 Layout 渲染成固定右下角） -->
             <NoticeBell v-if="isNoticeBellTop && !isMinScreenHidden('NoticeBell')" />
             <SmartMenuSearch />
@@ -42,7 +42,7 @@
         </el-dropdown>
         <!-- 设置 popover -->
         <el-popover placement="bottom" :width="260" trigger="hover">
-          <template #reference><el-button v-show="!isMinScreenHidden('Setting')" size="small" circle icon="Setting" plain></el-button></template>
+          <template #reference><el-button class="toolbar-btn-anim" v-show="!isMinScreenHidden('Setting')" size="small" circle icon="Setting" plain></el-button></template>
           <div class="popover-scroll">
               <el-form size="small">
                 <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
