@@ -19,10 +19,10 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
-            <el-button size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
+            <el-button v-show="!isXsHidden('Refresh')" size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
+            <el-button v-show="!isXsHidden('FullScreen')" size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
             <!-- 铃铛位置为 top 时内联进按钮组（bottom 时由 Layout 渲染成固定右下角） -->
-            <NoticeBell v-if="isNoticeBellTop" />
+            <NoticeBell v-if="isNoticeBellTop && !isXsHidden('NoticeBell')" />
             <SmartMenuSearch />
         </div>
 
@@ -42,7 +42,7 @@
         </el-dropdown>
         <!-- 设置 popover -->
         <el-popover placement="bottom" :width="260" trigger="hover">
-          <template #reference><el-button size="small" circle icon="Setting" plain style="margin-left: 12px"></el-button></template>
+          <template #reference><el-button v-show="!isXsHidden('Setting')" size="small" circle icon="Setting" plain></el-button></template>
           <div class="popover-scroll">
               <el-form size="small">
                 <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
@@ -159,6 +159,23 @@ function handleMediaChange(e) {
   isMediumDown.value = e.matches
 }
 
+// xs（≤768px）顶栏放不下，按此优先级让出一个元素给搜索框，避免压缩搜索框宽度
+const XS_HIDE_PRIORITY = ['Refresh', 'FullScreen', 'NoticeBell', 'Setting']
+
+const isXs = ref(false)
+const xsQuery = window.matchMedia('(max-width: 768px)')
+
+function handleXsChange(e) {
+  isXs.value = e.matches
+}
+
+// 铃铛配到 bottom 时本就不在顶栏（由 Layout 渲染在右下角），空间已省下，无需再让
+const xsHiddenKey = computed(() =>
+  isXs.value && isNoticeBellTop.value ? XS_HIDE_PRIORITY[0] : null,
+)
+
+const isXsHidden = (key) => xsHiddenKey.value === key
+
 // 中屏幕以下自动折叠菜单
 const savedCollapse = ref(null)
 watch(isMediumDown, (val) => {
@@ -178,10 +195,13 @@ watch(isMediumDown, (val) => {
 onMounted(() => {
   isMediumDown.value = mediaQuery.matches
   mediaQuery.addEventListener('change', handleMediaChange)
+  isXs.value = xsQuery.matches
+  xsQuery.addEventListener('change', handleXsChange)
 })
 
 onUnmounted(() => {
   mediaQuery.removeEventListener('change', handleMediaChange)
+  xsQuery.removeEventListener('change', handleXsChange)
 })
 
 // ============================================================
@@ -417,8 +437,20 @@ const onTextColorModeChange = (mode) => {
 .right {
     @include flex(null, center, null);
 
+    // 解开 flex item 默认的 min-width:auto，空间不足时允许收缩，避免把顶栏顶出横向滚动
+    min-width: 0;
+
     .buttons {
+        display: flex;
+        align-items: center;
+        // 同上：按钮组可收缩，收缩压力才会传导到可收缩的搜索框上
+        min-width: 0;
         margin-right: 20px;
+    }
+
+    // 设置按钮（原为内联 style，移入此处以便 xs 下用媒体查询收紧间距）
+    > .el-button {
+        margin-left: 12px;
     }
 }
 
@@ -465,9 +497,9 @@ const onTextColorModeChange = (mode) => {
   width: 100%;
 }
 
-// 中屏幕以下压缩搜索框宽度，防止断行
+// 中屏幕以下压缩搜索框基准宽度，防止断行
 @media (max-width: 1250px) {
-  :deep(.smart-menu-search .search-input-row) {
+  :deep(.smart-menu-search) {
     width: 130px;
   }
 }
@@ -483,8 +515,30 @@ const onTextColorModeChange = (mode) => {
     margin-right: 3px;
   }
 
-  // 进一步压缩搜索框宽度，避免与刷新/全屏按钮拥挤断行
-  :deep(.smart-menu-search .search-input-row) {
+  // 收紧按钮间距（12→6px、按钮组右边距 20→8px），腾出空间让搜索框保持 110px 不被压缩
+  // 选择器带 .right 前缀是为了压过基础样式里的 `.right .buttons` 声明
+  .right .buttons {
+    margin-right: 8px;
+    // 用 gap 统一间距，从而清掉子元素自带的 margin-left —— 让出刷新按钮后，首个可见按钮才不会有前导间距
+    gap: 6px;
+
+    > .el-button + .el-button,
+    > .smart-menu-search {
+      margin-left: 0;
+    }
+
+    // 铃铛根元素是 el-popover 而非 .notice-bell-wrapper，拿不到本组件的 scoped 标记，
+    // 其 margin-left:12px 声明在子组件样式里，故用 :deep + 足量特异性覆盖
+    > :deep(.notice-bell-wrapper.is-inline) {
+      margin-left: 0;
+    }
+  }
+
+  .right > .el-button {
+    margin-left: 6px;
+  }
+
+  :deep(.smart-menu-search) {
     width: 110px;
   }
 }
