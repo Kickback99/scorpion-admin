@@ -11,7 +11,8 @@
     <template #reference>
       <div class="notice-bell-wrapper" :class="{ 'is-inline': isTopPosition }">
         <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
-          <el-button size="small" circle :icon="Bell" plain @click="handleTogglePopover" />
+          <!-- 与顶栏图标按钮统一：不分上/下位置，一律去掉默认圆圈底与描边 -->
+          <el-button size="small" circle :icon="Bell" plain class="toolbar-icon-btn" @click="handleTogglePopover" />
         </el-badge>
       </div>
     </template>
