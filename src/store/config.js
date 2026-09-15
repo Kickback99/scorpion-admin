@@ -300,6 +300,17 @@ export const useConfigStore = defineStore({
       }
     },
 
+    /**
+     * 按完整路径（含 group 前缀）本地设置值，不调 API
+     * 供 ConfigManager 精确同步用：同名 key 在多个分组下并存时，
+     * setValue 的模糊匹配会命中先遍历到的分组，此处按路径直达指定分组
+     * @param {string} fullPath — 形如 'admin.notice.load_mode'
+     * @param {any} value — 新值
+     */
+    setValueByPath(fullPath, value) {
+      deepSet(this, fullPath.split('.'), value)
+    },
+
     // ==================== 核心：加载 & 更新 ====================
 
     /** 加载所有配置 */
