@@ -1,5 +1,6 @@
 import './assets/style/index.scss'
 import './assets/style/markdown.scss'
+import './assets/style/toolbar-anim.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'
