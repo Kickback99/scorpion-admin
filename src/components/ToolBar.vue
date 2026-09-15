@@ -19,10 +19,10 @@
     </div>
     <div class="right">
         <div class="buttons">
-            <el-button v-show="!isXsHidden('Refresh')" size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
-            <el-button v-show="!isXsHidden('FullScreen')" size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
+            <el-button v-show="!isMinScreenHidden('Refresh')" size="small" circle icon="Refresh" @click="modifyRefresh" plain></el-button>
+            <el-button v-show="!isMinScreenHidden('FullScreen')" size="small" circle icon="FullScreen" @click="fullScreen" plain></el-button>
             <!-- 铃铛位置为 top 时内联进按钮组（bottom 时由 Layout 渲染成固定右下角） -->
-            <NoticeBell v-if="isNoticeBellTop && !isXsHidden('NoticeBell')" />
+            <NoticeBell v-if="isNoticeBellTop && !isMinScreenHidden('NoticeBell')" />
             <SmartMenuSearch />
         </div>
 
@@ -42,7 +42,7 @@
         </el-dropdown>
         <!-- 设置 popover -->
         <el-popover placement="bottom" :width="260" trigger="hover">
-          <template #reference><el-button v-show="!isXsHidden('Setting')" size="small" circle icon="Setting" plain></el-button></template>
+          <template #reference><el-button v-show="!isMinScreenHidden('Setting')" size="small" circle icon="Setting" plain></el-button></template>
           <div class="popover-scroll">
               <el-form size="small">
                 <el-form-item label="暗黑模式"><el-switch :model-value="userConfigStore.isDarkEnabled" @change="toggleDark" size="small" inline-prompt active-icon="Moon" inactive-icon="Sunny" /></el-form-item>
@@ -159,22 +159,23 @@ function handleMediaChange(e) {
   isMediumDown.value = e.matches
 }
 
-// xs（≤768px）顶栏放不下，按此优先级让出一个元素给搜索框，避免压缩搜索框宽度
-const XS_HIDE_PRIORITY = ['Refresh', 'FullScreen', 'NoticeBell', 'Setting']
+// 最小屏幕（≤480px）顶栏放不下，按此优先级让出一个元素给搜索框，避免压缩搜索框宽度
+// 480 以上的断点不做任何让位，保持顶栏原始布局
+const MIN_SCREEN_HIDE_PRIORITY = ['Refresh', 'FullScreen', 'NoticeBell', 'Setting']
 
-const isXs = ref(false)
-const xsQuery = window.matchMedia('(max-width: 768px)')
+const isMinScreen = ref(false)
+const minScreenQuery = window.matchMedia('(max-width: 480px)')
 
-function handleXsChange(e) {
-  isXs.value = e.matches
+function handleMinScreenChange(e) {
+  isMinScreen.value = e.matches
 }
 
 // 铃铛配到 bottom 时本就不在顶栏（由 Layout 渲染在右下角），空间已省下，无需再让
-const xsHiddenKey = computed(() =>
-  isXs.value && isNoticeBellTop.value ? XS_HIDE_PRIORITY[0] : null,
+const minScreenHiddenKey = computed(() =>
+  isMinScreen.value && isNoticeBellTop.value ? MIN_SCREEN_HIDE_PRIORITY[0] : null,
 )
 
-const isXsHidden = (key) => xsHiddenKey.value === key
+const isMinScreenHidden = (key) => minScreenHiddenKey.value === key
 
 // 中屏幕以下自动折叠菜单
 const savedCollapse = ref(null)
@@ -195,13 +196,13 @@ watch(isMediumDown, (val) => {
 onMounted(() => {
   isMediumDown.value = mediaQuery.matches
   mediaQuery.addEventListener('change', handleMediaChange)
-  isXs.value = xsQuery.matches
-  xsQuery.addEventListener('change', handleXsChange)
+  isMinScreen.value = minScreenQuery.matches
+  minScreenQuery.addEventListener('change', handleMinScreenChange)
 })
 
 onUnmounted(() => {
   mediaQuery.removeEventListener('change', handleMediaChange)
-  xsQuery.removeEventListener('change', handleXsChange)
+  minScreenQuery.removeEventListener('change', handleMinScreenChange)
 })
 
 // ============================================================
@@ -448,10 +449,15 @@ const onTextColorModeChange = (mode) => {
         margin-right: 20px;
     }
 
-    // 设置按钮（原为内联 style，移入此处以便 xs 下用媒体查询收紧间距）
+    // 设置按钮（原为内联 style，移入此处以便最小屏幕下用媒体查询收紧间距）
     > .el-button {
         margin-left: 12px;
     }
+}
+
+// 顶栏空间充足，搜索框一律拒绝收缩；收缩兜底只在最小屏幕（≤480px）开放，见下方媒体查询
+:deep(.smart-menu-search) {
+    flex-shrink: 0;
 }
 
 // 隐藏颜色选择器清空按钮的2种方式
@@ -504,7 +510,7 @@ const onTextColorModeChange = (mode) => {
   }
 }
 
-// 移动端（≤768px）隐藏用户名，防止搜索框断行
+// 移动端（≤768px）隐藏用户名 + 压缩搜索框宽度（间距与布局保持原始，不在本断点收紧）
 @media (max-width: 768px) {
   .user-name {
     display: none;
@@ -515,6 +521,13 @@ const onTextColorModeChange = (mode) => {
     margin-right: 3px;
   }
 
+  :deep(.smart-menu-search) {
+    width: 110px;
+  }
+}
+
+// 最小屏幕（≤480px）：顶栏到这里才真的放不下，此时才开始「腾空间」并开放搜索框「兜底收缩」
+@media (max-width: 480px) {
   // 收紧按钮间距（12→6px、按钮组右边距 20→8px），腾出空间让搜索框保持 110px 不被压缩
   // 选择器带 .right 前缀是为了压过基础样式里的 `.right .buttons` 声明
   .right .buttons {
@@ -538,8 +551,9 @@ const onTextColorModeChange = (mode) => {
     margin-left: 6px;
   }
 
+  // 兜底：只有最小屏幕才重新开放搜索框收缩（下限 64px 由组件自身声明）
   :deep(.smart-menu-search) {
-    width: 110px;
+    flex-shrink: 1;
   }
 }
 

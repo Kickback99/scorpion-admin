@@ -393,7 +393,8 @@ onUnmounted(() => {
 .smart-menu-search {
   position: relative;
   display: inline-flex;
-  // 作为 flex item 参与父级工具栏布局：宽 200px，空间不足时可收缩而不是换行（下限 64px）
+  // 作为 flex item 参与父级工具栏布局：宽 200px，空间不足时可收缩到 64px
+  // 收缩是否开放由使用方决定（ToolBar 在 >480px 显式 flex-shrink:0 拒绝收缩，≤480px 才重新开放）
   // 注意用 width 而非 flex-basis：flex-basis 不参与 max-content 计算，会因下方 width:100% 退化成
   // 输入框固有宽度（约 195px），在空间充足时也会触发假性收缩
   flex: 0 1 auto;
