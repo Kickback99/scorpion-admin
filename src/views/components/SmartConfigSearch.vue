@@ -110,8 +110,12 @@ const searchIndex = groups.flatMap(group => {
 
 // 补充 configStore 中存在但 configItems 中未声明的额外 key
 const configStore = useConfigStore()
-const existingKeys = new Set(searchIndex.map(s => s.configKey))
 
+// 去重键 = 分组 + 相对路径。同名 key 在不同分组下并存时各自保留一条，
+// 若只按相对路径去重，后声明的分组会把先声明的覆盖掉，导致另一分组搜不出来
+const existingKeys = new Set(searchIndex.map(s => `${s.groupKey}.${s.configKey}`))
+
+// 展平为**不含分组前缀**的相对路径，与 configItems 的 item.key 格式保持一致
 const flattenState = (obj, prefix = '') => {
   const result = []
   for (const [key, value] of Object.entries(obj || {})) {
@@ -120,9 +124,7 @@ const flattenState = (obj, prefix = '') => {
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
       result.push(...flattenState(value, full))
     }
-    if (!existingKeys.has(full)) {
-      result.push({ configKey: full, value, prefix })
-    }
+    result.push({ configKey: full, value })
   }
   return result
 }
@@ -147,13 +149,14 @@ const extraKeys = computed(() => {
         })
       }
 
-      const flat = flattenState(topValue, topKey)
+      const flat = flattenState(topValue)
       for (const { configKey, value } of flat) {
-        const parts = configKey.split('.')
+        // 已由 configItems 声明过（同一分组同名 key）→ 跳过，避免重复条目
+        if (existingKeys.has(`${topKey}.${configKey}`)) continue
         extras.push({
           groupKey: topKey, groupLabel, configKey,
           label: '', desc: typeof value === 'object' ? '对象' : String(value),
-          breadcrumb: [topKey, ...parts.slice(1)],
+          breadcrumb: [topKey, ...configKey.split('.')],
           icon: null, isGroup: false,
         })
       }

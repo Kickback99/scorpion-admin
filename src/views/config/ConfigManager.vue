@@ -240,7 +240,8 @@ const addForm = reactive({
   min: null,           // 默认为 null，表示不设置
   max: null,           // 默认为 null，表示不设置
   enableThreshold: false,  // 是否启用阈值设置
-  parentPath: ''
+  parentPath: '',          // 父节点相对路径（不含 group 前缀）
+  parentGroupKey: ''       // 父节点所属分组（client / admin / user_config）
 })
 
 // 表单验证规则
@@ -405,7 +406,9 @@ const buildGroupedTreeData = (apiData) => {
       value: null, type: 'object', isObject: true,
       isEditing: false, editValue: null,
       children: convertToTreeData(groupData, '', group.key),
-      parentPath: '', min: undefined, max: undefined, isSystem: false
+      parentPath: '', min: undefined, max: undefined, isSystem: false,
+      // 分组根节点：row.key 即 group key，新增子项时无需再加分组前缀
+      isGroup: true
     })
   }
 
@@ -426,6 +429,8 @@ const buildGroupedTreeData = (apiData) => {
       editValue: isObject ? null : value,
       children: isObject ? convertToTreeData(value, key, '') : [],
       parentPath: '', min: undefined, max: undefined, isSystem: false,
+      // 孤儿根级 key：本身即顶层，新增子项时无需再加分组前缀
+      isGroup: true,
       _groupKey: '',
     })
   }
@@ -583,7 +588,7 @@ const handleSave = async (row) => {
       row.isEditing = false
       msg.primary('保存成功')
       // 同步更新 store
-      await syncStoreValue(row.key, newValue)
+      await syncStoreValue(row, newValue)
     } else {
       msg.error(res.message || '保存失败')
     }
@@ -593,9 +598,9 @@ const handleSave = async (row) => {
   }
 }
 
-// 同步 store 中的值
-const syncStoreValue = (key, value) => {
-  configStore.setValue(key, value)
+// 同步 store 中的值（按含分组前缀的完整路径写入，避免同名 key 跨分组歧义）
+const syncStoreValue = (row, value) => {
+  configStore.setValueByPath(buildApiKey(row), value)
   configStore.executeInit()
 }
 
@@ -673,7 +678,8 @@ const resetAddForm = () => {
   addForm.min = null
   addForm.max = null
   addForm.enableThreshold = false
-  
+  addForm.parentGroupKey = ''
+
   // 清除表单校验状态和错误信息
   if (addFormRef.value) {
     addFormRef.value.resetFields()
@@ -696,6 +702,10 @@ const handleAddRoot = () => {
 const handleAddChild = (row) => {
   resetAddForm()
   addForm.parentPath = row.key
+  // 分组根节点 / 孤儿根级 key 本身就是顶层，不需要再加分组前缀；
+  // 其余节点（如 admin 下的 notice）必须带上所属分组，
+  // 否则 client / admin 存在同名 key 时会落到错误的分类
+  addForm.parentGroupKey = row.isGroup ? '' : (row._groupKey || '')
   addDialogVisible.value = true
 }
 
@@ -719,19 +729,13 @@ const handleConfirmAdd = async () => {
         let targetObj = fullConfig
         
         if (addForm.parentPath) {
-          let pathParts = addForm.parentPath.split('.')
+          // 带上分组前缀，定位到唯一路径；
+          // 不再按 groups 顺序盲搜（client / admin 同名 key 时会命中错误的分类）
+          const pathParts = addForm.parentGroupKey
+            ? [addForm.parentGroupKey, ...addForm.parentPath.split('.')]
+            : addForm.parentPath.split('.')
           targetObj = getNestedObject(fullConfig, pathParts)
           if (!targetObj) {
-            // 父路径可能是相对路径（如仅 'address'），尝试在各 group 下查找
-            const { groups } = useConfigItems()
-            for (const g of groups) {
-              const tryParts = [g.key, ...pathParts]
-              const found = getNestedObject(fullConfig, tryParts)
-              if (found) { targetObj = found; pathParts = tryParts; break }
-            }
-          }
-          if (!targetObj) {
-            // 仍不存在则用原始 pathParts 创建
             ensureNestedPath(fullConfig, pathParts)
             targetObj = getNestedObject(fullConfig, pathParts)
           }
