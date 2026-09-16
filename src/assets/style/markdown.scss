@@ -77,12 +77,17 @@
 
 // 深色模式下 vuepress 预览背景
 .dark-mode {
-  .v-md-editor__preview-wrapper {
-    background: var(--el-bg-color) !important;
-  }
+  // 只读预览（VMdPreview：公告详情 / 通知铃铛 / 文章预览弹窗）跟随面板底色
   .vuepress-markdown-body {
     color: #fff;
     background: var(--el-bg-color) !important;
+  }
+
+  // 编辑器右侧预览（Markdown.vue）：与左侧编辑区同为纯黑
+  // 编辑区在下方被钉死为 #000，此处若用 var(--el-bg-color)(#141414) 会左右半边色差
+  // .v-md-editor__preview-wrapper 仅编辑器存在（VMdPreview 无此层），靠它拉开特异性分流
+  .v-md-editor__preview-wrapper .vuepress-markdown-body {
+    background: #000 !important;
   }
 }
 
