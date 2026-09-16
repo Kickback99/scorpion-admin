@@ -339,6 +339,17 @@ export const cleanupTabsByCurrentRoutes = () => {
 
 const whiteList = ['/login','/register','/401']
 
+// 中止导航：next(false) 后 vue-router 不触发 afterEach，进度条需手动收尾
+const abortNavigation = (next) => {
+    nprogress.done()
+    next(false)
+}
+
+// 导航中抛错（如异步路由组件加载失败）同样不触发 afterEach
+router.onError(() => {
+    nprogress.done()
+})
+
 router.beforeEach((to, from, next) => {
     nprogress.start()
     const settings =  useSettingStore()
@@ -363,7 +374,10 @@ router.beforeEach((to, from, next) => {
     if(to.path === '/login' && isLogin) {
         console.log('==================== 已登录不能输入登录地址回到登录页 ====================')
         msg.warning('请先退出登录')
-        return next(from.fullPath);
+        // 首次导航时 from 是 START_LOCATION（fullPath 为 '/'），回它会经 '/' 的 redirect 绕到仪表盘；
+        // 且 from 为 /login 时会自环，故显式判定来源是否可用
+        const hasOrigin = from.matched.length > 0 && from.path !== '/login'
+        return next(hasOrigin ? from.fullPath : '/index');
     }
 
     // 白名单放行
@@ -439,7 +453,7 @@ router.beforeEach((to, from, next) => {
         {
             // 认证过期已由 handleAuthExpired 清理+弹窗+跳转，这里静默阻止导航，避免重复弹窗
             if (error && error.__authExpired) {
-                next(false)
+                abortNavigation(next)
                 return
             }
             // 无菜单权限的后台用户 -> 跳转403
@@ -459,9 +473,9 @@ router.beforeEach((to, from, next) => {
                 cleanupTabsByCurrentRoutes()
             }else {
                 msg.error(error|| '加载菜单失败');
-                next(false); // 阻止导航
+                abortNavigation(next); // 阻止导航
             }
-                 
+
         }
     )
 });

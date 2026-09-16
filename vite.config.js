@@ -64,6 +64,29 @@ export default defineConfig(({mode}) => {
         }
       },
     },
+    // 依赖预构建白名单：提前声明「转换期才生成、预扫描发现不了」的依赖，
+    // 否则 Vite 会在运行时才发现它们，触发重新预构建 + full-reload，把导航中的用户打回上一页
+    optimizeDeps: {
+      include: [
+        // element-plus 按需样式入口：unplugin-vue-components 解析到组件时才注入，预扫描看不到
+        'element-plus/es/components/*/style/css',
+        // markdown 高亮语言包：prismjs 无 exports 字段，glob 会展开出全部 596 个语言包，故逐个列举
+        'prismjs/components/prism-core',
+        'prismjs/components/prism-json',
+        'prismjs/components/prism-clike',
+        'prismjs/components/prism-markup',
+        'prismjs/components/prism-javascript',
+        'prismjs/components/prism-java',
+        'prismjs/components/prism-css',
+        'prismjs/components/prism-bash',
+        'prismjs/components/prism-yaml',
+        'prismjs/components/prism-markdown',
+        'prismjs/components/prism-sql',
+        'prismjs/components/prism-typescript',
+        'prismjs/components/prism-nginx',
+        'prismjs/components/prism-docker',
+      ],
+    },
     // scss全局变量
     css: {
       preprocessorOptions: {
