@@ -1,85 +1,48 @@
-import { listIcons,getIcon } from '@iconify/vue';
-import { addCollection, addIcon } from '@iconify/vue/dist/offline';
-import { prefix as epPrefix, icons as epIcons } from '@iconify-json/ep/icons.json';
-import { prefix as riPrefix, icons as rIIcons } from '@iconify-json/ri/icons.json';
-import { prefix as fasPrefix, icons as fasIcons } from '@iconify-json/fa-solid/icons.json';
-import { useIconStore } from '@/store/icon';
+import { addCollection } from '@iconify/vue/dist/offline'
+import { getIconData } from '@/utils/iconifyOffline'
+import { useIconStore } from '@/store/icon'
 
-export function addBatchIconList(icons) {
-    // console.log('批量加载调用了');
+// 最近一次批量注册的完成 Promise
+let readyPromise = Promise.resolve()
 
-    // t_store_icon：iconifyBachOffline.js(所有批量图标)
-    // 存入store
-    const iconStore = useIconStore()
-    iconStore.setBatchIcons([...icons])
-    
-    // 获取已存在的图标列表
-    const existingIcons = listIcons();
-    const newIconsMap = {}; // 按前缀分组的新图标
-    const existingIconsToAdd = []; // 需要单独添加的已存在图标
-    
-    // 第一步：分类处理所有图标
-        icons.forEach(fullName => {
-        const [prefix, name] = fullName.split(':');
-        
-        // 先检查是否已存在
-        if (existingIcons.includes(fullName)) {
-            // 已存在 -> 从getIcon获取数据
-            const iconData = getIcon(fullName);
-            if (iconData) {
-                existingIconsToAdd.push({ fullName, iconData });
-            } /* else {
-                console.warn(`图标 ${fullName} 已存在但获取失败`);
-            } */
-        } else {
-            // 新图标 -> 从本地JSON获取数据
-            const iconData = getIconData(prefix, name);
-            if (!iconData) {
-                // console.warn(`无法获取图标数据: ${fullName}`);
-                return;
-            }
-            
-            // 按前缀分组
-            if (!newIconsMap[prefix]) {
-                newIconsMap[prefix] = {
-                    prefix,
-                    icons: {}
-                };
-            }
-            newIconsMap[prefix].icons[name] = iconData;
-        }
-    });
-    
-    // 第二步：批量添加新图标
-    Object.values(newIconsMap).forEach(group => {
-        if (Object.keys(group.icons).length > 0) {
-            // console.log(`批量添加前缀 ${group.prefix} 的图标集`, group);
-            addCollection(group);
-        }
-    });
-    
-    // 第三步：单独添加已存在的图标
-    existingIconsToAdd.forEach(({ fullName, iconData }) => {
-        // console.log(`单独添加已存在图标 ${fullName}`);
-        addIcon(fullName, iconData);
-    });
-    
-    // console.log('当前所有在线图标:', listIcons());
+/**
+ * 批量注册的完成 Promise
+ * 注册是异步的，只渲染「已注册图标」的 OfflineIcon 需等它 resolve 后再重渲染
+ * @returns {Promise<void>}
+ */
+export function whenBatchIconsReady() {
+    return readyPromise
 }
 
-// 获取图标数据的函数保持不变
-function getIconData(prefix, key) {
-    let iconData;
-    if (prefix === epPrefix) {
-        iconData = epIcons[key];
-        return iconData ? { ...iconData, width: 1024, height: 1024 } : null;
-    } else if (prefix === riPrefix) {
-        iconData = rIIcons[key];
-        return iconData ? { ...iconData, width: 24, height: 24 } : null;
-    } else if (prefix === fasPrefix) {
-        iconData = fasIcons[key];
-        if (!iconData) return null;
-        return iconData.width ? iconData : { ...iconData, width: 1024, height: 1024 };
+/**
+ * 批量注册离线图标（异步：图标集按前缀懒加载，加载完成后整集 addCollection）
+ * @param {string[]} icons - 完整图标名列表，如 ['ep:check', 'ri:add-fill']
+ * @returns {Promise<void>}
+ */
+export function addBatchIconList(icons) {
+    // t_store_icon：iconifyBachOffline.js(所有批量图标)
+    // 存入store（与图标数据加载无关，保持同步，供 IconCollect 使用）
+    const iconStore = useIconStore()
+    iconStore.setBatchIcons([...icons])
+
+    readyPromise = registerIcons(icons)
+    return readyPromise
+}
+
+/**
+ * 按前缀分组加载并整集注册
+ * @param {string[]} icons - 完整图标名列表
+ * @returns {Promise<void>}
+ */
+async function registerIcons(icons) {
+    const groups = {}
+    for (const fullName of icons) {
+        const [prefix, name] = fullName.split(':')
+        const iconData = await getIconData(prefix, name)
+        if (!iconData) continue
+        if (!groups[prefix]) groups[prefix] = { prefix, icons: {} }
+        groups[prefix].icons[name] = iconData
     }
-    return null;
+
+    Object.values(groups).forEach((group) => addCollection(group))
 }

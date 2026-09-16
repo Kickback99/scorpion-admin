@@ -1,10 +1,11 @@
-import { h, defineComponent,onMounted } from "vue";
+import { h, defineComponent,onMounted,ref } from "vue";
 import { Icon as IconifyIcon, addIcon } from "@iconify/vue/dist/offline";
 import { getIcon } from '@iconify/vue';
 
 import Check from "@iconify-icons/ep/check";
 import Bell from "@iconify-icons/ep/bell";
 import { useIconStore } from "@/store/icon";
+import { whenBatchIconsReady } from "./iconifyBachOffline";
 addIcon("check", Check);
 addIcon("bell", Bell);
 addIcon("ep:aim",{
@@ -36,6 +37,11 @@ export default defineComponent({
       // t_store_icon：offlineIcon.js(离线图标收集)
       // 存入store
     setup(props) {
+      // 批量注册已改为异步：注册完成后 bump 版本号触发重渲染
+      //（离线 storage 是普通对象，addCollection 不触发响应式更新）
+      const lazyIconVersion = ref(0)
+      whenBatchIconsReady().then(() => { lazyIconVersion.value++ })
+
       if (props.isCollect && props.icon) {
         const iconStore = useIconStore();
         onMounted(() => {
@@ -47,8 +53,12 @@ export default defineComponent({
           iconStore.setBatchUsedIcons([...uniqueIcons]);
         });
       }
+
+      return { lazyIconVersion }
     },
   render() {
+    // 订阅批量注册完成信号，注册到位后重渲染
+    void this.lazyIconVersion
     if (typeof this.icon === "object") addIcon(this.icon, this.icon);
     const attrs = this.$attrs;
     return h(
