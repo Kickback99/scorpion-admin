@@ -28,7 +28,8 @@ export default defineConfig(({mode}) => {
             'element-plus': ['element-plus', '@element-plus/icons-vue'],
             echarts: ['echarts'],
             editor: ['@kangc/v-md-editor', 'prismjs', 'markdown-it', 'highlight.js'],
-            utils: ['axios', 'crypto-js', 'cronstrue', 'pinyin-match', 'nprogress', 'mitt'],
+            // utils 被入口静态依赖，写进来的库会无条件进首屏 —— 懒加载的库（如 pinyin-match / cronstrue）不要放这
+            utils: ['axios', 'crypto-js', 'nprogress', 'mitt'],
           },
         },
       },
