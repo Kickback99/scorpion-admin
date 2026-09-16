@@ -221,12 +221,7 @@
                         upload-handler="notice"
                     />
                     <template #fallback>
-                        <div
-                            v-loading="true"
-                            :element-loading-background="loadingMaskBg"
-                            class="markdown-loading"
-                            :style="{ height: `${MARKDOWN_EDITOR_HEIGHT}px` }"
-                        ></div>
+                        <SmartLoading :height="MARKDOWN_EDITOR_HEIGHT" />
                     </template>
                 </Suspense>
                 <!-- 富文本模式（只读 → MarkdownPreview）：预览高度由内容撑开，占位只保底不塌陷 -->
@@ -235,11 +230,7 @@
                         <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="formModel.content" @click="handleCopyCodeSuccess" />
                     </div>
                     <template #fallback>
-                        <div
-                            v-loading="true"
-                            :element-loading-background="loadingMaskBg"
-                            class="markdown-loading markdown-loading--preview"
-                        ></div>
+                        <SmartLoading :min-height="MARKDOWN_PREVIEW_MIN_HEIGHT" />
                     </template>
                 </Suspense>
             </el-form-item>
@@ -327,11 +318,14 @@ import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { hasPerm, showPermColumn } from '@/utils/permissions'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
+import SmartLoading from '@/views/components/SmartLoading.vue'
 import msg from '@/components/msg'
 // 懒加载 Markdown 富文本编辑器，仅在编辑公告时加载
 const Markdown = defineAsyncComponent(() => import('@/components/Markdown.vue'))
 // 编辑器高度：加载占位与编辑器共用同一来源，避免加载前后高度跳变
 const MARKDOWN_EDITOR_HEIGHT = 400
+// 预览加载占位的最小高度：预览高度由公告内容撑开，占位只保底不塌陷
+const MARKDOWN_PREVIEW_MIN_HEIGHT = 200
 import {
     noticeListApi,
     noticeAddApi,
@@ -573,11 +567,6 @@ const MarkdownPreview = computed(() => {
     ),
   )
 })
-
-// v-loading 遮罩底色：跟随深浅模式，取值与 IconCollect.vue 保持一致
-const loadingMaskBg = computed(() =>
-    userConfigStore.isDarkEnabled ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'
-)
 
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -1206,16 +1195,6 @@ const handlePush = async (row) => {
   color: var(--el-text-color-primary);
   background: var(--el-fill-color-light);
   border-radius: 4px;
-}
-
-/* Markdown 懒加载占位：可编辑分支与编辑器等高，只读分支只保底不塌陷 */
-.markdown-loading {
-  width: 100%;
-  border-radius: 4px;
-}
-
-.markdown-loading--preview {
-  min-height: 200px;
 }
 
 /* 公告图片样式（公告详情弹窗专用，不抽取到公共样式） */
