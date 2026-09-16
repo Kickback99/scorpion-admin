@@ -9,7 +9,7 @@
     @hide="popoverVisible = false"
   >
     <template #reference>
-      <div class="notice-bell-wrapper" :class="{ 'is-inline': isTopPosition }">
+      <div class="notice-bell-wrapper" :class="{ 'is-inline': isTopPosition, 'is-two-digit': unreadCount > 9 }">
         <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
           <!-- 与顶栏图标按钮统一：不分上/下位置，一律去掉默认圆圈底与描边 -->
           <el-button size="small" circle :icon="Bell" plain class="toolbar-icon-btn" @click="handleTogglePopover" />
@@ -317,7 +317,28 @@ defineExpose({})
     position: static;
     display: inline-flex;
     align-items: center;
+    // 内联后必须清掉 2000：z-index 对 flex 子项在静态定位下依然生效，否则会盖住全屏编辑器（1001）
+    z-index: auto;
     margin-left: 12px;
+  }
+
+  // 气泡收小一档，贴合 24px 盒 / 12px 图标（EP 默认 18px 偏大）；只管本组件，不动全局 .el-badge
+  :deep(.el-badge) {
+    --el-badge-size: 14px;
+    --el-badge-font-size: 10px;
+    --el-badge-padding: 4px;
+    --el-badge-radius: 7px;
+  }
+
+  // 贴角位置：1px 是 EP 的边框补偿，末尾 +3px 左收、top 4px 下压，让气泡搭到铃铛右肩（原式 top 为 0）
+  :deep(.el-badge__content.is-fixed) {
+    right: calc(1px + var(--el-badge-size) / 2 + 3px);
+    top: 4px;
+  }
+
+  // 两位数（unreadCount > 9）：宽出一个字宽，把开头的 1px 抬到 5px 多左收 4px
+  &.is-two-digit :deep(.el-badge__content.is-fixed) {
+    right: calc(5px + var(--el-badge-size) / 2 + 3px);
   }
 
   :deep(.el-badge__content) {
