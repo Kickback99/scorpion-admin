@@ -21,9 +21,6 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import { ElDialog } from 'element-plus'
 ElDialog.props.closeOnClickModal.default = false
 
-// ECharts 按需注册
-import './plugins/echarts'
-
 const app = createApp(App)
 app.use(router)
 const pinia = createPinia() // 创建Pinia实例
