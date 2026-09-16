@@ -8,6 +8,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { init } from 'echarts/core'
+import '@/plugins/echarts' // 注册所用图表类型与组件（随图表所在页面懒加载，不进首屏）
 import { createLineChart } from './lineChart'
 
 // ============================================================
