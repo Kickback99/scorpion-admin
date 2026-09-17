@@ -281,3 +281,11 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
   // 超宽弹窗在小屏收回视口内，避免横向滚动
   max-width: 92vw;
 }
+
+// 移动端：百分比宽度在窄屏会把内容挤爆，用 min-width 与上面的 max-width 成对托底
+// 不覆盖 --el-dialog-width 是因为 EP 把它写成内联样式，得加 !important
+@media (max-width: 768px) {
+  .el-dialog {
+    min-width: 92vw;
+  }
+}
