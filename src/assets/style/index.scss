@@ -257,6 +257,10 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
   // hover / active 各走自己那套变量，填充主色圆的动效不受影响
   --el-button-bg-color: transparent;
   --el-button-border-color: transparent;
+
+  // 图标尺寸只能从按钮字号下手：EP 把 .el-button--small 写死 12px，而 .el-icon 是
+  // font-size: inherit。15px 对齐面包屑图标；circle 按钮宽度锁 24px，故盒子不变
+  font-size: 15px;
 }
 
 // ============================================================
