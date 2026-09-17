@@ -247,7 +247,7 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
 // 顶栏图标按钮 — 去掉无 type 的 circle 按钮自带的圆圈底与描边
 // 只作用于显式挂了 .toolbar-icon-btn 的按钮：ToolBar 的
 // Refresh / FullScreen / Setting，以及铃铛内联进顶栏时
-// （notice.bell.position = top）。铃铛固定在右下角时挂不上本类，
+// （notice.bell_position = top）。铃铛固定在右下角时挂不上本类，
 // 保留默认圆圈 —— 它悬浮在页面内容之上，去掉底/边会失去点击锚点。
 // 与 .el-button 一起限定以抬高特异性：element-plus 组件样式是按需注入的，
 // 可能晚于本文件加载，只用单类会被它的 --el-button-bg-color 顶掉

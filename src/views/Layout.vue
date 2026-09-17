@@ -105,7 +105,7 @@ const listData = computed(()=>
 const userConfigStore = useUserConfigStore()
 const configStore = useConfigStore()
 
-// 铃铛位置（配置项 notice.bell.position）：top 交给 ToolBar 内联渲染
+// 铃铛位置（配置项 notice.bell_position）：top 交给 ToolBar 内联渲染
 const isNoticeBellTop = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 const route = useRoute()
