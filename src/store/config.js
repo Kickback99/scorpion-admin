@@ -180,9 +180,7 @@ export const useConfigStore = defineStore({
       },
       notice: {
         load_mode: 'scroll',
-        bell: {
-          position: 'top',
-        },
+        bell_position: 'top',
       },
       captcha: {
         client_enabled: true,
@@ -478,9 +476,9 @@ export const useConfigStore = defineStore({
     getNoticeLoadMode()            { return this.getValue('notice.load_mode') || 'scroll' },
     setNoticeLoadMode(v)           { this.updateConfig('notice.load_mode', v) },
 
-    // -- notice.bell.position --
-    getNoticeBellPosition()        { return this.getValue('notice.bell.position') || 'top' },
-    setNoticeBellPosition(v)       { this.updateConfig('notice.bell.position', v) },
+    // -- notice.bell_position --
+    getNoticeBellPosition()        { return this.getValue('notice.bell_position') || 'top' },
+    setNoticeBellPosition(v)       { this.updateConfig('notice.bell_position', v) },
 
     // ==================== tree ====================
 
@@ -670,7 +668,7 @@ export const useConfigStore = defineStore({
     themeLayoutMode()         { return this.getValue('theme_layout_mode') || 'float' },
     themeDotShape()           { return this.getValue('theme_dot_shape') || 'circle' },
     noticeLoadMode()          { return this.getValue('notice.load_mode') || 'scroll' },
-    noticeBellPosition()      { return this.getValue('notice.bell.position') || 'top' },
+    noticeBellPosition()      { return this.getValue('notice.bell_position') || 'top' },
     treeAuthLineStyle()       { return this.getValue('tree.auth.line_style') || 'dashed' },
     treeCateLineStyle()       { return this.getValue('tree.cate.line_style') || 'dashed' },
     treeCateParentMode()      { return this.getValue('tree.cate.parent_mode') || 'custom' },
