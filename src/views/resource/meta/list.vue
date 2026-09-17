@@ -135,7 +135,7 @@
                         <el-image 
                             :src="row.img"
                             :fit="'cover'"
-                            style="width: 100%; height: 100%; cursor: pointer;"
+                            style="width: 100%; height: 100%; border-radius: 4px; cursor: pointer;"
                             :preview-src-list="[row.img]"
                             preview-teleported
                             loading="lazy"

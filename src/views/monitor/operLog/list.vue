@@ -88,7 +88,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="操作时间" min-width="180" />
-            <el-table-column width="150" fixed="right">
+            <el-table-column width="150" label="操作" fixed="right">
                 <template #default="{row}">
                     <el-button size="small" type="info" @click="onDetail(row)" icon="MoreFilled" circle plain/>
                     <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">

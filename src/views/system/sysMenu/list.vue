@@ -39,7 +39,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="200"/>
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{row}">
             <el-button size="small" type="primary" v-if="row.type !== 2" @click="addMenuButton(row)" v-perm="'btn.sysMenu.add'" plain>新增</el-button>
             <el-button size="small" type="warning" @click="editMenu(row)" v-perm="'btn.sysMenu.update'" plain>编辑</el-button>

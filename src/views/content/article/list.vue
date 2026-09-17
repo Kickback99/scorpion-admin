@@ -96,9 +96,9 @@
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :height="tableHeight">
         <el-table-column type="index" label="序号" width="55"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip/>
-        <el-table-column label="封面" width="100px">
+        <el-table-column label="封面" width="124px">
             <template #default="{row}">
-                <el-image style="width: 100px; height: 56px"  :src="handleImage(row)" :fit="fit" preview-teleported :preview-src-list="[handleImage(row)]"/>
+                <el-image style="width: 100px; height: 56px; border-radius: 4px;"  :src="handleImage(row)" :fit="'cover'" preview-teleported :preview-src-list="[handleImage(row)]"/>
             </template>
         </el-table-column>
         <el-table-column prop="cateName" label="分类" min-width="100" align="center"/>
