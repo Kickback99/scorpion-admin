@@ -90,7 +90,7 @@
         <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column label="头像" min-width="80" align="center">
             <template #default="{row}">
-                <el-image style="width: 50px; height: 50px" :src="handleImage(row)" :fit="fit" />
+                <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="handleImage(row)" :fit="'cover'" />
             </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名" min-width="140" align="center" show-overflow-tooltip/>
