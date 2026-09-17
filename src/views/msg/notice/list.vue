@@ -72,7 +72,7 @@
     </el-collapse>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" :max-height="tableMaxHeight">
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" :height="tableHeight">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
@@ -560,7 +560,7 @@ watch(searchActiveNames, (val) => {
 })
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableMaxHeight } = useTableAutoHeight()
+const { tableHeight } = useTableAutoHeight()
 
 // Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
 const MarkdownPreview = computed(() => {
