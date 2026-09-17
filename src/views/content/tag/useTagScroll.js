@@ -17,6 +17,7 @@ export function useTagScroll() {
   const total = ref(null)
   const loading = ref(false)   // 加载中标志
   const hasMore = ref(false)   // 是否还有更多
+  const scrollable = ref(false) // 内容是否真的超出容器（未超出则无"下滑加载"语境）
   const loadMoreRef = ref(null) // 触底哨兵元素
 
   const { registerReload } = useTagEditor()
@@ -71,23 +72,37 @@ export function useTagScroll() {
     }
   }
 
-  // 每次列表变化后重新检测（首屏不足 + 加载完成后继续补足）
-  watch(tableData, checkLoadMore, { flush: 'post' })
+  /**
+   * 检测内容是否撑破了滚动容器
+   * 一屏放得下就没有"下滑加载"的语境，底部提示不该出现
+   */
+  const checkScrollable = () => {
+    const wrap = document.querySelector('.main-scrollbar .el-scrollbar__wrap')
+    scrollable.value = !!wrap && wrap.scrollHeight > wrap.clientHeight + 1
+  }
+
+  // 每次列表变化后重新检测（首屏不足 + 加载完成后继续补足 + 是否已可滚动）
+  watch(tableData, () => {
+    checkLoadMore()
+    checkScrollable()
+  }, { flush: 'post' })
 
   // 捕获阶段监听滚动：el-scrollbar 的滚动不冒泡，需 capture 才能捕获嵌套滚动
   onMounted(() => {
     window.addEventListener('scroll', checkLoadMore, true)
+    window.addEventListener('resize', checkScrollable)
     render()
   })
 
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', checkLoadMore, true)
+    window.removeEventListener('resize', checkScrollable)
   })
 
   registerReload(render)
 
   return {
-    searchData, tableData, loading, hasMore, loadMoreRef,
+    searchData, tableData, loading, hasMore, scrollable, loadMoreRef,
     onSearch, onReset,
   }
 }
