@@ -258,3 +258,12 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
   --el-button-bg-color: transparent;
   --el-button-border-color: transparent;
 }
+
+// ============================================================
+// 表格单元格行高取整 —— 消除"只能滚 1px"的假滚动条
+// 成因与推导见 docs/admin/list-table-fixed-scroll.md
+// ============================================================
+.el-table tbody .el-table__cell {
+  padding-top: 8.1px;
+  padding-bottom: 8.1px;
+}
