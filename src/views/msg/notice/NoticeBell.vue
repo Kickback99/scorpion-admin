@@ -322,7 +322,7 @@ defineExpose({})
     margin-left: 12px;
   }
 
-  // 气泡收小一档，贴合 24px 盒 / 12px 图标（EP 默认 18px 偏大）；只管本组件，不动全局 .el-badge
+  // 气泡收小一档，贴合 24px 盒 / 15px 图标（EP 默认 18px 偏大）；只管本组件，不动全局 .el-badge
   :deep(.el-badge) {
     --el-badge-size: 14px;
     --el-badge-font-size: 10px;
