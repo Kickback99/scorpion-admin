@@ -38,7 +38,7 @@
             </div>
 
             <el-form-item prop="content">
-                <Markdown :height="395" v-model="blogData.content"></Markdown>
+                <Markdown :height="editorHeight" v-model="blogData.content"></Markdown>
             </el-form-item>
         </el-form>
 
@@ -189,7 +189,7 @@
 
 <script setup>
 // 框架核心
-import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 // 组件
@@ -1049,11 +1049,74 @@ onBeforeUnmount(() => {
 })
 
 // ============================================================
+// Markdown 编辑器高度自适应
+// ============================================================
+
+/** 编辑器兜底最小高度(px)：视口过矮时保证可编辑，超出部分交给窗口滚动 */
+const EDITOR_MIN_HEIGHT = 200
+/** 高度安全余量(px)：吸收亚像素舍入，避免刚好溢出产生滚动条 */
+const EDITOR_HEIGHT_GUTTER = 4
+
+/** 编辑器高度(px) — 实测遮罩窗口可用空间得到，非全屏/全屏都撑满 */
+const editorHeight = ref(395)
+
+let contentObserver = null
+
+/**
+ * 重算编辑器高度：窗口可视高 - 编辑器上方内容 - 页脚按钮占位
+ *
+ * 结果与编辑器自身高度无关（只取决于它上方的标题/引用图片面板），因此观察内容区
+ * 高度变化触发的重算会稳定收敛，不会与 ResizeObserver 形成往复循环。
+ * 浏览器全屏只是把视口放大，走同一套算法即可自动长高填满。
+ */
+const recalcEditorHeight = () => {
+  const winEl = document.querySelector('.window')
+  if (!winEl) return
+  const editorEl = winEl.querySelector('.v-md-editor')
+  const footerEl = winEl.querySelector('.footer')
+  if (!editorEl || !footerEl) return
+
+  const winRect = winEl.getBoundingClientRect()
+  const offsetTop = editorEl.getBoundingClientRect().top - winRect.top + winEl.scrollTop
+  const footerRow = footerEl.querySelector('.el-row')
+  const footerBlock = footerEl.offsetHeight + parseFloat(getComputedStyle(footerRow).marginTop || 0)
+
+  const avail = winEl.clientHeight - offsetTop - footerBlock - EDITOR_HEIGHT_GUTTER
+  editorHeight.value = Math.max(Math.floor(avail), EDITOR_MIN_HEIGHT)
+}
+
+/** 遮罩打开后观察内容区高度变化（引用图片面板 80↔300px 过渡、图片异步加载等） */
+watch(maskVisible, (visible) => {
+  contentObserver?.disconnect()
+  contentObserver = null
+  if (!visible) return
+
+  nextTick(() => {
+    recalcEditorHeight()
+    const contentEl = document.querySelector('.window .content')
+    if (contentEl && typeof ResizeObserver !== 'undefined') {
+      contentObserver = new ResizeObserver(() => requestAnimationFrame(recalcEditorHeight))
+      contentObserver.observe(contentEl)
+    }
+  })
+})
+
+// ============================================================
 // 生命周期
 // ============================================================
 
 onMounted(() => {
   loadAllTags()
+  // 浏览器全屏/缩放都会改变视口，编辑器高度需跟着重算
+  window.addEventListener('resize', recalcEditorHeight)
+  document.addEventListener('fullscreenchange', recalcEditorHeight)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', recalcEditorHeight)
+  document.removeEventListener('fullscreenchange', recalcEditorHeight)
+  contentObserver?.disconnect()
+  contentObserver = null
 })
 
 defineExpose({
