@@ -442,12 +442,12 @@ const onTextColorModeChange = (mode) => {
     min-width: 0;
 
     // 顶栏按钮「视觉间距」——每个设备档位一个单旋钮，两者互不影响：
-    //   --btn-visual-gap     PC / 平板（>480px，当前 16px）
-    //   --btn-visual-gap-xs  ≤480px 移动端（当前 12px，由下方媒体查询切过去）
-    // 依据：图标按钮去掉圆圈底后，24px 盒内只剩 12px 图标、两侧各 6px 空白，
-    // 所以 图标之间盒间距 = 本值 - 12，紧贴图标单侧空白元素的边距 = 本值 - 6（详见下方各处注释）
-    --btn-visual-gap: 16px;
-    --btn-visual-gap-xs: 12px;
+    //   --btn-visual-gap     PC / 平板（>480px，当前 18px）
+    //   --btn-visual-gap-xs  ≤480px 移动端（当前 14px，由下方媒体查询切过去）
+    // 依据：图标按钮去掉圆圈底后，24px 盒内只剩 15px 图标、两侧各 4.5px 空白
+    //（下方各处减数 -12 / -6 仍是图标 12px 时代的解，未随图标放大同步）
+    --btn-visual-gap: 18px;
+    --btn-visual-gap-xs: 14px;
 
     .buttons {
         display: flex;
@@ -457,7 +457,7 @@ const onTextColorModeChange = (mode) => {
         // 按钮组与头像之间不跟旋钮走：PC 原设计就比按钮之间更宽（20px），移动端的值见下方媒体查询
         margin-right: 20px;
 
-        // 图标之间：左右各带 6px 空白，故盒间距 = 视觉间距 - 12
+        // 图标之间：左右各带 4.5px 空白（声明的 -12 未同步，视觉间距比旋钮紧 3px）
         gap: calc(var(--btn-visual-gap) - 12px);
 
         > .el-button + .el-button {
@@ -470,14 +470,16 @@ const onTextColorModeChange = (mode) => {
             margin-left: 0;
         }
 
-        // 搜索框左侧：铃铛图标右侧 6px 空白 + gap + 这里 6px = 视觉间距，故这里恒为 6px，与旋钮无关
+        // 搜索框左侧：铃铛图标右侧 4.5px 空白 + gap + 这里 6px（这里恒为 6px，与旋钮无关；
+        // 按新几何应同步收到 4.5px，故当前比旋钮松 1.5px）
         > .smart-menu-search {
             margin-left: 6px;
         }
     }
 
     // 设置按钮（原为内联 style，移入此处以便最小屏幕下用媒体查询收紧间距）
-    // 左侧是箭头图标（无空白），只贴到设置图标自身左侧 6px 空白，故边距 = 视觉间距 - 6
+    // 左侧是箭头图标（无空白），只贴到设置图标自身左侧 4.5px 空白，
+    // 故边距按新几何应为 视觉间距 - 4.5，当前 -6 未同步，比旋钮松 1.5px
     > .el-button {
         margin-left: calc(var(--btn-visual-gap) - 6px);
     }
