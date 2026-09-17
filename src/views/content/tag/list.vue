@@ -50,10 +50,4 @@ const { dialogVisible, title, ruleFormRef, formModel, rules, confirm } = useTagE
 .tag-list-root {
   width: 100%;
 }
-
-/* 弹窗默认以视口为中心，而内容区被侧边栏推右，两者相差半个侧边栏宽；
-   右移该距离，弹窗中心才与表格/卡片/云的中心对齐 */
-:deep(.el-dialog) {
-  transform: translateX(calc(var(--sidebar-width, 0px) / 2));
-}
 </style>
