@@ -84,7 +84,7 @@
     @selection-change="removeMultiple"
     stripe="1"
     border
-    max-height="500"
+    :max-height="tableMaxHeight"
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="55" align="center" />
@@ -245,6 +245,7 @@ const {auth} = getCurrentInstance()
 import { clearRoute } from '@/utils/remove';
 import { loadMenu } from '@/router';
 import { useRouter, useRoute } from 'vue-router';
+import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { dayjs } from 'element-plus';
 import avatar from '@/assets/images/avatar-square.png'
@@ -644,6 +645,9 @@ const tabStore = useTabStore()
 
 // 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
 const route = useRoute()
+
+// 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
+const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
