@@ -115,7 +115,7 @@
     </el-collapse>
 
 
-    <el-table :data="tableData" style="width: 100%" max-height="500"
+    <el-table :data="tableData" style="width: 100%" :max-height="tableMaxHeight"
     v-loading="loading"
     ref="multipleTableRef"
     @selection-change="handleMultiple"
@@ -321,6 +321,7 @@ import { useUserConfigStore } from '@/store/userConfig';
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
+import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { getAllArticlesApi } from '@/api/business';
 import { hasPerm } from '@/utils/permissions';
@@ -333,6 +334,9 @@ const tabStore = useTabStore()
 
 // 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
 const route = useRoute()
+
+// 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
+const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
