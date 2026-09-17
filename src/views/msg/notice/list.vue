@@ -72,7 +72,7 @@
     </el-collapse>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
+    <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" :max-height="tableMaxHeight">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
@@ -313,7 +313,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent, computed } from 'vue'
+import { ref, reactive, nextTick, onMounted, onUnmounted, watch, defineAsyncComponent, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { hasPerm, showPermColumn } from '@/utils/permissions'
@@ -557,6 +557,23 @@ const searchActiveNames = ref(
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
+
+// 表格高度：按实测尺寸扣除折叠面板与分页占位，取整后保证页面永不溢出。
+// 页面一旦溢出，滚轮滚的就是外层页面，表格会停在亚像素位置导致内容重绘抖动。
+const tableMaxHeight = ref('500')
+
+const recalcTableHeight = () => {
+    const wrap = document.querySelector('.main-scrollbar > .el-scrollbar__wrap')
+    const collapse = document.querySelector('.search-collapse')
+    const pagination = document.querySelector('.el-pagination')
+    if (!wrap || !collapse || !pagination) return
+    const pagBlock = pagination.offsetHeight + parseFloat(getComputedStyle(pagination).marginTop || 0)
+    const avail = wrap.clientHeight - collapse.offsetHeight - pagBlock - 4
+    tableMaxHeight.value = `${Math.max(Math.floor(avail), 200)}px`
+}
+
+// 搜索面板折叠/展开是动画过渡，高度逐帧变化，用 ResizeObserver 跟随重算
+let collapseObserver = null
 
 // Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
 const MarkdownPreview = computed(() => {
@@ -817,8 +834,20 @@ const fetchNotices = async () => {
 }
 
 onMounted(() => {
+    recalcTableHeight()
+    window.addEventListener('resize', recalcTableHeight)
+    const collapse = document.querySelector('.search-collapse')
+    if (collapse && typeof ResizeObserver !== 'undefined') {
+        collapseObserver = new ResizeObserver(() => requestAnimationFrame(recalcTableHeight))
+        collapseObserver.observe(collapse)
+    }
     fetchNotices()
     loadAllUsers()
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', recalcTableHeight)
+    collapseObserver?.disconnect()
 })
 
 // 预加载角色缓存（顶层立即执行；无角色权限时不加载，避免越权调用 getAllRolesApi）
