@@ -138,7 +138,7 @@ const currentNotice = ref(null)
 // 加载方式（配置项 notice.load_mode）：scroll=滚动加载，pagination=分页加载
 const isScrollMode = computed(() => configStore.getNoticeLoadMode() === 'scroll')
 
-// 铃铛位置（配置项 notice.bell.position）：top=内联进顶栏，bottom=固定右下角
+// 铃铛位置（配置项 notice.bell_position）：top=内联进顶栏，bottom=固定右下角
 const isTopPosition = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 // ============================================================

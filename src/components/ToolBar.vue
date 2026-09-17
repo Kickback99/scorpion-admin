@@ -146,7 +146,7 @@ const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
 const configStore = useConfigStore()
 
-// 铃铛位置（配置项 notice.bell.position）：top 内联进按钮组，bottom 留在右下角
+// 铃铛位置（配置项 notice.bell_position）：top 内联进按钮组，bottom 留在右下角
 const isNoticeBellTop = computed(() => configStore.getNoticeBellPosition() === 'top')
 
 // ============================================================
