@@ -310,6 +310,22 @@ html.dark .el-header:not(.page-theme) {
   width: $menu-min-width;
 }
 
+// 侧边栏实际占位宽度 —— 供需要与内容区中心对齐的元素使用（如弹窗）
+// 折叠与移动端规则放后面，同特异性下靠源码顺序覆盖
+.common-layout {
+  --sidebar-width: 220px;
+
+  // 折叠态：侧边栏收窄为图标栏
+  &:has(.el-aside.is-collapsed) {
+    --sidebar-width: #{$menu-min-width};
+  }
+
+  // 移动端：侧边栏脱离文档流成为浮层，不再占用内容区宽度
+  &:has(.el-aside.mobile-sidebar) {
+    --sidebar-width: 0px;
+  }
+}
+
 // 折叠状态下，子菜单右侧加小三角标识
 :deep(.el-menu--collapse .el-sub-menu__title) {
   position: relative;
