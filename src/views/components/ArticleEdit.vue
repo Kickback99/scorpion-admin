@@ -42,7 +42,8 @@
             </el-form-item>
         </el-form>
 
-        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%" @close="hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">
+        <!-- 宽度 clamp(440px, 30%, 92vw)：纯 30% 在 769~1300px 只剩 230~390px，开关会被迫折三行、看着像竖排 -->
+        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="clamp(440px, 30%, 92vw)" @close="hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0">
             <el-form ref="formRef" :model="formModel" :rules="dialogRules" label-width="auto" size="small">
                 <el-form-item label="文章描述" prop="description">
                     <el-radio-group v-model="formModel.descriptionType" @change="handleDescriptionTypeChange">
@@ -81,7 +82,7 @@
 
               <!-- 文章封面：支持文件上传 / 自定义链接 / 引用封面 三种模式 -->
               <el-form-item label="文章封面">
-                  <el-radio-group v-model="formModel.coverOption" @change="handleCoverOptionChange">
+                  <el-radio-group class="cover-option-group" v-model="formModel.coverOption" @change="handleCoverOptionChange">
                       <el-radio :label="'upload'">文件上传</el-radio>
                       <el-radio :label="'custom'">自定义链接</el-radio>
                        <el-radio :label="'ref'">引用封面</el-radio>
@@ -1107,6 +1108,8 @@ defineExpose({
 
 .article-switches {
   display: flex;
+  // 三组开关固有宽约 322px，窄容器里必须允许折行，否则整行横向溢出弹窗
+  flex-wrap: wrap;
   gap: 32px;
   align-items: center;
 
@@ -1119,6 +1122,23 @@ defineExpose({
       color: var(--el-text-color-regular);
       white-space: nowrap;
     }
+  }
+}
+
+// 窄屏（≤460px）：封面单选与文章开关改上下排布
+// 460 是临界值，刚过即有 92vw ≈ 424px 够单行，不留"折成两行"的过渡态
+
+@media (max-width: 460px) {
+  .cover-option-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .article-switches {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 
