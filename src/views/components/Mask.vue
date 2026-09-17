@@ -82,6 +82,9 @@ const close = () => {
     // height: 50px;
     // background: coral;
     // line-height: 50px;
+    // 按钮下方留白，避免贴到窗口底边（并计入编辑器可用高度）
+    padding-bottom: 10px;
+
     .el-row {
         // 编辑器和按钮的间距，想调就改这个值
         margin-top: 14px;
