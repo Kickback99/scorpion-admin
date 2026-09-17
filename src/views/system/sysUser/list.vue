@@ -84,7 +84,7 @@
     @selection-change="removeMultiple"
     stripe="1"
     border
-    :max-height="tableMaxHeight"
+    :height="tableHeight"
     >
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="55" align="center" />
@@ -647,7 +647,7 @@ const tabStore = useTabStore()
 const route = useRoute()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableMaxHeight } = useTableAutoHeight()
+const { tableHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
