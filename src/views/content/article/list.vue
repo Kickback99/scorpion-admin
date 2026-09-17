@@ -93,7 +93,7 @@
         </el-collapse-item>
     </el-collapse>
 
-    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight">
         <el-table-column type="index" label="序号" width="55"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip/>
         <el-table-column label="封面" width="100px">
@@ -165,6 +165,7 @@ import { useArticleDraftStore } from '@/store/articleDraft';
 import { useConfigStore } from '@/store/config';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
+import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 const userConfigStore = useUserConfigStore()
 // 懒加载文章编辑器（完整 markdown 编辑器），仅打开新增/编辑弹窗时加载
 const ArticleEdit = defineAsyncComponent(() => import('@/views/components/ArticleEdit.vue'))
@@ -181,6 +182,10 @@ const searchActiveNames = ref(
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
 })
+
+// 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
+const { tableMaxHeight } = useTableAutoHeight()
+
 import cover from '@/assets/images/cover-rect.png'
 
 const handleImage = (row) => {
