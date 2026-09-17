@@ -85,8 +85,8 @@ const { handleAdd, handleEdit, removeRole } = useTagEditor()
   }
 }
 
-// 表格宽度上限 —— 列少，铺满整屏会把每列拉得过散；限宽后居中，既不留大块边距也不显空
-$table-max-width: 1000px;
+// 表格宽度上限 —— 列少，铺满整屏会把每列拉得过散；700px 下五列实际约 70/225/90/225/90
+$table-max-width: 700px;
 
 .tt-table {
   width: $table-max-width;
