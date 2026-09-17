@@ -90,8 +90,10 @@ html.dark .main-container:not(.page-theme) .tcl-toolbar {
   grid-template-columns: repeat(auto-fit, 100px);
   gap: 20px;
   justify-content: center;
-  // 顶部留白由上方的 .tcl-toolbar 提供，避免与工具栏 padding 叠加
-  padding: 0 20px 32px;
+  // 顶部留白主体由上方 .tcl-toolbar 提供，避免与工具栏 padding 叠加；
+  // 此处 8px 是给气泡 hover 预留的净空：scale(1.08) 让 100px 的圆上溢 4px，
+  // 而工具栏是不透明的粘性层，不留净空就会盖住圆的顶边
+  padding: 8px 20px 32px;
   min-height: 200px;
 }
 
