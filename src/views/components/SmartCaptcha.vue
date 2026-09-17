@@ -14,7 +14,7 @@
                         @click="generate"
                     >
                 </div>
-                <el-button v-if="backgroundLoaded" text circle size="small" icon="Refresh" @click="generate" :disabled="verified"></el-button>
+                <el-button v-if="backgroundLoaded" text circle size="small" icon="Refresh" @click="generate"></el-button>
             </div>
             <el-form ref="answerFormRef" :model="answerModel" :rules="answerRules" @submit.prevent>
                 <el-form-item prop="answer">
@@ -23,7 +23,6 @@
                         placeholder="请输入验证码"
                         clearable
                         :maxlength="answerMaxLength"
-                        :disabled="verified"
                     >
                         <template #prefix><el-icon><Key /></el-icon></template>
                     </el-input>
@@ -99,8 +98,8 @@
             </div>
         </template>
 
-        <!-- ===== 验证通过遮罩（文本/点选类型） ===== -->
-        <div v-if="verified && !isSliderType" class="captcha-success">
+        <!-- ===== 验证通过遮罩（仅点选类型；文本类提交即登录，遮罩无意义且会禁掉刷新按钮） ===== -->
+        <div v-if="verified && isClickType" class="captcha-success">
             <el-icon color="#67c23a" :size="20"><SuccessFilled /></el-icon>
             <span>验证通过</span>
         </div>
@@ -127,7 +126,6 @@ const props = defineProps({
 const TEXT_TYPES = ['default', 'chinese', 'english', 'number', 'mixed', 'gif']
 const isTextType = computed(() => TEXT_TYPES.includes(props.type))
 const isClickType = computed(() => props.type === 'click')
-const isSliderType = computed(() => !isTextType.value && !isClickType.value)
 
 // 点选验证码需要点击的字符数（对应后端 StandardWordClickImageCaptchaGenerator.checkClickCount 默认值）
 const CLICK_COUNT = 4
