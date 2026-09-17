@@ -16,7 +16,7 @@
         :key="tag.id"
         class="tcl-bubble"
       >
-        <el-tooltip :content="tag.name" :show-after="300" placement="top">
+        <el-tooltip :content="tag.remark || tag.name" :show-after="300" placement="top">
           <span class="tcl-bubble-name">{{ tag.name }}</span>
         </el-tooltip>
         <span class="tcl-bubble-count">{{ tag.articleCount }}</span>
