@@ -725,7 +725,15 @@ const handleConfirmAdd = async () => {
         } */
         
         const fullConfig = buildFullConfig()
-        
+
+        // 防御：fullConfig 由已加载的表格数据构建，而更新接口是全量覆盖。
+        // 若接口异常导致数据未加载（fullTableData / tableData 均为空），
+        // 提交后后端配置会被整体替换成只剩新增的这一项，故此处直接中止。
+        if (!Object.keys(fullConfig).length) {
+          msg.error('配置数据未加载，请刷新页面后重试')
+          return
+        }
+
         let targetObj = fullConfig
         
         if (addForm.parentPath) {
