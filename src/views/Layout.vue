@@ -18,22 +18,6 @@
           <el-menu-item index="/index">
                    <el-icon> <SingleIcon :icon="'ri:airplay-fill'"></SingleIcon> </el-icon> <span>仪表盘</span>
           </el-menu-item>
-
-              <el-sub-menu index="/template">
-                <template #title>
-                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
-                  <span>模板页面</span>
-                </template>
-                
-                <el-menu-item 
-                  v-for="item in tempMenuConfig" 
-                  :key="item.path"
-                  :index="item.path"
-                >
-                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
-                  <span>{{ item.title }}</span>
-                </el-menu-item>
-            </el-sub-menu>
       
           <menu-tree :listData="listData"></menu-tree>
 
@@ -48,6 +32,22 @@
                 </el-menu-item>
                 <el-menu-item index="/user/rePassword">
 					          <el-icon> <SingleIcon icon="ri:phone-lock-line"></SingleIcon> </el-icon> <span>重置密码</span>
+                </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="/template">
+                <template #title>
+                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
+                  <span>模板页面</span>
+                </template>
+                
+                <el-menu-item 
+                  v-for="item in tempMenuConfig" 
+                  :key="item.path"
+                  :index="item.path"
+                >
+                  <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
+                  <span>{{ item.title }}</span>
                 </el-menu-item>
             </el-sub-menu>
 
