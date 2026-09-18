@@ -34,11 +34,6 @@
             show-password
             :prefix-icon="Lock"
           />
-          <div class="password-tips">
-            <el-text type="info" size="small">
-              密码长度8-20位，包含字母、数字和特殊字符
-            </el-text>
-          </div>
         </el-form-item>
 
         <el-form-item label="确认密码" prop="confirmPassword">
@@ -91,6 +86,7 @@ import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
 import { Lock } from '@element-plus/icons-vue'
 import { userUpdatePwdApi } from '@/api/admin'
+import { PASSWORD_REGEX, PASSWORD_MESSAGE } from '@/utils/password'
 import { useTokenStore } from '@/store/token'
 import { useRouter } from 'vue-router'
 const tokenStore = useTokenStore()
@@ -117,7 +113,7 @@ const passwordStrength = computed(() => {
   let tips = []
 
   // 长度检查
-  if (password.length >= 8) strength += 25
+  if (password.length >= 6) strength += 25
   if (password.length >= 12) strength += 10
 
   // 字符类型检查
@@ -140,41 +136,16 @@ const passwordStrength = computed(() => {
 })
 
 // 自定义验证规则
-// 旧密码校验
-const validateOldPassword = (rule, value, callback) => {
-  if (!value) {
-    return callback(new Error('请输入原密码'))
-  }
-  if (value.length < 4) {
-    return callback(new Error('原密码长度不能少于4位'))
-  }
-  callback()
-}
-
-// 新密码校验
+// 新密码不能与原密码相同
 const validateNewPassword = (rule, value, callback) => {
-  if (!value) {
-    return callback(new Error('请输入新密码'))
-  }
-  if (value.length < 4) {
-    return callback(new Error('密码长度不能少于4位'))
-  }
-  if (value.length > 15) {
-    return callback(new Error('密码长度不能超过15位'))
-  }
-  if (!/^\S{4,15}$/.test(value)) {
-    return callback(new Error('密码必须是 4-15位 的非空字符'))
-  }
   if (value === formModel.oldPassword) {
     return callback(new Error('新密码不能与原密码相同'))
   }
   callback()
 }
 
+// 两次密码一致性校验
 const validateConfirmPassword = (rule, value, callback) => {
-  if (!value) {
-    return callback(new Error('请再次输入密码'))
-  }
   if (value !== formModel.newPassword) {
     return callback(new Error('两次输入的密码不一致'))
   }
@@ -184,13 +155,16 @@ const validateConfirmPassword = (rule, value, callback) => {
 // 表单验证规则
 const rules = reactive({
   oldPassword: [
-    { required: true, validator: validateOldPassword, trigger: 'blur' }
+    { required: true, message: '请输入原密码', trigger: 'blur' }
   ],
   newPassword: [
-    { required: true, validator: validateNewPassword, trigger: 'blur' }
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { pattern: PASSWORD_REGEX, message: PASSWORD_MESSAGE, trigger: 'blur' },
+    { validator: validateNewPassword, trigger: 'blur' }
   ],
   confirmPassword: [
-    { required: true, validator: validateConfirmPassword, trigger: 'blur' }
+    { required: true, message: '请再次输入密码', trigger: 'blur' },
+    { validator: validateConfirmPassword, trigger: 'blur' }
   ]
 })
 
@@ -280,11 +254,6 @@ const handleReset = () => {
 
 .password-form {
   margin-top: 20px;
-}
-
-.password-tips {
-  margin-left: 5px;
-  margin-top: 8px;
 }
 
 .password-strength {
