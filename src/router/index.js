@@ -29,7 +29,7 @@ export const routes = [
         {path:'/index',component:() => import('@/views/home/index.vue'),
             meta:{
                title:'仪表盘',
-               icon: 'ri:airplay-fill'
+               icon: 'ri:dashboard-3-line'
             }
         },
         {path:'/user/profile',component:() =>import('@/views/user/UserProfile.vue'),
@@ -41,7 +41,7 @@ export const routes = [
         {path:'/user/rePassword',component:() =>import('@/views/user/UserRePassword.vue'),
             meta:{
                 title:'重置密码',
-                icon: 'ri:phone-lock-line'
+                icon: 'ep:lock'
             }
         },
         {path:'/test',component:() => import('@/views/Test.vue'),
