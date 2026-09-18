@@ -13,7 +13,7 @@
             </el-form-item>
             <div class="remember-row">
                 <el-checkbox v-model="formModel.checkPwd" @click="handleCheckbox">记住密码</el-checkbox>
-                <span v-if="showAdminHint" class="admin-hint">管理员账号：admin，密码: 1234</span>
+                <span v-if="showAdminHint" class="admin-hint">管理员账号：admin，密码: 123456</span>
             </div>
             <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
@@ -37,6 +37,7 @@ import {adminLoginApi} from '@/api/admin'
 import {getAdminCaptchaConfigApi} from '@/api/captcha'
 import {useTokenStore} from '@/store/token'
 import { isCookieMode } from '@/utils/auth'
+import { PASSWORD_REGEX, PASSWORD_MESSAGE } from '@/utils/password'
 import { useUserStore } from '@/store/user';
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
@@ -94,7 +95,7 @@ function handleMediaChange(e) {
     ],
       password : [
         { required: true, message: '请输入密码', trigger: 'blur' },
-        { pattern:/^\S{4,15}$/,message:'密码必须是 4-15位 的非空字符',trigger:'blur'}
+        { pattern: PASSWORD_REGEX, message: PASSWORD_MESSAGE, trigger: 'blur' }
       ],
     }
 
