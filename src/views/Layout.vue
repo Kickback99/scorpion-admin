@@ -35,7 +35,7 @@
                 </el-menu-item>
             </el-sub-menu>
 
-            <el-sub-menu index="/template">
+            <el-sub-menu v-if="userStore.isAdmin" index="/template">
                 <template #title>
                   <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
                   <span>模板页面</span>
@@ -51,7 +51,7 @@
                 </el-menu-item>
             </el-sub-menu>
 
-            <el-menu-item index="/test">
+            <el-menu-item v-if="userStore.isAdmin" index="/test">
                    <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试</span> 
             </el-menu-item>
         </el-menu>

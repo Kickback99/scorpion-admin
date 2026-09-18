@@ -1,4 +1,4 @@
-import { routes, tempRoutes } from "@/router"
+import { routes, tempRoutes, ADMIN_ONLY_PATHS } from "@/router"
 import { useUserStore } from "@/store/user"
 
 // 获取动态路由组件 (重构后的版本)
@@ -91,13 +91,16 @@ export function getLocalRouteComponents(excludes = []) {
 
 
 
-// 获取本地可导航菜单项（供菜单搜索使用，仅含 title/icon/path）
+// 获取当前用户可导航的本地菜单项（供菜单搜索使用，仅含 title/icon/path）
 // 边界：/login 无 meta.title、404/403 不在 routes/tempRoutes 数据源中，均天然排除
 export function getLocalRouteMenuItems() {
   const items = []
+  const isAdmin = useUserStore().isAdmin
 
   const pushItem = (route) => {
     if (!route.meta?.title) return
+    // admin-only 路由对非管理员不展示，避免搜到后点进去落 404
+    if (!isAdmin && ADMIN_ONLY_PATHS.has(route.path)) return
     items.push({
       title: route.meta.title,
       icon: route.meta?.icon || 'ep:menu',
