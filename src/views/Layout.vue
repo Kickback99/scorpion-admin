@@ -35,7 +35,7 @@
                 </el-menu-item>
             </el-sub-menu>
 
-            <el-sub-menu index="/template">
+            <el-sub-menu v-if="showDemoPages" index="/template">
                 <template #title>
                   <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
                   <span>模板页面</span>
@@ -51,8 +51,8 @@
                 </el-menu-item>
             </el-sub-menu>
 
-            <el-menu-item index="/test">
-                   <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试</span> 
+            <el-menu-item v-if="showDemoPages" index="/test">
+                   <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试页面</span> 
             </el-menu-item>
         </el-menu>
       </el-scrollbar>
@@ -90,12 +90,16 @@ import { useRoute } from 'vue-router'
 import Logo from '@/components/logo/index.vue';
 import Tabs from '@/views/tabs/list.vue';
 import { tempMenuConfig } from '@/config/menuConfig'
+import { SHOW_DEMO_PAGES } from '@/router'
 import { useUserConfigStore } from '@/store/userConfig';
 import { useConfigStore } from '@/store/config';
 import singleIcon from '@/components/MyIcon/src/singleIcon';
 import NoticeBell from '@/views/msg/notice/NoticeBell.vue';
 
 const userStore = useUserStore()
+
+// 模板页面与测试页：开关开启且为管理员才显示
+const showDemoPages = computed(() => SHOW_DEMO_PAGES && userStore.isAdmin)
 
 const listData = computed(()=>
   userStore.userMenu

@@ -313,6 +313,13 @@ export const tempRoutes = Object.entries(modules).map(([filePath, component]) =>
 
 addDynamicRoutes(tempRoutes)
 
+// 演示页面（模板页面、测试页）总开关，默认关闭即对所有人隐藏
+export const SHOW_DEMO_PAGES = import.meta.env.VITE_SHOW_DEMO_PAGES === 'true'
+
+// 仅管理员可访问的本地路由：测试页 + temp 模板页
+// 复用 tempRoutes（按 views/temp/*.vue 派生），新增文件自动纳入，不会漏拦
+export const ADMIN_ONLY_PATHS = new Set(['/test', ...tempRoutes.map(route => route.path)])
+
 const MENU_ROUTES_STORAGE_KEY = 'menuRoutes'
 
 const getPersistedMenuRoutes = () => {
@@ -420,6 +427,11 @@ router.beforeEach((to, from, next) => {
 
     // 已登录，有菜单
     if(userStore.userMenu && userStore.userMenu.length > 0){
+        // 开关关闭或非管理员直通 404（与侧边栏隐藏保持一致）
+        // 此处菜单已加载，404 路由必然已注册，无需再 add404Routes
+        if ((!SHOW_DEMO_PAGES || !userStore.isAdmin) && ADMIN_ONLY_PATHS.has(to.path)) {
+            return next('/404')
+        }
         //放行
         console.log('==================== 已登录，有菜单 ====================')
         return next()
