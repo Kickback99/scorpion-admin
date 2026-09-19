@@ -24,7 +24,7 @@
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
-  :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey">
+  :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey" empty-text="暂无分类数据">
     <template #default="{ node, data }">
       <span class="custom-tree-node">
         <el-input :ref="setInputRef(data.id)" v-if="data.flag" 
