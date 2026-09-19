@@ -1,6 +1,6 @@
 <template>
   <!-- ===== 标签管理：按 tag_view_mode 渲染对应变体 ===== -->
-  <div class="tag-list-root">
+  <div class="tag-list-root" :class="{ 'is-table-view': mode === 'table' }">
     <TagTable v-if="mode === 'table'" />
     <TagCard v-else-if="mode === 'card'" />
     <TagCloud v-else />
@@ -49,5 +49,12 @@ const { dialogVisible, title, ruleFormRef, formModel, rules, confirm } = useTagE
 <style scoped>
 .tag-list-root {
   width: 100%;
+}
+
+/* 表格视图下弹窗默认以视口为中心，而内容区被侧边栏推右，两者相差半个侧边栏宽；
+   右移该距离，弹窗中心才与表格中心对齐。变量由 Layout 提供，移动端为 0px */
+/* 本规则给 .el-dialog 加了 transform，日后给此弹窗加 fullscreen 需排除 .is-fullscreen */
+.is-table-view :deep(.el-dialog) {
+  transform: translateX(calc(var(--sidebar-width, 0px) / 2));
 }
 </style>
