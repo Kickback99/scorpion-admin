@@ -93,7 +93,7 @@
         </el-collapse-item>
     </el-collapse>
 
-    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :height="tableHeight">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight">
         <el-table-column type="index" label="序号" width="55"></el-table-column>
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip/>
         <el-table-column label="封面" width="124px">
@@ -184,7 +184,7 @@ watch(searchActiveNames, (val) => {
 })
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableHeight } = useTableAutoHeight()
+const { tableMaxHeight } = useTableAutoHeight()
 
 import cover from '@/assets/images/cover-rect.png'
 
