@@ -115,7 +115,7 @@
     </el-collapse>
 
 
-    <el-table :data="tableData" style="width: 100%" :height="tableHeight"
+    <el-table :data="tableData" style="width: 100%" :max-height="tableMaxHeight"
     v-loading="loading"
     ref="multipleTableRef"
     @selection-change="handleMultiple"
@@ -336,7 +336,7 @@ const tabStore = useTabStore()
 const route = useRoute()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableHeight } = useTableAutoHeight()
+const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])

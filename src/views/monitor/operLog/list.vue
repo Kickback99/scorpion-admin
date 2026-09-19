@@ -66,7 +66,7 @@
         </el-form>
             </el-collapse-item>
         </el-collapse>
-        <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :height="tableHeight" @selection-change="removeMultiple">
+        <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" />
             <el-table-column type="index" label="序号"  width="60"/>
             <el-table-column prop="username" label="操作用户" min-width="110" />
@@ -206,7 +206,7 @@ const tabStore = useTabStore()
 const route = useRoute()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableHeight } = useTableAutoHeight()
+const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
