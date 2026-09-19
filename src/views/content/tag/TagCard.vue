@@ -11,29 +11,47 @@
     </div>
 
     <div class="tc-grid">
-      <div v-for="tag in tableData" :key="tag.id" class="tc-card">
-        <div class="tc-card-head">
-          <span class="tc-card-name">{{ tag.name }}</span>
-          <el-badge :value="tag.articleCount" type="primary" />
+      <!-- 加载中：铺与真实卡片同形的骨架，行结构一一对应，加载完切过去不跳动 -->
+      <template v-if="loading">
+        <div v-for="n in skeletonCount" :key="'sk' + n" class="tc-card">
+          <el-skeleton animated>
+            <template #template>
+              <div class="tc-skeleton-head">
+                <el-skeleton-item variant="text" style="width: 42%; height: 16px" />
+                <el-skeleton-item variant="circle" style="width: 18px; height: 18px" />
+              </div>
+              <el-skeleton-item variant="text" style="width: 88%; margin-top: 12px" />
+              <el-skeleton-item variant="text" style="width: 60%; margin-top: 6px" />
+              <el-skeleton-item variant="text" style="width: 44%; margin-top: 9px" />
+            </template>
+          </el-skeleton>
         </div>
-        <p class="tc-card-remark">{{ tag.remark || '暂无备注' }}</p>
-        <div class="tc-card-footer">
-          <span class="tc-card-time">{{ tag.createTime }}</span>
-          <div class="tc-card-actions">
-            <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click="handleEdit(tag)" icon="Edit" circle plain />
-            <el-popconfirm :title="`确定删除「${tag.name}」吗？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
-              <template #reference>
-                <el-button size="small" type="danger" v-perm="'btn.tag.remove'" icon="Delete" circle plain />
-              </template>
-            </el-popconfirm>
+      </template>
+      <template v-else>
+        <div v-for="tag in tableData" :key="tag.id" class="tc-card">
+          <div class="tc-card-head">
+            <span class="tc-card-name">{{ tag.name }}</span>
+            <el-badge :value="tag.articleCount" type="primary" />
+          </div>
+          <p class="tc-card-remark">{{ tag.remark || '暂无备注' }}</p>
+          <div class="tc-card-footer">
+            <span class="tc-card-time">{{ tag.createTime }}</span>
+            <div class="tc-card-actions">
+              <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click="handleEdit(tag)" icon="Edit" circle plain />
+              <el-popconfirm :title="`确定删除「${tag.name}」吗？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
+                <template #reference>
+                  <el-button size="small" type="danger" v-perm="'btn.tag.remove'" icon="Delete" circle plain />
+                </template>
+              </el-popconfirm>
+            </div>
           </div>
         </div>
-      </div>
-      <div v-if="!tableData.length" class="tc-empty">暂无标签数据</div>
+        <div v-if="!tableData.length" class="tc-empty">暂无标签数据</div>
+      </template>
     </div>
 
     <div ref="loadMoreRef" v-if="hasMore" class="tc-load-more">
-      {{ loading ? '加载中...' : '下滑加载更多' }}
+      {{ loadingMore ? '加载中...' : '下滑加载更多' }}
     </div>
     <div v-else-if="tableData.length && scrollable" class="tc-load-more">没有更多了</div>
   </div>
@@ -49,7 +67,7 @@ import { useTagEditor } from './useTagEditor'
 
 const {
   searchData, tableData,
-  loading, hasMore, scrollable, loadMoreRef,
+  loading, loadingMore, skeletonCount, hasMore, scrollable, loadMoreRef,
   onSearch, onReset,
 } = useTagScroll()
 
@@ -108,6 +126,13 @@ html.dark .main-container:not(.page-theme) .tc-toolbar {
 }
 
 .tc-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// 骨架卡片的标题行：与 .tc-card-head 同样是两端对齐，保证骨架/真卡的行结构一致
+.tc-skeleton-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
