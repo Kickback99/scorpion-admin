@@ -272,12 +272,8 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
   padding-bottom: 8.1px;
 }
 
-// el-dialog 对齐内容区中心：默认居中于视口，与内容区差半个侧边栏宽（变量由 Layout 提供）
-// 注意本规则给 .el-dialog 加了 transform，日后启用 fullscreen 弹窗需排除 .is-fullscreen
+// 弹窗随视口居中；需对齐内容区中心的（如标签管理）由组件自己右移半个侧边栏宽
 .el-dialog {
-  // 上界防右溢出，下界钳 0 防反被推左；100% 指弹窗自身宽度
-  transform: translateX(clamp(0px, calc(var(--sidebar-width, 0px) / 2), calc((100vw - 100%) / 2)));
-
   // 超宽弹窗在小屏收回视口内，避免横向滚动
   max-width: 92vw;
 }
