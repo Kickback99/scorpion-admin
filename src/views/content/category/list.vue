@@ -12,19 +12,19 @@
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
    <h4> isNative(原生): {{ isNative }}</h4>  -->
-  <el-button size="small" type="primary" @click="addParent" v-perm="'btn.category.add'" :disabled="disabledAddParent" plain>新增</el-button>
-  <el-button size="small" type="info" @click="handleReset" plain>重置</el-button>
+  <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="primary" @click="addParent" v-perm="'btn.category.add'" :disabled="disabledAddParent" plain>新增</el-button>
+  <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="info" @click="handleReset" plain>重置</el-button>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass, { 'page-theme': settingStore.pageTheme }]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
+  <el-tree v-loading="loading" class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass, { 'page-theme': settingStore.pageTheme }]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
-  :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey" empty-text="暂无分类数据">
+  :expand-on-click-node="false" @node-click="handleNodeClick" :default-expanded-keys="expandKey" :empty-text="loading ? '' : '暂无分类数据'">
     <template #default="{ node, data }">
       <span class="custom-tree-node">
         <el-input :ref="setInputRef(data.id)" v-if="data.flag" 
@@ -133,6 +133,9 @@ defineOptions({
 })
 
 const cateData = ref([])
+
+// 默认关闭loading
+const loading = ref(false)
 
 // 全部按钮的开关
 // 除了编辑按钮额外处理，其他按钮的显示隐藏都依赖这个数据
@@ -345,36 +348,44 @@ let nativeData = []
 
 // t_category_request:分类列表请求
 const render = async () => {
-  const res = await listApi()
-  // console.log(res.data)
-  cateData.value = res.data
-/*   const originData = res.data
-  cateData.value = modifyDisabled(originData,isCheckboxDisabled.value) */
-  console.log('render中...')
-  console.log(res.data)
-  // 同一个地址
-  // nativeData = [ ...res.data ]
+  // 开启loading动效
+  loading.value = true
+  try {
+    const res = await listApi()
+    // console.log(res.data)
+    cateData.value = res.data
+  /*   const originData = res.data
+    cateData.value = modifyDisabled(originData,isCheckboxDisabled.value) */
+    console.log('render中...')
+    console.log(res.data)
+    // 同一个地址
+    // nativeData = [ ...res.data ]
 
-  // 不同的地址
-  nativeData = JSON.parse(JSON.stringify(res.data))
-  // console.log(nativeData)
+    // 不同的地址
+    nativeData = JSON.parse(JSON.stringify(res.data))
+    // console.log(nativeData)
 
-  // 结束编辑
-  isEdit.value = false
+    // 结束编辑
+    isEdit.value = false
 
-  // 显示所有
-  allShow.value = true
+    // 显示所有
+    allShow.value = true
 
-  // 启用拖拽
-  isDraggable.value = true
+    // 启用拖拽
+    isDraggable.value = true
 
-  // 重置数据
-  if(Reflect.ownKeys(category).length >0){
-    for(const k in category){
-        delete category[k]
+    // 重置数据
+    if(Reflect.ownKeys(category).length >0){
+      for(const k in category){
+          delete category[k]
+      }
     }
+  } catch (error) {
+    console.error('获取分类列表失败:', error)
+  } finally {
+    // 关闭loading动效
+    loading.value = false
   }
-
 }
 
 /* const processData = computed(()=>{
@@ -2279,6 +2290,19 @@ const handleComment = () => {
 </script>
 
 <style lang="scss" scoped>
+// 加载期间隐藏工具栏按钮：避免 disabled 态来回翻造成闪烁
+// 用 visibility 而非 v-if —— 保留占位，树不会整体位移；且隐藏元素不接收点击，竞态防护仍在
+.cate-btn-loading {
+  visibility: hidden;
+}
+
+// ============================================================
+// 加载遮罩：限宽 320px（贴合节点实际宽度），避免铺满整行空白；只约束遮罩，不动树的布局
+// ============================================================
+:deep(.tree-with-line .el-loading-mask) {
+  max-width: 320px;
+}
+
 // ============================================================
 // 树形连接线：竖线+横线均在 .el-tree-node 上，每个节点独立定位
 // ============================================================
