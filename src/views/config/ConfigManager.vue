@@ -22,6 +22,7 @@
     </div>
 
     <el-table
+      v-loading="loading"
       ref="tableRef"
       :data="tableData"
       row-key="id"
@@ -226,6 +227,8 @@ const userConfigStore = useUserConfigStore()
 
 // 表格数据
 const tableData = ref([])
+// 默认关闭loading
+const loading = ref(false)
 const tableRef = ref(null)
 const fullTableData = ref([]) // 全量数据备份，搜索过滤时不变
 const filterKeyword = ref('')
@@ -440,6 +443,8 @@ const buildGroupedTreeData = (apiData) => {
 
 // 加载配置数据
 const loadConfigData = async () => {
+  // 开启loading动效
+  loading.value = true
   try {
     const res = await getConfigApi()
     if (res.code === 200 && res.data) {
@@ -451,6 +456,9 @@ const loadConfigData = async () => {
   } catch (error) {
     console.error('加载配置失败:', error)
     msg.error('加载配置失败')
+  } finally {
+    // 关闭loading动效
+    loading.value = false
   }
 }
 
