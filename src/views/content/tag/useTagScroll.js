@@ -3,7 +3,7 @@
  *
  * 滚动触底自动加载下一页，每页 PAGE_SIZE 条。
  */
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { listApi } from '@/api/contag'
 import { useTagEditor } from './useTagEditor'
 
@@ -15,7 +15,8 @@ export function useTagScroll() {
   const tableData = ref([])
   const page = ref(1)          // 已加载页码
   const total = ref(null)
-  const loading = ref(false)   // 加载中标志
+  const loading = ref(false)     // 首屏/替换式请求中（骨架屏依据）
+  const loadingMore = ref(false) // 翻页追加请求中（底部哨兵文案依据）
   const hasMore = ref(false)   // 是否还有更多
   const scrollable = ref(false) // 内容是否真的超出容器（未超出则无"下滑加载"语境）
   const loadMoreRef = ref(null) // 触底哨兵元素
@@ -27,17 +28,33 @@ export function useTagScroll() {
   // ============================================================
   /** 回到第一页并刷新（替换式） */
   const render = async () => {
-    page.value = 1
-    const res = await listApi(page.value, PAGE_SIZE, searchData.value)
-    tableData.value = res.data.items
-    total.value = res.data.total
-    hasMore.value = tableData.value.length < total.value
+    // 开启loading动效
+    loading.value = true
+    try {
+      page.value = 1
+      const res = await listApi(page.value, PAGE_SIZE, searchData.value)
+      tableData.value = res.data.items
+      total.value = res.data.total
+      hasMore.value = tableData.value.length < total.value
+    } catch (error) {
+      console.error('获取标签列表失败:', error)
+    } finally {
+      // 关闭loading动效
+      loading.value = false
+    }
   }
+
+  /**
+   * 骨架块数
+   * 首屏拿不到总数（正在请求的就是它），退化为每页条数；
+   * 之后用总数封顶 —— 不能直接按总数铺，总数 100 而一页只出 5 张会铺满屏再塌掉
+   */
+  const skeletonCount = computed(() => Math.min(total.value || PAGE_SIZE, PAGE_SIZE))
 
   /** 触底加载下一页（追加式） */
   const loadMore = async () => {
-    if (loading.value || !hasMore.value) return
-    loading.value = true
+    if (loading.value || loadingMore.value || !hasMore.value) return
+    loadingMore.value = true
     try {
       page.value += 1
       const res = await listApi(page.value, PAGE_SIZE, searchData.value)
@@ -45,7 +62,7 @@ export function useTagScroll() {
       total.value = res.data.total
       hasMore.value = tableData.value.length < total.value
     } finally {
-      loading.value = false
+      loadingMore.value = false
     }
   }
 
@@ -64,7 +81,7 @@ export function useTagScroll() {
   // ============================================================
   /** 哨兵进入视口即触发加载；首屏不足时自动补加载 */
   const checkLoadMore = () => {
-    if (loading.value || !hasMore.value) return
+    if (loading.value || loadingMore.value || !hasMore.value) return
     const el = loadMoreRef.value
     if (!el) return
     if (el.getBoundingClientRect().top <= window.innerHeight) {
@@ -102,7 +119,7 @@ export function useTagScroll() {
   registerReload(render)
 
   return {
-    searchData, tableData, loading, hasMore, scrollable, loadMoreRef,
+    searchData, tableData, loading, loadingMore, skeletonCount, hasMore, scrollable, loadMoreRef,
     onSearch, onReset,
   }
 }
