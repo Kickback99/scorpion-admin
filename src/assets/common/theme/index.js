@@ -138,6 +138,7 @@ export function applyTheme(themeName, _isDark) {
   injectInputCss()
   injectSelectCss()
   injectMessageCss()
+  injectLoadingCss()
 }
 
 // ============================================================
@@ -626,6 +627,19 @@ function injectBadgeCss() {
     'color:var(--el-color-primary-plain)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'border:1px solid var(--el-color-primary-plain)!important;' +
+    '}'
+}
+
+// ============================================================
+// loading 遮罩 — 深色模式下 EP 的黑遮罩盖在纯黑页面上会隐形
+// 用 html:where(.dark) 抬特异性压过 EP 原生规则，又低于组件 :deep() 覆盖（如 SmartCaptcha 的白遮罩）
+// ============================================================
+var _loadingCssEl = null
+function injectLoadingCss() {
+  _loadingCssEl = ensureEl('theme-loading-fix')
+  _loadingCssEl.textContent =
+    'html:where(.dark) .el-loading-mask{' +
+    'background-color:rgba(45,45,45,.8);' +
     '}'
 }
 
