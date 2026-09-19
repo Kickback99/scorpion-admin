@@ -29,7 +29,7 @@
           </el-popconfirm>
         </div>
       </div>
-      <div v-if="!tableData.length" class="tcl-empty">暂无标签，点击「新增」创建一个吧</div>
+      <div v-if="!tableData.length" class="tcl-empty">暂无标签数据</div>
     </div>
 
     <div ref="loadMoreRef" v-if="hasMore" class="tcl-load-more">
