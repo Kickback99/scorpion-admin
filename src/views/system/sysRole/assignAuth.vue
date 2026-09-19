@@ -13,6 +13,7 @@
         </div>
       </div>
       <el-tree
+        v-loading="treeLoading"
         class="tree-with-line"
         :class="[lineClass, authChildClass, { 'page-theme': settingStore.pageTheme }]"
         style="margin: 12px 0"
@@ -21,8 +22,10 @@
         node-key="id"
         show-checkbox
         :props="defaultProps"
+        :empty-text="treeLoading ? '' : '暂无菜单数据'"
       />
-      <div style="padding: 20px 20px;">
+      <!-- 加载期间隐藏：空树只有 60px 高，按钮会贴在加载条下面，加载完又跳下 148px -->
+      <div v-if="!treeLoading" style="padding: 20px 20px;">
         <el-button size="small" type="primary" :loading="loading" @click="save" plain>保存</el-button>
         <el-button size="small" type="info" @click="$router.push('/system/sysRole')" plain>返回</el-button>
       </div>
@@ -54,6 +57,8 @@ const props = defineProps({
 });
 
 const loading = ref(false);
+// 默认关闭loading（树形权限数据请求）
+const treeLoading = ref(false);
 const sysMenuList = ref([]);
 const treeRef = ref(null);
 const defaultProps = {
@@ -63,16 +68,25 @@ const defaultProps = {
 
 //t_role_request: 获取角色菜单数据请求
 const render = async () => {
-    const roleId = route.query.id
-    if (!roleId) {
-      return
+    // 开启loading动效
+    treeLoading.value = true
+    try {
+      const roleId = route.query.id
+      if (!roleId) {
+        return
+      }
+      const result = await allocMenusApi(roleId);
+      sysMenuList.value = result.data;
+      await nextTick()
+      const checkedIds = getCheckedIds(sysMenuList.value);
+      // console.log('getPermissions() checkedIds', checkedIds);
+      treeRef.value?.setCheckedKeys(checkedIds)
+    } catch (error) {
+      console.error('获取角色权限列表失败:', error)
+    } finally {
+      // 关闭loading动效
+      treeLoading.value = false
     }
-    const result = await allocMenusApi(roleId);
-    sysMenuList.value = result.data;
-    await nextTick()
-    const checkedIds = getCheckedIds(sysMenuList.value);
-    // console.log('getPermissions() checkedIds', checkedIds);
-    treeRef.value?.setCheckedKeys(checkedIds)
 };
 
 render()
@@ -330,6 +344,13 @@ const save = async () => {
 @keyframes tree-shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+// ============================================================
+// 加载遮罩：限宽 320px（贴合节点实际宽度），避免铺满整行空白；只约束遮罩，不动树的布局
+// ============================================================
+:deep(.tree-with-line .el-loading-mask) {
+  max-width: 320px;
 }
 
 // ============================================================
