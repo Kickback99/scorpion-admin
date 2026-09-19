@@ -15,7 +15,7 @@
     </div>
 
     <!-- 列宽约定：一律用 min-width 作基准，剩余宽度由表格按各列基准比例分配；新增列写个 min-width 即可自动参与 -->
-    <el-table :data="tableData" class="tt-table">
+    <el-table :data="tableData" class="tt-table" empty-text="暂无标签数据">
       <el-table-column type="index" label="序号" min-width="60" />
       <el-table-column prop="name" label="标签名" min-width="200" />
       <el-table-column prop="articleCount" label="文章数量" min-width="80" align="center" />
