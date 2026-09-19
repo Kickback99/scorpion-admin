@@ -124,7 +124,7 @@
             :data="tableData" 
             style="width: 100%" 
             border
-            :height="tableHeight"
+            :max-height="tableMaxHeight"
             v-loading="loading"
         >
             <el-table-column prop="id" label="ID" width="80" align="center" />
@@ -240,7 +240,7 @@ const tabStore = useTabStore()
 const route = useRoute()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
-const { tableHeight } = useTableAutoHeight()
+const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
     saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
