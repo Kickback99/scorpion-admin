@@ -11,25 +11,35 @@
     </div>
 
     <div class="tcl-cloud">
-      <div
-        v-for="tag in tableData"
-        :key="tag.id"
-        class="tcl-bubble"
-      >
-        <el-tooltip :content="tag.remark || tag.name" :show-after="300" placement="top">
-          <span class="tcl-bubble-name">{{ tag.name }}</span>
-        </el-tooltip>
-        <span class="tcl-bubble-count">{{ tag.articleCount }}</span>
-        <div class="tcl-bubble-actions">
-          <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click.stop="handleEdit(tag)" icon="Edit" circle plain />
-          <el-popconfirm :title="`确定删除「${tag.name}」？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
-            <template #reference>
-              <el-button size="small" type="danger" v-perm="'btn.tag.remove'" icon="Delete" @click.stop circle plain />
-            </template>
-          </el-popconfirm>
+      <!-- 加载中：铺与真实气泡同尺寸的圆形骨架，占住同一套网格，加载完切过去不跳动 -->
+      <template v-if="loading">
+        <el-skeleton v-for="n in skeletonCount" :key="'sk' + n" animated class="tcl-bubble-sk">
+          <template #template>
+            <el-skeleton-item variant="circle" />
+          </template>
+        </el-skeleton>
+      </template>
+      <template v-else>
+        <div
+          v-for="tag in tableData"
+          :key="tag.id"
+          class="tcl-bubble"
+        >
+          <el-tooltip :content="tag.remark || tag.name" :show-after="300" placement="top">
+            <span class="tcl-bubble-name">{{ tag.name }}</span>
+          </el-tooltip>
+          <span class="tcl-bubble-count">{{ tag.articleCount }}</span>
+          <div class="tcl-bubble-actions">
+            <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click.stop="handleEdit(tag)" icon="Edit" circle plain />
+            <el-popconfirm :title="`确定删除「${tag.name}」？`" @confirm="removeRole(tag.id)" width="220" icon="WarnTriangleFilled">
+              <template #reference>
+                <el-button size="small" type="danger" v-perm="'btn.tag.remove'" icon="Delete" @click.stop circle plain />
+              </template>
+            </el-popconfirm>
+          </div>
         </div>
-      </div>
-      <div v-if="!tableData.length" class="tcl-empty">暂无标签数据</div>
+        <div v-if="!tableData.length" class="tcl-empty">暂无标签数据</div>
+      </template>
     </div>
 
     <div ref="loadMoreRef" v-if="hasMore" class="tcl-load-more">
@@ -49,7 +59,7 @@ import { useTagEditor } from './useTagEditor'
 
 const {
   searchData, tableData,
-  loadingMore, hasMore, scrollable, loadMoreRef,
+  loading, loadingMore, skeletonCount, hasMore, scrollable, loadMoreRef,
   onSearch, onReset,
 } = useTagScroll()
 
@@ -95,6 +105,12 @@ html.dark .main-container:not(.page-theme) .tcl-toolbar {
   // 而工具栏是不透明的粘性层，不留净空就会盖住圆的顶边
   padding: 8px 20px 32px;
   min-height: 200px;
+}
+
+// 圆形骨架：尺寸与 .tcl-bubble 一致，共用同一套网格，避免加载前后错位
+// 改 EP 变量而不是 width/height —— line-height 也吃这个变量，只改宽高会留下行盒高度偏差
+.tcl-bubble-sk {
+  --el-skeleton-circle-size: 100px;
 }
 
 .tcl-bubble {
