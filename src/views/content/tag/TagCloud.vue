@@ -33,7 +33,7 @@
     </div>
 
     <div ref="loadMoreRef" v-if="hasMore" class="tcl-load-more">
-      {{ loading ? '加载中...' : '下滑加载更多' }}
+      {{ loadingMore ? '加载中...' : '下滑加载更多' }}
     </div>
     <div v-else-if="tableData.length && scrollable" class="tcl-load-more">没有更多了</div>
   </div>
@@ -49,7 +49,7 @@ import { useTagEditor } from './useTagEditor'
 
 const {
   searchData, tableData,
-  loading, hasMore, scrollable, loadMoreRef,
+  loadingMore, hasMore, scrollable, loadMoreRef,
   onSearch, onReset,
 } = useTagScroll()
 
