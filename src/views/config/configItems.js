@@ -9,11 +9,12 @@
  */
 import { useRenderIcon } from '@/components/MyIcon/src/hook'
 import { useConfigStore, registerItems } from '@/store/config'
+import { PIE_CHART_MODE_OPTIONS } from '@/config/pieChartOptions'
 import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
   Aim, Star, ChatDotRound, List, Document, Message, InfoFilled, Postcard, Comment, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
-  PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort
+  PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort, PieChart
 } from '@element-plus/icons-vue'
 
 export function useConfigItems() {
@@ -122,6 +123,8 @@ export function useConfigItems() {
         { key: 'dashboard.line_chart.y_valid_field', type:'radio', label: '有效 Y 字段', desc: '近 7 天趋势允许的有效 Y 字段',            icon: SemiSelect,       get: () => config.getValue('dashboard.line_chart.y_valid_field'), set: (v) => config.updateConfig('dashboard.line_chart.y_valid_field', v), options: [{ value: 'any', label: '任意' }, { value: 'all', label: '全部' }] },
         { key: 'dashboard.line_chart.priority',      type:'radio', label: '趋势优先级',   desc: '近 7 天趋势优先级',                      icon: Sort,         get: () => config.getValue('dashboard.line_chart.priority'),      set: (v) => config.updateConfig('dashboard.line_chart.priority', v),        options: [{ value: 'date', label: '日期' }, { value: 'data', label: '数据' }] },
         { key: 'dashboard.line_chart.week_offset',   type:'number',label: '周偏移',       desc: '近 7 天趋势图可回滚的周偏移',             icon: "Refresh",      get: () => config.getValue('dashboard.line_chart.week_offset'),   set: (v) => config.updateConfig('dashboard.line_chart.week_offset', v),     min: () => 0, max: () => 52 },
+        // ===== dashboard.pie_chart =====
+        { key: 'dashboard.pie_chart.mode',           type:'radio', label: '饼图统计维度', desc: '仪表盘饼图按标签还是按分类统计',           icon: PieChart,       get: () => config.getValue('dashboard.pie_chart.mode'),           set: (v) => config.updateConfig('dashboard.pie_chart.mode', v),            options: PIE_CHART_MODE_OPTIONS },
         // ===== notice =====
         { key: 'notice.load_mode',                   type: 'radio',  label: '公告加载方式',   desc: '公告列表的加载方式',                      icon: Tickets,        get: () => config.getValue('notice.load_mode'),            set: (v) => config.updateConfig('notice.load_mode', v),               options: [{ value: 'scroll', label: '滚动加载' }, { value: 'pagination', label: '分页加载' }] },
         { key: 'notice.bell_position',               type: 'radio',  label: '公告铃铛位置',   desc: '公告铃铛在页面中的显示位置',              icon: Aim,            get: () => config.getValue('notice.bell_position'),        set: (v) => config.updateConfig('notice.bell_position', v),           options: [{ value: 'top', label: '顶部' }, { value: 'bottom', label: '底部' }] },

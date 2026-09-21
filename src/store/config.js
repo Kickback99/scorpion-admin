@@ -177,6 +177,9 @@ export const useConfigStore = defineStore({
           priority: 'data',
           week_offset: 12,
         },
+        pie_chart: {
+          mode: 'category',
+        },
       },
       notice: {
         load_mode: 'scroll',
@@ -648,6 +651,12 @@ export const useConfigStore = defineStore({
 
     getDashboardTopCardEnabled()   { return this.getValue('dashboard.top_card_enabled') === true },
     toggleDashboardTopCardEnabled(){ this.updateConfig('dashboard.top_card_enabled', !this.getValue('dashboard.top_card_enabled')) },
+
+    // ==================== dashboard.pie_chart ====================
+
+    getDashboardPieChartMode()     { return this.getValue('dashboard.pie_chart.mode') || 'category' },
+    // 仪表盘下拉切换只重绘图表，静默更新；配置页改才弹提示
+    setDashboardPieChartMode(v, silent = false) { this.updateConfig('dashboard.pie_chart.mode', v, silent) },
   },
 
   // ============================================================
@@ -732,6 +741,7 @@ export const useConfigStore = defineStore({
 
     // ===== dashboard (admin 组) =====
     isDashboardTopCardEnabled() { return this.getValue('dashboard.top_card_enabled') === true },
+    dashboardPieChartMode()     { return this.getValue('dashboard.pie_chart.mode') || 'category' },
   },
 
   // ============================================================

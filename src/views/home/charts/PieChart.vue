@@ -13,6 +13,7 @@ import '@/plugins/echarts' // 注册所用图表类型与组件（随图表所�
 const props = defineProps({
   legendData: { type: Array, default: () => [] },
   seriesData: { type: Array, default: () => [] },
+  seriesName: { type: String, default: '统计' },
 })
 
 const chartRef = ref(null)
@@ -62,7 +63,7 @@ const buildOption = () => {
       },
     },
     series: [{
-      name: '分类统计',
+      name: props.seriesName,
       type: 'pie',
       radius: isMobile ? ['30%', '58%'] : isMedium ? ['28%', '52%'] : ['40%', '70%'],
       center: isMobile ? ['50%', '42%'] : isMedium ? ['28%', '50%'] : ['40%', '50%'],
@@ -94,7 +95,7 @@ const handleResize = () => {
   chartInstance?.setOption(buildOption())
 }
 
-watch(() => [props.legendData, props.seriesData], renderChart, { deep: true })
+watch(() => [props.legendData, props.seriesData, props.seriesName], renderChart, { deep: true })
 
 onMounted(() => {
   renderChart()

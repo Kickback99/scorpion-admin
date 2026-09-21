@@ -29,10 +29,11 @@ export const getChartsBarApi = () => http.get(API.CHARTS_BAR)
 export const getChartLineApi = (offset = 0, initialOffset = null, direction = 'prev') => http.get(API.CHART_LINE, { params: { offset, initialOffset, direction } })
 
 /**
- * 获取文章状态饼图数据
+ * 获取饼图统计数据
+ * @param {string} [mode='category'] 统计维度（category：分类，tag：标签）
  * @returns {Promise} { legendData:[], seriesData:[] }
  */
-export const getChartPieApi = () => http.get(API.CHART_PIE)
+export const getChartPieApi = (mode = 'category') => http.get(API.CHART_PIE, { params: { mode } })
 
 /**
  * 获取近7天面积图数据
