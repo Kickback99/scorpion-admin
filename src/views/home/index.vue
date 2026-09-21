@@ -185,9 +185,14 @@
       <el-col :xs="24" :md="9">
         <el-card shadow="never">
           <template #header>
-            <div class="chart-header"><span>分类统计</span></div>
+            <div class="chart-header">
+              <span>{{ pieTitle }}</span>
+              <el-select :model-value="pieMode" size="small" class="chart-select" :disabled="pieLoading" @change="handlePieModeChange">
+                <el-option v-for="opt in PIE_CHART_MODE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
+              </el-select>
+            </div>
           </template>
-          <PieChart :legend-data="pieChart.legendData" :series-data="pieChart.seriesData" />
+          <PieChart :legend-data="pieChart.legendData" :series-data="pieChart.seriesData" :series-name="pieTitle" />
         </el-card>
       </el-col>
     </el-row>
@@ -208,6 +213,7 @@ import GaugeGroup from './charts/GaugeGroup.vue'
 import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
 import CountTo from '@/components/CountTo/index.vue'
+import { PIE_CHART_MODE_OPTIONS } from '@/config/pieChartOptions'
 import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartAreaApi } from '@/api/dashboard'
 import websocketManager from '@/server/websocketManager'
 
@@ -227,6 +233,7 @@ const lineLoading = ref(false)
 const fallbackMaxOffset = configStore.getDashboardLineChartWeekOffset() || 12
 const lineChart = reactive({ xData: [], y1: [], y2: [], y3: [], periodLabel: '', hasData: false, isLatest: false, maxOffset: fallbackMaxOffset, hasPrev: true })
 const pieChart = reactive({ legendData: [], seriesData: [] })
+const pieLoading = ref(false)
 const gaugeData = ref([])
 const areaChart = reactive({ xData: [], y1: [], periodLabel: '', hasData: false, maxOffset: 12, hasPrev: true })
 const areaOffset = ref(0)
@@ -241,6 +248,11 @@ const hitokoto = ref('加载中...')
 // 计算属性
 // ============================================================
 const topCardVisible = computed(() => configStore.getDashboardTopCardEnabled())
+
+// 饼图维度以配置项为唯一数据源，下拉只做投影
+const pieMode = computed(() => configStore.getDashboardPieChartMode())
+
+const pieTitle = computed(() => PIE_CHART_MODE_OPTIONS.find(o => o.value === pieMode.value)?.label || '统计')
 
 const nickname = computed(() => userStore.userInfo?.nickname || userStore.userInfo?.username || 'Admin')
 
@@ -330,12 +342,21 @@ const fetchLineChart = async (direction = 'prev') => {
   lineLoading.value = false
 }
 
-const fetchPieChart = async () => {
+const fetchPieChart = async (mode = pieMode.value) => {
+  pieLoading.value = true
   try {
-    const res = await getChartPieApi()
+    const res = await getChartPieApi(mode)
     pieChart.legendData = res.data?.legendData || []
     pieChart.seriesData = res.data?.seriesData || []
   } catch { /* keep defaults */ }
+  pieLoading.value = false
+}
+
+// 切换维度：写配置静默持久化，取数直接用事件值
+// 不能读 pieMode —— updateConfig 是异步的，state 要等接口回来才更新，读到的会是旧值
+const handlePieModeChange = (mode) => {
+  configStore.setDashboardPieChartMode(mode, true)
+  fetchPieChart(mode)
 }
 
 // ============================================================
@@ -595,6 +616,13 @@ const handleAreaReset = () => { areaStack.value = []; areaOffset.value = 0; area
       flex-wrap: nowrap;
       font-size: 15px; font-weight: 600;
       color: var(--el-text-color-primary);
+    }
+
+    // 饼图维度下拉：靠右对齐，字重跟随控件自身而非卡片标题
+    .chart-select {
+      width: 100px;
+      margin-left: auto;
+      font-weight: 400;
     }
   }
 }
