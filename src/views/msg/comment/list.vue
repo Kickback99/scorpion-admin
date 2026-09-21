@@ -136,7 +136,9 @@
         <el-table-column prop ="status" label="评论状态" min-width="100">
             <template #default="{row}">
                 <el-button size="small" type="success" v-if="row.status === 0" plain>已通过</el-button>
-                <el-button size="small" type="danger" v-if="row.status === 1" plain>已驳回</el-button>
+                <!-- 已驳回按来源区分：rejectSource=1 是用户在提交时被敏感词自动拦截的，其余是人工审核驳回 -->
+                <el-button size="small" type="danger" v-if="row.status === 1 && row.rejectSource === 1" plain>自动驳回</el-button>
+                <el-button size="small" type="danger" v-if="row.status === 1 && row.rejectSource !== 1" plain>已驳回</el-button>
                 <el-button size="small" type="warning" v-if="row.status === 2" plain>待审核</el-button>
             </template>
         </el-table-column>
