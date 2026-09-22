@@ -226,24 +226,24 @@ import SmartSelector from '@/views/components/SmartSelector.vue';
 import { reactive, ref, onMounted, watch } from 'vue';
 import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
-import { useConfigStore } from '@/store/config';
+import { useSettingStore } from '@/setting';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { dayjs } from 'element-plus'
 
-const configStore = useConfigStore()
+const settingStore = useSettingStore()
 const tabStore = useTabStore()
 
-// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
+// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 settingStore 本地默认值
 const route = useRoute()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
 const { tableMaxHeight } = useTableAutoHeight()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
-    saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
+    saved !== undefined ? saved : (settingStore.collapseSearchEnabled ? [] : ['search'])
 )
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)

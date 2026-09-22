@@ -162,7 +162,7 @@ import { dayjs, ElMessageBox } from 'element-plus';
 import msg from '@/components/msg';
 import { useUserConfigStore } from '@/store/userConfig';
 import { useArticleDraftStore } from '@/store/articleDraft';
-import { useConfigStore } from '@/store/config';
+import { useSettingStore } from '@/setting';
 import { useTabStore } from '@/store/tabs';
 import { useRoute } from 'vue-router';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
@@ -170,14 +170,14 @@ const userConfigStore = useUserConfigStore()
 // 懒加载文章编辑器（完整 markdown 编辑器），仅打开新增/编辑弹窗时加载
 const ArticleEdit = defineAsyncComponent(() => import('@/views/components/ArticleEdit.vue'))
 const draftStore = useArticleDraftStore()
-const configStore = useConfigStore()
+const settingStore = useSettingStore()
 const tabStore = useTabStore()
 
-// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
+// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 settingStore 本地默认值
 const route = useRoute()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
-    saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
+    saved !== undefined ? saved : (settingStore.collapseSearchEnabled ? [] : ['search'])
 )
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
