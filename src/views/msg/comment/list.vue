@@ -258,15 +258,19 @@
             </template>
 
             <el-form-item label="回复内容" prop="content">
-                <el-input 
-                    v-model="replyModel.content" 
-                    type="textarea" 
+                <el-input
+                    v-model="replyModel.content"
+                    type="textarea"
                     ref="replyInputRef"
-                    :rows="4" 
+                    :rows="4"
                     placeholder="请输入回复内容"
                     maxlength="512"
                     show-word-limit
                 />
+                <!-- 表情按钮贴输入框底部，布局与用户端评论框一致 -->
+                <div class="reply-emoji-bar">
+                    <SmartEmojiPicker v-model="replyModel.content" :input-el="replyInputRef" />
+                </div>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -328,6 +332,7 @@ import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { getAllArticlesApi } from '@/api/business';
 import { hasPerm } from '@/utils/permissions';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
+import SmartEmojiPicker from '@/views/components/SmartEmojiPicker.vue';
 import msg from '@/components/msg'
 
 const userConfigStore = useUserConfigStore()
@@ -1119,5 +1124,12 @@ const loadStatistics = async () => {
 }
 @keyframes load-spin {
   to { transform: rotate(360deg); }
+}
+
+/* ==================== 回复弹窗表情按钮 ==================== */
+/* 单独占一行贴在输入框下方（form-item 内容是 flex-wrap，100% 宽度会换行） */
+.reply-emoji-bar {
+    width: 100%;
+    margin-top: 8px;
 }
 </style>
