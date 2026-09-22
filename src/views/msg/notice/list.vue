@@ -340,7 +340,7 @@ import {
 import { View } from '@element-plus/icons-vue'
 import { getAllUsersApi, getAllRolesApi } from '@/api/business'
 import { useUserConfigStore } from '@/store/userConfig'
-import { useConfigStore } from '@/store/config'
+import { useSettingStore } from '@/setting'
 import { useTabStore } from '@/store/tabs'
 import { useRoute } from 'vue-router'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
@@ -546,14 +546,14 @@ const prevTargetType = ref(null)             // 切换前的推送范围
 const prevTargetUserType = ref(null)         // 切换前的目标用户类型
 
 const userConfigStore = useUserConfigStore()
-const configStore = useConfigStore()
+const settingStore = useSettingStore()
 const tabStore = useTabStore()
 
-// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 configStore 默认值
+// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 settingStore 本地默认值
 const route = useRoute()
 const saved = tabStore.collapseStates[route.path]
 const searchActiveNames = ref(
-    saved !== undefined ? saved : (configStore.getCollapseSearchEnabled() ? [] : ['search'])
+    saved !== undefined ? saved : (settingStore.collapseSearchEnabled ? [] : ['search'])
 )
 watch(searchActiveNames, (val) => {
     tabStore.setCollapseState(route.path, val)
