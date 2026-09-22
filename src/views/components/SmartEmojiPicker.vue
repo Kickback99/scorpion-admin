@@ -3,7 +3,7 @@
     <!-- ===== 表情选择 ===== -->
     <!-- 用 el-popover：点开后在光标处插入（弹层被传送到 body，不受弹窗滚动容器裁剪） -->
     <el-popover
-        v-if="EMOJI_ENABLED"
+        v-if="configStore.isCommentReplyEmojiEnabled"
         v-model:visible="popoverOpen"
         :width="288"
         trigger="click"
@@ -48,15 +48,12 @@
 import { nextTick, ref } from 'vue'
 import { EMOJI_LIST } from '@/utils/emojis'
 import msg from '@/components/msg'
+import { useConfigStore } from '@/store/config'
 
 // ============================================================
 // 数据
 // ============================================================
-// 表情开关，与用户端 AppEmojiPicker 同名同语义：后续接入配置中心时改为远程开关
-const EMOJI_ENABLED = true
-
-// 点完表情是否立即收起面板：管理端面板在弹窗内不挡视线，默认保持常驻，方便连选多个
-const EMOJI_CLOSE_ON_PICK = false
+const configStore = useConfigStore()
 
 const modelValue = defineModel({ type: String, default: '' })
 
@@ -106,7 +103,8 @@ const handlePick = (emoji) => {
     modelValue.value = modelValue.value.slice(0, at) + emoji + modelValue.value.slice(at)
 
     caret.value = at + emoji.length
-    if (EMOJI_CLOSE_ON_PICK) popoverOpen.value = false
+    // 点完是否收起走配置：默认 false（管理端面板不挡视线，保持常驻便于连选）
+    if (configStore.isCommentReplyEmojiAutoCloseEnabled) popoverOpen.value = false
     // v-model 回写 value 会把光标顶到末尾，必须等 DOM 更新后再设回去
     nextTick(() => {
         el?.focus()
