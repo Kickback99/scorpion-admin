@@ -49,6 +49,15 @@
                 <el-form-item label="菜单折叠"><el-switch :model-value="userConfigStore.getCollapseEnabled()" @change="userConfigStore.toggleCollapse" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" /></el-form-item>
                 <el-form-item>
                   <template #label>
+                    搜索面板折叠
+                    <el-tooltip content="列表页搜索面板默认折叠，各标签页会记住手动状态" placement="top">
+                      <el-icon><QuestionFilled /></el-icon>
+                    </el-tooltip>
+                  </template>
+                  <el-switch :model-value="stringStore.collapseSearchEnabled" @change="onCollapseSearchChange" size="small" inline-prompt active-icon="Expand" inactive-icon="Fold" />
+                </el-form-item>
+                <el-form-item>
+                  <template #label>
                     保存标签
                     <el-tooltip content="退出或 401 后是否保留已打开的标签页" placement="top">
                       <el-icon><QuestionFilled /></el-icon>
@@ -353,6 +362,11 @@ const toggleDark = async () => {
 // 退出清标签切换
 const onClearTabsChange = (val) => {
     stringStore.keepTabs = val
+}
+
+// 搜索面板折叠切换
+const onCollapseSearchChange = (val) => {
+    stringStore.collapseSearchEnabled = val
 }
 
 // 标签模式切换

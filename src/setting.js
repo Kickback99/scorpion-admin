@@ -12,6 +12,8 @@ export const useSettingStore = defineStore({
         keepTabs: true,
         /** 退出标记：登录后忽略 redirect，直接进仪表盘 */
         logoutIntent: false,
+        /** 搜索面板折叠：true=列表页搜索面板默认折叠（仅对无历史偏好的标签页生效） */
+        collapseSearchEnabled: true,
         /** 标签模式：'neutral'=中性色 | 'ui'=跟随 ui-mode | 'theme'=主题色 */
         tagMode: 'neutral',
         /** 菜单手风琴：true=排它式展开，同一时间只展开一个子菜单 */
@@ -47,7 +49,7 @@ export const useSettingStore = defineStore({
     },
     persist: {
         key: 'setting-store',
-        paths: ['keepTabs', 'logoutIntent', 'tagMode', 'menuAccordion', 'menuThemeColor', 'pageTheme', 'dynamicMode', 'loginBgUrl'],
+        paths: ['keepTabs', 'logoutIntent', 'collapseSearchEnabled', 'tagMode', 'menuAccordion', 'menuThemeColor', 'pageTheme', 'dynamicMode', 'loginBgUrl'],
     },
 })
 
