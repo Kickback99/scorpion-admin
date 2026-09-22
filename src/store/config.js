@@ -139,7 +139,6 @@ export const useConfigStore = defineStore({
       },
       icon_enabled: true,
       button_permission_mode: 'hide',
-      collapse_search_enabled: false,
       config_view_mode: 'card',
       tag_view_mode: 'card',
       search_menu_focus: false,
@@ -437,10 +436,6 @@ export const useConfigStore = defineStore({
     getButtonPermissionMode()      { return this.getValue('button_permission_mode') || 'hide' },
     setButtonPermissionMode(v)     { this.updateConfig('button_permission_mode', v) },
 
-    // -- collapse_search_enabled --
-    getCollapseSearchEnabled()     { return this.getValue('collapse_search_enabled') === true },
-    toggleCollapseSearchEnabled()  { this.updateConfig('collapse_search_enabled', !this.getValue('collapse_search_enabled')) },
-
     // -- config_view_mode --
     getConfigViewMode()            { return this.getValue('config_view_mode') || 'card' },
     setConfigViewMode(v)           { this.updateConfig('config_view_mode', v) },
@@ -681,7 +676,6 @@ export const useConfigStore = defineStore({
   getters: {
     // ===== 顶层（admin 组） =====
     buttonPermissionMode()    { return this.getValue('button_permission_mode') || 'hide' },
-    isCollapseSearchEnabled() { return this.getValue('collapse_search_enabled') === true },
     configViewMode()          { return this.getValue('config_view_mode') || 'card' },
     tagViewMode()             { return this.getValue('tag_view_mode') || 'card' },
     isWebsocketEnabled()        { return this.getValue('websocket.enabled') === true },
