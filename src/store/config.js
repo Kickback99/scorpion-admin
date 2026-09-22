@@ -89,6 +89,7 @@ export const useConfigStore = defineStore({
         child_comment_limit: 3,
         child_page_size: 10,
         parent_page_size: 10,
+        emoji_enabled: true,
       },
       nav: {
         friend_link_enabled: false,
@@ -191,6 +192,10 @@ export const useConfigStore = defineStore({
         client_register_type: 'default',
         client_login_type: 'slider',
         admin_login_type: 'slider',
+      },
+      comment: {
+        reply_emoji_enabled: true,
+        reply_emoji_auto_close_enabled: false,
       },
     },
 
@@ -531,6 +536,17 @@ export const useConfigStore = defineStore({
     getParentPageSize()            { return this.getValue('comment.parent_page_size') ?? 10 },
     setParentPageSize(v)           { this.updateConfig('comment.parent_page_size', v) },
 
+    getCommentEmojiEnabled()       { return this.getValue('comment.emoji_enabled') ?? true },
+    toggleCommentEmojiEnabled()    { this.updateConfig('comment.emoji_enabled', !this.getValue('comment.emoji_enabled')) },
+
+    // ==================== comment（admin 组） ====================
+
+    getCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
+    toggleCommentReplyEmojiEnabled()       { this.updateConfig('comment.reply_emoji_enabled', !this.getValue('comment.reply_emoji_enabled')) },
+
+    getCommentReplyEmojiAutoCloseEnabled() { return this.getValue('comment.reply_emoji_auto_close_enabled') ?? false },
+    toggleCommentReplyEmojiAutoCloseEnabled() { this.updateConfig('comment.reply_emoji_auto_close_enabled', !this.getValue('comment.reply_emoji_auto_close_enabled')) },
+
     // ==================== nav ====================
 
     getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
@@ -693,6 +709,11 @@ export const useConfigStore = defineStore({
     // ===== comment (client 组) =====
     isArticleCommentEnabled()    { return this.getValue('comment.article_comment_enabled') === true },
     isFriendLinkCommentEnabled() { return this.getValue('comment.friend_link_comment_enabled') === true },
+    isCommentEmojiEnabled()      { return this.getValue('comment.emoji_enabled') ?? true },
+
+    // ===== comment (admin 组) =====
+    isCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
+    isCommentReplyEmojiAutoCloseEnabled() { return this.getValue('comment.reply_emoji_auto_close_enabled') ?? false },
 
     // ===== user 前台认证 (client 组) =====
     isUserLoginEnabled()      { return this.getValue('user.login_enabled') === true },
