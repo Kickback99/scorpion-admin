@@ -1,4 +1,4 @@
-<!-- CountTo — 数字滚动动画，从 startVal 缓动滚动到 endVal，显示时做 K/M 缩写 -->
+<!-- CountTo — 数字滚动动画，从当前显示值缓动到 endVal，显示时做 K/M 缩写 -->
 <template>
   <span>{{ displayText }}</span>
 </template>
@@ -9,13 +9,13 @@ import { onMounted, onUnmounted, ref, watch } from 'vue'
 const props = defineProps({
   endVal: { type: Number, default: 0 },
   startVal: { type: Number, default: 0 },
-  duration: { type: Number, default: 1000 }
+  duration: { type: Number, default: 400 }
 })
 
-// easeOutExpo 缓动：先快后慢
-const easeOutExpo = (t, b, c, d) => (c * (-Math.pow(2, (-10 * t) / d) + 1) * 1024) / 1023 + b
+// easeOutCubic 缓动：数值分布比 easeOutExpo 均匀，前 1/4 时长走约 58%
+const easeOutCubic = (t, b, c, d) => c * (1 - Math.pow(1 - t / d, 3)) + b
 
-// K/M 缩写（与首页 formatNumber 一致）
+// K/M 缩写
 const format = (num) => {
   const n = Math.round(num ?? 0)
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
@@ -24,17 +24,22 @@ const format = (num) => {
 }
 
 const displayText = ref(format(props.startVal))
+// 记录当前滚到哪，作为下次滚动的起点 —— 增量更新才不会每次都从 startVal 重来
+let current = props.startVal
 let rafId = null
 
 const run = () => {
   cancelAnimationFrame(rafId)
-  const from = props.startVal
+  const from = current
   const to = props.endVal
+  if (from === to) return
   let startTime = null
   const step = (now) => {
     if (startTime === null) startTime = now
     const progress = Math.min(now - startTime, props.duration)
-    displayText.value = format(easeOutExpo(progress, from, to - from, props.duration))
+    current = progress < props.duration ? easeOutCubic(progress, from, to - from, props.duration) : to
+    const text = format(current)
+    if (text !== displayText.value) displayText.value = text // 文本没变就不写，省掉重复渲染
     if (progress < props.duration) {
       rafId = requestAnimationFrame(step)
     }
