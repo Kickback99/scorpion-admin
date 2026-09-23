@@ -141,7 +141,6 @@ const vo = reactive({
     templateImageHeight: 0
 })
 
-const verifying = ref(false)
 const verified = ref(false)
 // 校验通过后签发的一次性 verifyToken（提交登录 / 注册时消费）
 const verifyToken = ref('')
@@ -229,7 +228,6 @@ const onClickCaptcha = (e) => {
 
 const generate = async () => {
     verified.value = false
-    verifying.value = true
     backgroundLoaded.value = false
     try {
         const res = await captchaGenerateApi(props.type)
@@ -244,8 +242,6 @@ const generate = async () => {
         console.error('生成验证码失败:', e)
         // 失败时保留旧图：恢复已加载状态，避免 loading 卡住
         backgroundLoaded.value = true
-    } finally {
-        verifying.value = false
     }
 }
 
@@ -282,7 +278,6 @@ const verify = async () => {
         throw new Error('请输入正确的验证码')
     }
     const v = (answerModel.answer || '').trim()
-    verifying.value = true
     try {
         const res = await captchaVerifyApi({ id: vo.id, type: props.type, answer: v })
         verifyToken.value = res.data
@@ -294,14 +289,11 @@ const verify = async () => {
         verifyToken.value = ''
         generate()
         throw e
-    } finally {
-        verifying.value = false
     }
 }
 defineExpose({ verify })
 
 const handleSliderVerify = async () => {
-    verifying.value = true
     try {
         const track = {
             bgImageWidth: vo.backgroundImageWidth,
@@ -319,13 +311,10 @@ const handleSliderVerify = async () => {
         }
     } catch (e) {
         generate()
-    } finally {
-        verifying.value = false
     }
 }
 
 const handleClickVerify = async () => {
-    verifying.value = true
     try {
         const track = {
             bgImageWidth: vo.backgroundImageWidth,
@@ -344,8 +333,6 @@ const handleClickVerify = async () => {
     } catch (e) {
         clickPoints.value = []
         generate()
-    } finally {
-        verifying.value = false
     }
 }
 </script>
