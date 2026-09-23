@@ -233,7 +233,12 @@ const cleanZombieUsers = async () => {
     cleaning.value = true
     try {
         const res = await cleanZombieApi()
-        msg.primary(res.message || `已清理 ${res.data.count} 个僵尸用户`)
+        msg.primary({
+            message: res.message || `已清理 ${res.data.count} 个僵尸用户`,
+            dangerouslyUseHTMLString: true,
+            duration: 5000,  // 消息显示时间长一点
+            customClass: 'message-right-top'
+        })
         // 刷新列表
         await loadOnlineList()
     } catch (error) {
