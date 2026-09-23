@@ -50,6 +50,9 @@ class WebSocketManager {
     if (this.isConnecting || this.socket) {
       if (this.socket) {
         console.log('🔌 关闭现有连接，准备重新连接')
+        // 先摘掉旧连接的 onclose：它是异步触发的，内部会把 this.socket 置 null，
+        // 而此时该字段已指向新连接，会让新连接变成无人引用的孤儿，导致退出时 close() 关不掉它
+        this.socket.onclose = null
         this.socket.close()
         this.socket = null
       }
