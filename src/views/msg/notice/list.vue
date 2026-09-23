@@ -76,7 +76,13 @@
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
-        <el-table-column prop="content" label="公告内容" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="content" label="公告内容" min-width="150" show-overflow-tooltip>
+            <template #default="{ row }">
+                <!-- 富文本内容不直接展示，改为弹窗预览 -->
+                <el-button v-if="row.type === 1" size="small" type="info" :icon="View" @click="handlePreview(row)" plain>预览</el-button>
+                <span v-else>{{ row.content }}</span>
+            </template>
+        </el-table-column>
         <el-table-column label="消息类型" width="100">
             <template #default=" { row} ">
                 <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
@@ -310,6 +316,18 @@
             </span>
         </template>
     </el-dialog>
+
+    <!-- ===== 富文本预览弹窗 ===== -->
+    <el-dialog v-model="previewVisible" width="55%">
+        <Suspense>
+            <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
+                <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
+            </div>
+            <template #fallback>
+                <SmartLoading :min-height="MARKDOWN_PREVIEW_MIN_HEIGHT" />
+            </template>
+        </Suspense>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -450,6 +468,10 @@ watch(quickDate, (val) => { if (val) setQuickDate(val) })
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
+
+// 富文本预览弹窗
+const previewVisible = ref(false)
+const previewContent = ref('')
 
 const defaultModel = {
     id: null,
@@ -1048,6 +1070,17 @@ const handleDetail = async (row) => {
   } catch (e) {
     // request.js 已统一提示接口错误，这里不重复弹错误
   }
+}
+
+// ============================================================
+// 富文本预览
+// ============================================================
+/**
+ * 弹窗预览富文本公告内容
+ */
+const handlePreview = (row) => {
+    previewContent.value = row.content || ''
+    previewVisible.value = true
 }
 
 // ============================================================
