@@ -145,6 +145,8 @@ const verifying = ref(false)
 const verified = ref(false)
 // 校验通过后签发的一次性 verifyToken（提交登录 / 注册时消费）
 const verifyToken = ref('')
+// 行为类校验进行中的 promise：用户拖完/点完立刻提交时，verify() 需要等它落地才能取到 token
+let pendingVerify = null
 // 背景图加载状态：generate 时置 false，背景图 onload 置 true（驱动 v-loading 与行为类交互显隐）
 const backgroundLoaded = ref(false)
 
@@ -199,7 +201,7 @@ const onPointerUp = () => {
     isDragging.value = false
     const t = Date.now() - dragStartTime.value
     trackList.value.push({ x: Math.round(pieceX.value / scale.value), y: 0, t })
-    if (trackList.value.length > 1) handleSliderVerify()
+    if (trackList.value.length > 1) pendingVerify = handleSliderVerify()
 }
 
 useEventListener(window, 'pointermove', onPointerMove)
@@ -217,7 +219,7 @@ const onClickCaptcha = (e) => {
     const naturalY = Math.round(e.offsetY / scale.value)
     clickPoints.value.push({ x: naturalX, y: naturalY })
     if (clickPoints.value.length >= CLICK_COUNT) {
-        handleClickVerify()
+        pendingVerify = handleClickVerify()
     }
 }
 
@@ -265,6 +267,8 @@ const answerRules = { answer: [{ required: true, message: '请输入验证码', 
 
 // 对外暴露：提交登录 / 注册前调用，返回一次性 verifyToken；失败抛错（阻止提交）
 const verify = async () => {
+    // 行为类：校验请求可能仍在飞行中（拖完/点完立刻提交），先等它落地再取 token，否则本次提交会被丢掉
+    if (pendingVerify) await pendingVerify
     // 已通过验证则复用缓存 token，避免重复后端校验（答案 key 校验成功后已删，重试会误报过期）
     if (verifyToken.value) return verifyToken.value
     // 行为类：未完成动作则拦截

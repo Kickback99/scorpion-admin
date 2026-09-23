@@ -109,6 +109,8 @@ const handleLogin = async() => {
     try {
     // 管理端验证码必填：提交前统一校验 + 后端验证，拿到一次性 token 再登录
     if (captchaEnabled.value) {
+        // 验证码是异步 chunk，未挂载完成时 ref 仍为 null，直接调用会抛原始 TypeError
+        if (!captchaRef.value) throw new Error('验证码加载中，请稍后重试')
         formModel.value.captchaVerifyToken = await captchaRef.value.verify()
     }
     const res = await adminLoginApi(formModel.value)
@@ -167,6 +169,8 @@ const handleLogin = async() => {
 
     } catch (error) {
         // console.log(error)
+        // 客户端侧错误（未完成验证码 / 未填答案）不进拦截器，需在此补提示；接口错误拦截器已弹过窗
+        if (error instanceof Error && !error.isAxiosError) msg.warning(error.message)
         loading.value = false
         // throw(error)
     }
