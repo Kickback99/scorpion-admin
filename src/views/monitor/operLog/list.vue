@@ -117,7 +117,7 @@
           <!--   <el-form  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm"
                 :size="formSize" status-icon>
                 <el-form-item label="IP地址" >
-                    <el-input  v-model="formModel.ipaddr" />
+                    <el-input  v-model="formModel.ip" />
                 </el-form-item>
 
                 <el-form-item label="请求路径" >
@@ -141,7 +141,7 @@
                 <!-- 基础信息 -->
                 <el-tab-pane label="基础信息">
                 <el-descriptions :column="1" border>
-                    <el-descriptions-item label="IP地址">{{ formModel.ipaddr }}</el-descriptions-item>
+                    <el-descriptions-item label="IP地址">{{ formModel.ip }}</el-descriptions-item>
                     <el-descriptions-item label="请求路径">{{ formModel.reqUrl }}</el-descriptions-item>
                     <el-descriptions-item label="方法名称">{{ formModel.method }}</el-descriptions-item>
                 </el-descriptions>
