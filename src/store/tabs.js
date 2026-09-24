@@ -25,11 +25,23 @@ export const useTabStore = defineStore({
       if (idx !== -1) this.tabList.splice(idx, 1)
       this.removeCollapseState(path)
     },
+    /** 整体替换标签页列表（关闭单个/右侧/其他/全部），并清理已关闭标签页的折叠偏好 */
+    setTabList(tabs) {
+      this.tabList = tabs
+      const alive = new Set(tabs.map(t => t.path))
+      Object.keys(this.collapseStates).forEach(path => {
+        if (!alive.has(path)) this.removeCollapseState(path)
+      })
+    },
     setCollapseState(path, value) {
       this.collapseStates[path] = value
     },
     removeCollapseState(path) {
       delete this.collapseStates[path]
+    },
+    /** 清空全部折叠偏好，让各标签页回落到总开关默认值 */
+    clearCollapseStates() {
+      this.collapseStates = {}
     },
     clearTabs(){
       this.$reset()

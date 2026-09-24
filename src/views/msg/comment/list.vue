@@ -324,9 +324,7 @@ import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
 import { useUserConfigStore } from '@/store/userConfig';
-import { useSettingStore } from '@/setting';
-import { useTabStore } from '@/store/tabs';
-import { useRoute } from 'vue-router';
+import { useSearchCollapse } from '@/utils/useSearchCollapse';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import { getAllArticlesApi } from '@/api/business';
@@ -336,21 +334,12 @@ import SmartEmojiPicker from '@/views/components/SmartEmojiPicker.vue';
 import msg from '@/components/msg'
 
 const userConfigStore = useUserConfigStore()
-const settingStore = useSettingStore()
-const tabStore = useTabStore()
 
-// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 settingStore 本地默认值
-const route = useRoute()
+// 搜索面板折叠：标签页偏好优先，无偏好回退总开关
+const { searchActiveNames } = useSearchCollapse()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
 const { tableMaxHeight } = useTableAutoHeight()
-const saved = tabStore.collapseStates[route.path]
-const searchActiveNames = ref(
-    saved !== undefined ? saved : (settingStore.collapseSearchEnabled ? [] : ['search'])
-)
-watch(searchActiveNames, (val) => {
-    tabStore.setCollapseState(route.path, val)
-})
 const { isDarkEnabled: isDark } = storeToRefs(userConfigStore)
 
 // 视图模式：normal-正常模式，audit-审核模式，pick-挑拣模式

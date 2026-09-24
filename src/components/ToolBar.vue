@@ -50,7 +50,7 @@
                 <el-form-item>
                   <template #label>
                     搜索面板折叠
-                    <el-tooltip content="列表页搜索面板默认折叠，各标签页会记住手动状态" placement="top">
+                    <el-tooltip content="列表页搜索面板的总开关，切换会重置所有标签页；之后各页仍各自记住手动状态" placement="top">
                       <el-icon><QuestionFilled /></el-icon>
                     </el-tooltip>
                   </template>
@@ -364,9 +364,10 @@ const onClearTabsChange = (val) => {
     stringStore.keepTabs = val
 }
 
-// 搜索面板折叠切换
+// 搜索面板折叠总开关切换：清空各标签页偏好，全局归位
 const onCollapseSearchChange = (val) => {
     stringStore.collapseSearchEnabled = val
+    tabStore.clearCollapseStates()
 }
 
 // 标签模式切换
