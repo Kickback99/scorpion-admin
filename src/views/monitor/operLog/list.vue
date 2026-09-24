@@ -193,27 +193,16 @@
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
 import { reactive, ref, computed, watch, defineAsyncComponent } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
-import { useSettingStore } from '@/setting';
-import { useTabStore } from '@/store/tabs';
-import { useRoute } from 'vue-router';
+import { useSearchCollapse } from '@/utils/useSearchCollapse';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import msg from '@/components/msg'
 const userConfigStore = useUserConfigStore()
-const settingStore = useSettingStore()
-const tabStore = useTabStore()
 
-// 搜索面板折叠：优先读 tabStore 保存的偏好，无记录时回退 settingStore 本地默认值
-const route = useRoute()
+// 搜索面板折叠：标签页偏好优先，无偏好回退总开关
+const { searchActiveNames } = useSearchCollapse()
 
 // 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
 const { tableMaxHeight } = useTableAutoHeight()
-const saved = tabStore.collapseStates[route.path]
-const searchActiveNames = ref(
-    saved !== undefined ? saved : (settingStore.collapseSearchEnabled ? [] : ['search'])
-)
-watch(searchActiveNames, (val) => {
-    tabStore.setCollapseState(route.path, val)
-})
 // Markdown 预览组件：懒加载 v-md-editor + 跟随深浅模式实时切换主题（computed + key）
 const MarkdownPreview = computed(() => {
   const theme = userConfigStore.isDarkEnabled ? 'vuepress' : 'github'
