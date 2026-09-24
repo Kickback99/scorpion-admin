@@ -1,31 +1,33 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <div class="toolbar">
-        <el-form label-width="auto" inline size="small"> 
+        <el-form label-width="auto" inline size="small">
             <el-form-item>
                 <el-input v-model="searchData.username" placeholder="请输入用户名" />
             </el-form-item>
             <el-form-item>
-                <el-select style="width: 200px" v-model="searchData.type" placeholder="请选择用户类型">
-                    <el-option label="前台" value="1" />
-                    <el-option label="后台" value="0" />
-                </el-select>
+                <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
             </el-form-item>
             <el-form-item>
                 <el-select style="width: 200px" v-model="searchData.status" placeholder="请选择登录状态">
                     <!-- 遍历所有状态选项 -->
                     <el-option
-                    v-for="item in [
-                        { label: '登录', value: '0' },
-                        { label: '注册', value: '1' },
-                        { label: '退出', value: '2' },
-                        { label: '注销', value: '3' }
-                    ]"
+                    v-for="item in statusOptions"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                     :disabled="disabledStatusOptions.includes(item.value)"
                     />
                 </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-input v-model="searchData.os" placeholder="请输入操作系统" />
+            </el-form-item>
+            <el-form-item>
+                <el-input v-model="searchData.browser" placeholder="请输入浏览器" />
+            </el-form-item>
+            <el-form-item>
+                <el-input v-model="searchData.location" placeholder="请输入登录地点" />
             </el-form-item>
 <!--             <el-form-item label="时间范围">
                 <el-date-picker
@@ -55,15 +57,17 @@
                     :disabled-date="(date) => searchData.createTimeBegin ? date < new Date(searchData.createTimeBegin) : false"
                 />
             </el-form-item>
-            <el-form-item>
-                <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
-                <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-                <el-button size="small" type="danger" @click="deleteSelectRows()" plain>批量删除</el-button>
+            <el-form-item class="toolbar-actions">
+                <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
+                <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
+                <!-- 批量删除靠最右，与搜索/重置拉开距离，避免误点 -->
+                <el-button class="toolbar-actions-right" size="small" type="danger" @click="handleBatchDelete" plain>批量删除</el-button>
             </el-form-item>
         </el-form>
     </div>
 
-    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="removeMultiple">
+    <!-- ===== 数据表格 ===== -->
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="username" label="用户名" min-width="110" />
@@ -80,6 +84,10 @@
                 <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
+        <el-table-column prop="ip" label="IP地址" min-width="130" show-overflow-tooltip/>
+        <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip/>
+        <el-table-column prop="browser" label="浏览器" min-width="110" show-overflow-tooltip/>
+        <el-table-column prop="location" label="登录地点" min-width="120" show-overflow-tooltip/>
         <el-table-column label="token" min-width="150" >
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
@@ -87,17 +95,17 @@
                         {{ row.token ? `${row.token.substring(0, 6)}...${row.token.substring(row.token.length - 4)}` : '' }}
                     </span>
 
-                    <!-- <el-icon 
+                    <!-- <el-icon
                         v-if="row.token"
-                        style="cursor: pointer" 
+                        style="cursor: pointer"
                         @click="handleCopy(row.token, row.id)"
                     >
                         <component :is="copiedId === row.id ? CircleCheck : CopyDocument" />
                     </el-icon> -->
 
-                    <el-icon 
+                    <el-icon
                         v-if="row.token"
-                        style="cursor: pointer; transition: all 0.3s" 
+                        style="cursor: pointer; transition: all 0.3s"
                         @click="handleCopy(row.token, row.id)"
                         :class="copiedId === row.id ? 'copiedStyle' : 'copyStyle'"
                     >
@@ -109,7 +117,7 @@
         <el-table-column prop="createTime" label="操作日期" min-width="180" />
         <el-table-column  label="操作" width="150" fixed="right">
             <template #default="{row}">
-                <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">
+                <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
                     <el-button size="small" type="danger" icon="Delete" circle plain/>
                 </template>
@@ -118,6 +126,7 @@
         </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -125,22 +134,34 @@
         :page-sizes="[2, 5, 7, 10]"
         layout="jumper, sizes, total, ->, prev, pager, next"
         :total="total"
-        @size-change="onSizeChange"
-        @current-change="onCurrentChange"
+        @size-change="handleSizeChange"
+        @current-change="handlePageChange"
         style="margin-top: 20px; justify-content: flex-end;"
     />
 
 </template>
 
 <script setup>
-import { reactive, ref,computed,watch } from 'vue';
-import { loginLogListApi,loginLogRemoveApi } from '@/api/log';
+import { computed, reactive, ref, watch } from 'vue';
+import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import msg from '@/components/msg';
+import { loginLogListApi, loginLogRemoveApi } from '@/api/log';
 
+// ============================================================
+// 数据
+// ============================================================
 const searchData = reactive({})
 
 // 登录状态映射（对齐后端 LoginLogEnum）
 const statusMap = { 0: '登录', 1: '注册', 2: '退出', 3: '注销' }
+
+// 登录状态下拉选项（对齐后端 LoginLogEnum）
+const statusOptions = [
+    { label: '登录', value: '0' },
+    { label: '注册', value: '1' },
+    { label: '退出', value: '2' },
+    { label: '注销', value: '3' }
+]
 
 const tableData = ref([])
 
@@ -154,85 +175,9 @@ const total = ref(null)
 // 默认关闭loading
 const loading = ref(false)
 
-// t_log_request：日志列表请求
-const render = async() => {
-    // 开启loading动效
-    loading.value = true
-    try {
-        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
-        tableData.value = res.data.items
-        total.value = res.data.total
-    } catch (e) {
-    } finally {
-        // 关闭loading动效
-        loading.value = false
-    }
-}
-
-render()
-
-//点击分页事件
-const onSizeChange = (size) => {
-    //console.log(`onSizeChange：每页显示${size}条`)
-    //每页条数发生变化时，重新从第一页渲染
-    params.value.pageNum = 1
-    //更新每页条数
-    params.value.pageSize = size
-    //重新渲染
-    render()
-}
-
-const onCurrentChange = (page) => {
-    //console.log(`onCurrentChange：当前第${page}页`)
-    //更新当前页
-    params.value.pageNum = page
-    //重新渲染
-    render()
-}
-
-const onSearch = () => {
-    params.value.pageNum = 1
-    render()
-}
-
-const onReset = () => {
-    params.value.pageNum = 1
-    searchData.value = {}
-    Object.assign(searchData,{username:'',type:null,status:null,createTimeBegin:'',createTimeEnd:''})
-    render()
-}
-
 const multipleSelection = ref([])
 
-// t_log_request：登录日志删除请求
-const removeRow = async(id) => {
-    await loginLogRemoveApi(id)
-    msg.primary('删除成功')
-    render()
-}
-
-// t_log_request：登录日志批量删除请求
-const deleteSelectRows = async() => {
-    console.log(multipleSelection.value.length)
-    if(multipleSelection.value.length === 0){
-        msg.error('请先勾选要删除的行')
-        return
-    }
-    
-    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
-        type: 'warning',
-        confirmButtonText: '确认',
-        cancelButtonText: '取消'
-    })
-   const rowIds = multipleSelection.value.map(row => row.id)
-   await removeRow(rowIds)
-}
-
-const removeMultiple = (raw) =>{
-    console.log(raw)
-    multipleSelection.value = raw
-    // console.log(multipleSelection.value)
-}
+const copiedId = ref(null) // 记录当前已复制的行ID
 
 // 计算属性：返回需要禁用的选项值
 const disabledStatusOptions = computed(() => {
@@ -252,6 +197,52 @@ watch(() => searchData.type, (newType) => {
   searchData.status = null; // 清空已选类型
 });
 
+// ============================================================
+// 渲染
+// ============================================================
+// t_log_request：日志列表请求
+const fetchLoginLogList = async() => {
+    // 开启loading动效
+    loading.value = true
+    try {
+        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
+        tableData.value = res.data.items
+        total.value = res.data.total
+    } catch (e) {
+    } finally {
+        // 关闭loading动效
+        loading.value = false
+    }
+}
+
+fetchLoginLogList()
+
+//点击分页事件
+const handleSizeChange = (size) => {
+    //console.log(`handleSizeChange：每页显示${size}条`)
+    //每页条数发生变化时，重新从第一页渲染
+    params.value.pageNum = 1
+    //更新每页条数
+    params.value.pageSize = size
+    //重新渲染
+    fetchLoginLogList()
+}
+
+const handlePageChange = (page) => {
+    //console.log(`handlePageChange：当前第${page}页`)
+    //更新当前页
+    params.value.pageNum = page
+    //重新渲染
+    fetchLoginLogList()
+}
+
+// 表格勾选变化
+const handleSelectionChange = (raw) =>{
+    console.log(raw)
+    multipleSelection.value = raw
+    // console.log(multipleSelection.value)
+}
+
 // 复制到剪贴板的方法
 /* const copyToClipboard = (text) => {
   try {
@@ -269,15 +260,13 @@ watch(() => searchData.type, (newType) => {
   }
 } */
 
-const copiedId = ref(null) // 记录当前已复制的行ID
-
 const handleCopy = (text, id) => {
   try {
     navigator.clipboard.writeText(text)
     copiedId.value = id // 设置当前复制的行ID
 
     msg.primary('复制成功')
-    
+
     // 3秒后恢复原图标
     setTimeout(() => {
       if (copiedId.value === id) {
@@ -293,7 +282,7 @@ const handleCopy = (text, id) => {
     document.execCommand('copy')
     document.body.removeChild(textarea)
     copiedId.value = id
-    
+
     setTimeout(() => {
       if (copiedId.value === id) {
         copiedId.value = null
@@ -302,12 +291,70 @@ const handleCopy = (text, id) => {
   }
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
+const handleSearch = () => {
+    params.value.pageNum = 1
+    fetchLoginLogList()
+}
+
+const handleReset = () => {
+    params.value.pageNum = 1
+    searchData.value = {}
+    Object.assign(searchData,{username:'',type:null,status:null,os:'',browser:'',location:'',createTimeBegin:'',createTimeEnd:''})
+    fetchLoginLogList()
+}
+
+// ============================================================
+// 删除
+// ============================================================
+// t_log_request：登录日志删除请求
+const handleDelete = async(id) => {
+    await loginLogRemoveApi(id)
+    msg.primary('删除成功')
+    fetchLoginLogList()
+}
+
+// t_log_request：登录日志批量删除请求
+const handleBatchDelete = async() => {
+    console.log(multipleSelection.value.length)
+    if(multipleSelection.value.length === 0){
+        msg.error('请先勾选要删除的行')
+        return
+    }
+
+    await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
+        type: 'warning',
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+    })
+   const rowIds = multipleSelection.value.map(row => row.id)
+   await handleDelete(rowIds)
+}
 
 </script>
 
 <style lang="scss" scoped>
 .toolbar {
     @include flex(space-between,null,null)
+}
+
+// 操作按钮行独占整行：内容撑满宽度后，批量删除才能用 margin-left:auto 顶到最右
+// margin-right 归零是为了抵消 el-form--inline 给每个 form-item 的右侧间距（否则整行溢出）
+:deep(.toolbar-actions) {
+    display: flex;
+    width: 100%;
+    margin-right: 0;
+}
+
+:deep(.toolbar-actions .el-form-item__content) {
+    display: flex;
+    width: 100%;
+}
+
+:deep(.toolbar-actions-right) {
+    margin-left: auto;
 }
 
 :deep(.copyStyle){
