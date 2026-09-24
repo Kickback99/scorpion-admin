@@ -252,7 +252,7 @@ const removeTab = (targetName) => {
   }
 
   activeTab.value = activeName
-  tabStore.tabList = currentTabs.filter((tab) => tab.path !== targetName)
+  tabStore.setTabList(currentTabs.filter((tab) => tab.path !== targetName))
 
   nextTick(() => {
     adjustScrollPosition()
@@ -438,7 +438,7 @@ const closeRightTabs = (currentTab) => {
   const currentIndex = tabs.value.findIndex(tab => tab.path === currentTab.path)
   if (currentIndex !== -1) {
     const tabsToKeep = tabs.value.slice(0, currentIndex + 1)
-    tabStore.tabList = tabsToKeep
+    tabStore.setTabList(tabsToKeep)
 
     // 如果当前激活的标签在关闭的右侧，跳转到当前标签
     if (tabs.value.findIndex(tab => tab.path === route.path) > currentIndex) {
@@ -479,7 +479,7 @@ const closeOtherTabs = (currentTab) => {
   }
 
   // 更新标签页列表
-  tabStore.tabList = tabsToKeep
+  tabStore.setTabList(tabsToKeep)
 
   // 路由跳转
   if (route.path !== targetTab.path && targetTab.path !== '/index') {
@@ -498,13 +498,13 @@ const closeAllTabs = () => {
 
   // 如果仪表盘存在，只保留仪表盘；如果不存在，创建仪表盘
   if (homeTab) {
-    tabStore.tabList = [homeTab]
+    tabStore.setTabList([homeTab])
   } else {
-    tabStore.tabList = [{
+    tabStore.setTabList([{
       path: '/index',
       fullPath: '/index',
       title: '仪表盘'
-    }]
+    }])
   }
 
   if (route.path !== '/index') {

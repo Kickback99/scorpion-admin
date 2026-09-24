@@ -12,7 +12,7 @@ export const useSettingStore = defineStore({
         keepTabs: true,
         /** 退出标记：登录后忽略 redirect，直接进仪表盘 */
         logoutIntent: false,
-        /** 搜索面板折叠：true=列表页搜索面板默认折叠（仅对无历史偏好的标签页生效） */
+        /** 搜索面板折叠总开关：true=列表页搜索面板折叠；切换时清空各标签页偏好，全局归位 */
         collapseSearchEnabled: true,
         /** 标签模式：'neutral'=中性色 | 'ui'=跟随 ui-mode | 'theme'=主题色 */
         tagMode: 'neutral',
