@@ -152,6 +152,13 @@ import { loginLogListApi, loginLogRemoveApi } from '@/api/log';
 // ============================================================
 const searchData = reactive({})
 
+// 日期只选到"天"，而 create_time 是 datetime：补时分秒后再比较，否则结束日当天会被整天漏掉
+const queryParams = computed(() => ({
+    ...searchData,
+    createTimeBegin: searchData.createTimeBegin ? `${searchData.createTimeBegin} 00:00:00` : '',
+    createTimeEnd: searchData.createTimeEnd ? `${searchData.createTimeEnd} 23:59:59` : ''
+}))
+
 // 登录状态映射（对齐后端 LoginLogEnum）
 const statusMap = { 0: '登录', 1: '注册', 2: '退出', 3: '注销' }
 
@@ -205,7 +212,7 @@ const fetchLoginLogList = async() => {
     // 开启loading动效
     loading.value = true
     try {
-        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,searchData)
+        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,queryParams.value)
         tableData.value = res.data.items
         total.value = res.data.total
     } catch (e) {
