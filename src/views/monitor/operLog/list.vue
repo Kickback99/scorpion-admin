@@ -229,11 +229,18 @@ const loading = ref(false)
 
 const searchData = reactive({})
 
+// 日期只选到"天"，而 create_time 是 datetime：补时分秒后再比较，否则结束日当天会被整天漏掉
+const queryParams = computed(() => ({
+    ...searchData,
+    createTimeBegin: searchData.createTimeBegin ? `${searchData.createTimeBegin} 00:00:00` : '',
+    createTimeEnd: searchData.createTimeEnd ? `${searchData.createTimeEnd} 23:59:59` : ''
+}))
+
 const render = async() => {
     // 开启loading动效
     loading.value = true
     try {
-        const res = await operlogListApi(params.pageNum,params.pageSize,searchData)
+        const res = await operlogListApi(params.pageNum,params.pageSize,queryParams.value)
         tableData.value = res.data.items
         total.value = res.data.total
     } catch (e) {

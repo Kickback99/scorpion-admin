@@ -43,8 +43,7 @@
                 style="width:190px"
                 @change="(val) => { applyTimeParams(); handleSearch() }"
             />
-        </el-form-item>
-        <el-form-item>
+            <span style="margin: 0 8px">至</span>
             <el-date-picker
                 v-model="endTime"
                 type="datetime"
@@ -52,6 +51,7 @@
                 format="YYYY-MM-DD HH:mm:ss"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 :clearable="true"
+                :default-time="endOfDay"
                 style="width:190px"
                 @change="(val) => { applyTimeParams(); handleSearch() }"
             />
@@ -367,6 +367,8 @@ import dayjs from 'dayjs'
 // ============================================================
 const startTime = ref('')
 const endTime = ref('')
+// 点日历选日期时的默认时间：不设则结束端落 00:00:00，结束日当天 00:00:00 之后的记录会被整天漏掉
+const endOfDay = new Date(2000, 0, 1, 23, 59, 59)
 const quickDate = ref('')
 const quickDateOptions = [
     { label: '快捷日期', value: '', disabled: true },
