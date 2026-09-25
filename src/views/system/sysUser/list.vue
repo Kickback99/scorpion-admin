@@ -742,19 +742,26 @@ const shortcuts = [
     {
         text: "上周",
         value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            const now = new Date()
+            const day = now.getDay() || 7 // 周日 0 换算成 7，按周一为一周之始
+            const start = new Date(now)
+            start.setDate(now.getDate() - day - 6) // 上周一
+            start.setHours(0, 0, 0, 0)
+            const end = new Date(now)
+            end.setDate(now.getDate() - day) // 上周日
+            end.setHours(23, 59, 59, 0)
             return [start, end]
         }
     },
     {
         text: "上个月",
         value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-            return [start, end]
+            const now = new Date()
+            // 月份传 -1 自动跨年；日传 0 取上月最后一天
+            return [
+                new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0),
+                new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59)
+            ]
         }
     },
     {
