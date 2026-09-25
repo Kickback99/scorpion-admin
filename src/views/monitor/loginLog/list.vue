@@ -1,5 +1,7 @@
 <template>
     <!-- ===== 搜索栏 ===== -->
+    <el-collapse class="search-collapse" v-model="searchActiveNames">
+        <el-collapse-item title="" name="search">
     <div class="toolbar">
         <el-form label-width="auto" inline size="small">
             <el-form-item>
@@ -67,9 +69,11 @@
             </el-form-item>
         </el-form>
     </div>
+        </el-collapse-item>
+    </el-collapse>
 
     <!-- ===== 数据表格 ===== -->
-    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"  @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight"  @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="username" label="用户名" min-width="110" />
@@ -117,7 +121,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="createTime" label="操作日期" min-width="180" />
-        <el-table-column  label="操作" width="150" fixed="right">
+        <el-table-column  label="操作" width="150">
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
@@ -148,6 +152,14 @@ import { computed, reactive, ref, watch } from 'vue';
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import msg from '@/components/msg';
 import { loginLogListApi, loginLogRemoveApi } from '@/api/log';
+import { useSearchCollapse } from '@/utils/useSearchCollapse';
+import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
+
+// 搜索面板折叠：标签页偏好优先，无偏好回退总开关
+const { searchActiveNames } = useSearchCollapse()
+
+// 表格高度自适应：扣除搜索面板与分页占位，保证页面永不溢出
+const { tableMaxHeight } = useTableAutoHeight()
 
 // ============================================================
 // 数据
