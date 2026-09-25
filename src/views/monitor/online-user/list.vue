@@ -2,7 +2,7 @@
 <template>
     <div>
         <!-- 筛选区域 -->
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between">
             <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
                 <el-form-item>
                     <el-input v-model="searchModel.keyword" placeholder="请输入用户名" clearable />
