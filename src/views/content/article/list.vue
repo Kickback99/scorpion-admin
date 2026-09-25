@@ -74,6 +74,7 @@
                     format="YYYY-MM-DD HH:mm:ss"
                     value-format="YYYY-MM-DD HH:mm:ss"
                     :clearable="true"
+                    :default-time="endOfDay"
                     @change="updateEndTime"
                 />
             </el-form-item>
@@ -204,6 +205,8 @@ const loading = ref(false)
 // 独立的开始和结束时间
 const startTime = ref('')
 const endTime = ref('')
+// 点日历选日期时的默认时间：不设则结束端落 00:00:00，结束日当天 00:00:00 之后的记录会被整天漏掉
+const endOfDay = new Date(2000, 0, 1, 23, 59, 59)
 
 // t_article_request：文章列表请求
 const render = async() => {
