@@ -197,7 +197,24 @@ class WebSocketManager {
           customClass: 'message-right-top'
         })
         break
-        
+
+      case 'online':  // 上线通知（文案后端拼好：欢迎语 / 「管理员 张三 上线了」）
+
+        // 获取配置 store（case 间共享块作用域，不能复用 comment 的 configStore）
+        const onlineConfigStore = useConfigStore()
+        // 检查上线通知是否开启
+        if (!onlineConfigStore.getNotificationOnlineEnabled()) {
+          return
+        }
+
+        msg.primary({
+          message: arr[1],  // 整句已由后端拼好，昵称已 HTML 转义
+          dangerouslyUseHTMLString: true,
+          duration: 5000,  // 上线消息显示时间长一点
+          customClass: 'message-right-top'
+        })
+        break
+
       case 'task':  // 任务消息
         const taskTitle = arr[1]
         const taskContent = arr[2]
