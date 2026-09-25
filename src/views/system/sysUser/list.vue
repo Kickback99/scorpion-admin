@@ -50,6 +50,7 @@
                             range-separator="至"
                             start-placeholder="开始日期时间"
                             end-placeholder="结束日期时间"
+                            :default-time="defaultTimeRange"
                             :popper-options="{
                                 placement: 'bottom-start'
                             }"
@@ -704,6 +705,9 @@ watch(() => searchData.value.timeField, () => {
 
 // 日期时间范围相关
 const dataTimeRange = ref([])
+
+// 点日历选日期时的默认时间：不设则两端都是 00:00:00，结束日当天 00:00:00 之后的记录会被整天漏掉
+const defaultTimeRange = [new Date(2000, 0, 1, 0, 0, 0), new Date(2000, 0, 1, 23, 59, 59)]
 
 // shortcuts 快捷选项
 const shortcuts = [
