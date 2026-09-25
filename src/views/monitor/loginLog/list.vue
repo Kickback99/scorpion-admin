@@ -57,11 +57,13 @@
                     :disabled-date="(date) => searchData.createTimeBegin ? date < new Date(searchData.createTimeBegin) : false"
                 />
             </el-form-item>
-            <el-form-item class="toolbar-actions">
+            <el-form-item>
                 <el-button size="small" type="primary" icon="Search" @click="handleSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="handleReset" plain>重置</el-button>
-                <!-- 批量删除靠最右，与搜索/重置拉开距离，避免误点 -->
-                <el-button class="toolbar-actions-right" size="small" type="danger" @click="handleBatchDelete" plain>批量删除</el-button>
+            </el-form-item>
+            <!-- 批量删除顶到行尾，与搜索/重置拉开距离，避免误点 -->
+            <el-form-item class="toolbar-actions-right">
+                <el-button size="small" type="danger" @click="handleBatchDelete" plain>批量删除</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -347,21 +349,17 @@ const handleBatchDelete = async() => {
     @include flex(space-between,null,null)
 }
 
-// 操作按钮行独占整行：内容撑满宽度后，批量删除才能用 margin-left:auto 顶到最右
-// margin-right 归零是为了抵消 el-form--inline 给每个 form-item 的右侧间距（否则整行溢出）
-:deep(.toolbar-actions) {
+// 换行交给 flex：搜索/重置紧跟日期选择器留在同一行，批量删除再由 margin-left 顶到行尾
+:deep(.el-form--inline) {
     display: flex;
-    width: 100%;
-    margin-right: 0;
-}
-
-:deep(.toolbar-actions .el-form-item__content) {
-    display: flex;
+    flex-wrap: wrap;
     width: 100%;
 }
 
-:deep(.toolbar-actions-right) {
+// 右间距归零是为了抵消 el-form--inline 给每个 form-item 的 32px（否则批量删除离右边界差一截）
+:deep(.el-form--inline .toolbar-actions-right) {
     margin-left: auto;
+    margin-right: 0;
 }
 
 :deep(.copyStyle){
