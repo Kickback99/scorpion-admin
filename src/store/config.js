@@ -157,6 +157,7 @@ export const useConfigStore = defineStore({
         },
       },
       notification: {
+        online_enabled: true,
         comment_enabled: true,
       },
       storage: {
@@ -607,6 +608,9 @@ export const useConfigStore = defineStore({
     setListPaginationPageSize(v)   { this.updateConfig('article_list.pagination_page_size', v) },
 
     // ==================== notification ====================
+
+    getNotificationOnlineEnabled()    { return this.getValue('notification.online_enabled') ?? true },
+    toggleNotificationOnlineEnabled() { this.updateConfig('notification.online_enabled', !this.getValue('notification.online_enabled')) },
 
     getNotificationCommentEnabled()   { return this.getValue('notification.comment_enabled') ?? true },
     toggleNotificationCommentEnabled(){ this.updateConfig('notification.comment_enabled', !this.getValue('notification.comment_enabled')) },
