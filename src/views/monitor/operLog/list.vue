@@ -53,7 +53,6 @@
             <el-form-item>
                 <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-                <el-button size="small" type="danger" @click="deleteSelectRows()" plain>批量删除</el-button>
             </el-form-item>
             <el-form-item>
             <el-form-item label="显示模式">
@@ -62,6 +61,10 @@
                     <el-radio label="label">显示中文</el-radio>
                 </el-radio-group>
             </el-form-item>
+            </el-form-item>
+            <!-- 批量删除顶到行尾，与搜索/重置拉开距离，避免误点 -->
+            <el-form-item class="toolbar-actions-right">
+                <el-button size="small" type="danger" @click="deleteSelectRows()" plain>批量删除</el-button>
             </el-form-item>
         </el-form>
             </el-collapse-item>
@@ -437,6 +440,19 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+/* 换行交给 flex：搜索/重置/显示模式紧跟日期选择器留在同一行，批量删除再由 margin-left 顶到行尾 */
+:deep(.el-form--inline) {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* 右间距归零是为了抵消 el-form--inline 给每个 form-item 的 32px（否则批量删除离右边界差一截） */
+:deep(.el-form--inline .toolbar-actions-right) {
+  margin-left: auto;
+  margin-right: 0;
+}
+
 /* 调整编辑器内边距 */
 .v-md-editor-preview {
   padding: 0 16px;
