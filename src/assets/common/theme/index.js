@@ -209,6 +209,18 @@ function injectButtonCss(types) {
       'border-color:transparent!important;' +
       '--el-button-text-color:var(--el-color-' + tt + ')!important;' +
       '}' +
+    // text 按钮：无底色，两种 uiMode 统一用主色（-plain 恒定偏黑，深色底下看不清）
+    // 不写 background，保住 EP 原生 hover 淡底
+    '.ui-full .el-button--' + tt + '.is-text:not(.is-disabled),' +
+      '.ui-plain .el-button--' + tt + '.is-text:not(.is-disabled){' +
+      'color:var(--el-color-' + tt + ')!important;' +
+      '--el-button-text-color:var(--el-color-' + tt + ')!important;' +
+      '}' +
+    // hover —— EP 只换底色不换字色，需显式钉住，否则被上面 plain 的 :hover 白字命中
+    '.ui-full .el-button--' + tt + '.is-text:not(.is-disabled):hover,' +
+      '.ui-plain .el-button--' + tt + '.is-text:not(.is-disabled):hover{' +
+      'color:var(--el-color-' + tt + ')!important;' +
+      '}' +
     // link disabled — 恢复原生灰色低调样式
     '.el-button--' + tt + '.is-link.is-disabled{' +
       'color:var(--el-text-color-placeholder)!important;' +
