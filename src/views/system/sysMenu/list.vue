@@ -8,7 +8,6 @@
            </div>
            <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
          </div>
-        
 
         <!-- 表格 -->
         <el-table
@@ -550,7 +549,6 @@ const modifyMenu = async() => {
         position: sticky;
         top: 0;
         z-index: 7;
-        background: var(--el-bg-color);
         padding: 4px 0;
     }
 
