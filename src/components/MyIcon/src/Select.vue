@@ -340,7 +340,6 @@ watch(
 :deep(.el-tabs__nav-wrap) {
   position: static;
   margin: 0;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 6%);
 }
 
 :deep(.el-tabs__nav-wrap::after) {
