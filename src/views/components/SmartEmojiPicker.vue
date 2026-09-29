@@ -55,6 +55,9 @@ import { useConfigStore } from '@/store/config'
 // ============================================================
 const configStore = useConfigStore()
 
+// 点完表情是否立即收起面板：管理端面板在弹窗内不挡视线，默认保持常驻，方便连选多个
+const EMOJI_CLOSE_ON_PICK = false
+
 const modelValue = defineModel({ type: String, default: '' })
 
 const props = defineProps({
@@ -103,8 +106,7 @@ const handlePick = (emoji) => {
     modelValue.value = modelValue.value.slice(0, at) + emoji + modelValue.value.slice(at)
 
     caret.value = at + emoji.length
-    // 点完是否收起走配置：默认 false（管理端面板不挡视线，保持常驻便于连选）
-    if (configStore.isCommentReplyEmojiAutoCloseEnabled) popoverOpen.value = false
+    if (EMOJI_CLOSE_ON_PICK) popoverOpen.value = false
     // v-model 回写 value 会把光标顶到末尾，必须等 DOM 更新后再设回去
     nextTick(() => {
         el?.focus()
