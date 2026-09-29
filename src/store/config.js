@@ -195,7 +195,6 @@ export const useConfigStore = defineStore({
       },
       comment: {
         reply_emoji_enabled: true,
-        reply_emoji_auto_close_enabled: false,
       },
     },
 
@@ -540,9 +539,6 @@ export const useConfigStore = defineStore({
     getCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
     toggleCommentReplyEmojiEnabled()       { this.updateConfig('comment.reply_emoji_enabled', !this.getValue('comment.reply_emoji_enabled')) },
 
-    getCommentReplyEmojiAutoCloseEnabled() { return this.getValue('comment.reply_emoji_auto_close_enabled') ?? false },
-    toggleCommentReplyEmojiAutoCloseEnabled() { this.updateConfig('comment.reply_emoji_auto_close_enabled', !this.getValue('comment.reply_emoji_auto_close_enabled')) },
-
     // ==================== nav ====================
 
     getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
@@ -711,7 +707,6 @@ export const useConfigStore = defineStore({
 
     // ===== comment (admin 组) =====
     isCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
-    isCommentReplyEmojiAutoCloseEnabled() { return this.getValue('comment.reply_emoji_auto_close_enabled') ?? false },
 
     // ===== user 前台认证 (client 组) =====
     isUserLoginEnabled()      { return this.getValue('user.login_enabled') === true },

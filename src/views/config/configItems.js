@@ -137,7 +137,6 @@ export function useConfigItems() {
         { key: 'captcha.admin_login_type',      type: 'radio',  label: '管理登录验证码类型', desc: '管理端登录使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.admin_login_type'),       set: (v) => config.updateConfig('captcha.admin_login_type', v), options: CAPTCHA_OPTIONS },
         // ===== comment =====
         { key: 'comment.reply_emoji_enabled',        type: 'switch', label: '回复表情',       desc: '回复弹窗显示表情选择入口',                icon: Comment,        get: () => config.getValue('comment.reply_emoji_enabled'),         set: (v) => config.updateConfig('comment.reply_emoji_enabled', v) },
-        { key: 'comment.reply_emoji_auto_close_enabled', type: 'switch', label: '点完即收',   desc: '选中表情后是否立即收起面板', icon: "Fold",         get: () => config.getValue('comment.reply_emoji_auto_close_enabled'), set: (v) => config.updateConfig('comment.reply_emoji_auto_close_enabled', v) },
       ]
     },
     {
