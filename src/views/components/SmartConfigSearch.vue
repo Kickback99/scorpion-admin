@@ -2,7 +2,12 @@
 <template>
   <!-- ===== 配置搜索 ===== -->
   <div class="smart-config-search" ref="containerRef">
-    <div class="scs-input-row" :class="{ 'is-focused': isFocused }">
+    <div
+      class="scs-input-row"
+      :class="{ 'is-focused': isFocused }"
+      @mouseenter="isHovering = true"
+      @mouseleave="isHovering = false"
+    >
       <el-icon class="scs-input-icon" @click="handleIconClick"><Search /></el-icon>
       <input
         ref="inputRef"
@@ -12,6 +17,15 @@
         @focus="handleFocus"
         @keydown="handleKeydown"
       />
+      <!-- 复刻 el-input 的 clear：mousedown 阻止失焦，点击只清词不收起结果面板 -->
+      <el-icon
+        v-if="showClear"
+        class="scs-input-clear"
+        @mousedown.prevent="noop"
+        @click="query = ''"
+      >
+        <CircleClose />
+      </el-icon>
     </div>
 
     <div class="scs-results" ref="resultsRef" v-if="isFocused && displayList.length > 0">
@@ -43,7 +57,7 @@
 // 依赖导入
 // ============================================================
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { Search, Setting } from '@element-plus/icons-vue'
+import { Search, Setting, CircleClose } from '@element-plus/icons-vue'
 import { useConfigItems } from '@/views/config/configItems'
 import { useConfigStore } from '@/store/config'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
@@ -59,12 +73,19 @@ async function ensurePinyinMatch() {
 // ============================================================
 const query = ref('')
 const isFocused = ref(false)
+const isHovering = ref(false)
 const activeIndex = ref(0)
 const inputRef = ref(null)
 const containerRef = ref(null)
 const resultsRef = ref(null)
 const recentList = ref([])
 const MAX_RECENT = 5
+
+// 对齐 el-input 的 clear 显示时机：有值，且聚焦或悬停
+const showClear = computed(() => !!query.value && (isFocused.value || isHovering.value))
+
+// 配合 @mousedown.prevent，占位用，防止点击清空时输入框失焦
+const noop = () => {}
 
 // ============================================================
 // 构建搜索索引 — 从 configItems.js 展平所有配置项
@@ -269,11 +290,8 @@ const handleFocus = () => { isFocused.value = true; activeIndex.value = 0 }
 
 const handleClearRecent = () => { recentList.value = [] }
 
+// 放大镜只负责聚焦；清空交给右侧 clear 按钮，避免同一个动作用两种方式触发
 const handleIconClick = () => {
-  if (isFocused.value) {
-    query.value = ''
-    activeIndex.value = 0
-  }
   inputRef.value?.focus()
 }
 
@@ -362,6 +380,25 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
 
   &::placeholder {
     color: var(--el-text-color-placeholder);
+  }
+}
+
+// 尺寸对齐左侧 .scs-input-icon；取色对齐 el-input 的清除图标（placeholder 色，hover 转 secondary）
+// 注意别用 --el-input-icon-color：它声明在 .el-input 类上，这里没有该祖先会解析失败
+.scs-input-clear {
+  flex-shrink: 0;
+  width: 22px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--el-text-color-placeholder);
+  cursor: pointer;
+  transition: color 0.25s;
+
+  &:hover {
+    color: var(--el-text-color-secondary);
   }
 }
 

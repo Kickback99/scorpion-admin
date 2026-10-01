@@ -135,7 +135,7 @@
 
     <!-- 编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="45%">
-        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" status-icon size="small">
+        <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
 
             <!-- 轮播类型（仅新增时显示） -->
             <el-form-item v-if="!formModel.id" label="轮播类型">
