@@ -1,4 +1,3 @@
-// src/data/elementIcons.js
 // 按需引入白名单图标（与 elIcons.json 保持同步），避免全量打包 @element-plus/icons-vue
 import {
   User,
@@ -40,18 +39,6 @@ import {
 } from '@element-plus/icons-vue'
 
 import elIcons from './elIcons'
-
-// 定义需要的图标名称数组（只在这里定义一次）
-/* const activeIcons = [
-  'Edit',
-  'Delete',
-  'Refresh',
-  'User',
-  'Search',
-  'Plus',
-  'Baseball',
-  'WarnTriangleFilled'
-] */
 
 // 图标映射对象（供 registerIcons / icons 按名查找）
 const AllIcons = {
