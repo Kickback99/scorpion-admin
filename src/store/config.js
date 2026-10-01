@@ -37,6 +37,7 @@ const DEFAULT_NUMBER_LIMITS = {
   'article.carousel_limit':                   { min: 0, max: 99 },
   'article_list.scroll_page_size':            { min: 5, max: 15 },
   'article_list.pagination_page_size':        { min: 5, max: 15 },
+  'article_list.title_bone_count':            { min: 1, max: 2 },
   'storage.data_retention_days':              { min: 0, max: 100 },
   'storage.file_retention_days':              { min: 0, max: 100 },
   'tree.cate.parent_width':                   { min: 12, max: 200 },
@@ -118,6 +119,7 @@ export const useConfigStore = defineStore({
         load_mode: 'scroll',
         scroll_page_size: 10,
         pagination_page_size: 7,
+        title_bone_count: 1,
       },
       websocket: {
         enabled: true,
@@ -603,6 +605,9 @@ export const useConfigStore = defineStore({
     getListPaginationPageSize()    { return this.getValue('article_list.pagination_page_size') ?? 7 },
     setListPaginationPageSize(v)   { this.updateConfig('article_list.pagination_page_size', v) },
 
+    getListTitleBoneCount()        { return this.getValue('article_list.title_bone_count') ?? 1 },
+    setListTitleBoneCount(v)       { this.updateConfig('article_list.title_bone_count', v) },
+
     // ==================== notification ====================
 
     getNotificationOnlineEnabled()    { return this.getValue('notification.online_enabled') ?? true },
@@ -728,6 +733,7 @@ export const useConfigStore = defineStore({
     isListViewEnabled()       { return this.getValue('article_list.view_enabled') ?? true },
     isListFavoriteEnabled()   { return this.getValue('article_list.favorite_enabled') ?? true },
     isListCommentEnabled()    { return this.getValue('article_list.comment_enabled') ?? true },
+    listTitleBoneCount()      { return this.getValue('article_list.title_bone_count') ?? 1 },
 
     // ===== notification (admin 组) =====
     isNotificationCommentEnabled() { return this.getValue('notification.comment_enabled') ?? true },
