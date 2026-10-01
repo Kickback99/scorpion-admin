@@ -251,6 +251,7 @@ a {
     margin: 0px auto 30px auto;
     text-align: center;
     color: #444;
+    font-size: large;
 }
 
 .login-form {
