@@ -10,13 +10,13 @@
                 <CateSelect v-model="searchData.categoryId"></CateSelect>
             </el-form-item>
             <el-form-item>
-                    <el-select  style="width: 200px" v-model="searchData.isTop" placeholder="请选择置顶">
+                    <el-select  v-model="searchData.isTop" placeholder="请选择置顶">
                         <el-option label="置顶" value="1" />
                         <el-option label="非置顶" value="0" />
                     </el-select>
             </el-form-item>
             <el-form-item>
-                    <el-select  style="width: 200px" v-model="searchData.status" placeholder="请选择状态">
+                    <el-select  v-model="searchData.status" placeholder="请选择状态">
                         <el-option label="已发布" value="0" />
                         <el-option label="草稿" value="1" />
                     </el-select>
@@ -35,7 +35,7 @@
             <br>
 
             <el-form-item>
-                <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
+                <el-select v-model="searchData.timeField" placeholder="请选择时间">
                     <el-option label="请选择时间" value="" :disabled="true"/>
                     <el-option label="创建时间" value="create_time" />
                     <el-option label="修改时间" value="update_time" />

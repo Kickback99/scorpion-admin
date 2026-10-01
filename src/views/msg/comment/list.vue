@@ -20,14 +20,14 @@
             </el-form-item>
 
             <el-form-item>
-                    <el-select  style="width: 200px" v-model="searchData.type" placeholder="请选择评论类型">
+                    <el-select  v-model="searchData.type" placeholder="请选择评论类型">
                         <el-option label="文章评论" value="0" />
                         <el-option label="友链评论" value="1" />
                     </el-select>
             </el-form-item>
 
             <el-form-item>
-                    <el-select  style="width: 200px" v-model="searchData.status" placeholder="请选择评论状态">
+                    <el-select  v-model="searchData.status" placeholder="请选择评论状态">
                         <el-option label="请选择评论状态" value="" />
                         <el-option label="已通过" :value="0" />
                         <el-option label="已驳回" :value="1" />
@@ -36,7 +36,7 @@
             </el-form-item>
 
             <el-form-item>
-                    <el-select  style="width: 200px" v-model="searchData.rootId" placeholder="请选择评论类型">
+                    <el-select  v-model="searchData.rootId" placeholder="请选择评论类型">
                         <el-option label="请选择评论层级" value="" />
                         <el-option label="根评论" :value="-1" :disabled="viewMode === 'pick'" />
                         <el-option label="子评论" :value="0"  :disabled="viewMode === 'pick'" />

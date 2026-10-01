@@ -11,7 +11,7 @@
                 <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
             </el-form-item>
             <el-form-item>
-                <el-select style="width: 200px" v-model="searchData.status" placeholder="请选择登录状态">
+                <el-select v-model="searchData.status" placeholder="请选择登录状态">
                     <!-- 遍历所有状态选项 -->
                     <el-option
                     v-for="item in statusOptions"
