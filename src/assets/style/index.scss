@@ -9,6 +9,11 @@
 #nprogress .peg {
   box-shadow: 0 0 10px var(--el-color-primary), 0 0 5px var(--el-color-primary) !important;
 }
+// 右上角转圈同样走主题色，避免与进度条撞色
+#nprogress .spinner-icon {
+  border-top-color: var(--el-color-primary) !important;
+  border-left-color: var(--el-color-primary) !important;
+}
 
 // ============================================================
 // 全局滚动条 — 跟随主题色
