@@ -25,9 +25,7 @@
                     <el-input
                         v-model="searchModel.targetId"
                         placeholder="业务ID搜索"
-                        clearable
                         @input="handleTargetIdInput"
-                        style="width: 200px"
                     />
                 </el-form-item>
 
@@ -44,8 +42,6 @@
                     <el-input 
                         v-model="searchModel.uuid" 
                         placeholder="请输入文件UUID" 
-                        clearable
-                        style="width: 200px"
                     />
                 </el-form-item>
                 
@@ -71,7 +67,7 @@
                 <br>
 
                 <el-form-item>
-                    <el-select v-model="searchModel.timeField" placeholder="请选择时间" style="width: 120px">
+                    <el-select v-model="searchModel.timeField" placeholder="请选择时间">
                         <el-option label="请选择时间" value="" :disabled="true"/>
                         <el-option label="创建时间" value="create_time" />
                         <el-option label="修改时间" value="update_time" />

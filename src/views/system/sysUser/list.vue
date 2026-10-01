@@ -33,7 +33,7 @@
 
                     <!-- 时间字段选择器 -->
                     <el-form-item>
-                        <el-select v-model="searchData.timeField" placeholder="请选择时间" style="width: 120px">
+                        <el-select v-model="searchData.timeField" placeholder="请选择时间">
                             <el-option label="请选择时间" value="" :disabled="true" />
                             <el-option label="创建时间" value="create_time" />
                             <el-option label="修改时间" value="update_time" />

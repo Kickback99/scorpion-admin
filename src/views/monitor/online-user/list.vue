@@ -5,9 +5,9 @@
         <div class="flex justify-between">
             <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
                 <el-form-item>
-                    <el-input v-model="searchModel.keyword" placeholder="请输入用户名" clearable />
+                    <el-input v-model="searchModel.keyword" placeholder="请输入用户名" />
                 </el-form-item>
-                <el-form-item style="width: 223px">
+                <el-form-item>
                     <SmartSelector v-model="searchModel.role" :data="roleOptions" placeholder="请选择用户类型" />
                 </el-form-item>
                 <el-form-item>

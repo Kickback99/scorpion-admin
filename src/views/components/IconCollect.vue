@@ -19,7 +19,6 @@
         <el-input
           v-model="filterValue"
           placeholder="搜索图标"
-          clearable
           @clear="onClear"
         />
         
