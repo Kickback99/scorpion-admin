@@ -63,11 +63,12 @@
                     <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
                     <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
                     </el-form-item>
-                </el-form>
-                <div class="right">
+                    <!-- 批量删除、新增顶到行尾，与搜索/重置拉开距离，避免误点 -->
+                    <el-form-item class="toolbar-actions-right">
                     <el-button size="small" type="danger" @click="deleteSelectRows()" v-perm="'btn.sysUser.remove'" icon="Delete" plain>批量删除</el-button>
                     <el-button size="small" type="primary" @click="addDialog" v-perm="'btn.sysUser.add'" icon="Plus" plain>新增</el-button>
-                </div>
+                    </el-form-item>
+                </el-form>
             </div>
         </el-collapse-item>
     </el-collapse>
@@ -826,5 +827,18 @@ const regenerateTimeParams = () => {
 .layout {
     display: flex;
     justify-content: space-between;
+}
+
+// 换行交给 flex：搜索/重置紧跟日期选择器留在同一行，批量删除/新增再由 margin-left 顶到行尾
+:deep(.el-form--inline) {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+// 右间距归零是为了抵消 el-form--inline 给每个 form-item 的 32px（否则按钮离右边界差一截）
+:deep(.el-form--inline .toolbar-actions-right) {
+    margin-left: auto;
+    margin-right: 0;
 }
 </style>
