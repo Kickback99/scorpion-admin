@@ -40,6 +40,8 @@ const DEFAULT_NUMBER_LIMITS = {
   'article_list.title_bone_count':            { min: 1, max: 2 },
   'storage.data_retention_days':              { min: 0, max: 99 },
   'storage.file_retention_days':              { min: 0, max: 99 },
+  'storage.login_log_retention_days':         { min: 0, max: 99 },
+  'storage.oper_log_retention_days':          { min: 0, max: 99 },
   'tree.cate.parent_width':                   { min: 12, max: 200 },
 }
 
@@ -165,7 +167,8 @@ export const useConfigStore = defineStore({
       storage: {
         data_retention_days: 30,
         file_retention_days: 7,
-        log_retention_days: 7,
+        login_log_retention_days: 7,
+        oper_log_retention_days: 7,
       },
       logo: {
         admin_dark_logo: 'neon',
@@ -635,8 +638,11 @@ export const useConfigStore = defineStore({
     getStorageFileRetentionDays()  { return this.getValue('storage.file_retention_days') ?? 7 },
     setStorageFileRetentionDays(v) { this.updateConfig('storage.file_retention_days', v) },
 
-    getStorageLogRetentionDays()   { return this.getValue('storage.log_retention_days') ?? 7 },
-    setStorageLogRetentionDays(v)  { this.updateConfig('storage.log_retention_days', v) },
+    getStorageLoginLogRetentionDays()  { return this.getValue('storage.login_log_retention_days') ?? 7 },
+    setStorageLoginLogRetentionDays(v) { this.updateConfig('storage.login_log_retention_days', v) },
+
+    getStorageOperLogRetentionDays()   { return this.getValue('storage.oper_log_retention_days') ?? 7 },
+    setStorageOperLogRetentionDays(v)  { this.updateConfig('storage.oper_log_retention_days', v) },
 
     // ==================== logo ====================
 
@@ -752,7 +758,8 @@ export const useConfigStore = defineStore({
     // ===== storage (admin 组) =====
     storageDataRetentionDays() { return this.getValue('storage.data_retention_days') ?? 30 },
     storageFileRetentionDays() { return this.getValue('storage.file_retention_days') ?? 7 },
-    storageLogRetentionDays()  { return this.getValue('storage.log_retention_days') ?? 7 },
+    storageLoginLogRetentionDays() { return this.getValue('storage.login_log_retention_days') ?? 7 },
+    storageOperLogRetentionDays()  { return this.getValue('storage.oper_log_retention_days') ?? 7 },
 
     // ===== line_config (admin 组) =====
     dashboardLineChartYValidField() { return this.getValue('dashboard.line_chart.y_valid_field') },
