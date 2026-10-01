@@ -2,32 +2,36 @@
     <div class="smart-captcha" :class="{ 'is-verified': verified }">
         <!-- ===== 文本验证码（算术/中文/英文/数字/混合/GIF） ===== -->
         <template v-if="isTextType">
+            <!-- 输入框占剩余宽度，验证码图片 + 刷新按钮靠右；移动端改回图片在上的上下布局 -->
             <div class="captcha-text-row">
-                <div class="captcha-text-img-box" v-loading="!backgroundLoaded">
-                    <img
-                        v-if="vo.backgroundImage"
-                        :src="vo.backgroundImage"
-                        class="captcha-text-img"
-                        alt="验证码"
-                        title="点击刷新"
-                        @load="backgroundLoaded = true"
-                        @click="generate"
-                    >
+                <el-form ref="answerFormRef" class="captcha-text-form" :model="answerModel" :rules="answerRules" @submit.prevent>
+                    <el-form-item prop="answer">
+                        <el-input
+                            v-model="answerModel.answer"
+                            size="large"
+                            placeholder="请输入验证码"
+                            clearable
+                            :maxlength="answerMaxLength"
+                        >
+                            <template #prefix><el-icon><Key /></el-icon></template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
+                <div class="captcha-text-aside">
+                    <div class="captcha-text-img-box" v-loading="!backgroundLoaded">
+                        <img
+                            v-if="vo.backgroundImage"
+                            :src="vo.backgroundImage"
+                            class="captcha-text-img"
+                            alt="验证码"
+                            title="点击刷新"
+                            @load="backgroundLoaded = true"
+                            @click="generate"
+                        >
+                    </div>
+                    <el-button v-if="backgroundLoaded" text circle size="small" icon="Refresh" @click="generate"></el-button>
                 </div>
-                <el-button v-if="backgroundLoaded" text circle size="small" icon="Refresh" @click="generate"></el-button>
             </div>
-            <el-form ref="answerFormRef" :model="answerModel" :rules="answerRules" @submit.prevent>
-                <el-form-item prop="answer">
-                    <el-input
-                        v-model="answerModel.answer"
-                        placeholder="请输入验证码"
-                        clearable
-                        :maxlength="answerMaxLength"
-                    >
-                        <template #prefix><el-icon><Key /></el-icon></template>
-                    </el-input>
-                </el-form-item>
-            </el-form>
         </template>
 
         <!-- ===== 点选验证码 ===== -->
@@ -342,11 +346,26 @@ const handleClickVerify = async () => {
     position: relative;
     width: 100%;
 
+    // 文本验证码（左输入框 / 右图片 + 刷新）
     .captcha-text-row {
         display: flex;
         align-items: center;
-        gap: 4px;
-        margin-bottom: 10px;
+        gap: 8px;
+
+        // 输入框占剩余宽度；min-width 归零保证能被压缩
+        .captcha-text-form {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        // 图片 + 刷新按钮整体不压缩，顶对齐使图片上下边与输入框齐平
+        .captcha-text-aside {
+            flex: 0 0 auto;
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         .captcha-text-img-box {
             min-width: 100px;
@@ -361,6 +380,20 @@ const handleClickVerify = async () => {
             height: 40px;
             cursor: pointer;
             border-radius: 4px;
+        }
+    }
+
+    // 移动端（同 Login.vue 断点）：改回图片在上、输入框整宽的上下布局，
+    // 间距沿用改版前的图片与输入框间距
+    @media (max-width: 768px) {
+        .captcha-text-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+
+            .captcha-text-aside {
+                order: -1;
+            }
         }
     }
 
