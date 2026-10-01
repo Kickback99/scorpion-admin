@@ -249,6 +249,24 @@ html.dark .main-container:not(.page-theme) .el-collapse.search-collapse {
 }
 
 // ============================================================
+// 分类页工具栏 — 吸顶 + 背景三态跟随主题（对齐 .main-container）
+// ============================================================
+.cate-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  // 接管原 el-tree 的 margin-top:15px，滚动时盖住穿过的内容
+  padding-bottom: 15px;
+  background-color: var(--el-fill-color-light);
+}
+html.dark .main-container:not(.page-theme) .cate-toolbar {
+  background-color: var(--el-color-black);
+}
+.main-container.page-theme .cate-toolbar {
+  background-color: var(--page-theme-bg);
+}
+
+// ============================================================
 // 顶栏图标按钮 — 去掉无 type 的 circle 按钮自带的圆圈底与描边
 // 只作用于显式挂了 .toolbar-icon-btn 的按钮：ToolBar 的
 // Refresh / FullScreen / Setting，以及铃铛内联进顶栏时

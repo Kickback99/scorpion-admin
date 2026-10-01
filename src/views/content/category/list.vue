@@ -12,15 +12,18 @@
    <h4> isHasChild(有子节点吗): {{ isHasChild }}</h4> 
    <h4> isNormal(正常): {{ isNormal }}</h4> 
    <h4> isNative(原生): {{ isNative }}</h4>  -->
-  <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="primary" @click="addParent" v-perm="'btn.category.add'" :disabled="disabledAddParent" plain>新增</el-button>
-  <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="info" @click="handleReset" plain>重置</el-button>
+  <!-- 吸顶工具栏：三态背景见 index.scss .cate-toolbar -->
+  <div class="cate-toolbar">
+    <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="primary" @click="addParent" v-perm="'btn.category.add'" :disabled="disabledAddParent" plain>新增</el-button>
+    <el-button :class="{ 'cate-btn-loading': loading }" size="small" type="info" @click="handleReset" plain>重置</el-button>
+  </div>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
         <el-table-column prop="name" label="分类名"  />
     </el-table> -->
 
   <!-- 树形展示 -->
-  <el-tree v-loading="loading" class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass, { 'page-theme': settingStore.pageTheme }]" :style="cateParentStyle" style="max-width: 600px; margin-top: 15px;" :data="cateData" :props="defaultProps"
+  <el-tree v-loading="loading" class="tree-with-line" :class="[lineClass, cateParentClass, cateChildClass, { 'page-theme': settingStore.pageTheme }]" :style="cateParentStyle" style="max-width: 600px;" :data="cateData" :props="defaultProps"
   show-checkbox  
   node-key="id" @check-change="handleChecked" @check="getCheck"
   :draggable="isDraggable"  :allow-drop="allowDrop" @node-drop="handleDrop"  ref="treeRef"
