@@ -13,7 +13,7 @@ import { PIE_CHART_MODE_OPTIONS } from '@/config/pieChartOptions'
 import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
   Aim, Star, ChatDotRound, List, Document, InfoFilled, Postcard, Collection,
-  View, CollectionTag, ChatSquare, Tickets, Bell,
+  View, CollectionTag, ChatSquare, Tickets, Bell, Memo,
   PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort, PieChart
 } from '@element-plus/icons-vue'
 
@@ -75,6 +75,7 @@ export function useConfigItems() {
         { key: 'article_list.load_mode',             type: 'radio',  label: '文章加载方式',   desc: '列表页文章的加载方式',                    icon: Tickets,        get: () => config.getValue('article_list.load_mode'),              set: (v) => config.updateConfig('article_list.load_mode', v),           options: [{ value: 'scroll', label: '滚动加载' }, { value: 'pagination', label: '分页加载' }] },
         { key: 'article_list.scroll_page_size',      type: 'number', label: '滚动分页大小',   desc: '滚动模式下每次加载的文章数量',            icon: List,           get: () => config.getValue('article_list.scroll_page_size'),         set: (v) => config.updateConfig('article_list.scroll_page_size', v),     min: () => getMin('article_list.scroll_page_size'), max: () => getMax('article_list.scroll_page_size') },
         { key: 'article_list.pagination_page_size',  type: 'number', label: '分页大小',       desc: '分页模式下每页文章数量',                  icon: List,           get: () => config.getValue('article_list.pagination_page_size'),     set: (v) => config.updateConfig('article_list.pagination_page_size', v), min: () => getMin('article_list.pagination_page_size'), max: () => getMax('article_list.pagination_page_size') },
+        { key: 'article_list.title_bone_count',      type: 'number', label: '标题骨行数',     desc: '文章列表骨架屏的标题占位行数', icon: Memo, get: () => config.getValue('article_list.title_bone_count'),      set: (v) => config.updateConfig('article_list.title_bone_count', v),     min: () => getMin('article_list.title_bone_count'), max: () => getMax('article_list.title_bone_count') },
         // ===== websocket =====
         { key: 'websocket.enabled',              type: 'switch', label: 'WebSocket 连接', desc: '控制前端 WebSocket 连接的开启与关闭',      icon: Connection,     get: () => config.getValue('websocket.enabled'),           set: (v) => config.updateConfig('websocket.enabled', v) },
         { key: 'websocket.backend_enabled',      type: 'switch', label: '后端 WebSocket', desc: '后端 WebSocket 连接状态（只读）',          icon: Connection,     get: () => config.getValue('websocket.backend_enabled'), readonly: true },
