@@ -83,7 +83,7 @@
         <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip/>
         <el-table-column prop="browser" label="浏览器" min-width="110" show-overflow-tooltip/>
         <el-table-column prop="location" label="登录地点" min-width="120" show-overflow-tooltip/>
-        <el-table-column label="token" min-width="150" >
+        <el-table-column label="token" min-width="150" show-overflow-tooltip>
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
                     <span style="overflow: hidden; text-overflow: ellipsis">
@@ -100,7 +100,7 @@
                 </div>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="操作日期" min-width="180" />
+        <el-table-column prop="createTime" label="操作日期" min-width="200" />
         <el-table-column  label="操作" width="150">
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
