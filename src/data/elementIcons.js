@@ -36,6 +36,7 @@ import {
   UserFilled,
   Iphone,
   Message,
+  Comment
 } from '@element-plus/icons-vue'
 
 import elIcons from './elIcons'
@@ -46,7 +47,7 @@ const AllIcons = {
   WarnTriangleFilled, Check, EditPen, SwitchButton, Baseball, Upload, Download,
   CopyDocument, CircleCheck, MoreFilled, Expand, Top, Fold, Right, Bottom,
   ArrowLeft, ArrowDown, ArrowRight, CircleClose, Sunny, Moon, Setting,
-  QuestionFilled, UserFilled, Iphone, Message,
+  QuestionFilled, UserFilled, Iphone, Message, Comment
 }
 
 // 导出图标对象（可选）

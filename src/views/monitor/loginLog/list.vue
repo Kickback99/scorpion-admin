@@ -54,7 +54,7 @@
             </el-form-item>
             <!-- 批量删除顶到行尾，与搜索/重置拉开距离，避免误点 -->
             <el-form-item class="toolbar-actions-right">
-                <el-button size="small" type="danger" @click="handleBatchDelete" plain>批量删除</el-button>
+                <el-button size="small" type="danger" icon="Delete" @click="handleBatchDelete" plain>批量删除</el-button>
             </el-form-item>
         </el-form>
     </div>

@@ -12,7 +12,7 @@ import { useConfigStore, registerItems } from '@/store/config'
 import { PIE_CHART_MODE_OPTIONS } from '@/config/pieChartOptions'
 import {
   Key, Link, ChatDotSquare, ChatLineSquare, Brush, Connection,
-  Aim, Star, ChatDotRound, List, Document, Message, InfoFilled, Postcard, Comment, Collection,
+  Aim, Star, ChatDotRound, List, Document, InfoFilled, Postcard, Collection,
   View, CollectionTag, ChatSquare, Tickets, Bell,
   PictureFilled, DeleteFilled, FolderDelete, Grid, DataBoard, SemiSelect, Sort, PieChart
 } from '@element-plus/icons-vue'
@@ -51,7 +51,7 @@ export function useConfigItems() {
         { key: 'comment.child_comment_limit',        type: 'number', label: '子评论默认显示数量', sys: true, desc: '超过此数量显示「查看更多」按钮',       icon: ChatDotRound,   get: () => config.getValue('comment.child_comment_limit'),          set: (v) => config.updateConfig('comment.child_comment_limit', v),       min: () => getMin('comment.child_comment_limit'), max: () => getMax('comment.child_comment_limit') },
         { key: 'comment.child_page_size',            type: 'number', label: '子评论分页大小', sys: true, desc: '点击查看更多时每次加载的数量',          icon: List,           get: () => config.getValue('comment.child_page_size'),              set: (v) => config.updateConfig('comment.child_page_size', v),           min: () => getMin('comment.child_page_size'),     max: () => getMax('comment.child_page_size') },
         { key: 'comment.parent_page_size',           type: 'number', label: '父评论分页大小', desc: '每次滚动加载父评论的分页大小',          icon: Document,       get: () => config.getValue('comment.parent_page_size'),             set: (v) => config.updateConfig('comment.parent_page_size', v),          min: () => getMin('comment.parent_page_size'),    max: () => getMax('comment.parent_page_size') },
-        { key: 'comment.emoji_enabled',              type: 'switch', label: '评论表情',       desc: '开启后评论框显示表情选择入口',            icon: Comment,        get: () => config.getValue('comment.emoji_enabled'),               set: (v) => config.updateConfig('comment.emoji_enabled', v) },
+        { key: 'comment.emoji_enabled',              type: 'switch', label: '评论表情',       desc: '开启后评论框显示表情选择入口',            icon: "Comment",        get: () => config.getValue('comment.emoji_enabled'),               set: (v) => config.updateConfig('comment.emoji_enabled', v) },
         // ===== nav =====
         { key: 'nav.friend_link_enabled',            type: 'switch', label: '前端友链',       desc: '控制前台友链模块的显示',                icon: Link,           get: () => config.getValue('nav.friend_link_enabled'),         set: (v) => config.updateConfig('nav.friend_link_enabled', v) },
         { key: 'nav.about_enabled',                  type: 'switch', label: '关于页面',       desc: '控制前台关于页面入口的显示',            icon: InfoFilled,     get: () => config.getValue('nav.about_enabled'),               set: (v) => config.updateConfig('nav.about_enabled', v) },
@@ -59,9 +59,9 @@ export function useConfigItems() {
         { key: 'user.login_enabled',                 type: 'switch', label: '前端登录',       sys: true,       desc: '控制前台登录功能的开启与关闭',           icon: "Lock",         get: () => config.getValue('user.login_enabled'),          set: (v) => config.updateConfig('user.login_enabled', v) },
         { key: 'user.other_login_enabled',           type: 'switch', label: '其他登录',       desc: '允许第三方登录方式',                      icon: Key,            get: () => config.getValue('user.other_login_enabled'),      set: (v) => config.updateConfig('user.other_login_enabled', v) },
         // ===== profile =====
-        { key: 'profile.my_feedback_enabled',        type: 'switch', label: '我的反馈',       desc: '个人中心显示反馈入口',                    icon: Message,        get: () => config.getValue('profile.my_feedback_enabled'),          set: (v) => config.updateConfig('profile.my_feedback_enabled', v) },
+        { key: 'profile.my_feedback_enabled',        type: 'switch', label: '我的反馈',       desc: '个人中心显示反馈入口',                    icon: "Message",        get: () => config.getValue('profile.my_feedback_enabled'),          set: (v) => config.updateConfig('profile.my_feedback_enabled', v) },
         { key: 'profile.my_publishes_enabled',       type: 'switch', label: '我的发布',       desc: '个人中心显示发布内容入口',                icon: Postcard,       get: () => config.getValue('profile.my_publishes_enabled'),         set: (v) => config.updateConfig('profile.my_publishes_enabled', v) },
-        { key: 'profile.my_comments_enabled',        type: 'switch', label: '我的评论',       desc: '个人中心显示评论入口',                    icon: Comment,        get: () => config.getValue('profile.my_comments_enabled'),          set: (v) => config.updateConfig('profile.my_comments_enabled', v) },
+        { key: 'profile.my_comments_enabled',        type: 'switch', label: '我的评论',       desc: '个人中心显示评论入口',                    icon: "Comment",        get: () => config.getValue('profile.my_comments_enabled'),          set: (v) => config.updateConfig('profile.my_comments_enabled', v) },
         { key: 'profile.my_favorites_enabled',       type: 'switch', label: '我的收藏',       desc: '个人中心显示收藏入口',                    icon: Collection,     get: () => config.getValue('profile.my_favorites_enabled'),         set: (v) => config.updateConfig('profile.my_favorites_enabled', v) },
         // ===== article_detail =====
         { key: 'article_detail.theme',               type: 'radio',  label: '文章主题',       sys: true,       desc: '文章详情页的代码高亮主题风格',            icon: Brush,          get: () => config.getValue('article_detail.theme'),              set: (v) => config.updateConfig('article_detail.theme', v),             options: [{ value: 0, label: 'github' }, { value: 1, label: 'vuepress' }] },
@@ -136,7 +136,7 @@ export function useConfigItems() {
         { key: 'captcha.client_login_type',     type: 'radio',  label: '用户登录验证码类型', desc: '用户端登录锁定后使用的验证码类型',         icon: "Refresh",     get: () => config.getValue('captcha.client_login_type'),      set: (v) => config.updateConfig('captcha.client_login_type', v), options: CAPTCHA_OPTIONS },
         { key: 'captcha.admin_login_type',      type: 'radio',  label: '管理登录验证码类型', desc: '管理端登录使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.admin_login_type'),       set: (v) => config.updateConfig('captcha.admin_login_type', v), options: CAPTCHA_OPTIONS },
         // ===== comment =====
-        { key: 'comment.reply_emoji_enabled',        type: 'switch', label: '回复表情',       desc: '回复弹窗显示表情选择入口',                icon: Comment,        get: () => config.getValue('comment.reply_emoji_enabled'),         set: (v) => config.updateConfig('comment.reply_emoji_enabled', v) },
+        { key: 'comment.reply_emoji_enabled',        type: 'switch', label: '回复表情',       desc: '回复弹窗显示表情选择入口',                icon: "Comment",        get: () => config.getValue('comment.reply_emoji_enabled'),         set: (v) => config.updateConfig('comment.reply_emoji_enabled', v) },
       ]
     },
     {
