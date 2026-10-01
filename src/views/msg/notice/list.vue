@@ -5,7 +5,7 @@
     <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
         <!-- 第一排：基础筛选 -->
         <el-form-item>
-            <el-input v-model="searchModel.keyword" placeholder="请输入公告内容" clearable style="width:180px" />
+            <el-input v-model="searchModel.keyword" placeholder="请输入公告内容" />
         </el-form-item>
         <el-form-item>
             <SmartSelector v-model="searchModel.status" :data="statusOptions" style="width:140px" placeholder="请选择状态" />

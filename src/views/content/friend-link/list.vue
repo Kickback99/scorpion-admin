@@ -5,7 +5,7 @@
             <el-form-item >
                 <el-input v-model="searchModel.keyword" placeholder="请输入名字/描述"/>
             </el-form-item>
-            <el-form-item style="width: 200px">
+            <el-form-item>
                 <SmartSelector v-model="searchModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>
             </el-form-item>
              <el-form-item >
@@ -84,7 +84,7 @@
                 <el-input :prefix-icon="User" placeholder="请输入网站地址" v-model="formModel.address" />
             </el-form-item>
 
-            <el-form-item style="width: 200px">
+            <el-form-item>
                 <SmartSelector v-model="formModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>
             </el-form-item>
             
