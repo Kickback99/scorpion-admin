@@ -72,10 +72,6 @@
         </el-collapse-item>
     </el-collapse>
 
-
-
-
-
     <!-- 表格 -->
     <el-table
     v-loading="loading"
