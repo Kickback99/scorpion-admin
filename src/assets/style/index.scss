@@ -308,3 +308,26 @@ html.dark .main-container:not(.page-theme) .cate-toolbar {
     min-width: 92vw;
   }
 }
+
+// ============================================================
+// 日期选择器、分页跳页、数字输入框内部也用 el-input 渲染
+// 全局默认可清空后多出来的清除图标，会与组件自身的重复 / 挤占窄控件，隐藏掉
+// ============================================================
+.el-date-editor .el-input__suffix .el-input__clear,
+.el-pagination__editor .el-input__suffix .el-input__clear,
+.el-input-number .el-input__suffix .el-input__clear {
+  display: none;
+}
+
+// 校验状态图标（红叉 / 灰勾）和 clear 图标抢同一个 suffix 位：错误反馈已有红框 + 下方
+// 文案，成功态的灰勾 EP 也没配色，隐藏它让 clear 独占，免得两个图标并排挤在一起
+.el-form .el-form-item .el-input__validateIcon {
+  display: none;
+}
+
+// inline 表单的 form-item 宽度由内容撑开，clearable 图标进 flex 流会推移整排控件 22px
+// 锁死宽度即可根治；日期选择器与自定义组件带内联 width，优先级更高，不受影响
+.el-form--inline .el-form-item__content > .el-input:not(.el-date-editor),
+.el-form--inline .el-form-item__content > .el-select {
+  width: 200px;
+}

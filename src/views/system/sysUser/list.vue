@@ -8,7 +8,6 @@
                     label-width="auto"
                     class="demo-ruleForm"
                     size="small"
-                    status-icon
                     >
                     <el-form-item>
                     <el-input prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
@@ -123,7 +122,7 @@
     <!-- 用户新增和修改弹层 -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
         <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
-            size="small" status-icon label-width="auto">
+            size="small" label-width="auto">
             <el-form-item label="用户名" prop="username">
                 <el-input prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
             </el-form-item>
@@ -174,7 +173,7 @@
     <!-- 用户分配角色弹层 -->
     <el-dialog v-model="allocRolesVisible" title="分配角色" >
         <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
-            size="small" status-icon>
+            size="small">
             <el-form-item label="用户名">
                 <el-input prefix-icon="User" disabled v-model="formData.username" />
             </el-form-item>

@@ -18,8 +18,11 @@ import './assets/style/tailwind.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
 // 全局设置 el-dialog 默认不通过点击遮罩层关闭
-import { ElDialog } from 'element-plus'
+import { ElDialog, ElInput } from 'element-plus'
 ElDialog.props.closeOnClickModal.default = false
+// 全局设置 el-input 默认可清空。clearable 是简写 Boolean，归一化时会被换成
+// { type: Boolean }，改 .default 无效，必须整体替换；el-input-tag 有独立 props，不受影响
+ElInput.props.clearable = { type: Boolean, default: true }
 
 const app = createApp(App)
 app.use(router)

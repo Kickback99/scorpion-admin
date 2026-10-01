@@ -13,7 +13,6 @@
         :rules="rules"
         label-width="120px"
         class="password-form"
-        status-icon
         size="small"
       >
         <el-form-item label="原密码" prop="oldPassword">

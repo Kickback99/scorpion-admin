@@ -7,7 +7,6 @@
         label-width="120px"
         class="demo-ruleForm"
         size="small"
-        status-icon
         >
         <el-form-item  prop="roleName">
         <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
