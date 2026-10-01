@@ -118,7 +118,7 @@
 
         <el-dialog v-model="dialogVisible" title="查看日志详情" width="50%">
           <!--   <el-form  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm"
-                :size="formSize" status-icon>
+                :size="formSize">
                 <el-form-item label="IP地址" >
                     <el-input  v-model="formModel.ip" />
                 </el-form-item>
