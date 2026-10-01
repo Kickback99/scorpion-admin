@@ -10,7 +10,6 @@
                             v-model="answerModel.answer"
                             size="large"
                             placeholder="请输入验证码"
-                            clearable
                             :maxlength="answerMaxLength"
                         >
                             <template #prefix><el-icon><Key /></el-icon></template>

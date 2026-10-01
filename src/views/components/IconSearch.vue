@@ -3,7 +3,6 @@
           <el-input
             v-model="filterValue"
             placeholder="搜索图标"
-            clearable
           />
           <!-- tabs标签页 -->
           <el-tabs v-model="currentActiveType" @tab-click="handleClick">
