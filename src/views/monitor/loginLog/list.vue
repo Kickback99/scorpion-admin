@@ -31,17 +31,6 @@
             <el-form-item>
                 <el-input v-model="searchData.location" placeholder="请输入登录地点" />
             </el-form-item>
-<!--             <el-form-item label="时间范围">
-                <el-date-picker
-                v-model="dateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                value-format="YYYY-MM-DD"
-                @change="handleDateChange"
-                />
-            </el-form-item> -->
             <el-form-item>
                 <el-date-picker
                     v-model="searchData.createTimeBegin"
@@ -100,15 +89,6 @@
                     <span style="overflow: hidden; text-overflow: ellipsis">
                         {{ row.token ? `${row.token.substring(0, 6)}...${row.token.substring(row.token.length - 4)}` : '' }}
                     </span>
-
-                    <!-- <el-icon
-                        v-if="row.token"
-                        style="cursor: pointer"
-                        @click="handleCopy(row.token, row.id)"
-                    >
-                        <component :is="copiedId === row.id ? CircleCheck : CopyDocument" />
-                    </el-icon> -->
-
                     <el-icon
                         v-if="row.token"
                         style="cursor: pointer; transition: all 0.3s"
