@@ -38,8 +38,8 @@ const DEFAULT_NUMBER_LIMITS = {
   'article_list.scroll_page_size':            { min: 5, max: 15 },
   'article_list.pagination_page_size':        { min: 5, max: 15 },
   'article_list.title_bone_count':            { min: 1, max: 2 },
-  'storage.data_retention_days':              { min: 0, max: 100 },
-  'storage.file_retention_days':              { min: 0, max: 100 },
+  'storage.data_retention_days':              { min: 0, max: 99 },
+  'storage.file_retention_days':              { min: 0, max: 99 },
   'tree.cate.parent_width':                   { min: 12, max: 200 },
 }
 
