@@ -279,7 +279,7 @@ const getFieldMax = (key) => {
 const TOP_LEVEL_ORDER = [
   'comment', 'nav', 'user', 'profile',
   'article_detail', 'article_list', 'notification',
-  'user_config', 'oss', 'person', 'logo',
+  'user_config', 'oss', 'logo',
 ]
 
 // 从 configItems.js 提取 desc 映射
