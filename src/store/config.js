@@ -35,6 +35,7 @@ const DEFAULT_NUMBER_LIMITS = {
   'comment.parent_page_size':                 { min: 5, max: 15 },
   'article.top_limit':                        { min: 1, max: 99 },
   'article.carousel_limit':                   { min: 0, max: 99 },
+  'article.tag_limit':                        { min: 0, max: 99 },
   'article_list.scroll_page_size':            { min: 5, max: 15 },
   'article_list.pagination_page_size':        { min: 5, max: 15 },
   'article_list.title_bone_count':            { min: 1, max: 2 },
@@ -139,6 +140,7 @@ export const useConfigStore = defineStore({
       article: {
         top_limit: 3,
         carousel_limit: 3,
+        tag_limit: 16,
         save_edit: false,
       },
       icon_enabled: true,
@@ -516,6 +518,9 @@ export const useConfigStore = defineStore({
     getArticleCarouselLimit()      { return this.getValue('article.carousel_limit') ?? 3 },
     setArticleCarouselLimit(v)     { this.updateConfig('article.carousel_limit', v) },
 
+    getArticleTagLimit()           { return this.getValue('article.tag_limit') ?? 16 },
+    setArticleTagLimit(v)          { this.updateConfig('article.tag_limit', v) },
+
     getArticleSaveEdit()           { return this.getValue('article.save_edit') === true },
     toggleArticleSaveEdit()        { this.updateConfig('article.save_edit', !this.getValue('article.save_edit')) },
 
@@ -709,6 +714,7 @@ export const useConfigStore = defineStore({
     // ===== article (admin 组) =====
     articleTopLimit()         { return this.getValue('article.top_limit') ?? 3 },
     articleCarouselLimit()    { return this.getValue('article.carousel_limit') ?? 3 },
+    articleTagLimit()         { return this.getValue('article.tag_limit') ?? 16 },
     isArticleSaveEdit()       { return this.getValue('article.save_edit') === true },
 
     // ===== comment (client 组) =====
