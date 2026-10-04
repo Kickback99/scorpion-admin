@@ -7,9 +7,9 @@
           <el-input size="small" v-model="searchData.keyword" placeholder="请输入标签名/备注" />
         </el-form-item>
         <el-form-item>
-          <el-button size="small" type="primary" icon="Search" plain @click="onSearch">搜索</el-button>
-          <el-button size="small" type="info" icon="Refresh" plain @click="onReset">重置</el-button>
-          <el-button size="small" type="primary" v-perm="'btn.tag.add'" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
+          <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+          <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+          <el-button size="small" type="primary" icon="Plus" v-perm="'btn.tag.add'" @click="handleAdd({})" plain>新增</el-button>
         </el-form-item>
       </el-form>
     </div>
