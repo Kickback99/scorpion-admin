@@ -387,6 +387,11 @@
   background-color: var(--el-fill-color-light) !important;
 }
 
+/* 激活标签 close 图标 hover — 对齐 plain 的淡底色；full 模式下会被 .ui-full 规则填成主题色底导致撞色 */
+.tags-view.tag-mode-neutral .scroll-item.is-active .el-icon-close:hover {
+  background-color: rgb(0 0 0 / 6%);
+}
+
 /* ============================================================
    tag-mode-theme — 主题色深底风格（不受 uiMode 影响，统一处理）
    ============================================================ */
