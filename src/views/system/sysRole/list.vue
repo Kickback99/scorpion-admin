@@ -9,7 +9,7 @@
         size="small"
         >
         <el-form-item  prop="roleName">
-        <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名/角色编码" v-model="searchData.roleName"/><br>
+        <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名/角色编码" v-model="searchData.roleName" /><br>
         </el-form-item>
 
 
@@ -63,10 +63,10 @@
         size="small"  
         :rules="rules">
             <el-form-item label="角色名称" prop="roleName">
-                <el-input :prefix-icon="useRenderIcon('ri:group-line')" v-model="dialogData.roleName" placeholder="请输入角色名称"/>
+                <el-input :prefix-icon="useRenderIcon('ri:group-line')" v-model="dialogData.roleName" placeholder="请输入角色名称" />
             </el-form-item>
             <el-form-item label="角色编码" prop="roleCode">
-                <el-input prefix-icon="Comment" v-model="dialogData.roleCode" placeholder="请输入角色编码"/>
+                <el-input prefix-icon="Comment" v-model="dialogData.roleCode" placeholder="请输入角色编码" />
             </el-form-item>
             <el-form-item label="关联用户">
                 <SmartAutoComplete

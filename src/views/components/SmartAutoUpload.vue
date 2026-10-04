@@ -1,6 +1,6 @@
 <template>
 
-      <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178"/>
+      <el-progress v-show="isProgressVisible"  type="circle" :percentage="percentage" :width="178" />
 
       <el-upload
           v-show="!isProgressVisible"
@@ -14,7 +14,7 @@
           :on-success="onSuccess"
           :on-progress="handleProgress"
           :before-upload="beforeAvatarUpload">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar" @load="isProgressVisible=false"/>
+          <img v-if="imageUrl" :src="imageUrl" class="avatar" @load="isProgressVisible=false" />
           <el-icon v-else class="avatar-uploader-icon">
               <Plus />
           </el-icon>
