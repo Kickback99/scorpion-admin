@@ -36,7 +36,7 @@
 
             <el-form-item>
                 <el-select v-model="searchData.timeField" placeholder="请选择时间">
-                    <el-option label="请选择时间" value="" :disabled="true"/>
+                    <el-option label="请选择时间" value="" :disabled="true" />
                     <el-option label="创建时间" value="create_time" />
                     <el-option label="修改时间" value="update_time" />
                 </el-select>
@@ -99,13 +99,13 @@
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
         <el-table-column label="封面" width="124px">
             <template #default="{row}">
-                <el-image style="width: 100px; height: 56px; border-radius: 4px;"  :src="handleImage(row)" :fit="'cover'" preview-teleported :preview-src-list="[handleImage(row)]"/>
+                <el-image style="width: 100px; height: 56px; border-radius: 4px;"  :src="handleImage(row)" :fit="'cover'" preview-teleported :preview-src-list="[handleImage(row)]" />
             </template>
         </el-table-column>
-        <el-table-column prop="cateName" label="分类" min-width="100" align="center"/>
+        <el-table-column prop="cateName" label="分类" min-width="100" align="center" />
         <el-table-column label="置顶" min-width="90" align="center">
             <template #default="{row}">
-                <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
+                <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)" />
             </template>
         </el-table-column>
         <el-table-column label="状态" min-width="90" align="center">

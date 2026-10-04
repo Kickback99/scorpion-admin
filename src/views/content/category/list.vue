@@ -19,7 +19,7 @@
   </div>
   <!-- table树形展示 -->
   <!-- <el-table :data="cateData" :style="{ width: '100%' }" row-key="id">
-        <el-table-column prop="name" label="分类名"  />
+        <el-table-column prop="name" label="分类名" />
     </el-table> -->
 
   <!-- 树形展示 -->
@@ -106,7 +106,7 @@
 
         <!-- <el-popconfirm v-if="data.children === null || data.children.length === 0" :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>
-                    <el-button :disabled="$hasPerm('btn.sysRole.remove')" type="danger" icon="Delete"  circle plain/>
+                    <el-button :disabled="$hasPerm('btn.sysRole.remove')" type="danger" icon="Delete"  circle plain />
                 </template>
             </el-popconfirm> -->
           <!-- <el-button @click="handleTest(node,data)">test</el-button> -->

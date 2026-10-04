@@ -1,6 +1,6 @@
 <template>
     <el-select v-model="text" :placeholder="placeholder">
-        <el-option v-for="item in data" :key="item.value" :label="item.label" :value="item.value" :disabled="item.disabled? true : false"/>
+        <el-option v-for="item in data" :key="item.value" :label="item.label" :value="item.value" :disabled="item.disabled? true : false" />
     </el-select>
 </template>
  
