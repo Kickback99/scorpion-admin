@@ -9,7 +9,7 @@
         size="small"
         >
         <el-form-item  prop="roleName">
-        <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名 | 角色编码" v-model="searchData.roleName"/><br>
+        <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名/角色编码" v-model="searchData.roleName"/><br>
         </el-form-item>
 
 
@@ -72,7 +72,7 @@
                 <SmartAutoComplete
                     v-model="selectedUserNames"
                     :fetch-suggestions-api="fetchUsers"
-                    placeholder="请输入用户名|昵称搜索"
+                    placeholder="请输入用户名/昵称"
                     :max="10"
                     :debounce-delay="300"
                     :min-search-length="1"
