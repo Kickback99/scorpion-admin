@@ -556,6 +556,11 @@ const modifyMenu = async() => {
         display: flex;
         align-items: center;
         gap: 4px;
+
+        // text 型按钮自带 11px 左右内边距，图标会被推离左边界；去掉首位按钮的左内边距使其贴齐
+        .el-button:first-child {
+            padding-left: 0;
+        }
     }
 
     /* 搜索高亮 */
