@@ -401,7 +401,7 @@ defineExpose({
   color: var(--el-text-color-regular);
   margin: 16px 0 12px 0;
   padding-left: 8px;
-  border-left: 3px solid var(--el-color-info);
+  border-left: 3px solid var(--el-color-primary);
 }
 
 .comment-card {
