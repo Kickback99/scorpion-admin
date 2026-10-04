@@ -73,7 +73,7 @@
                   <SvgIcon v-else-if="currentActiveType === 'svg'" 
                   :name="item.name" :color="item.color?item.color:''" />
                   <template v-else-if="currentActiveType ===  'alibaba'">
-                    <IconFont v-if="item.type == 'iconfont'" :icon="item.icon" :style="{color:item.color?item.color:''}"/>
+                    <IconFont v-if="item.type == 'iconfont'" :icon="item.icon" :style="{color:item.color?item.color:''}" />
                     <IconFont v-else-if="item.type == 'uni'" :icon="item.icon" :fill="item.color?item.color:''"  uni />
                     <IconFont v-else  :icon="item.icon" :fill="item.color?item.color:''" />
                   </template>

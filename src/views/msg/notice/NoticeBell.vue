@@ -42,7 +42,7 @@
             <span>{{ unreadLoadingMore ? '加载中...' : '下滑加载更多' }}</span>
           </div>
           <div v-else-if="isScrollMode && unreadScrollable && unreadList.length > 0" class="load-more-tip">没有更多了</div>
-          <el-empty v-if="!loading && unreadList.length === 0" description="暂无未读公告" :image-size="0" class="empty-no-icon"/>
+          <el-empty v-if="!loading && unreadList.length === 0" description="暂无未读公告" :image-size="0" class="empty-no-icon" />
         </div>
         <!-- 分页（仅分页加载模式） -->
         <div v-if="!isScrollMode && unreadTotal > pageSize" class="notice-pagination">

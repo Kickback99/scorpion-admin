@@ -66,10 +66,10 @@
         <el-main class="main-container" :class="{ 'page-theme': settingStore.pageTheme }">
           <Tabs></Tabs>
           <el-scrollbar v-if="!isConfigRoute" class="main-scrollbar">
-            <router-view v-if="isDestroy"/>
+            <router-view v-if="isDestroy" />
           </el-scrollbar>
           <div v-else class="main-scrollbar main-scrollbar--plain">
-            <router-view v-if="isDestroy"/>
+            <router-view v-if="isDestroy" />
           </div>
         </el-main>
         <!-- <el-footer>Footer</el-footer> -->

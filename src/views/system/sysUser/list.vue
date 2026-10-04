@@ -10,7 +10,7 @@
                     size="small"
                     >
                     <el-form-item>
-                    <el-input prefix-icon="User"  placeholder="请输入用户名/呢称/手机号" v-model="searchData.keyword"/><br>
+                    <el-input prefix-icon="User"  placeholder="请输入用户名/呢称/手机号" v-model="searchData.keyword" /><br>
                     </el-form-item>
 
                     <el-form-item>
@@ -93,7 +93,7 @@
         <el-table-column prop="username" label="用户名" min-width="140" align="center" show-overflow-tooltip />
         <el-table-column prop="nickname" label="呢称" min-width="110" align="center" show-overflow-tooltip />
         <el-table-column prop="roleNames" label="用户角色" align="center" width="85" show-overflow-tooltip />
-        <el-table-column prop="phone" label="手机"  width="130" align="center"/>
+        <el-table-column prop="phone" label="手机"  width="130" align="center" />
         <el-table-column label="类型" min-width="80" align="center ">
             <template #default="{row}">
                 {{ row.type === 0 ? '后台':'前台' }}
@@ -101,10 +101,10 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" min-width="90" align="center">
             <template #default="{row}">
-                <el-switch v-model="row.status" size="small" :active-value="0" :inactive-value="1" @change="modifySwitch(row)"/>
+                <el-switch v-model="row.status" size="small" :active-value="0" :inactive-value="1" @change="modifySwitch(row)" />
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" align="center" width="185"/>
+        <el-table-column prop="createTime" label="创建时间" align="center" width="185" />
         <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
         <el-table-column v-if="showPermColumn(['btn.sysUser.update', 'btn.sysUser.remove', 'btn.sysUser.assignRole'])" label="操作" width="200" align="center" fixed="right">
             <template #default="{row,$index}">

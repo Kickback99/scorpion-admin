@@ -70,7 +70,7 @@
 
                 <el-form-item>
                     <el-select v-model="searchModel.timeField" placeholder="请选择时间">
-                        <el-option label="请选择时间" value="" :disabled="true"/>
+                        <el-option label="请选择时间" value="" :disabled="true" />
                         <el-option label="创建时间" value="create_time" />
                         <el-option label="修改时间" value="update_time" />
                     </el-select>

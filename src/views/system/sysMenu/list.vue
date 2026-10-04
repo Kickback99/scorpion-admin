@@ -32,7 +32,7 @@
         <el-table-column prop="sortValue" label="排序" width="60" align="center" />
         <el-table-column label="状态" width="80" align="center" >
             <template #default="{row}">
-                <!-- <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)"/> -->
+                <!-- <el-switch v-model="row.status"  :active-value="1" :inactive-value="0" @change="modifySwitch(row)" /> -->
                  <el-button size="small" type="success" v-if="row.status === 0" plain>启用</el-button>
                  <el-button size="small" type="danger" v-else plain>禁用</el-button>
             </template>
@@ -60,7 +60,7 @@
   >
   <el-form ref="dataForm" :model="formModel" label-width="auto" size="small">
           <el-form-item label="所属上级" v-if="formModel.parentName">
-            <el-input v-model="formModel.parentName" disabled="true"/>
+            <el-input v-model="formModel.parentName" disabled="true" />
           </el-form-item>
           <el-form-item label="菜单类型" prop="type">
             <el-radio-group v-model="formModel.type" :disabled="typeDisabled">
@@ -70,7 +70,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="菜单名称" prop="name">
-            <el-input v-model="formModel.name"/>
+            <el-input v-model="formModel.name" />
           </el-form-item>
           <el-form-item label="图标" prop="icon" v-if="formModel.type !== 2">
 <!--             <el-select v-model="formModel.icon" clearable>
@@ -110,7 +110,7 @@
             <el-input v-model="formModel.component" :disabled="isComponentDisabled " placeholder="请输入组件路径" />
           </el-form-item>
           <el-form-item v-if="formModel.type === 2">
-            <el-input v-model="formModel.perms" placeholder="请输入权限标识" maxlength="100"/>
+            <el-input v-model="formModel.perms" placeholder="请输入权限标识" maxlength="100" />
             <template #label>
                 权限字符
                   <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('btn.sysUser.list'))" placement="top">
