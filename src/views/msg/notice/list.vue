@@ -83,7 +83,7 @@
                 <span v-else>{{ row.content }}</span>
             </template>
         </el-table-column>
-        <el-table-column label="消息类型" width="100">
+        <el-table-column label="类型" width="100">
             <template #default=" { row} ">
                 <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
                 <el-button v-else type="warning" size="small" plain>富文本</el-button>

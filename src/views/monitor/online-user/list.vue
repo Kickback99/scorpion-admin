@@ -39,7 +39,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="ip" label="IP地址" min-width="130" />
+            <el-table-column prop="ip" label="登录 IP" min-width="130" />
             <el-table-column prop="os" label="操作系统" min-width="120" />
             <el-table-column prop="browser" label="浏览器" min-width="100" />
             <el-table-column prop="location" label="登录地点" min-width="100" />

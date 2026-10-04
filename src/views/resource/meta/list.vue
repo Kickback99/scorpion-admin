@@ -5,9 +5,9 @@
             <el-collapse-item title="" name="search">
         <div class="flex justify-between items-center mb-4">
             <!-- 刻意不设 label-width：auto 会给长短不一的标签注入 margin 做对齐，
-                 导致「业务ID」与输入框的间距被撑大；让标签各自收缩，各标签间距才统一 -->
+                 导致「业务 ID」与输入框的间距被撑大；让标签各自收缩，各标签间距才统一 -->
             <el-form ref="formRef" :model="searchModel" inline size="small">
-                <el-form-item label="业务ID">
+                <el-form-item label="业务 ID">
                     <SmartAutoComplete
                         v-model="selectedTargetId"
                         :fetch-suggestions-api="fetchBusinessData"
@@ -26,7 +26,7 @@
                 <el-form-item>
                     <el-input
                         v-model="searchModel.targetId"
-                        placeholder="业务ID搜索"
+                        placeholder="业务 ID 搜索"
                         @input="handleTargetIdInput"
                     />
                 </el-form-item>
@@ -40,10 +40,10 @@
                     />
                 </el-form-item>
 
-                <el-form-item label="文件UUID">
+                <el-form-item label="文件 UUID">
                     <el-input 
                         v-model="searchModel.uuid" 
-                        placeholder="请输入文件UUID" 
+                        placeholder="请输入文件 UUID" 
                     />
                 </el-form-item>
                 
@@ -149,9 +149,9 @@
                   </template>
             </el-table-column>
             
-            <el-table-column prop="uuid" label="文件UUID" width="200" show-overflow-tooltip />
+            <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip />
             
-            <el-table-column prop="ossPath" label="OSS路径" min-width="250" show-overflow-tooltip />
+            <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip />
             
             <el-table-column prop="fileType" label="文件类型" width="120">
                 <template #default="{ row }">
@@ -161,7 +161,7 @@
                 </template>
             </el-table-column>
             
-            <el-table-column prop="targetId" label="业务ID" width="120">
+            <el-table-column prop="targetId" label="业务 ID" width="120">
                 <template #default="{ row }">
                     <span v-if="row.targetId === 0">-</span>
                     <span v-else>{{ row.targetId }}</span>
@@ -632,7 +632,7 @@ onMounted(() => {
 
 // ==================== 事件处理 ====================
 
-// 业务ID搜索框：仅允许输入数字
+// 业务 ID 搜索框：仅允许输入数字
 const handleTargetIdInput = () => {
     searchModel.targetId = searchModel.targetId.replace(/\D/g, '')
 }

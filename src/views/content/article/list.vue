@@ -27,7 +27,7 @@
             </el-form-item>
 
             <el-form-item>
-                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px; margin-right: 15px;" placeholder="请选择排序(默认置顶+创建时间)"></SmartSelector>
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px; margin-right: 15px;" placeholder="请选择排序（默认置顶 + 创建时间）"></SmartSelector>
                 <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
                 <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
@@ -318,7 +318,7 @@ const setSortOrder = (order) => {
 }
 
 const fields = ref([
-    {label:'请选择排序(默认置顶+创建时间)',value:''},
+    {label:'请选择排序（默认置顶 + 创建时间）',value:''},
     {label:'文章标题',value:'title'},
     {label:'创建时间',value:'create_time'},
     {label:'修改时间',value:'update_time'},

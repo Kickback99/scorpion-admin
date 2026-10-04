@@ -82,7 +82,7 @@
         </el-table-column>
         <el-table-column prop="ext" label="扩展名" min-width="90" />
         <el-table-column prop="size" label="文件大小" min-width="100" />
-        <el-table-column label="文件UUID" min-width="230" show-overflow-tooltip>
+        <el-table-column label="文件 UUID" min-width="230" show-overflow-tooltip>
             <template #default="{ row }">
                 {{ getFileUUID(row.url).replace(/\.[^.]+$/, '') }}
             </template>
