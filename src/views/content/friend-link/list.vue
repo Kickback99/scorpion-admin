@@ -23,15 +23,15 @@
     <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column prop="name" label="名字" min-width="80" show-overflow-tooltip />
-        <el-table-column label="logo" min-width="80" align="center">
+        <el-table-column prop="name" label="友链名称" min-width="80" show-overflow-tooltip />
+        <el-table-column label="Logo" min-width="80" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="handleImage(row)" :fit="'cover'" />
             </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="address" label="地址" min-width="190" show-overflow-tooltip />
-        <el-table-column label="状态" min-width="100">
+        <el-table-column prop="description" label="友链描述" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="address" label="友链地址" min-width="190" show-overflow-tooltip />
+        <el-table-column label="友链状态" min-width="100">
             <template #default="{row}">
                 <el-button size="small" type="primary" plain v-if="row.status === '0'">已通过</el-button>
                 <el-button size="small" type="danger"  plain v-if="row.status === '1'">已驳回</el-button>
@@ -69,11 +69,11 @@
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto"
                 size="small">
             <el-form-item prop="name">
-                <el-input :prefix-icon="User" placeholder="请输入名字" v-model="formModel.name" />
+                <el-input :prefix-icon="User" placeholder="请输入友链名称" v-model="formModel.name" />
             </el-form-item>
 
             <el-form-item prop="description">
-                <el-input :prefix-icon="User" placeholder="请输入描述" v-model="formModel.description" />
+                <el-input :prefix-icon="User" placeholder="请输入友链描述" v-model="formModel.description" />
             </el-form-item>
 
             <el-form-item prop="logo">
@@ -81,7 +81,7 @@
             </el-form-item>
 
             <el-form-item prop="address">
-                <el-input :prefix-icon="User" placeholder="请输入网站地址" v-model="formModel.address" />
+                <el-input :prefix-icon="User" placeholder="请输入友链地址" v-model="formModel.address" />
             </el-form-item>
 
             <el-form-item>
