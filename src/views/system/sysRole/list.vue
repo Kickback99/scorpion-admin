@@ -20,7 +20,7 @@
         </el-form>
         <div class="right">
             <el-button size="small" type="danger" icon="Delete" @click="deleteSelectRows()" plain>批量删除</el-button>
-            <el-button size="small" type="primary" v-perm="'btn.sysRole.add'" @click="addDialog" icon="Plus" plain>新增</el-button>
+            <el-button size="small" type="primary" v-perm="'btn.sysRole.add'" @click="addDialog" icon="Plus" plain>新增角色</el-button>
         </div>
     </div>
 

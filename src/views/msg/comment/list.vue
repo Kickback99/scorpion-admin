@@ -61,8 +61,8 @@
 
         <!-- 顶部操作栏：新增「回复」按钮 -->
         <div class="top-action-bar">
-            <el-button v-perm="'btn.comment.add'" size="small" type="primary" @click="handleTopReply" plain>
-                回复
+            <el-button v-perm="'btn.comment.add'" size="small" type="primary" icon="Plus" @click="handleTopReply" plain>
+                新增回复
             </el-button>
         </div>
 
@@ -70,9 +70,9 @@
 
     <div class="action-bar">
         <div class="action-buttons">
-            <el-button v-perm="'btn.comment.audit'" size="small" type="primary" @click="batchApproveRows()"  plain>批量通过</el-button>
-            <el-button v-perm="'btn.comment.audit'" size="small" type="danger" @click="batchRejectRows()"  plain>批量驳回</el-button>
-            <el-button v-perm="'btn.comment.audit'" size="small" type="danger" @click="batchDeleteRows()"  plain>批量删除</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="primary" icon="Check"  @click="batchApproveRows()" plain>批量通过</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="danger"  icon="Close" @click="batchRejectRows()"  plain>批量驳回</el-button>
+            <el-button v-perm="'btn.comment.audit'" size="small" type="danger"  icon="Delete" @click="batchDeleteRows()"  plain>批量删除</el-button>
         </div>
 
         <!-- 统计区域：按钮显示状态文字，数字单独显示 -->
@@ -714,7 +714,7 @@ const handleTopReply = () => {
     replyModel.toCommentUserId = -1
     
     selectedArticles.value = []
-    replyDialogTitle.value = '发布根评论'
+    replyDialogTitle.value = '回复根评论'
     
     // 打开对话框
     replyDialogVisible.value = true
