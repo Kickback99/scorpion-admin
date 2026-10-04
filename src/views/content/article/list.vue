@@ -86,7 +86,7 @@
                 </el-form-item>
 
                 <el-form-item style="margin-left:auto; margin-right:0">
-                    <el-button size="small" type="primary" v-perm="'btn.article.add'" icon="Plus" @click="handleAdd({})" plain>新增</el-button>
+                    <el-button size="small" type="primary" v-perm="'btn.article.add'" icon="Plus" @click="handleAdd({})" plain>新增文章</el-button>
                 </el-form-item>
             </template>
         </el-form>

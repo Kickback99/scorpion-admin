@@ -4,7 +4,7 @@
              <el-button text size="small" @click="handleToggleExpand">
                <el-icon><component :is="tableExpanded ? 'Fold' : 'Expand'" /></el-icon> {{ tableExpanded ? '全部折叠' : '全部展开' }}
              </el-button>
-             <el-button size="small" type="primary" v-perm="'btn.sysMenu.add'" @click="addDir" icon="Plus" plain>新增</el-button>
+             <el-button size="small" type="primary" v-perm="'btn.sysMenu.add'" @click="addDir" icon="Plus" plain>新增菜单</el-button>
            </div>
            <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
          </div>
