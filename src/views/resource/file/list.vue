@@ -73,7 +73,7 @@
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"   @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="name" label="文件名称" min-width="150" />
+        <el-table-column prop="name" label="文件名称" min-width="150" show-overflow-tooltip />
         <el-table-column label="图片" min-width="120">
             <template #default="{ row }">
                 <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolvePreviewUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolvePreviewUrl(row.url)]" />

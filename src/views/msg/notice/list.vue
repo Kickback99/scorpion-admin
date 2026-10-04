@@ -89,7 +89,7 @@
                 <el-button v-else type="warning" size="small" plain>富文本</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="120" align="center">
+        <el-table-column prop="status" label="状态" width="120">
             <template #default="{ row }">
                 <el-button size="small" type="info" v-if="row.status === 0">草稿</el-button>
                 <el-button size="small" type="success" v-if="row.status === 1">已推送</el-button>
