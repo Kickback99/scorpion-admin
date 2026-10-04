@@ -11,7 +11,7 @@
                     <SmartAutoComplete
                         v-model="selectedTargetId"
                         :fetch-suggestions-api="fetchBusinessData"
-                        placeholder="请输入文章标题/用户昵称/用户名搜索"
+                        placeholder="请输入业务名称"
                         :max="1"
                         :debounce-delay="300"
                         :min-search-length="1"

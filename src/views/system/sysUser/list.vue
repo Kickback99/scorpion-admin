@@ -10,7 +10,7 @@
                     size="small"
                     >
                     <el-form-item>
-                    <el-input prefix-icon="User"  placeholder="请输入用户名 | 呢称 | 手机号" v-model="searchData.keyword"/><br>
+                    <el-input prefix-icon="User"  placeholder="请输入用户名/呢称/手机号" v-model="searchData.keyword"/><br>
                     </el-form-item>
 
                     <el-form-item>

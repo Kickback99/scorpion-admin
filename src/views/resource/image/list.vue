@@ -5,7 +5,7 @@
         <SmartAutoComplete
           v-model="selectedSearch"
           :fetch-suggestions-api="fetchBusinessData"
-          placeholder="搜索文章/用户/轮播标题"
+          placeholder="请输入业务名称"
           :max="1"
           :debounce-delay="300"
           :min-search-length="1"
