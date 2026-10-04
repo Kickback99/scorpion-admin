@@ -16,12 +16,12 @@
 
     <!-- 列宽约定：一律用 min-width 作基准，剩余宽度由表格按各列基准比例分配；新增列写个 min-width 即可自动参与 -->
     <el-table v-loading="loading" :data="tableData" class="tt-table" empty-text="暂无标签数据">
-      <el-table-column type="index" label="序号" min-width="60" />
-      <el-table-column prop="name" label="标签名" min-width="200" />
+      <el-table-column type="index" label="序号" min-width="60" align="center" />
+      <el-table-column prop="name" label="标签名" min-width="200" align="center" />
       <el-table-column prop="articleCount" label="文章数量" min-width="80" align="center" />
-      <el-table-column prop="remark" label="备注" min-width="200" />
+      <el-table-column prop="remark" label="备注" min-width="200" align="center" />
       <!-- 操作列用固定宽度：两个 24px 圆钮 + 12px 间距 + 左右各 12px 内边距 = 84px 打底，90px 留 6px 余量 -->
-      <el-table-column v-if="showPermColumn(['btn.tag.update', 'btn.tag.remove'])" label="操作" width="90">
+      <el-table-column v-if="showPermColumn(['btn.tag.update', 'btn.tag.remove'])" label="操作" width="90" align="center">
         <template #default="{row}">
           <el-button size="small" type="warning" v-perm="'btn.tag.update'" @click="handleEdit(row)" icon="Edit" circle plain />
           <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">

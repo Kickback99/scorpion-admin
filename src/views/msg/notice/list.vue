@@ -73,8 +73,8 @@
 
     <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" :max-height="tableMaxHeight">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column prop="title" label="标题" width="150" show-overflow-tooltip />
         <el-table-column prop="content" label="公告内容" min-width="150" show-overflow-tooltip>
             <template #default="{ row }">
@@ -83,20 +83,20 @@
                 <span v-else>{{ row.content }}</span>
             </template>
         </el-table-column>
-        <el-table-column label="类型" width="100">
+        <el-table-column label="类型" width="100" align="center">
             <template #default=" { row} ">
                 <el-button v-if="!row.type" type="primary" size="small" plain>普通</el-button>
                 <el-button v-else type="warning" size="small" plain>富文本</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="120">
+        <el-table-column prop="status" label="状态" width="120" align="center">
             <template #default="{ row }">
                 <el-button size="small" type="info" v-if="row.status === 0">草稿</el-button>
                 <el-button size="small" type="success" v-if="row.status === 1">已推送</el-button>
                 <el-button size="small" type="success" v-if="row.status === 2">已下架</el-button>
             </template>
         </el-table-column>
-        <el-table-column label="推送范围" width="120">
+        <el-table-column label="推送范围" width="120" align="center">
             <template #default="{ row }">
                 <el-button v-if="row.targetType === 1" type="primary" size="small">前台用户</el-button>
                 <el-button v-else-if="row.targetType === 2" type="warning" size="small">后台管理员</el-button>

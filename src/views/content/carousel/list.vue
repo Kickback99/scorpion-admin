@@ -15,9 +15,9 @@
     </div>
 
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple" max-height="500">
-        <el-table-column prop="id" label="轮播ID" width="80" />
+        <el-table-column prop="id" label="ID" width="80" align="center" />
 
-        <el-table-column label="轮播图" width="120">
+        <el-table-column label="轮播图" width="120" align="center">
             <template #default="{ row }">
                 <el-image style="width: 80px; height: 45px; border-radius: 4px;" :src="row.img" :fit="'cover'" preview-teleported :preview-src-list="[row.img]"/>
             </template>

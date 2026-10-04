@@ -120,20 +120,20 @@
     ref="multipleTableRef"
     @selection-change="handleMultiple"
     >
-        <el-table-column type="selection" :selectable="selectable" width="55" />
+        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
-        <el-table-column label="评论类型" min-width="100" >
+        <el-table-column label="评论类型" min-width="100" align="center">
             <template #default="{row}">
                 {{ row.type === '0' ? '文章评论':'友链评论' }}
             </template>
         </el-table-column>
-        <el-table-column label="评论层级" min-width="100">
+        <el-table-column label="评论层级" min-width="100" align="center">
             <template #default="{row}">
                 {{ row.rootId === -1 ? '根评论':'子评论' }}
             </template>
         </el-table-column>
         <el-table-column prop="content" label="评论内容" min-width="150" show-overflow-tooltip />
-        <el-table-column prop ="status" label="评论状态" min-width="100">
+        <el-table-column prop ="status" label="评论状态" min-width="100" align="center">
             <template #default="{row}">
                 <el-button size="small" type="success" v-if="row.status === 0" plain>已通过</el-button>
                 <!-- 已驳回按来源区分：rejectSource=1 是用户在提交时被敏感词自动拦截的，其余是人工审核驳回 -->
