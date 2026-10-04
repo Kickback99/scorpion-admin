@@ -23,6 +23,9 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
+                <el-input v-model="searchData.ip" placeholder="请输入 IP 地址" />
+            </el-form-item>
+            <el-form-item>
                 <el-input v-model="searchData.os" placeholder="请输入操作系统" />
             </el-form-item>
             <el-form-item>
@@ -303,7 +306,7 @@ const handleSearch = () => {
 const handleReset = () => {
     params.value.pageNum = 1
     searchData.value = {}
-    Object.assign(searchData,{username:'',type:null,status:null,os:'',browser:'',location:'',createTimeBegin:'',createTimeEnd:''})
+    Object.assign(searchData,{username:'',type:null,status:null,ip:'',os:'',browser:'',location:'',createTimeBegin:'',createTimeEnd:''})
     fetchLoginLogList()
 }
 
