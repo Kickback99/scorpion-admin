@@ -668,7 +668,7 @@ const handleParentBlur = (node,data) => {
 
       msg.error('请输入内容')
       if(treeList.value.length === 0){
-        msg.error('回到最原始的数据')
+        // msg.error('回到最原始的数据')
         disabledAddParent.value = false
         allShow.value = true
         // t_reset：handleBlur初始化(新增父子模式)
@@ -1863,7 +1863,7 @@ const handleParentRevert = (node,data) => {
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (treeList.value.length === 0) {
-    msg.error('回到最原始的数据')
+    // msg.error('回到最原始的数据')
     disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增父子模式)
     isDraggable.value = true
@@ -1971,7 +1971,7 @@ const handleRevert = (e,node, data) => {
 
   // 如果一开始的长度跟后面新增的长度一致，说明没有新增的元素，则显示全部按钮
   if (beforeCount === afterCount) {
-    msg.error('回到最原始的数据')
+    // msg.error('回到最原始的数据')
     disabledAddParent.value = false
     // t_reset：handleRevert初始化(新增模式)
     isDraggable.value = true
