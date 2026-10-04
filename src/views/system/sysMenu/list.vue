@@ -28,7 +28,7 @@
         </el-table-column>
         <el-table-column prop="perms" label="权限标识" min-width="160"/>
         <el-table-column prop="path" label="路由地址" width="120"/>
-        <el-table-column prop="component" label="组件路径" min-width="180" show-overflow-tooltip/>
+        <el-table-column prop="component" label="组件路径" min-width="180" show-overflow-tooltip />
         <el-table-column prop="sortValue" label="排序" width="60"/>
         <el-table-column label="状态" width="80">
             <template #default="{row}">
