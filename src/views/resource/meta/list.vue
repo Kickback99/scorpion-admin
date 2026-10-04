@@ -124,9 +124,9 @@
             :max-height="tableMaxHeight"
             v-loading="loading"
         >
-            <el-table-column prop="id" label="ID" width="80" align="center" />
+            <el-table-column prop="id" label="ID" width="80"/>
             
-            <el-table-column label="图片" width="200" align="center">
+            <el-table-column label="图片" width="200">
                 <template #default="{ row }">
                     <div style="width: 100px; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; border: 1px solid #ebeef5; margin: 4px auto;">
                         <el-image 
@@ -151,7 +151,7 @@
             
             <el-table-column prop="ossPath" label="OSS路径" min-width="250" show-overflow-tooltip />
             
-            <el-table-column prop="fileType" label="文件类型" width="120" align="center">
+            <el-table-column prop="fileType" label="文件类型" width="120">
                 <template #default="{ row }">
                     <el-button size="small" :type="getFileTypeTag(row.fileType)" plain>
                         {{ row.targetId && row.targetId > 0 ? getFileTypeLabel(row.fileType): '孤儿' }}
@@ -159,14 +159,14 @@
                 </template>
             </el-table-column>
             
-            <el-table-column prop="targetId" label="业务ID" width="120" align="center">
+            <el-table-column prop="targetId" label="业务ID" width="120">
                 <template #default="{ row }">
                     <span v-if="row.targetId === 0">-</span>
                     <span v-else>{{ row.targetId }}</span>
                 </template>
             </el-table-column>
 
-            <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
+            <el-table-column prop="isDeleted" label="删除状态" width="100">
                 <template #default="{ row }">
                     <el-button size="small" :type="row.isDeleted === 0 ? 'success' : 'danger'" plain>
                         {{ row.isDeleted === 0 ? '正常' : '已删除' }}
@@ -187,13 +187,13 @@
                 </template>
             </el-table-column>
             
-            <el-table-column prop="createTime" label="创建时间" width="200" align="center">
+            <el-table-column prop="createTime" label="创建时间" width="200">
                 <template #default="{ row }">
                     {{ row.createTime }}
                 </template>
             </el-table-column>
             
-            <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
+            <el-table-column prop="updateTime" label="更新时间" width="200">
                 <template #default="{ row }">
                     {{ row.updateTime }}
                 </template>
