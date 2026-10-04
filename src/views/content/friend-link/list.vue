@@ -3,7 +3,7 @@
     <div class="flex justify-between">
         <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small"> 
             <el-form-item >
-                <el-input v-model="searchModel.keyword" placeholder="请输入名字/描述"/>
+                <el-input v-model="searchModel.keyword" placeholder="请输入友链名称/描述"/>
             </el-form-item>
             <el-form-item>
                 <SmartSelector v-model="searchModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>

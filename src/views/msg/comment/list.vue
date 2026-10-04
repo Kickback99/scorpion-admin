@@ -16,7 +16,7 @@
             </el-form-item>
 
             <el-form-item>
-                 <el-input v-model="searchData.keyword" placeholder="请输入标题 | 用户名"></el-input>   
+                 <el-input v-model="searchData.keyword" placeholder="请输入评论内容/评论人"></el-input>   
             </el-form-item>
 
             <el-form-item>
@@ -142,7 +142,7 @@
                 <el-button size="small" type="warning" v-if="row.status === 2" plain>待审核</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="创建者" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="username" label="评论人" min-width="110" show-overflow-tooltip />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
         <!-- 操作列 - 根据模式动态显示不同按钮 -->
         <el-table-column label="操作" width="280" fixed="right" >
