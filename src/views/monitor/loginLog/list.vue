@@ -38,7 +38,7 @@
                 <el-date-picker
                     v-model="searchData.createTimeBegin"
                     type="date"
-                    placeholder="开始日期"
+                    placeholder="选择开始日期"
                     value-format="YYYY-MM-DD"
                     :disabled-date="(date) => searchData.createTimeEnd ? date > new Date(searchData.createTimeEnd) : false"
                 />
@@ -46,7 +46,7 @@
                 <el-date-picker
                     v-model="searchData.createTimeEnd"
                     type="date"
-                    placeholder="结束日期"
+                    placeholder="选择结束日期"
                     value-format="YYYY-MM-DD"
                     :disabled-date="(date) => searchData.createTimeBegin ? date < new Date(searchData.createTimeBegin) : false"
                 />
