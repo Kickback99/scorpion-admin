@@ -47,8 +47,8 @@
                             type="datetimerange"
                             :shortcuts="shortcuts"
                             range-separator="至"
-                            start-placeholder="开始日期时间"
-                            end-placeholder="结束日期时间"
+                            start-placeholder="选择开始时间"
+                            end-placeholder="选择结束时间"
                             :default-time="defaultTimeRange"
                             :popper-options="{
                                 placement: 'bottom-start'

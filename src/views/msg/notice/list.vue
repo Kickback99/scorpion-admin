@@ -36,7 +36,7 @@
             <el-date-picker
                 v-model="startTime"
                 type="datetime"
-                placeholder="开始时间"
+                placeholder="选择开始时间"
                 format="YYYY-MM-DD HH:mm:ss"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 :clearable="true"
@@ -47,7 +47,7 @@
             <el-date-picker
                 v-model="endTime"
                 type="datetime"
-                placeholder="结束时间"
+                placeholder="选择结束时间"
                 format="YYYY-MM-DD HH:mm:ss"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 :clearable="true"
