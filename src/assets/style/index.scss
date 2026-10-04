@@ -72,6 +72,17 @@
 }
 
 // ============================================================
+// 评论详情抽屉内部滚动条 — 比全局更淡，避免在浅色抽屉里过于抢眼
+// 宽度/圆角/透明轨道沿用全局规则，此处只覆盖颜色
+// ============================================================
+.el-drawer__body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+}
+.el-drawer__body::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+}
+
+// ============================================================
 // 浅色模式 pagination 输入框/选择器/页码/翻页按钮背景统一为 fill-color-light
 // ============================================================
 html:not(.dark) {
