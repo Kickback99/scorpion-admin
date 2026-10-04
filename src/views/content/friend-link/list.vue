@@ -23,7 +23,7 @@
     <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
         <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column prop="name" label="名字" min-width="80" show-overflow-tooltip/>
+        <el-table-column prop="name" label="名字" min-width="80" show-overflow-tooltip />
         <el-table-column label="logo" min-width="80" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="handleImage(row)" :fit="'cover'" />

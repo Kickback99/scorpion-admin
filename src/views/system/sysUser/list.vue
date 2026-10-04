@@ -90,9 +90,9 @@
                 <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="handleImage(row)" :fit="'cover'" />
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" min-width="140" align="center" show-overflow-tooltip/>
-        <el-table-column prop="nickname" label="呢称" min-width="110" align="center" show-overflow-tooltip/>
-        <el-table-column prop="roleNames" label="用户角色" align="center" width="85" show-overflow-tooltip/>
+        <el-table-column prop="username" label="用户名" min-width="140" align="center" show-overflow-tooltip />
+        <el-table-column prop="nickname" label="呢称" min-width="110" align="center" show-overflow-tooltip />
+        <el-table-column prop="roleNames" label="用户角色" align="center" width="85" show-overflow-tooltip />
         <el-table-column prop="phone" label="手机"  width="130" align="center"/>
         <el-table-column label="类型" min-width="80" align="center ">
             <template #default="{row}">

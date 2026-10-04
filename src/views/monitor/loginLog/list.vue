@@ -82,10 +82,10 @@
                 <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="ip" label="IP地址" min-width="130" show-overflow-tooltip/>
-        <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip/>
-        <el-table-column prop="browser" label="浏览器" min-width="100" show-overflow-tooltip/>
-        <el-table-column prop="location" label="登录地点" min-width="120" show-overflow-tooltip/>
+        <el-table-column prop="ip" label="IP地址" min-width="130" show-overflow-tooltip />
+        <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="browser" label="浏览器" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="location" label="登录地点" min-width="120" show-overflow-tooltip />
         <el-table-column label="token" min-width="150" show-overflow-tooltip>
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
