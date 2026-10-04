@@ -34,6 +34,9 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
+                <el-input v-model="searchData.ip" placeholder="请输入请求 IP" />
+            </el-form-item>
+            <el-form-item>
                 <el-date-picker
                     v-model="searchData.createTimeBegin"
                     type="date"
@@ -297,7 +300,7 @@ const onSearch = () => {
 
 const onReset = () => {
     params.pageNum = 1
-    Object.assign(searchData,{username:'',module:'',type:'',reqMode:'',createTimeBegin:'',createTimeEnd:''})
+    Object.assign(searchData,{username:'',module:'',type:'',reqMode:'',ip:'',createTimeBegin:'',createTimeEnd:''})
     render()
 }
 
