@@ -4,7 +4,7 @@
             <div class="layout">
                 <el-form ref="formRef" label-width="auto" inline size="small">
             <el-form-item>
-                <el-input v-model="searchData.keyword" placeholder="请输入标题 | 内容" />
+                <el-input v-model="searchData.keyword" placeholder="请输入文章标题/内容" />
             </el-form-item>
             <el-form-item>
                 <CateSelect v-model="searchData.categoryId"></CateSelect>
