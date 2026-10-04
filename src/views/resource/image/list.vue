@@ -1,6 +1,5 @@
 <template>
   <div class="image-management">
-    <!-- ===== 搜索栏 ===== -->
     <div class="management-header">
       <div class="search-area">
         <SmartAutoComplete
@@ -16,28 +15,27 @@
           @tag-removed="handleSearchRemoved"
           style="width: 320px"
         />
+
+        <!-- 图片类型切换 -->
+        <el-radio-group v-model="currentImageType" @change="handleTypeChange" size="small">
+          <el-radio-button value="all">全部图片</el-radio-button>
+          <el-radio-button value="cover">封面</el-radio-button>
+          <el-radio-button value="content">内容图</el-radio-button>
+          <el-radio-button value="carousel">轮播</el-radio-button>
+          <el-radio-button value="notice">公告</el-radio-button>
+          <el-radio-button value="avatar">头像</el-radio-button>
+        </el-radio-group>
+
+        <!-- 原始上传筛选 -->
+        <el-checkbox v-model="filterOriginal" @change="handleFilterChange" size="small">
+          仅原始上传
+        </el-checkbox>
       </div>
     </div>
 
-    <!-- ===== 筛选栏 ===== -->
     <div class="filter-toolbar">
-      <!-- 图片类型切换 -->
-      <el-radio-group v-model="currentImageType" @change="handleTypeChange" size="small">
-        <el-radio-button value="all">全部图片</el-radio-button>
-        <el-radio-button value="cover">封面</el-radio-button>
-        <el-radio-button value="content">内容图</el-radio-button>
-        <el-radio-button value="carousel">轮播</el-radio-button>
-        <el-radio-button value="notice">公告</el-radio-button>
-        <el-radio-button value="avatar">头像</el-radio-button>
-      </el-radio-group>
-
-      <!-- 原始上传筛选 -->
-      <el-checkbox v-model="filterOriginal" @change="handleFilterChange" size="small">
-        仅原始上传
-      </el-checkbox>
-
       <!-- 显示字段切换 -->
-      <el-radio-group v-model="displayField" size="small" style="margin-left: 16px;">
+      <el-radio-group v-model="displayField" size="small">
         <el-radio-button value="id">ID</el-radio-button>
         <el-radio-button value="uuid">UUID</el-radio-button>
         <el-radio-button value="businessId">BusinessID</el-radio-button>
@@ -508,6 +506,14 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+
+  .search-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
 
   h4 {
     margin: 0;
