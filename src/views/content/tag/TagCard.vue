@@ -5,9 +5,9 @@
       <el-input size="small" v-model="searchData.keyword" placeholder="请输入标签名/备注" class="tc-search" @keyup.enter="onSearch">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-button size="small" type="primary" @click="onSearch" plain>搜索</el-button>
-      <el-button size="small" type="info" @click="onReset" plain>重置</el-button>
-      <el-button size="small" type="primary" v-perm="'btn.tag.add'" icon="Plus" @click="handleAdd({})" plain>新增标签</el-button>
+      <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
+      <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
+      <el-button size="small" type="primary" icon="Plus" v-perm="'btn.tag.add'" @click="handleAdd({})" plain>新增标签</el-button>
     </div>
 
     <div class="tc-grid">
