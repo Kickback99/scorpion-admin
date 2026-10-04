@@ -62,7 +62,7 @@
     </div>
 
     <!-- ===== 图片网格 ===== -->
-    <div class="image-grid" v-loading="loading">
+    <div v-if="imageList.length > 0" class="image-grid" v-loading="loading">
       <div
         v-for="(img, index) in imageList"
         :key="img.id"
@@ -110,7 +110,9 @@
     </div>
 
     <!-- 空状态 -->
-    <el-empty v-if="!loading && imageList.length === 0" description="暂无图片" :image-size="80" />
+    <div v-else class="empty-state" v-loading="loading">
+      <el-empty description="暂无图片" :image-size="80" />
+    </div>
 
     <!-- ===== 图片预览器（全局单例，避免网格多实例同步冲突） ===== -->
     <el-image-viewer
@@ -493,6 +495,9 @@ onMounted(() => {
 .image-management {
   padding: 16px;
   height: 100%;
+  // 父级 el-scrollbar__view 是内容高度，height:100% 不生效；
+  // 用 vh 兜底撑满可视区（134 = 顶部 header+tabs 118 + 底部留白 16），空状态才有机可居中
+  min-height: calc(100vh - 134px);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -533,7 +538,6 @@ onMounted(() => {
   flex-wrap: wrap;
   flex-shrink: 0;
   padding: 8px 0;
-  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 // ============================================================
@@ -561,6 +565,16 @@ onMounted(() => {
     background: var(--el-border-color);
     border-radius: 2px;
   }
+}
+
+// ============================================================
+// 空状态（撑满剩余空间并居中）
+// ============================================================
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 // ============================================================
@@ -677,7 +691,6 @@ onMounted(() => {
   justify-content: flex-end;
   padding: 8px 0 0;
   flex-shrink: 0;
-  border-top: 1px solid var(--el-border-color-lighter);
 }
 
 // ============================================================
