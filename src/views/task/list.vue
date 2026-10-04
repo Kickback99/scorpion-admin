@@ -422,7 +422,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .task-container {
-  padding: 20px;
+  // 水平留白交给 Layout 的 .main-container 统一给，页面不自叠一层（与其它列表页一致）
+  padding: 20px 0;
   
   .toolbar {
     margin-bottom: 20px;

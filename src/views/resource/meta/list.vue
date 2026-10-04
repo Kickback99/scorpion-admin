@@ -4,7 +4,9 @@
         <el-collapse class="search-collapse" v-model="searchActiveNames">
             <el-collapse-item title="" name="search">
         <div class="flex justify-between items-center mb-4">
-            <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
+            <!-- 刻意不设 label-width：auto 会给长短不一的标签注入 margin 做对齐，
+                 导致「业务ID」与输入框的间距被撑大；让标签各自收缩，各标签间距才统一 -->
+            <el-form ref="formRef" :model="searchModel" inline size="small">
                 <el-form-item label="业务ID">
                     <SmartAutoComplete
                         v-model="selectedTargetId"
