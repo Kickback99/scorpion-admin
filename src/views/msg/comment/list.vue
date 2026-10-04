@@ -142,7 +142,7 @@
                 <el-button size="small" type="warning" v-if="row.status === 2" plain>待审核</el-button>
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="创建者" min-width="110" />
+        <el-table-column prop="username" label="创建者" min-width="110" show-overflow-tooltip />
         <el-table-column prop="createTime" label="创建日期" width="190"/>
         <!-- 操作列 - 根据模式动态显示不同按钮 -->
         <el-table-column label="操作" width="280" fixed="right" >
