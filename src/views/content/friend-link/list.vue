@@ -22,7 +22,7 @@
 
     <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleSelectionChange" max-height="500">
-        <el-table-column type="selection" :selectable="selectable" width="55" />
+        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column prop="name" label="友链名称" min-width="80" show-overflow-tooltip />
         <el-table-column label="Logo" min-width="80" align="center">
             <template #default="{row}">
