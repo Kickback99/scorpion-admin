@@ -19,7 +19,7 @@
 
         <el-table-column label="轮播图" width="120" align="center">
             <template #default="{ row }">
-                <el-image style="width: 80px; height: 45px; border-radius: 4px;" :src="row.img" :fit="'cover'" preview-teleported :preview-src-list="[row.img]"/>
+                <el-image style="width: 80px; height: 45px; border-radius: 4px;" :src="row.img" :fit="'cover'" preview-teleported :preview-src-list="[row.img]" />
             </template>
         </el-table-column>
 

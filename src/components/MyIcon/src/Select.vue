@@ -220,7 +220,7 @@ watch(
             <!-- 如果icon数据属性不存在，则显示一个离线图标 -->
               <SingleIcon v-if="!icon" :icon=search />
             <!-- 如果icon数据属性存在，则显示一个在线图标 -->
-              <OnlineIcon v-else :icon="inputValue" :isCollect="false"/>
+              <OnlineIcon v-else :icon="inputValue" :isCollect="false" />
             </div>
           </template>
 

@@ -174,7 +174,7 @@
           :min="addForm.min !== null ? addForm.min : undefined"
           :max="addForm.max !== null ? addForm.max : undefined"
           />
-          <el-switch v-else-if="addForm.type === 'boolean'" v-model="addForm.value" size="small"/>
+          <el-switch v-else-if="addForm.type === 'boolean'" v-model="addForm.value" size="small" />
         </el-form-item>
         
         <!-- 阈值设置开关 -->

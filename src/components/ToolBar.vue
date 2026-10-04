@@ -28,7 +28,7 @@
 
         <el-dropdown @command="handleCommand">
             <span class="el-dropdown_box">
-                <el-avatar :src="handleAvatar"/>
+                <el-avatar :src="handleAvatar" />
                 <span class="user-name">{{ userStore.userInfo.nickname || userStore.userInfo.username }}</span>
                 <el-icon><component is="ArrowDown"></component></el-icon>
             </span>
