@@ -66,15 +66,15 @@
 
     <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight"  @selection-change="handleSelectionChange">
-        <el-table-column type="selection" :selectable="selectable" width="55" />
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="username" label="用户名" min-width="110" />
-        <el-table-column  label="用户类型" min-width="100">
+        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
+        <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column prop="username" label="用户名" min-width="110" align="center" />
+        <el-table-column  label="用户类型" min-width="100" align="center">
             <template #default="{row}">
                 {{ row.type === 0 ? '后台用户':'前台用户' }}
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="操作状态" min-width="100">
+        <el-table-column prop="status" label="操作状态" min-width="100" align="center">
             <template #default="{row}">
                 <el-tag type="success" size="small" v-if="row.status === 0">{{ statusMap[row.status] || '未知状态' }}</el-tag>
                 <el-tag type="primary" size="small" v-if="row.status === 1">{{ statusMap[row.status] || '未知状态' }}</el-tag>
@@ -82,11 +82,11 @@
                 <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="ip" label="IP 地址" min-width="130" show-overflow-tooltip />
-        <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="browser" label="浏览器" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="location" label="操作地点" min-width="120" show-overflow-tooltip />
-        <el-table-column label="Token" min-width="150" show-overflow-tooltip>
+        <el-table-column prop="ip" label="IP 地址" min-width="130" show-overflow-tooltip align="center" />
+        <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip align="center" />
+        <el-table-column prop="browser" label="浏览器" min-width="100" show-overflow-tooltip align="center" />
+        <el-table-column prop="location" label="操作地点" min-width="120" show-overflow-tooltip align="center" />
+        <el-table-column label="Token" min-width="150" show-overflow-tooltip align="center">
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
                     <span style="overflow: hidden; text-overflow: ellipsis">
@@ -103,8 +103,8 @@
                 </div>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="操作日期" min-width="200" />
-        <el-table-column  label="操作" width="150">
+        <el-table-column prop="createTime" label="操作日期" min-width="200" align="center" />
+        <el-table-column  label="操作" width="150" align="center">
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                 <template #reference>

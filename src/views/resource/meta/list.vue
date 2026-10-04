@@ -126,9 +126,9 @@
             :max-height="tableMaxHeight"
             v-loading="loading"
         >
-            <el-table-column prop="id" label="ID" width="80"/>
+            <el-table-column prop="id" label="ID" width="80" align="center" />
             
-            <el-table-column label="图片" width="200">
+            <el-table-column label="图片" width="200" align="center">
                 <template #default="{ row }">
                     <div style="width: 100px; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; border: 1px solid #ebeef5; margin: 4px auto;">
                         <el-image 
@@ -143,17 +143,17 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="业务名称" width="200" show-overflow-tooltip >
+            <el-table-column label="业务名称" width="200" show-overflow-tooltip align="center">
                   <template #default="{ row }">
                      {{  row.title ? row.title : '该业务不存在'  }}
                   </template>
             </el-table-column>
             
-            <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip />
+            <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip align="center" />
             
-            <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip />
+            <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip align="center" />
             
-            <el-table-column prop="fileType" label="文件类型" width="120">
+            <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">
                     <el-button size="small" :type="getFileTypeTag(row.fileType)" plain>
                         {{ row.targetId && row.targetId > 0 ? getFileTypeLabel(row.fileType): '孤儿' }}
@@ -161,14 +161,14 @@
                 </template>
             </el-table-column>
             
-            <el-table-column prop="targetId" label="业务 ID" width="120">
+            <el-table-column prop="targetId" label="业务 ID" width="120" align="center">
                 <template #default="{ row }">
                     <span v-if="row.targetId === 0">-</span>
                     <span v-else>{{ row.targetId }}</span>
                 </template>
             </el-table-column>
 
-            <el-table-column prop="isDeleted" label="删除状态" width="100">
+            <el-table-column prop="isDeleted" label="删除状态" width="100" align="center">
                 <template #default="{ row }">
                     <el-button size="small" :type="row.isDeleted === 0 ? 'success' : 'danger'" plain>
                         {{ row.isDeleted === 0 ? '正常' : '已删除' }}
@@ -189,13 +189,13 @@
                 </template>
             </el-table-column>
             
-            <el-table-column prop="createTime" label="创建时间" width="200">
+            <el-table-column prop="createTime" label="创建时间" width="200" align="center">
                 <template #default="{ row }">
                     {{ row.createTime }}
                 </template>
             </el-table-column>
             
-            <el-table-column prop="updateTime" label="更新时间" width="200">
+            <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
                 <template #default="{ row }">
                     {{ row.updateTime }}
                 </template>

@@ -95,7 +95,7 @@
     </el-collapse>
 
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight">
-        <el-table-column type="index" label="序号" width="55"></el-table-column>
+        <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
         <el-table-column label="封面" width="124px">
             <template #default="{row}">
@@ -103,12 +103,12 @@
             </template>
         </el-table-column>
         <el-table-column prop="cateName" label="分类" min-width="100" align="center"/>
-        <el-table-column label="置顶" min-width="90">
+        <el-table-column label="置顶" min-width="90" align="center">
             <template #default="{row}">
                 <el-switch v-model="row.isTop" size="small" active-value="1" inactive-value="0" @change="modifySwitch(row)"/>
             </template>
         </el-table-column>
-        <el-table-column label="状态" min-width="90">
+        <el-table-column label="状态" min-width="90" align="center">
               <template #default="{row}">
                  <el-button size="small" type="success" v-if="row.status === '0'" plain>已发布</el-button>
                  <el-button size="small" type="info" v-else plain>草稿</el-button>

@@ -21,7 +21,7 @@
         </div>
 
         <!-- 表格 -->
-        <el-table :data="filteredTableData" style="width: 100%" stripe align="center" max-height="500">
+        <el-table :data="filteredTableData" style="width: 100%" stripe max-height="500">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
                     <el-avatar 
@@ -31,20 +31,20 @@
                     />
                 </template>
             </el-table-column>
-            <el-table-column prop="username" label="用户名" min-width="120" />
-            <el-table-column prop="roleName" label="用户类型" min-width="100">
+            <el-table-column prop="username" label="用户名" min-width="120" align="center" />
+            <el-table-column prop="roleName" label="用户类型" min-width="100" align="center">
                 <template #default="{row}">
                     <el-button size="small" :type="row.role === 'admin' ? 'danger' : 'primary'" plain>
                         {{row.userId === "1" && row.role === "admin" ? '超级管理员' : row.roleName }}
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="ip" label="登录 IP" min-width="130" />
-            <el-table-column prop="os" label="操作系统" min-width="120" />
-            <el-table-column prop="browser" label="浏览器" min-width="100" />
-            <el-table-column prop="location" label="登录地点" min-width="100" />
-            <el-table-column prop="loginTime" label="登录时间" min-width="160" />
-            <el-table-column v-if="showPermColumn(['btn.onlineuser.execute'])" label="操作" fixed="right">
+            <el-table-column prop="ip" label="登录 IP" min-width="130" align="center" />
+            <el-table-column prop="os" label="操作系统" min-width="120" align="center" />
+            <el-table-column prop="browser" label="浏览器" min-width="100" align="center" />
+            <el-table-column prop="location" label="登录地点" min-width="100" align="center" />
+            <el-table-column prop="loginTime" label="登录时间" min-width="160" align="center" />
+            <el-table-column v-if="showPermColumn(['btn.onlineuser.execute'])" label="操作" fixed="right" align="center">
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
