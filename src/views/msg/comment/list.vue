@@ -143,7 +143,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="username" label="评论人" min-width="110" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建日期" width="190"/>
+        <el-table-column prop="createTime" label="创建时间" width="190"/>
         <!-- 操作列 - 根据模式动态显示不同按钮 -->
         <el-table-column label="操作" width="280" fixed="right" >
             <template #default="{ row }">
