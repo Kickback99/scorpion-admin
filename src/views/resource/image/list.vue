@@ -493,7 +493,8 @@ onMounted(() => {
 // 根布局
 // ============================================================
 .image-management {
-  padding: 16px;
+  // 水平留白交给 Layout 的 .main-container 统一给，页面不自叠一层（与其它列表页一致）
+  padding: 16px 0;
   height: 100%;
   // 父级 el-scrollbar__view 是内容高度，height:100% 不生效；
   // 用 vh 兜底撑满可视区（134 = 顶部 header+tabs 118 + 底部留白 16），空状态才有机可居中
