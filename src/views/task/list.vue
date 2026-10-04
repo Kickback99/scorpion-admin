@@ -20,7 +20,7 @@
       </el-table-column>
       <el-table-column prop="taskName" label="任务名称" width="150" align="center" />
       <el-table-column prop="description" label="任务描述" min-width="200" align="center" show-overflow-tooltip />
-      <el-table-column prop="cronExpression" label="Cron表达式" width="180" align="center">
+      <el-table-column prop="cronExpression" label="Cron 表达式" width="180" align="center">
         <template #default="{ row }">
           <el-tag type="primary" size="small">{{ row.cronExpression }}</el-tag>
         </template>

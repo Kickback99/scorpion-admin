@@ -11,7 +11,7 @@
                 <UserTypeSelect v-model="searchData.type"></UserTypeSelect>
             </el-form-item>
             <el-form-item>
-                <el-select v-model="searchData.status" placeholder="请选择登录状态">
+                <el-select v-model="searchData.status" placeholder="请选择操作状态">
                     <!-- 遍历所有状态选项 -->
                     <el-option
                     v-for="item in statusOptions"
@@ -32,7 +32,7 @@
                 <el-input v-model="searchData.browser" placeholder="请输入浏览器" />
             </el-form-item>
             <el-form-item>
-                <el-input v-model="searchData.location" placeholder="请输入登录地点" />
+                <el-input v-model="searchData.location" placeholder="请输入操作地点" />
             </el-form-item>
             <el-form-item>
                 <el-date-picker
@@ -74,7 +74,7 @@
                 {{ row.type === 0 ? '后台用户':'前台用户' }}
             </template>
         </el-table-column>
-        <el-table-column prop="status" label="登录状态" min-width="100">
+        <el-table-column prop="status" label="操作状态" min-width="100">
             <template #default="{row}">
                 <el-tag type="success" size="small" v-if="row.status === 0">{{ statusMap[row.status] || '未知状态' }}</el-tag>
                 <el-tag type="primary" size="small" v-if="row.status === 1">{{ statusMap[row.status] || '未知状态' }}</el-tag>
@@ -82,11 +82,11 @@
                 <el-tag type="warning" size="small" v-if="row.status === 3">{{ statusMap[row.status] || '未知状态' }}</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="ip" label="IP地址" min-width="130" show-overflow-tooltip />
+        <el-table-column prop="ip" label="IP 地址" min-width="130" show-overflow-tooltip />
         <el-table-column prop="os" label="操作系统" min-width="120" show-overflow-tooltip />
         <el-table-column prop="browser" label="浏览器" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="location" label="登录地点" min-width="120" show-overflow-tooltip />
-        <el-table-column label="token" min-width="150" show-overflow-tooltip>
+        <el-table-column prop="location" label="操作地点" min-width="120" show-overflow-tooltip />
+        <el-table-column label="Token" min-width="150" show-overflow-tooltip>
             <template #default="{row}">
                 <div style="display: flex; align-items: center; gap: 8px">
                     <span style="overflow: hidden; text-overflow: ellipsis">
