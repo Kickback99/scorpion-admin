@@ -2,6 +2,7 @@
   <div class="selector">
           <el-input
             v-model="filterValue"
+            size="small"
             placeholder="搜索图标"
           />
           <!-- tabs标签页 -->

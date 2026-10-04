@@ -18,6 +18,7 @@
     <div class="icons-container">
         <el-input
           v-model="filterValue"
+          size="small"
           placeholder="搜索图标"
           @clear="onClear"
         />
