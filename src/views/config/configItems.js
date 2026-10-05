@@ -104,6 +104,8 @@ export function useConfigItems() {
         // ===== notification =====
         { key: 'notification.online_enabled',        type: 'switch', label: '上线通知',         desc: '有用户或管理员上线时弹出通知提醒',        icon: Bell,           get: () => config.getValue('notification.online_enabled'),  set: (v) => config.updateConfig('notification.online_enabled', v) },
         { key: 'notification.comment_enabled',       type: 'switch', label: '评论通知',         desc: '后台收到新评论时弹出通知提醒',            icon: Bell,           get: () => config.getValue('notification.comment_enabled'), set: (v) => config.updateConfig('notification.comment_enabled', v) },
+        // ===== comment =====
+        { key: 'comment.reply_emoji_enabled',        type: 'switch', label: '回复表情',       desc: '回复弹窗显示表情选择入口',                icon: "Comment",        get: () => config.getValue('comment.reply_emoji_enabled'),         set: (v) => config.updateConfig('comment.reply_emoji_enabled', v) },
         // ===== tree =====
         { key: 'tree.auth.line_style',               type: 'radio',  label: '授权树连接线',     desc: '控制授权页面树形控件的连接线样式',        icon: Grid,           get: () => config.getValue('tree.auth.line_style'),          set: (v) => config.updateConfig('tree.auth.line_style', v),                            options: [{ value: 'none', label: '无' }, { value: 'solid', label: '实线' }, { value: 'dashed', label: '虚线' }] },
         { key: 'tree.auth.child_mode',               type: 'radio',  label: '授权子节点宽度',   desc: '控制授权树形子节点的宽度模式',            icon: Grid,           get: () => config.getValue('tree.auth.child_mode'),          set: (v) => config.updateConfig('tree.auth.child_mode', v),                           options: [{ value: 'content', label: '内容宽' }, { value: 'fill', label: '占满' }] },
@@ -138,8 +140,6 @@ export function useConfigItems() {
         { key: 'captcha.client_register_type',  type: 'radio',  label: '注册验证码类型', desc: '用户端注册使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.client_register_type'),   set: (v) => config.updateConfig('captcha.client_register_type', v), options: CAPTCHA_OPTIONS },
         { key: 'captcha.client_login_type',     type: 'radio',  label: '用户登录验证码类型', desc: '用户端登录锁定后使用的验证码类型',         icon: "Refresh",     get: () => config.getValue('captcha.client_login_type'),      set: (v) => config.updateConfig('captcha.client_login_type', v), options: CAPTCHA_OPTIONS },
         { key: 'captcha.admin_login_type',      type: 'radio',  label: '管理登录验证码类型', desc: '管理端登录使用的验证码类型',                icon: "Refresh",     get: () => config.getValue('captcha.admin_login_type'),       set: (v) => config.updateConfig('captcha.admin_login_type', v), options: CAPTCHA_OPTIONS },
-        // ===== comment =====
-        { key: 'comment.reply_emoji_enabled',        type: 'switch', label: '回复表情',       desc: '回复弹窗显示表情选择入口',                icon: "Comment",        get: () => config.getValue('comment.reply_emoji_enabled'),         set: (v) => config.updateConfig('comment.reply_emoji_enabled', v) },
       ]
     },
     {
