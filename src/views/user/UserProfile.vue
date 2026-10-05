@@ -285,15 +285,12 @@ const handleSave = async () => {
     msg.primary('个人信息更新成功')
   } catch (error) {
     loading.value = false
-    
-    // 区分错误类型
+
+    // 表单验证失败才提示；接口错误已由 request.js 拦截器统一弹后端文案，避免双弹且被写死文案盖掉
     if (error?.fields) {
-      // 表单验证失败
       msg.error('请完善表单信息')
     } else {
-      // API请求失败
       console.error('API请求错误:', error)
-      msg.error('保存失败，请重试')
     }
   }
 }
