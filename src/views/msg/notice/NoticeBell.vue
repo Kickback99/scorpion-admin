@@ -97,7 +97,16 @@
     <el-divider />
     <div v-if="currentNotice?.type === 0" class="notice-body">{{ currentNotice?.content || '' }}</div>
     <div v-else :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
-      <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="currentNotice?.content || ''" @click="handleCopyCodeSuccess" />
+      <!-- 懒加载期间交给 Suspense 兜底，与用户端 AppNoticeDialog 同款 -->
+      <Suspense>
+        <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="currentNotice?.content || ''" @click="handleCopyCodeSuccess" />
+        <template #fallback>
+          <div class="dialog-loading">
+            <el-icon class="is-loading" :size="40"><Loading /></el-icon>
+            <span>加载中...</span>
+          </div>
+        </template>
+      </Suspense>
     </div>
   </el-dialog>
 </template>
@@ -481,6 +490,23 @@ defineExpose({})
 :deep(.el-empty .el-empty__image) {
   display: none !important;
   margin: 0;
+}
+
+/* 懒加载兜底：撑住高度，与用户端 AppNoticeDialog 的 .dialog-loading 同款 */
+.dialog-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 180px;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+
+  /* 转圈走主题色变量，对应用户端 v-progress-circular 的 color="primary" */
+  :deep(.el-icon) {
+    color: var(--el-color-primary);
+  }
 }
 
 /* 公告图片样式（公告详情弹窗专用，不抽取到公共样式） */
