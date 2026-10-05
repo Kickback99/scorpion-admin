@@ -494,6 +494,12 @@ defineExpose({})
 </style>
 
 <style lang="scss">
+/* 公告详情弹窗标题对齐详情页 h1 的 28px；全局 .el-dialog__title 是 14px !important，靠类名提特异性盖掉它
+   （正文 markdown h2 是 24px、vuepress 26.4px，28px 才压得住） */
+.notice-detail-dialog .el-dialog__title {
+  font-size: 28px !important;
+}
+
 /* 详情弹窗滚动条同步 index.scss 半透明风格 */
 .el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar {
   width: 4px;
