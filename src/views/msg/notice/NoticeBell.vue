@@ -526,19 +526,34 @@ defineExpose({})
   font-size: 28px !important;
 }
 
-/* 详情弹窗滚动条同步 index.scss 半透明风格 */
-.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar {
+/* EP 默认让整屏遮罩滚（.el-overlay-dialog），滚动条会跑到窗口最右侧、弹窗被"穿过"。
+   改为弹窗自身滚：高度按 EP 默认 margin（15vh / 50px）封顶，滚动条落回 body 内部 ——
+   body 上方有 header、下方有弹窗 16px 内边距，都不会碰到圆角 */
+.notice-detail-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 15vh - 50px);
+
+  .el-dialog__body {
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
+/* 详情弹窗滚动条：沿用 index.scss 的全局配方（4px / 圆角 2px / 透明轨道 / 主题色 35%–50%），
+   即 da93340b 抽屉淡化那套；滚动条已从 .el-overlay-dialog 移进弹窗 body，故改指向 body */
+.notice-detail-dialog .el-dialog__body::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb {
+.notice-detail-dialog .el-dialog__body::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
   border-radius: 2px;
 }
-.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb:hover {
+.notice-detail-dialog .el-dialog__body::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
 }
-.el-overlay:has(.notice-detail-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
+.notice-detail-dialog .el-dialog__body::-webkit-scrollbar-track {
   background: transparent;
 }
 </style>
