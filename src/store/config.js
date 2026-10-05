@@ -166,6 +166,9 @@ export const useConfigStore = defineStore({
         online_enabled: true,
         comment_enabled: true,
       },
+      comment: {
+        reply_emoji_enabled: true,
+      },
       storage: {
         data_retention_days: 30,
         file_retention_days: 7,
@@ -199,9 +202,6 @@ export const useConfigStore = defineStore({
         client_register_type: 'default',
         client_login_type: 'slider',
         admin_login_type: 'slider',
-      },
-      comment: {
-        reply_emoji_enabled: true,
       },
     },
 
@@ -544,11 +544,6 @@ export const useConfigStore = defineStore({
     getCommentEmojiEnabled()       { return this.getValue('comment.emoji_enabled') ?? true },
     toggleCommentEmojiEnabled()    { this.updateConfig('comment.emoji_enabled', !this.getValue('comment.emoji_enabled')) },
 
-    // ==================== comment（admin 组） ====================
-
-    getCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
-    toggleCommentReplyEmojiEnabled()       { this.updateConfig('comment.reply_emoji_enabled', !this.getValue('comment.reply_emoji_enabled')) },
-
     // ==================== nav ====================
 
     getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
@@ -623,6 +618,11 @@ export const useConfigStore = defineStore({
 
     getNotificationCommentEnabled()   { return this.getValue('notification.comment_enabled') ?? true },
     toggleNotificationCommentEnabled(){ this.updateConfig('notification.comment_enabled', !this.getValue('notification.comment_enabled')) },
+
+    // ==================== comment（admin 组） ====================
+
+    getCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
+    toggleCommentReplyEmojiEnabled()       { this.updateConfig('comment.reply_emoji_enabled', !this.getValue('comment.reply_emoji_enabled')) },
 
     // ==================== user_config ====================
 
@@ -722,9 +722,6 @@ export const useConfigStore = defineStore({
     isFriendLinkCommentEnabled() { return this.getValue('comment.friend_link_comment_enabled') === true },
     isCommentEmojiEnabled()      { return this.getValue('comment.emoji_enabled') ?? true },
 
-    // ===== comment (admin 组) =====
-    isCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
-
     // ===== user 前台认证 (client 组) =====
     isUserLoginEnabled()      { return this.getValue('user.login_enabled') === true },
     isUserOtherLoginEnabled() { return this.getValue('user.other_login_enabled') === true },
@@ -749,6 +746,9 @@ export const useConfigStore = defineStore({
 
     // ===== notification (admin 组) =====
     isNotificationCommentEnabled() { return this.getValue('notification.comment_enabled') ?? true },
+
+    // ===== comment (admin 组) =====
+    isCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
 
     // ===== user_config (user 组) =====
     isUserCollapseEnabled()   { return this.getValue('collapse_enabled') ?? true },
