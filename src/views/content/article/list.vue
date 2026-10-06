@@ -146,7 +146,7 @@
 
     <!-- 文章预览弹窗 -->
     <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" align-center destroy-on-close
-        class="preview-dialog">
+        class="preview-dialog md-dialog" :class="{ 'md-vuepress': userConfigStore.isDarkEnabled }">
         <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
             <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
         </div>
