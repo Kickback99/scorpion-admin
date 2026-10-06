@@ -177,7 +177,7 @@
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%" class="notice-dialog">
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
             
             <!-- 公告标题 -->
@@ -318,7 +318,7 @@
     </el-dialog>
 
     <!-- ===== 富文本预览弹窗 ===== -->
-    <el-dialog v-model="previewVisible" width="55%">
+    <el-dialog v-model="previewVisible" width="55%" class="notice-dialog">
         <Suspense>
             <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }" class="detail-panel">
                 <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
@@ -1206,14 +1206,6 @@ const handlePush = async (row) => {
     align-items: center;
 }
 
-/* 弹窗样式调整 */
-:deep(.el-dialog) {
-    .el-dialog__body {
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-}
-
 .notice-content-view {
   white-space: pre-wrap;
   word-break: break-word;
@@ -1232,5 +1224,38 @@ const handlePush = async (row) => {
     width: $notice-img !important;
     margin: auto !important;
   }
+}
+</style>
+
+<style lang="scss">
+/* 必须放非 scoped 块：遮罩是页面组件的兄弟而非后代，scoped 的 :deep(.el-dialog) 匹配不到
+   （原来那条 max-height: 80vh 就是这么失效的）。高度/滚动条配方对齐 NoticeBell 的 .notice-detail-dialog */
+.notice-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--el-dialog-margin-top, 15vh) - 150px);
+
+  .el-dialog__body {
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
+.notice-dialog .el-dialog__body::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.notice-dialog .el-dialog__body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
+  border-radius: 2px;
+}
+
+.notice-dialog .el-dialog__body::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
+}
+
+.notice-dialog .el-dialog__body::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>
