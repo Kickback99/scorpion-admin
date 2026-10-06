@@ -90,7 +90,7 @@
 
   <!-- 详情弹窗 -->
   <el-dialog v-model="detailVisible" :title="currentNotice?.title || '公告消息'" :width="dialogWidth" destroy-on-close
-      class="notice-detail-dialog" :class="{ 'md-vuepress': userConfigStore.isDarkEnabled }">
+      class="notice-detail-dialog md-dialog" :class="{ 'md-vuepress': userConfigStore.isDarkEnabled }">
     <div class="notice-meta">
       <span class="meta-time">推送时间：{{ currentNotice?.pushTime || '-' }}</span>
     </div>
@@ -520,18 +520,7 @@ defineExpose({})
 </style>
 
 <style lang="scss">
-/* 公告详情弹窗标题对齐详情页 h1：28px + 字重 600。
-   全局 .el-dialog__title 是 14px !important（且 EP 根本没设字重、继承到 400），都靠类名提特异性盖掉 */
-.notice-detail-dialog .el-dialog__title {
-  font-size: 28px !important;
-  font-weight: 600 !important;
-  /* 标题色跟随 md 主题的正文色：浅色走 github（正文继承 EP 的 regular 灰），
-     深色走 vuepress（markdown.scss 把正文写死纯白）；原来固定用 primary，与正文不在同一档 */
-  color: var(--el-text-color-regular) !important;
-}
-.notice-detail-dialog.md-vuepress .el-dialog__title {
-  color: #fff !important;
-}
+/* 标题样式（28px/600/颜色）已抽到 markdown.scss 的 .md-dialog，此处只管高度与滚动 */
 
 /* EP 默认让整屏遮罩滚，滚动条会跑到窗口最右侧、弹窗被"穿过" → 改弹窗自身滚（滚动条才落在 body 内）。
    高度 = 视口 − 顶部偏移(main.js 全局) − 150px 底部安全区；底部刻意大于顶部（150 > 100），长文才不撑成通屏页 */
