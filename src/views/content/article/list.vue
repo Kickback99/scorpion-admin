@@ -145,7 +145,7 @@
     <ArticleEdit ref="maskRef" @reRender="render"></ArticleEdit>
 
     <!-- 文章预览弹窗 -->
-    <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" top="2vh" destroy-on-close
+    <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" align-center destroy-on-close
         class="preview-dialog">
         <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
             <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
@@ -475,12 +475,12 @@ const handleCopyCodeSuccess = (e) => {
 }
 
 /* EP 默认让整屏遮罩滚（.el-overlay-dialog），滚动条会跑到窗口最右侧、弹窗被"穿过"。
-   改为弹窗自身滚：高度按本弹窗 top(2vh) + EP 默认下边距 50px 封顶，滚动条落回 body 内部 ——
+   改为弹窗自身滚：align-center 居中后上下留白自动等宽，高度按留白封顶，滚动条落回 body 内部 ——
    body 上方有 header、下方有弹窗 16px 内边距，都不会碰到圆角 */
 .preview-dialog {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 2vh - 50px);
+  max-height: calc(100vh - 10vh);
 
   .el-dialog__body {
     overflow-y: auto;
