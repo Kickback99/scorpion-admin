@@ -312,6 +312,12 @@ html.dark .main-container:not(.page-theme) .cate-toolbar {
   max-width: 92vw;
 }
 
+/* EP 的关闭按钮是 absolute 的 48px 方盒、top: 0，圆心固定距弹窗顶 24px，而 14px 标题行心在 28px。
+   多一层 .el-dialog 是为了提特异性：index.scss 早于 EP 组件样式加载，同特异性靠顺序赢不了 */
+.el-dialog .el-dialog__headerbtn {
+  top: 4px;
+}
+
 // 移动端：百分比宽度在窄屏会把内容挤爆，用 min-width 与上面的 max-width 成对托底
 // 不覆盖 --el-dialog-width 是因为 EP 把它写成内联样式，得加 !important
 @media (max-width: 768px) {
