@@ -160,6 +160,25 @@
     padding-bottom: 24px;
   }
 
+  /* 标题放大后关闭按钮要跟着下移并放大：28px 标题首行行心在 43.6px，48px 方盒要 top: 20；
+     多带一层 .el-dialog 是为了压过 index.scss 的全局订正 */
+  &.el-dialog .el-dialog__headerbtn {
+    top: 20px;
+    font-size: 24px;
+  }
+
+  /* 关闭图标颜色跟随正文（同 56e6a9a 的标题口径），EP 默认的 --el-color-info 与正文差一档；
+     最后那条 :hover 是补回 EP 的悬浮变主色 —— 上面两条特异性更高，会一起压掉它 */
+  &.el-dialog .el-dialog__headerbtn .el-dialog__close {
+    color: var(--el-text-color-regular);
+  }
+  &.md-vuepress.el-dialog .el-dialog__headerbtn .el-dialog__close {
+    color: #fff;
+  }
+  &.el-dialog .el-dialog__headerbtn:hover .el-dialog__close {
+    color: var(--el-color-primary);
+  }
+
   .el-dialog__title {
     font-size: 28px !important;
     font-weight: 600 !important;
