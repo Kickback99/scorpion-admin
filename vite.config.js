@@ -16,7 +16,11 @@ export default defineConfig(({mode}) => {
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: isProd,
+          // 不能整删：error/warn 是上线后唯一的排查线索（项目没有错误上报），只剔掉调试用的四类
+          drop_console: false,
+          pure_funcs: isProd
+            ? ['console.log', 'console.info', 'console.debug', 'console.trace']
+            : [],
           drop_debugger: isProd,
         },
       },
@@ -35,9 +39,12 @@ export default defineConfig(({mode}) => {
       },
     },
     resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
+      alias: [
+        { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+        // markdown-it 只把 punycode 用在 IDN 域名上，改走本地空实现 —— 用它才能让 Vite 的内置替身
+        // 只归 crypto-js 一方，否则替身落进 editor chunk 会把整个 editor 拖成入口静态依赖
+        { find: /^punycode$/, replacement: fileURLToPath(new URL('./src/utils/punycode-stub.js', import.meta.url)) },
+      ]
     },
     //配置代理
     server: {

@@ -12,8 +12,31 @@ import '@kangc/v-md-editor/lib/theme/style/github.css';
 import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
 import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
 
-import hljs from 'highlight.js';
+// 只取 core：全量入口会把 191 种语言一起打进 chunk（实测 842KB → 58KB）；语言表与 front/client 对齐，
+// xml/javascript/css 是硬依赖 —— vue 借道 xml 高亮，而 xml 的 script/style 段由 subLanguage 引用 javascript/css
+import hljs from 'highlight.js/lib/core';
+import xml from 'highlight.js/lib/languages/xml';
+import javascript from 'highlight.js/lib/languages/javascript';
+import css from 'highlight.js/lib/languages/css';
+import typescript from 'highlight.js/lib/languages/typescript';
+import scss from 'highlight.js/lib/languages/scss';
+import json from 'highlight.js/lib/languages/json';
+import yaml from 'highlight.js/lib/languages/yaml';
+import markdown from 'highlight.js/lib/languages/markdown';
+import bash from 'highlight.js/lib/languages/bash';
+import java from 'highlight.js/lib/languages/java';
+import sql from 'highlight.js/lib/languages/sql';
+import nginx from 'highlight.js/lib/languages/nginx';
+import python from 'highlight.js/lib/languages/python';
+import diff from 'highlight.js/lib/languages/diff';
 import Prism from 'prismjs';
+
+// 以后用到新语言在这里加一行即可（与 front/client 的 hljs 语言表同集）
+const hljsLanguages = {
+  xml, javascript, css, typescript, scss, json, yaml, markdown, bash,
+  java, sql, nginx, python, diff,
+};
+Object.entries(hljsLanguages).forEach(([name, language]) => hljs.registerLanguage(name, language));
 
 /**
  * 创建 Markdown 编辑器/预览器组件
