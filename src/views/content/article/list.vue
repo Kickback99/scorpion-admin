@@ -474,22 +474,37 @@ const handleCopyCodeSuccess = (e) => {
   -webkit-backdrop-filter: blur(15px) !important;
 }
 
-/* 预览弹窗滚动条 — 半透明模拟 config 模块风格 */
-.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar {
+/* EP 默认让整屏遮罩滚（.el-overlay-dialog），滚动条会跑到窗口最右侧、弹窗被"穿过"。
+   改为弹窗自身滚：高度按本弹窗 top(2vh) + EP 默认下边距 50px 封顶，滚动条落回 body 内部 ——
+   body 上方有 header、下方有弹窗 16px 内边距，都不会碰到圆角 */
+.preview-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2vh - 50px);
+
+  .el-dialog__body {
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
+/* 预览弹窗滚动条：沿用 index.scss 的全局配方（4px / 圆角 2px / 透明轨道 / 主题色 35%–50%），
+   即 da93340b 抽屉淡化那套；滚动条已从 .el-overlay-dialog 移进弹窗 body，故改指向 body */
+.preview-dialog .el-dialog__body::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
 
-.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--el-color-primary-light-5) 45%, transparent);
+.preview-dialog .el-dialog__body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--el-color-primary-light-5) 35%, transparent);
   border-radius: 2px;
 }
 
-.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--el-color-primary) 60%, transparent);
+.preview-dialog .el-dialog__body::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--el-color-primary) 50%, transparent);
 }
 
-.el-overlay:has(.preview-dialog) .el-overlay-dialog::-webkit-scrollbar-track {
+.preview-dialog .el-dialog__body::-webkit-scrollbar-track {
   background: transparent;
 }
 </style>
