@@ -533,13 +533,12 @@ defineExpose({})
   color: #fff !important;
 }
 
-/* EP 默认让整屏遮罩滚（.el-overlay-dialog），滚动条会跑到窗口最右侧、弹窗被"穿过"。
-   改为弹窗自身滚：高度按 EP 默认 margin（15vh / 50px）封顶，滚动条落回 body 内部 ——
-   body 上方有 header、下方有弹窗 16px 内边距，都不会碰到圆角 */
+/* EP 默认让整屏遮罩滚，滚动条会跑到窗口最右侧、弹窗被"穿过" → 改弹窗自身滚（滚动条才落在 body 内）。
+   高度 = 视口 − 顶部偏移(main.js 全局) − 150px 底部安全区；底部刻意大于顶部（150 > 100），长文才不撑成通屏页 */
 .notice-detail-dialog {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 15vh - 50px);
+  max-height: calc(100vh - var(--el-dialog-margin-top, 15vh) - 150px);
 
   .el-dialog__body {
     overflow-y: auto;

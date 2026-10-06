@@ -6,7 +6,7 @@
     <TagCloud v-else />
 
     <!-- 共享弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="title" width="380px" top="15vh">
+    <el-dialog v-model="dialogVisible" :title="title" width="380px">
       <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
         <el-form-item label="标签名称" prop="name">
           <el-input  placeholder="请输入标签名称" v-model="formModel.name" />
