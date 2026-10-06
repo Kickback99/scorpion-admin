@@ -146,3 +146,33 @@
   transform: translate(-50%, -50%) rotate(45deg);
   border-radius: 1px;
 }
+
+// ============ 弹窗标题（正文渲染 markdown 的弹窗）============
+
+/* 标题 28px/600 才压得过正文 h2（vuepress 26.4px、github 24px，均 600 字重），颜色跟随正文。
+   全局 .el-dialog__title 是 14px 且 EP 没设字重（继承到 400），故靠 .md-dialog 提特异性盖掉；
+   启用：给弹窗加 .md-dialog，深色再加 .md-vuepress（正文被本文件写死纯白，标题要跟） */
+.md-dialog {
+  /* EP 给 16px 标题写死了行高（--el-dialog-font-line-height: 24px），字号翻到 28px 后
+     行高比字号还小、多行会挤成一坨；上下内边距也按放大后的字号补，否则标题贴着弹窗顶 */
+  .el-dialog__header {
+    padding-top: 8px;
+    padding-bottom: 24px;
+  }
+
+  .el-dialog__title {
+    font-size: 28px !important;
+    font-weight: 600 !important;
+    color: var(--el-text-color-regular) !important;
+    line-height: 1.4;
+
+    /* 长标题只留两行，否则 header 被撑高、把正文挤下去 */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}
+.md-dialog.md-vuepress .el-dialog__title {
+  color: #fff !important;
+}
