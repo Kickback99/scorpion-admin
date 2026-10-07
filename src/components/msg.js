@@ -22,8 +22,8 @@ function create(defaults) {
     // 对象模式: msg.primary({ message: '...', dangerouslyUseHTMLString: true })
     if (typeof message === 'object' && message !== null) {
       // 对象模式消息图标对齐第一行（适配多行 HTML 内容）
-      const iconTop = !('icon' in message) ? 'msg-icon-top' : ''
-      const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, mergeClass(iconTop, message.customClass)))
+      // 对齐与「用哪个图标」无关，自定义 icon 同样要贴首行，故不再按 icon 是否存在分流
+      const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, mergeClass('msg-icon-top', message.customClass)))
       return ElMessage({ ...def, ...defaults, ...message, customClass })
     }
     // 字符串模式: msg.primary('hello')
