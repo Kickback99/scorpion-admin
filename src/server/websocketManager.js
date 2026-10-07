@@ -7,6 +7,10 @@ import router from '@/router';
 import { useConfigStore } from '@/store/config';
 import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
+import { useRenderIcon } from '@/components/MyIcon/src/hook'
+
+// 公告 toast 图标（组件定义只建一次，不必每条消息重建）
+const NOTICE_ICON = useRenderIcon('ri:megaphone-line')
 
 class WebSocketManager {
   constructor() {
@@ -262,6 +266,13 @@ class WebSocketManager {
       case 'notice':
         const noticeId = arr[1]
         const noticeTitle = arr[2]
+        msg.primary({
+          message: `你收到一条通知：<br><br>${noticeTitle}`,
+          dangerouslyUseHTMLString: true,
+          duration: 5000,  // 公告消息显示时间长一点
+          customClass: 'message-right-top',
+          icon: NOTICE_ICON
+        })
         // 触发全局事件，NoticeBell 组件监听此事件更新未读数
         window.dispatchEvent(new CustomEvent('notice-push', {
           detail: { noticeId, title: noticeTitle }
