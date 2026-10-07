@@ -76,12 +76,12 @@
         <el-table-column prop="name" label="文件名称" min-width="150" show-overflow-tooltip />
         <el-table-column label="文件预览" min-width="120" align="center">
             <template #default="{ row }">
-                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolvePreviewUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolvePreviewUrl(row.url)]" />
+                <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolvePreviewUrl(row.url)" style="width: 80px; height: 45px; border-radius: 4px;" fit="cover" preview-teleported :preview-src-list="[resolvePreviewUrl(row.url)]" />
                 <span v-else>-</span>
             </template>
         </el-table-column>
         <el-table-column prop="ext" label="文件类型" min-width="90" align="center" />
-        <el-table-column prop="size" label="文件大小" min-width="100" align="center" />
+        <el-table-column prop="size" label="文件大小（KB）" min-width="120" align="center" />
         <el-table-column label="文件 UUID" min-width="230" show-overflow-tooltip>
             <template #default="{ row }">
                 {{ getFileUUID(row.url).replace(/\.[^.]+$/, '') }}
