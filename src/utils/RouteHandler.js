@@ -1,7 +1,7 @@
 import { routes, tempRoutes, ADMIN_ONLY_PATHS } from "@/router"
 import { useUserStore } from "@/store/user"
 
-// 获取动态路由组件 (重构后的版本)
+// 获取动态路由组件（重构后的版本）
 export function getDynamicRouteComponents(excludes = []) {
   const userStore = useUserStore()
   const menuData = userStore.userMenu
@@ -14,7 +14,7 @@ export function getDynamicRouteComponents(excludes = []) {
       // 检查是否在排除列表中
       const shouldExclude = excludes.includes(route.name)
       
-      // 添加当前路由组件 (排除Layout组件和指定名称的组件)
+      // 添加当前路由组件（排除Layout组件和指定名称的组件）
       if (route.component && route.component.__name !== 'Layout' && !shouldExclude) {
         components.push({
           path: route.path,

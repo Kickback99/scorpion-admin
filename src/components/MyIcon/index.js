@@ -1,6 +1,6 @@
 import OfflineIcon from './src/offlineIcon'
 
-// iconify本地图标(满的)
+// iconify本地图标（满的）
 import SingleIcon from "./src/singleIcon";
 // iconify在线图标
 import OnlineIcon from "./src/onlineIcon";

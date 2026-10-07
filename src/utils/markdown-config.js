@@ -41,7 +41,7 @@ Object.entries(hljsLanguages).forEach(([name, language]) => hljs.registerLanguag
 /**
  * 创建 Markdown 编辑器/预览器组件
  * @param {string} theme - 主题 'github' | 'vuepress'
- * @param {boolean} isPreview - true=仅预览模式(VMdPreview) / false=编辑模式(VMdEditor)
+ * @param {boolean} isPreview - true=仅预览模式（VMdPreview） / false=编辑模式（VMdEditor）
  * @returns {object} Vue 组件
  */
 export function createMarkdownPreview(theme = 'github', isPreview = false) {
