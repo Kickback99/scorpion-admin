@@ -92,7 +92,6 @@ export default defineConfig(({mode}) => {
         'prismjs/components/prism-sql',
         'prismjs/components/prism-typescript',
         'prismjs/components/prism-nginx',
-        'prismjs/components/prism-docker',
       ],
     },
     // scss全局变量
