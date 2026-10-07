@@ -31,7 +31,7 @@
         </el-table-column>
         <el-table-column prop="description" label="友链描述" min-width="150" show-overflow-tooltip />
         <el-table-column prop="address" label="友链地址" min-width="190" show-overflow-tooltip />
-        <el-table-column label="友链状态" min-width="100">
+        <el-table-column label="友链状态" min-width="100" align="center">
             <template #default="{row}">
                 <el-button size="small" type="primary" plain v-if="row.status === '0'">已通过</el-button>
                 <el-button size="small" type="danger"  plain v-if="row.status === '1'">已驳回</el-button>
@@ -39,7 +39,7 @@
             </template>
         </el-table-column>
 
-        <el-table-column v-if="showPermColumn(['btn.friendlink.update', 'btn.friendlink.remove'])" label="操作" width="150" fixed="right">
+        <el-table-column v-if="showPermColumn(['btn.friendlink.update', 'btn.friendlink.remove'])" label="操作" width="150" fixed="right" align="center">
             <template #default="{row}">
                 <el-button v-perm="'btn.friendlink.update'" @click="handleEdit(row)" size="small" type="warning" icon="Edit" circle plain ></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">

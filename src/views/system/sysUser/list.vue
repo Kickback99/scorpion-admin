@@ -83,18 +83,18 @@
     border
     :max-height="tableMaxHeight"
     >
-        <el-table-column type="selection" :selectable="selectable" width="55" />
+        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column label="头像" min-width="80" align="center">
             <template #default="{row}">
                 <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="handleImage(row)" :fit="'cover'" />
             </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" min-width="140" align="center" show-overflow-tooltip />
-        <el-table-column prop="nickname" label="呢称" min-width="110" align="center" show-overflow-tooltip />
+        <el-table-column prop="username" label="用户名" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="nickname" label="呢称" min-width="110" show-overflow-tooltip />
         <el-table-column prop="roleNames" label="用户角色" align="center" width="85" show-overflow-tooltip />
         <el-table-column prop="phone" label="手机"  width="130" align="center" />
-        <el-table-column label="类型" min-width="80" align="center ">
+        <el-table-column label="类型" min-width="80" align="center">
             <template #default="{row}">
                 {{ row.type === 0 ? '后台':'前台' }}
             </template>
