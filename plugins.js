@@ -32,7 +32,8 @@ export function getPlugins(){
         svgLoader(),  // 添加 SVG 加载器
         prismjs({
           // 只列本体名，别名由组件文件自行注册：js←javascript、html/xml←markup、ts←typescript、shell/sh←bash
-          languages:['json','javascript','java','markup','css','bash','typescript','sql','yaml','nginx','markdown','docker']
+          // 这里每加一种，vite.config.js 的 optimizeDeps.include 必须同步补一行，否则首次进 markdown 预览会触发重载
+          languages:['json','javascript','java','markup','css','bash','typescript','sql','yaml','nginx','markdown']
         }),
         //element plus 自动导入插件
         AutoImport({
