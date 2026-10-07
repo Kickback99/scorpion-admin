@@ -10,7 +10,7 @@ export const useIconStore = defineStore({
         onlineIcons:[],
         // 批量收集
         batchIcons:[],
-        // 批量收集(已使用)
+        // 批量收集（已使用）
         batchUsedIcons:[],
         // 单个图标收集
         singleIcons:[],

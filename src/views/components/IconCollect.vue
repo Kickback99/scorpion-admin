@@ -147,7 +147,7 @@ onMounted(async () => {
   // 后台延迟执行「收集全站路由组件」扫描，让图标页首屏（online 等 tab）先渲染，不阻塞主线程
   setTimeout(async () => {
   try {
-    // 获取所有路由组件 (本地 + 动态)
+    // 获取所有路由组件（本地 + 动态）
     const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
     const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
     
@@ -350,7 +350,7 @@ function onCurrentChange(page) {
   currentPage.value = page
 }
 
-// 处理标题显示(普通函数)
+// 处理标题显示（普通函数）
 /* const handleTitle = (item)=>{
   const selected = currentActiveType.value
   if(selected === 'alibaba' || selected === "element"){
@@ -360,7 +360,7 @@ function onCurrentChange(page) {
   }else return item
 } */
 
-// 处理标题显示(计算属性返回一个函数)
+// 处理标题显示（计算属性返回一个函数）
 const handleTitle = computed(() => {
   const selected = currentActiveType.value
   return (item) => {

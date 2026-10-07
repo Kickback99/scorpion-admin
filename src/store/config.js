@@ -722,7 +722,7 @@ export const useConfigStore = defineStore({
     isFriendLinkCommentEnabled() { return this.getValue('comment.friend_link_comment_enabled') === true },
     isCommentEmojiEnabled()      { return this.getValue('comment.emoji_enabled') ?? true },
 
-    // ===== user 前台认证 (client 组) =====
+    // ===== user 前台认证（client 组） =====
     isUserLoginEnabled()      { return this.getValue('user.login_enabled') === true },
     isUserOtherLoginEnabled() { return this.getValue('user.other_login_enabled') === true },
 

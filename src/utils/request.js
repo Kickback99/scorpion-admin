@@ -60,7 +60,7 @@ instance.interceptors.request.use(
     config => {
         const tokenStore =  useTokenStore()
         // 请求发出时保存浏览器地址栏路径，401 响应中用于 redirect
-        // 生产环境路由带 base 前缀(/admin/)，剥离为内部路径，否则登录后重定向 404
+        // 生产环境路由带 base 前缀（/admin/），剥离为内部路径，否则登录后重定向 404
         const currentPath = window.location.href.replace(window.location.origin, '')
         const routerBase = import.meta.env.VITE_ROUTER_URL
         config._currentPath = routerBase && currentPath.startsWith(routerBase)

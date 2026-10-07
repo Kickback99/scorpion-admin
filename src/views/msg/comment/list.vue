@@ -9,7 +9,7 @@
             <el-form-item>
                 <el-radio-group v-model="viewMode" @change="handleModeChange">
                     <el-radio-button label="normal">正常模式</el-radio-button>
-                    <!-- 挑拣模式(动态只读)：只有进入挑拣模式时才解除禁用，其他模式时禁用 -->
+                    <!-- 挑拣模式（动态只读）：只有进入挑拣模式时才解除禁用，其他模式时禁用 -->
                     <el-radio-button label="pick" :disabled="viewMode !== 'pick'">挑拣模式</el-radio-button>
                     <el-radio-button label="audit">审核模式</el-radio-button>
                 </el-radio-group>
@@ -44,7 +44,7 @@
             </el-form-item>
 
             <el-form-item>
-                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px;" placeholder="请选择排序(默认创建时间)">
+                <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 255px;" placeholder="请选择排序（默认创建时间）">
                 </SmartSelector>
             </el-form-item>
 
@@ -954,7 +954,7 @@ const setSortOrder = (order) => {
 }
 
 const fields = computed(() => [
-    {label:'请选择排序(默认创建时间)', value:''},
+    {label:'请选择排序（默认创建时间）', value:''},
     {label:'评论内容', value:'content'},
     {label:'评论状态', value:'status'},
     {label:'创建时间', value:'create_time'},

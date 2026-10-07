@@ -15,12 +15,12 @@ import { useUserConfigStore } from '@/store/userConfig'
 const userConfigStore = useUserConfigStore()
 
 const props = defineProps({
-    /** 占位高度(px) — 懒加载内容高度固定时传它，占位与真实内容严格等高，加载前后不跳变 */
+    /** 占位高度（px） — 懒加载内容高度固定时传它，占位与真实内容严格等高，加载前后不跳变 */
     height: {
         type: Number,
         default: 0
     },
-    /** 占位最小高度(px) — 懒加载内容高度由内容撑开时传它，只保底不塌陷 */
+    /** 占位最小高度（px） — 懒加载内容高度由内容撑开时传它，只保底不塌陷 */
     minHeight: {
         type: Number,
         default: 0

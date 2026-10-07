@@ -30,7 +30,7 @@ export const checkApproveValid = (rows) => {
         }
     }
     
-    // 可通过的：待审核(2) 和 已驳回(1)
+    // 可通过的：待审核（2）和 已驳回（1）
     const validRows = rows.filter(row => row.status === 2 || row.status === 1)
     
     return {
@@ -70,7 +70,7 @@ export const checkRejectValid = (rows) => {
         }
     }
     
-    // 可驳回的：待审核(2) 和 已通过(0)
+    // 可驳回的：待审核（2）和 已通过（0）
     const validRows = rows.filter(row => row.status === 2 || row.status === 0)
     
     return {
