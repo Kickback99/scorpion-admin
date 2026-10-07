@@ -67,7 +67,7 @@ class WebSocketManager {
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        // console.log(`✅ WebSocket 连接成功，角色: ${role}，用户ID: ${userId}`)
+        // console.log(`✅ WebSocket 连接成功，角色：${role}，用户ID: ${userId}`)
         this.isConnecting = false
         this.reconnectAttempts = 0
       }
@@ -128,7 +128,7 @@ class WebSocketManager {
   handleReconnect(userId, role) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
-      console.log(`🔄 后台服务不可用，自动重连中 (第${this.reconnectAttempts}/${this.maxReconnectAttempts}次)，${this.reconnectInterval / 1000}s 后重试`)
+      console.log(`🔄 后台服务不可用，自动重连中（第${this.reconnectAttempts}/${this.maxReconnectAttempts}次），${this.reconnectInterval / 1000}s 后重试`)
       this.clearReconnectTimer()
       this.reconnectTimer = setTimeout(() => {
         this.init(userId, role)
@@ -143,7 +143,7 @@ class WebSocketManager {
     try {
       // 1. 处理纯文本消息（定时任务结果等）
       if (typeof messageData === 'string' && !messageData.startsWith('{') && !messageData.startsWith('[')) {
-        // sendMessage，直接显示(目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截)
+        // sendMessage，直接显示（目前有定时任务、强退用户的操作结果反馈：用户主动操作/心跳拦截）
         msg.primary({
           message: messageData.replace(/\n/g, '<br><br>'),
           dangerouslyUseHTMLString: true,
@@ -295,7 +295,7 @@ class WebSocketManager {
       case 'online_users_update':
         // 缓存数据
         this.cachedOnlineUsers = data
-        // console.log('缓存在线用户数据:', data)
+        // console.log('缓存在线用户数据：', data)
         // 触发全局事件
         window.dispatchEvent(new CustomEvent('online-users-update', {
             detail: data

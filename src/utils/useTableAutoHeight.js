@@ -1,9 +1,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
-/** 表格高度安全余量(px)：吸收亚像素舍入，避免页面刚好溢出 */
+/** 表格高度安全余量（px）：吸收亚像素舍入，避免页面刚好溢出 */
 const TABLE_HEIGHT_GUTTER = 4
 
-/** 表格兜底最小高度(px)：视口过矮时表格不至于被压没 */
+/** 表格兜底最小高度（px）：视口过矮时表格不至于被压没 */
 const TABLE_MIN_HEIGHT = 200
 
 /**

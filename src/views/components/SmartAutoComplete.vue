@@ -568,7 +568,7 @@ const handleKeydown = (event) => {
       if (showDropdown.value) {
         event.preventDefault()
         isKeyboardMode.value = true
-        hoverIndex.value = -1  // 排它(排除鼠标经过高亮)
+        hoverIndex.value = -1  // 排它（排除鼠标经过高亮）
         // 更新索引
         const newIndex = Math.min(activeIndex.value + 1, filteredSuggestions.value.length - 1)
         activeIndex.value = newIndex
@@ -588,7 +588,7 @@ const handleKeydown = (event) => {
       if (showDropdown.value) {
         event.preventDefault()
         isKeyboardMode.value = true
-        hoverIndex.value = -1  // 排它(排除鼠标经过高亮)
+        hoverIndex.value = -1  // 排它（排除鼠标经过高亮）
         event.preventDefault()
         // 更新索引
         const newIndex = Math.max(activeIndex.value - 1, 0)

@@ -13,7 +13,7 @@ export function useWebSocket(role = 'admin') {
     const stopWatch = watch(
       () => userStore.userInfo?.id,
       (newUserId, oldUserId) => {
-        console.log('👤 用户ID变化:', { old: oldUserId, new: newUserId })
+        console.log('👤 用户ID变化：', { old: oldUserId, new: newUserId })
         
         if (newUserId && newUserId !== oldUserId) {
           console.log('✅ 检测到新用户ID，初始化 WebSocket')
@@ -39,7 +39,7 @@ export function useWebSocket(role = 'admin') {
 
     // 监听用户信息变化
         watch(() => userStore.userInfo, (newUserInfo,oldUserInfo) => {
-            // console.log('👤 用户信息发生变化:', newUserInfo,oldUserInfo)
+            // console.log('👤 用户信息发生变化：', newUserInfo,oldUserInfo)
             if (newUserInfo?.id) {
                 connect()
             } else if (oldUserInfo?.id) {

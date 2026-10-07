@@ -51,7 +51,7 @@
           <el-button v-perm="'btn.task.execute'" size="small" type="info" @click="refreshSingleTask(row)" plain>刷新</el-button>
           <!-- 启用/禁用 -->
           <el-button v-perm="'btn.task.execute'" size="small" :type="row.status === 0 ? 'danger' : 'success'" @click="toggleStatus(row)" plain>{{ row.status === 0 ? '禁用' : '启用' }}</el-button>
-          <!-- 删除任务(仅禁用状态可删除) -->
+          <!-- 删除任务（仅禁用状态可删除） -->
           <el-popconfirm
             :title="`确定要删除【${row.taskName}】吗？`"
             confirm-button-text="确定删除"

@@ -398,7 +398,7 @@ const save = async () => {
     // 水平虚线 — width 24px 横跨 padding + icon 区域
     // 父节点：可见 icon 盖住 content 内部分，视觉上只露 padding 段
     // 叶子节点：icon 为 visibility:hidden 不渲染，横线穿透直达复选框
-    // hover 时 __content 背景 (z-index:1) 自动盖住越界部分
+    // hover 时 __content 背景（z-index:1）自动盖住越界部分
     &::after {
       content: '';
       position: absolute;

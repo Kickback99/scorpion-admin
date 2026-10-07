@@ -29,7 +29,7 @@
           <span class="tag-title">
             {{ item.title }}
           </span>
-          <!-- 仪表盘(index === 0)不显示关闭按钮 -->
+          <!-- 仪表盘（index === 0）不显示关闭按钮 -->
           <span
             v-if="item.path !== '/index'"
             class="el-icon-close"

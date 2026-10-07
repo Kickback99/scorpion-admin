@@ -523,7 +523,7 @@ defineExpose({})
 /* 标题样式（28px/600/颜色）已抽到 markdown.scss 的 .md-dialog，此处只管高度与滚动 */
 
 /* EP 默认让整屏遮罩滚，滚动条会跑到窗口最右侧、弹窗被"穿过" → 改弹窗自身滚（滚动条才落在 body 内）。
-   高度 = 视口 − 顶部偏移(main.js 全局) − 150px 底部安全区；底部刻意大于顶部（150 > 100），长文才不撑成通屏页 */
+   高度 = 视口 − 顶部偏移（main.js 全局） − 150px 底部安全区；底部刻意大于顶部（150 > 100），长文才不撑成通屏页 */
 .notice-detail-dialog {
   display: flex;
   flex-direction: column;

@@ -51,13 +51,13 @@ const tabsList = [
 // 提取当前页显示的元素列表
   /* 
     算法如下：
-      第1页(提取0-35)
+      第1页（提取0-35）
       0
       35
-      第2页(提取35-70)
+      第2页（提取35-70）
       35
       70
-      第3页(提取70-105)
+      第3页（提取70-105）
       70
       105 
   */
@@ -92,12 +92,12 @@ const tabNames = tabsList.map(item => {
 // 把inputValue.value的值赋值给currentActiveType.value和icon.value
 function setVal() {
   if(startsWithAnyPrefix(inputValue.value,tabNames)){
-    // 提取:号之前的字符串
+    // 提取：号之前的字符串
     currentActiveType.value = inputValue.value.substring(
         0,
         inputValue.value.indexOf(":") + 1
       );
-        // 提取:号之后的字符串
+        // 提取：号之后的字符串
       icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
       }
 }
