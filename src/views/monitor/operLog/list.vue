@@ -72,25 +72,26 @@
         </el-form>
             </el-collapse-item>
         </el-collapse>
+
         <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
             <el-table-column type="index" label="序号"  width="60" align="center" />
             <el-table-column prop="username" label="操作用户" min-width="110" />
             <el-table-column  label="操作模块" min-width="110" align="center">
                 <template #default="{row}">
-                    {{ displayMode === 'label' ? row.moduleLabel : row.module }}
+                  {{ displayMode === 'label' ? row.moduleLabel : row.module }}
                 </template>
             </el-table-column>
             <el-table-column label="操作类型" min-width="100" align="center">
                 <template #default="{row}">
                     <el-tag :type="getTagType(row.type)" size="small">
-                         {{ displayMode === 'label' ? row.typeLabel : row.type  }}
+                      {{ displayMode === 'label' ? row.typeLabel : row.type  }}
                     </el-tag>
                 </template>
             </el-table-column>
             <el-table-column  label="请求方式" min-width="100" align="center">
                 <template #default="{row}">
-                       <el-tag :type="getTagType(row.reqMode)" size="small">{{ row.reqMode }}</el-tag>
+                  <el-tag :type="getTagType(row.reqMode)" size="small">{{ row.reqMode }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="操作时间" min-width="180"  align="center" />
@@ -99,11 +100,10 @@
                     <el-button size="small" type="info" @click="onDetail(row)" icon="MoreFilled" circle plain />
                     <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="removeRow(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
-                    <el-button size="small" type="danger" icon="Delete" circle plain />
+                          <el-button size="small" type="danger" icon="Delete" circle plain />
                         </template>
                     </el-popconfirm>
                 </template>
-                
             </el-table-column>
         </el-table>
 

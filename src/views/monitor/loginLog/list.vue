@@ -107,9 +107,9 @@
         <el-table-column  label="操作" width="150" align="center">
             <template #default="{row}">
                 <el-popconfirm :title="`你确定要删除这条数据吗`" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
-                <template #reference>
-                    <el-button size="small" type="danger" icon="Delete" circle plain />
-                </template>
+                    <template #reference>
+                        <el-button size="small" type="danger" icon="Delete" circle plain />
+                    </template>
                 </el-popconfirm>
             </template>
         </el-table-column>

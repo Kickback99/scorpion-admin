@@ -87,7 +87,7 @@
                 {{ getFileUUID(row.url).replace(/\.[^.]+$/, '') }}
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" min-width="180" align="center"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" min-width="180" align="center" />
         <el-table-column label="操作" width="190" fixed="right" align="center">
             <template #default="{row}">
                 <el-button size="small" type="warning" v-perm="'btn.file.update'" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
