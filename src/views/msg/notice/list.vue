@@ -105,11 +105,11 @@
             </template>
         </el-table-column>
         <el-table-column prop="createByName" label="创建者" width="120" />
-        <el-table-column prop="pushTime" label="推送时间" width="200" />
-        <el-table-column prop="createTime" label="创建时间" width="200" />
-        <el-table-column prop="updateTime" label="更新时间" width="200" />
+        <el-table-column prop="pushTime" label="推送时间" width="200" align="center" />
+        <el-table-column prop="createTime" label="创建时间" width="200" align="center" />
+        <el-table-column prop="updateTime" label="更新时间" width="200" align="center" />
 
-        <el-table-column v-if="showPermColumn(['btn.notice.execute', 'btn.notice.update', 'btn.notice.list', 'btn.notice.remove'])" label="操作" width="320" fixed="right">
+        <el-table-column v-if="showPermColumn(['btn.notice.execute', 'btn.notice.update', 'btn.notice.list', 'btn.notice.remove'])" label="操作" width="320" fixed="right" align="center">
             <template #default="{ row }">
                 <!-- 推送按钮 -->
                 <el-button

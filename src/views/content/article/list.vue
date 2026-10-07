@@ -114,9 +114,9 @@
                  <el-button size="small" type="info" v-else plain>草稿</el-button>
               </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="185" />
-        <el-table-column prop="updateTime" label="修改时间" width="185" />
-        <el-table-column label="操作" width="270" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="185" align="center" />
+        <el-table-column prop="updateTime" label="修改时间" width="185" align="center" />
+        <el-table-column label="操作" width="270" fixed="right" align="center">
             <template #default="{row}">
                 <el-button size="small" type="info" @click="handlePreview(row)" plain>预览</el-button>
                 <el-button size="small" type="warning" v-perm="'btn.article.update'" @click="handleEdit(row)" plain>编辑</el-button>

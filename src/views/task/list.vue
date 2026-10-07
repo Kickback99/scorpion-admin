@@ -13,19 +13,19 @@
     <!-- ==================== 任务表格 ==================== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" border>
       <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="taskCode" label="任务编码" width="180" align="center">
+      <el-table-column prop="taskCode" label="任务编码" width="180">
         <template #default="{ row }">
           <el-tag type="info" size="small">{{ row.taskCode }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="taskName" label="任务名称" width="150" align="center" />
-      <el-table-column prop="description" label="任务描述" min-width="200" align="center" show-overflow-tooltip />
-      <el-table-column prop="cronExpression" label="Cron 表达式" width="180" align="center">
+      <el-table-column prop="taskName" label="任务名称" width="150" />
+      <el-table-column prop="description" label="任务描述" min-width="200" show-overflow-tooltip />
+      <el-table-column prop="cronExpression" label="Cron 表达式" width="180">
         <template #default="{ row }">
           <el-tag type="primary" size="small">{{ row.cronExpression }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="执行周期说明" min-width="200" align="center" show-overflow-tooltip >
+      <el-table-column label="执行周期说明" min-width="200" show-overflow-tooltip >
         <template #default="{ row }">
             <span style="font-size: 13px; color: var(--el-text-color-primary);">
               {{ translateCron(row.cronExpression) }}
