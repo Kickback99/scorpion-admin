@@ -62,11 +62,11 @@
             </el-col>
             
             <el-col :xs="24" :sm="12">
-              <el-form-item label="呢称" prop="nickname">
+              <el-form-item label="昵称" prop="nickname">
                 <el-input 
                   v-model="userInfo.nickname" 
                   :disabled="!editMode"
-                  placeholder="请输入呢称"
+                  placeholder="请输入昵称"
                 />
               </el-form-item>
             </el-col>
@@ -214,7 +214,7 @@ const rules = reactive({
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ],
   nickname: [
-    { required: true, message: '请输入呢称', trigger: 'blur' }
+    { required: true, message: '请输入昵称', trigger: 'blur' }
   ]
 })
 
