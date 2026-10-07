@@ -48,7 +48,7 @@
         v-model="copyFormat" 
         :data="copyFormatOptions" 
         style="width: 160px; margin-left: 12px;" 
-        placeholder="复制格式(默认md)"
+        placeholder="复制格式（默认md）"
       />
 
       <!-- 排序 -->
@@ -440,7 +440,7 @@ const handleSetBackground = (img) => {
 
 // 复制格式选项
 const copyFormatOptions = [
-  { label: '复制格式(默认md)', value: '' },
+  { label: '复制格式（默认md）', value: '' },
   { label: 'UUID', value: 'uuid' },
   { label: 'OSS路径', value: 'ossPath' },
 ]

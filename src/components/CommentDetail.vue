@@ -23,7 +23,7 @@
       </div>
 
       <!-- 子评论列表 -->
-      <div class="sub-title">子评论 ({{ children.length }})</div>
+      <div class="sub-title">子评论（{{ children.length }}）</div>
       <div class="children-list">
         <div 
           v-for="child in children" 
@@ -84,7 +84,7 @@
       </div>
 
       <!-- 谁回复了我 -->
-      <div class="sub-title">谁回复了我 ({{ whoRepliedToMe.length }})</div>
+      <div class="sub-title">谁回复了我（{{ whoRepliedToMe.length }}）</div>
       <div class="reply-group" v-if="whoRepliedToMe.length > 0">
           <div v-for="reply in whoRepliedToMe" :key="reply.id" class="comment-card">
               <div class="comment-card-header">
@@ -157,7 +157,7 @@
         </div>
 
         <!-- 谁回复了我 -->
-        <div class="sub-title">谁回复了我 ({{ whoRepliedToMe.length }})</div>
+        <div class="sub-title">谁回复了我（{{ whoRepliedToMe.length }}）</div>
         <div class="reply-group" v-if="whoRepliedToMe.length > 0">
             <div v-for="reply in whoRepliedToMe" :key="reply.id" class="comment-card">
                 <div class="comment-card-header">

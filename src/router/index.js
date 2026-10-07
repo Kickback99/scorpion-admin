@@ -101,7 +101,7 @@ function routesHandler(router,parentType=null){
                 const compName = route.component
                 // 注意：这里 component 字段存储的是相对路径，如 'config/sysConfig/list'
                 const path = `../views/${route.name}/${compName}.vue`
-                // console.log('加载配置管理组件:', path)
+                // console.log('加载配置管理组件：', path)
                 route.component = modules[path]
             }}else {
             // 如果是子路由，继承父路由的type属性
@@ -129,7 +129,7 @@ function routesHandler(router,parentType=null){
 
 
 
-            // 处理二级子菜单：为这些孩子构建新的属性(parentPath，level)便于menu来添加父级路径
+            // 处理二级子菜单：为这些孩子构建新的属性（parentPath，level）便于menu来添加父级路径
             if(route.children != null && route.component == 'ParentView'){
                 let parent = route.path
                 route.redirect = route.children[0].path
@@ -174,7 +174,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
                     permissions: res.data.permissions
             };
         } else {
-            // 场景2：仅刷新菜单(修改菜单后调用)
+            // 场景2：仅刷新菜单（修改菜单后调用）
             const res = await userStore.refreshMenuOnly();
             menuData = {
                 routers: res.routers,
@@ -221,7 +221,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         } else {
             // Layout 顶层路由正常添加
             router.addRoute(route);
-            // console.log(`添加普通路由: ${route.path}`);
+            // console.log(`添加普通路由：${route.path}`);
         }
     });
 
@@ -293,7 +293,7 @@ let count = 1;
 function addDynamicRoutes(routerData){
     routerData.forEach(r => {
         //router.addRoute('/',r) //错误写法
-        router.addRoute('parentNode',r) //此处必须填写的父路由名字(name)
+        router.addRoute('parentNode',r) //此处必须填写的父路由名字（name）
     })
 }
 

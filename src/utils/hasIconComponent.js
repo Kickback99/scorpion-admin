@@ -64,25 +64,25 @@ function collectElementPlusIcons(content, elementIcons, importPath) {
   
   // 使用确认能正常工作的正则表达式
   const iconPatterns = [
-    // 1. 静态属性: icon="Edit", prefix-icon="Search"
+    // 1. 静态属性：icon="Edit", prefix-icon="Search"
     /(?:icon|active-icon|inactive-icon|prefix-icon|suffix-icon)="([^"]+)"/gi,
     
-    // 2. 动态属性: :icon="Edit", :icon="'Search'"
+    // 2. 动态属性：:icon="Edit", :icon="'Search'"
     /(?:icon|active-icon|inactive-icon|prefix-icon|suffix-icon)=["']?([A-Z][A-Za-z0-9]*)["']?/g,
     
-    // 3. el-icon 内的组件: <el-icon><Edit /></el-icon> 或 <el-icon><Edit></Edit></el-icon>
+    // 3. el-icon 内的组件：<el-icon><Edit /></el-icon> 或 <el-icon><Edit></Edit></el-icon>
     /<el-icon[^>]*>[\s\S]*?<([A-Z][A-Za-z0-9]*)(?:\s[^>]*)?(?:\s*\/>|>[\s\S]*?<\/\1>)[\s\S]*?<\/el-icon>/gi,
     
-    // 4. 直接使用的图标组件: <Edit /> 或 <Edit></Edit>
+    // 4. 直接使用的图标组件：<Edit /> 或 <Edit></Edit>
     /<([A-Z][A-Za-z0-9]+)(?:\s[^>]*)?(?:\s*\/>|>[\s\S]*?<\/\1>)/g,
     
-    // 5. 动态组件: <component :is="Edit" />
+    // 5. 动态组件：<component :is="Edit" />
     /<component[^>]*:is=["']?([A-Z][A-Za-z0-9]*)["']?[^>]*\/>/gi,
     
-    // 6. 动态组件: <component is="Expand" />
+    // 6. 动态组件：<component is="Expand" />
     /<component[^>]*\sis=["']?([A-Z][A-Za-z0-9]*)["']?[^>]*>/gi,
     
-    // 7. 三元表达式中的图标: :is="condition?'Top':'Bottom'"
+    // 7. 三元表达式中的图标：:is="condition?'Top':'Bottom'"
     /:is=["'][^"']*\?["']?([A-Z][A-Za-z0-9]*)["']?:["']?([A-Z][A-Za-z0-9]*)["']?/gi
   ];
 

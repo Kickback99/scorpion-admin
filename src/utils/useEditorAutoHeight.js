@@ -1,9 +1,9 @@
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
-/** 编辑器高度安全余量(px)：吸收亚像素舍入，避免刚好溢出产生滚动条 */
+/** 编辑器高度安全余量（px）：吸收亚像素舍入，避免刚好溢出产生滚动条 */
 const EDITOR_HEIGHT_GUTTER = 4
 
-/** 编辑器兜底最小高度(px)：视口过矮时保证可编辑，溢出部分交给窗口滚动 */
+/** 编辑器兜底最小高度（px）：视口过矮时保证可编辑，溢出部分交给窗口滚动 */
 const EDITOR_MIN_HEIGHT = 200
 
 /**

@@ -19,14 +19,14 @@ function mergeClass(a, b) {
 /** 带 options 覆盖的快捷方法 */
 function create(defaults) {
   return (message, options) => {
-    // 对象模式: msg.primary({ message: '...', dangerouslyUseHTMLString: true })
+    // 对象模式：msg.primary({ message: '...', dangerouslyUseHTMLString: true })
     if (typeof message === 'object' && message !== null) {
       // 对象模式消息图标对齐第一行（适配多行 HTML 内容）
       const iconTop = !('icon' in message) ? 'msg-icon-top' : ''
       const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, mergeClass(iconTop, message.customClass)))
       return ElMessage({ ...def, ...defaults, ...message, customClass })
     }
-    // 字符串模式: msg.primary('hello')
+    // 字符串模式：msg.primary('hello')
     const customClass = mergeClass(def.customClass, mergeClass(defaults.customClass, options?.customClass))
     return ElMessage({ ...def, ...defaults, ...options, customClass, message })
   }

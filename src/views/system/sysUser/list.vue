@@ -19,7 +19,7 @@
 
                     <!-- 排序字段选择器（SmartSelector） -->
                     <el-form-item>
-                        <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序(默认创建时间)">
+                        <SmartSelector v-model="searchData.sortField" :data="fields" style="width: 200px;" placeholder="请选择排序（默认创建时间）">
                         </SmartSelector>
                     </el-form-item>
 
@@ -684,7 +684,7 @@ const setSortOrder = (order) => {
 
 // 排序字段选项
 const fields = ref([
-    { label: '请选择排序(默认创建时间)', value: '' },
+    { label: '请选择排序（默认创建时间）', value: '' },
     { label: '用户名', value: 'username' },
     { label: '昵称', value: 'nickname' },
     { label: '创建时间', value: 'create_time' },
