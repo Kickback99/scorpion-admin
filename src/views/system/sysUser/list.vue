@@ -108,13 +108,13 @@
         <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
         <el-table-column v-if="showPermColumn(['btn.sysUser.update', 'btn.sysUser.remove', 'btn.sysUser.assignRole'])" label="操作" width="200" align="center" fixed="right">
             <template #default="{row,$index}">
-            <el-button size="small" type="warning" v-perm="'btn.sysUser.update'" @click="editDialog(row)" plain>编辑</el-button>
-            <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
-                <template #reference>
-                    <el-button size="small" type="danger" v-perm="'btn.sysUser.remove'" plain>删除</el-button>
-                </template>
-            </el-popconfirm>
-            <el-button size="small" type="success" v-perm="'btn.sysUser.assignRole'" @click="showAllocRoles(row)" plain>分配</el-button>
+                <el-button size="small" type="warning" v-perm="'btn.sysUser.update'" @click="editDialog(row)" plain>编辑</el-button>
+                <el-popconfirm :title="`你确定要删除${row.username}吗`" @confirm="removeUsers(row.id)" width="250px" icon="WarnTriangleFilled">
+                    <template #reference>
+                        <el-button size="small" type="danger" v-perm="'btn.sysUser.remove'" plain>删除</el-button>
+                    </template>
+                </el-popconfirm>
+                <el-button size="small" type="success" v-perm="'btn.sysUser.assignRole'" @click="showAllocRoles(row)" plain>分配</el-button>
             </template>
         </el-table-column>
     </el-table>
