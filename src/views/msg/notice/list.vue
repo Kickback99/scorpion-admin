@@ -275,7 +275,7 @@
                     :debounce-delay="300"
                     :min-search-length="1"
                     :allow-custom="false"
-                    custom-disabled-message="请输入已存在的用户名|呢称"
+                    custom-disabled-message="请输入已存在的用户名|昵称"
                     :auto-search-on-enter="true"
                     :disabled="isReadonly || !!formModel.pushTime"
                     style="width: 100%"

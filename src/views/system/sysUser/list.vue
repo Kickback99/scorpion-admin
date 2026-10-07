@@ -10,7 +10,7 @@
                     size="small"
                     >
                     <el-form-item>
-                    <el-input prefix-icon="User"  placeholder="请输入用户名/呢称/手机号" v-model="searchData.keyword" /><br>
+                    <el-input prefix-icon="User"  placeholder="请输入用户名/昵称/手机号" v-model="searchData.keyword" /><br>
                     </el-form-item>
 
                     <el-form-item>
@@ -91,7 +91,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名" min-width="140" show-overflow-tooltip />
-        <el-table-column prop="nickname" label="呢称" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="nickname" label="昵称" min-width="110" show-overflow-tooltip />
         <el-table-column prop="roleNames" label="用户角色" align="center" width="85" show-overflow-tooltip />
         <el-table-column prop="phone" label="手机"  width="130" align="center" />
         <el-table-column label="类型" min-width="80" align="center">
@@ -127,8 +127,8 @@
                 <el-input prefix-icon="User" placeholder="请输入用户名" v-model="formData.username" />
             </el-form-item>
 
-            <el-form-item label="呢称" prop="nickname">
-                <el-input prefix-icon="UserFilled" placeholder="请输入呢称" v-model="formData.nickname" />
+            <el-form-item label="昵称" prop="nickname">
+                <el-input prefix-icon="UserFilled" placeholder="请输入昵称" v-model="formData.nickname" />
             </el-form-item>
 
             <el-form-item label="手机号" prop="phone">
@@ -573,7 +573,7 @@ const rules = {
   ],
     nickname : [
       { required: false, trigger: 'blur' },
-      { pattern:/^\S{2,15}$/,message:'呢称必须是 2-15位 的非空字符',trigger:'blur'}
+      { pattern:/^\S{2,15}$/,message:'昵称必须是 2-15位 的非空字符',trigger:'blur'}
     ],
 
     phone : [
@@ -686,7 +686,7 @@ const setSortOrder = (order) => {
 const fields = ref([
     { label: '请选择排序(默认创建时间)', value: '' },
     { label: '用户名', value: 'username' },
-    { label: '呢称', value: 'nickname' },
+    { label: '昵称', value: 'nickname' },
     { label: '创建时间', value: 'create_time' },
     { label: '修改时间', value: 'update_time' },
 ])
