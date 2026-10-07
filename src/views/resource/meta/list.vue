@@ -143,15 +143,15 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="业务名称" width="200" show-overflow-tooltip align="center">
+            <el-table-column label="业务名称" width="200" show-overflow-tooltip>
                   <template #default="{ row }">
                      {{  row.title ? row.title : '该业务不存在'  }}
                   </template>
             </el-table-column>
             
-            <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip align="center" />
+            <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip />
             
-            <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip align="center" />
+            <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip />
             
             <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">

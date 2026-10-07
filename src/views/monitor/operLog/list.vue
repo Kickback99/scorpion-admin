@@ -75,7 +75,7 @@
         <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
             <el-table-column type="index" label="序号"  width="60" align="center" />
-            <el-table-column prop="username" label="操作用户" min-width="110"  align="center" />
+            <el-table-column prop="username" label="操作用户" min-width="110" />
             <el-table-column  label="操作模块" min-width="110" align="center">
                 <template #default="{row}">
                     {{ displayMode === 'label' ? row.moduleLabel : row.module }}

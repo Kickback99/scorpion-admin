@@ -19,16 +19,16 @@
         border stripe
         max-height="calc(100vh - 180px)"
         >
-        <el-table-column prop="name" label="菜单名称" min-width="160" align="center" />
+        <el-table-column prop="name" label="菜单名称" min-width="160" />
         <el-table-column label="图标" width="60" align="center">
           <template #default="{row}">
             <!-- <Icon icon="row.icon == null ? 'ep:user':row.icon" /> -->
              <el-icon><SingleIcon :icon="row.icon"></SingleIcon></el-icon>
           </template>
         </el-table-column>
-        <el-table-column prop="perms" label="权限标识" min-width="160" align="center" />
-        <el-table-column prop="path" label="路由地址" width="120" align="center" />
-        <el-table-column prop="component" label="组件路径" min-width="180" show-overflow-tooltip align="center" />
+        <el-table-column prop="perms" label="权限标识" min-width="160" />
+        <el-table-column prop="path" label="路由地址" width="120" />
+        <el-table-column prop="component" label="组件路径" min-width="180" show-overflow-tooltip />
         <el-table-column prop="sortValue" label="排序" width="60" align="center" />
         <el-table-column label="状态" width="80" align="center" >
             <template #default="{row}">

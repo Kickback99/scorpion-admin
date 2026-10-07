@@ -97,8 +97,8 @@
                 <span>{{ row.articleId ? '文章详情' : '外链' }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="200" />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="200" align="center" />
+        <el-table-column label="操作" width="150" fixed="right" align="center">
             <template #default="{ row }">
                 <!-- 失败状态显示重试按钮 -->
                 <el-button
