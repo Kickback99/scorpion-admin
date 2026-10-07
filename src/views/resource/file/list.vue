@@ -80,15 +80,15 @@
                 <span v-else>-</span>
             </template>
         </el-table-column>
-        <el-table-column prop="ext" label="扩展名" min-width="90" />
-        <el-table-column prop="size" label="文件大小" min-width="100" />
+        <el-table-column prop="ext" label="扩展名" min-width="90" align="center" />
+        <el-table-column prop="size" label="文件大小" min-width="100" align="center" />
         <el-table-column label="文件 UUID" min-width="230" show-overflow-tooltip>
             <template #default="{ row }">
                 {{ getFileUUID(row.url).replace(/\.[^.]+$/, '') }}
             </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" min-width="180"></el-table-column>
-        <el-table-column label="操作" width="190" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" min-width="180" align="center"></el-table-column>
+        <el-table-column label="操作" width="190" fixed="right" align="center">
             <template #default="{row}">
                 <el-button size="small" type="warning" v-perm="'btn.file.update'" @click="handleEdit(row)" icon="Edit" circle plain></el-button>
                 <el-popconfirm :title="`你确定要删除${row.name}吗`" @confirm="handleRemove(row.id)" width="250px"

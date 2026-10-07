@@ -35,8 +35,8 @@
         <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column v-if="showPermColumn(['btn.sysRole.update', 'btn.sysRole.remove', 'btn.sysRole.assignAuth'])" label="操作" width="200" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" align="center" />
+        <el-table-column v-if="showPermColumn(['btn.sysRole.update', 'btn.sysRole.remove', 'btn.sysRole.assignAuth'])" label="操作" width="200" fixed="right" align="center">
             <template #default="{row,$index}">
             <el-button size="small" type="warning" v-perm="'btn.sysRole.update'" @click="editDialog(row)" plain>编辑</el-button>
             <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
