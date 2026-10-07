@@ -176,6 +176,18 @@
                 </template>
             </el-table-column>
 
+            <el-table-column prop="createTime" label="创建时间" width="200" align="center">
+                <template #default="{ row }">
+                    {{ row.createTime }}
+                </template>
+            </el-table-column>
+            
+            <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
+                <template #default="{ row }">
+                    {{ row.updateTime }}
+                </template>
+            </el-table-column>
+
             <el-table-column v-if="showPermColumn(['btn.meta.update'])" label="操作" width="100" align="center" fixed="right">
                 <template #default="{ row }">
                     <el-popconfirm
@@ -186,18 +198,6 @@
                             <el-button size="small" type="danger" v-perm="'btn.meta.update'" :disabled="row.isDeleted === 0" plain>恢复</el-button>
                         </template>
                     </el-popconfirm>
-                </template>
-            </el-table-column>
-            
-            <el-table-column prop="createTime" label="创建时间" width="200" align="center">
-                <template #default="{ row }">
-                    {{ row.createTime }}
-                </template>
-            </el-table-column>
-            
-            <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
-                <template #default="{ row }">
-                    {{ row.updateTime }}
                 </template>
             </el-table-column>
         </el-table>
