@@ -38,13 +38,13 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column v-if="showPermColumn(['btn.sysRole.update', 'btn.sysRole.remove', 'btn.sysRole.assignAuth'])" label="操作" width="200" fixed="right">
             <template #default="{row,$index}">
-            <el-button size="small" type="warning" v-perm="'btn.sysRole.update'" @click="editDialog(row)" plain>编辑</el-button>
-            <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
-                <template #reference>
-                    <el-button size="small" type="danger" v-perm="'btn.sysRole.remove'" plain>删除</el-button>
-                </template>
-            </el-popconfirm>
-            <el-button size="small" type="success" v-perm="'btn.sysRole.assignAuth'" @click="showAssignAuth(row)" plain>授权</el-button>
+                <el-button size="small" type="warning" v-perm="'btn.sysRole.update'" @click="editDialog(row)" plain>编辑</el-button>
+                <el-popconfirm :title="`你确定要删除${row.roleName}吗`" @confirm="removeRole(row.id)" width="250px" icon="WarnTriangleFilled">
+                    <template #reference>
+                        <el-button size="small" type="danger" v-perm="'btn.sysRole.remove'" plain>删除</el-button>
+                    </template>
+                </el-popconfirm>
+                <el-button size="small" type="success" v-perm="'btn.sysRole.assignAuth'" @click="showAssignAuth(row)" plain>授权</el-button>
             </template>
         </el-table-column>
     </el-table>

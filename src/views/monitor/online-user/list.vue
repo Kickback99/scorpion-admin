@@ -48,15 +48,15 @@
                 <template #default="{row}">
                     <el-popconfirm :title="`确定要强制踢出 ${row.username} 吗？`" @confirm="handleKick(row)">
                         <template #reference>
-                        <el-button
-                            size="small"
-                            type="primary"
-                            :loading="kickingMap[row.userId + '_' + row.role]"
-                            v-perm="'btn.onlineuser.execute'" :disabled="kickingMap[row.userId + '_' + row.role]"
-                            plain
-                            >
-                            {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }}
-                        </el-button>
+                            <el-button
+                                size="small"
+                                type="primary"
+                                :loading="kickingMap[row.userId + '_' + row.role]"
+                                v-perm="'btn.onlineuser.execute'" :disabled="kickingMap[row.userId + '_' + row.role]"
+                                plain
+                                >
+                                {{ kickingMap[row.userId + '_' + row.role] ? '强退中' : '强退' }}
+                            </el-button>
                         </template>
                     </el-popconfirm>
                 </template>
