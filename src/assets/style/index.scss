@@ -209,6 +209,11 @@ html.dark .auth-header:not(.page-theme) {
   } */
 }
 
+// 通知类消息最小宽度：短文案不塌成窄条，长文案仍按 fit-content 撑开
+.msg-min-width {
+  min-width: min(320px, calc(100vw - 60px));
+}
+
 // MessageBox 弹窗按钮统一 small 尺寸
 .el-message-box__btns .el-button {
   height: 24px;

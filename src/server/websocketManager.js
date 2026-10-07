@@ -9,8 +9,12 @@ import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 import { useRenderIcon } from '@/components/MyIcon/src/hook'
 
-// 公告 toast 图标（组件定义只建一次，不必每条消息重建）
-const NOTICE_ICON = useRenderIcon('ri:megaphone-line')
+// 各类消息的 toast 图标（组件定义只建一次，不必每条消息重建）
+const NOTICE_ICON = useRenderIcon('ri:megaphone-line')     // 公告推送 / 上线通知
+const TEXT_ICON = useRenderIcon('ri:robot-2-line')         // 纯文本播报：任务结果、强退/退出反馈
+const TASK_ICON = useRenderIcon('ri:task-line')            // 任务消息
+const SYSTEM_ICON = useRenderIcon('ri:settings-3-line')    // 系统消息
+const FALLBACK_ICON = useRenderIcon('ri:information-line') // 未知类型兜底
 
 class WebSocketManager {
   constructor() {
@@ -152,7 +156,8 @@ class WebSocketManager {
           message: messageData.replace(/\n/g, '<br><br>'),
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 消息显示时间长一点
-          customClass: 'message-right-top'
+          customClass: 'message-right-top',
+          icon: TEXT_ICON
         })
         return
       }
@@ -198,7 +203,7 @@ class WebSocketManager {
           message: commentMessage,
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 评论消息显示时间长一点
-          customClass: 'message-right-top'
+          customClass: 'message-right-top msg-min-width'
         })
         break
 
@@ -215,7 +220,8 @@ class WebSocketManager {
           message: arr[1],  // 整句已由后端拼好，昵称已 HTML 转义
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 上线消息显示时间长一点
-          customClass: 'message-right-top'
+          customClass: 'message-right-top',
+          icon: NOTICE_ICON
         })
         break
 
@@ -225,15 +231,17 @@ class WebSocketManager {
         const taskMessage = `${taskTitle}\n${taskContent}`
         msg.primary({
           message: taskMessage,
-          dangerouslyUseHTMLString: true
+          dangerouslyUseHTMLString: true,
+          icon: TASK_ICON
         })
         break
-        
+
       case 'system':  // 系统消息
         const systemMsg = arr[1]
         msg.primary({
           message: systemMsg,
-          dangerouslyUseHTMLString: true
+          dangerouslyUseHTMLString: true,
+          icon: SYSTEM_ICON
         })
         break
       
@@ -270,7 +278,7 @@ class WebSocketManager {
           message: `你收到一条通知：<br><br>${noticeTitle}`,
           dangerouslyUseHTMLString: true,
           duration: 5000,  // 公告消息显示时间长一点
-          customClass: 'message-right-top',
+          customClass: 'message-right-top msg-min-width',
           icon: NOTICE_ICON
         })
         // 触发全局事件，NoticeBell 组件监听此事件更新未读数
@@ -319,7 +327,7 @@ class WebSocketManager {
       default:
         // 普通任务结果消息
         if (data.message) {
-          msg.primary(data.message)
+          msg.primary({ message: data.message, icon: FALLBACK_ICON })
           return
         }
         console.warn('未知的消息类型:', data.type)
