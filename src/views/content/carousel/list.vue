@@ -92,7 +92,7 @@
 
         <!-- <el-table-column prop="description" label="轮播描述" min-width="150" show-overflow-tooltip /> -->
         <el-table-column prop="sort" label="排序" width="80" align="center" />
-        <el-table-column label="跳转链接" min-width="150" show-overflow-tooltip>
+        <el-table-column label="跳转链接" min-width="150">
             <template #default="{ row }">
                 <span>{{ row.articleId ? '文章详情' : '外链' }}</span>
             </template>

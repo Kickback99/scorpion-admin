@@ -5,7 +5,7 @@
                 <el-input v-model="searchData.name" placeholder="请输入文件名称" />
             </el-form-item>
             <el-form-item>
-                <SmartSelector v-model="searchData.ext" :data="exts" style="width: 200px;" placeholder="请选择扩展名">
+                <SmartSelector v-model="searchData.ext" :data="exts" style="width: 200px;" placeholder="请选择文件类型">
                 </SmartSelector>
             </el-form-item>
             <el-form-item label="下载模式">
@@ -74,13 +74,13 @@
         <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="name" label="文件名称" min-width="150" show-overflow-tooltip />
-        <el-table-column label="图片" min-width="120" align="center">
+        <el-table-column label="文件预览" min-width="120" align="center">
             <template #default="{ row }">
                 <el-image v-if="IMAGE_EXTS.includes(row.ext)" :src="resolvePreviewUrl(row.url)" style="width: 80px; height: 45px" fit="cover" preview-teleported :preview-src-list="[resolvePreviewUrl(row.url)]" />
                 <span v-else>-</span>
             </template>
         </el-table-column>
-        <el-table-column prop="ext" label="扩展名" min-width="90" align="center" />
+        <el-table-column prop="ext" label="文件类型" min-width="90" align="center" />
         <el-table-column prop="size" label="文件大小" min-width="100" align="center" />
         <el-table-column label="文件 UUID" min-width="230" show-overflow-tooltip>
             <template #default="{ row }">
