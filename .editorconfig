@@ -1,0 +1,16 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Markdown 的行尾双空格是硬换行（<br>），不能 trim
+[*.md]
+trim_trailing_whitespace = false
+
+# 单行压缩的资源文件：补末尾换行反而会让 diff 把整行标成改动
+[*.svg]
+insert_final_newline = false

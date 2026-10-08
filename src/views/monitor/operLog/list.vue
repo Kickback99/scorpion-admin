@@ -350,10 +350,10 @@ const disabledTypes = computed(() => {
   if (!module) {
     return [];
   }
-  
+
   // 默认禁用项（适用于所有模块）
   const defaultDisabled = ['BATCH_INSERT', 'BATCH_UPDATE', 'USER_AUTH', 'ROLE_AUTH', 'AUDIT', "BATCH_AUDIT", 'PUSH'];
-  
+
   // 按模块动态调整
   switch (module) {
     case 'CATE': // 分类管理

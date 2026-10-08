@@ -31,7 +31,7 @@
                 <el-button size="small" :type="searchData.sortOrder === 'ASC' ? 'primary' : ''" icon="Top" @click="setSortOrder('ASC')" circle plain />
                 <el-button size="small" :type="searchData.sortOrder === 'DESC' ? 'primary' : ''" icon="Bottom" @click="setSortOrder('DESC')" circle plain />
             </el-form-item>
-            
+
             <br>
 
             <el-form-item>
@@ -78,7 +78,7 @@
                     @change="updateEndTime"
                 />
             </el-form-item>
-                
+
             <template class="flex">
                 <el-form-item>
                         <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
@@ -151,7 +151,7 @@
             <component :is="MarkdownPreview" :key="userConfigStore.isDarkEnabled" :text="previewContent" @click="handleCopyCodeSuccess" />
         </div>
     </el-dialog>
-   
+
 </template>
 
 <script setup>
@@ -300,7 +300,7 @@ const handleDelete = async(id) => {
 
 // t_article_request：更改文章状态请求
 const modifySwitch = async(row) =>{
-    
+
    const res = await isTopApi(row.id,row.isTop)
     // row.isTop === "1" ? msg.primary('已置顶'):msg.error('已取消置顶')
     // 根据返回的 message 显示不同的提示
@@ -338,7 +338,7 @@ const remapTimeParams = () => {
     searchData.value.createTimeEnd = null
     searchData.value.updateTimeBegin = null
     searchData.value.updateTimeEnd = null
-    
+
     // 根据当前 timeField 设置对应的时间字段
     if (searchData.value.timeField === 'create_time') {
         searchData.value.createTimeBegin = startTime.value || null
@@ -352,7 +352,7 @@ const remapTimeParams = () => {
 // 开始时间变化
 const updateStartTime = (value) => {
     startTime.value = value || ''
-    
+
     if (searchData.value.timeField === 'create_time') {
         searchData.value.createTimeBegin = value || null
     } else {
@@ -363,7 +363,7 @@ const updateStartTime = (value) => {
 // 结束时间变化
 const updateEndTime = (value) => {
     endTime.value = value || ''
-    
+
     if (searchData.value.timeField === 'create_time') {
         searchData.value.createTimeEnd = value || null
     } else {
@@ -383,7 +383,7 @@ const setQuickDate = (type) => {
     const now = new Date()
     let start = null
     let end = now
-    
+
     switch (type) {
         case 'today':
             start = new Date(now)
@@ -405,10 +405,10 @@ const setQuickDate = (type) => {
             start.setMonth(start.getMonth() - 1)
             break
     }
-    
+
     startTime.value = start ? dayjs(start).format('YYYY-MM-DD HH:mm:ss') : ''
     endTime.value = end ? dayjs(end).format('YYYY-MM-DD HH:mm:ss') : ''
-    
+
     // 触发时间更新
     updateStartTime(startTime.value)
     updateEndTime(endTime.value)

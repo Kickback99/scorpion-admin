@@ -7,7 +7,7 @@ import http from '@/utils/request'
  * @param {Object} searchData 查询条件
  * @returns {Promise}
  */
-export const fileMetaListApi = (pageNum, pageSize, searchData) => 
+export const fileMetaListApi = (pageNum, pageSize, searchData) =>
     http.get(`/admin/resource/meta`, {
         params: {
             pageNum,
@@ -23,5 +23,5 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
  * @param {number} id 文件元数据 ID
  * @returns {Promise}
  */
-export const recoverFileMetaApi = (id) => 
+export const recoverFileMetaApi = (id) =>
     http.put(`/admin/resource/meta/recover/${id}`);

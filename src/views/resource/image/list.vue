@@ -43,11 +43,11 @@
       </el-radio-group>
 
       <!-- 复制格式下拉选择 -->
-      <SmartSelector 
+      <SmartSelector
         size="small"
-        v-model="copyFormat" 
-        :data="copyFormatOptions" 
-        style="width: 160px; margin-left: 12px;" 
+        v-model="copyFormat"
+        :data="copyFormatOptions"
+        style="width: 160px; margin-left: 12px;"
         placeholder="复制格式（默认md）"
       />
 
@@ -238,17 +238,17 @@ const fetchImages = async () => {
   loading.value = true;
   try {
     const params = {};
-    
+
     // 类型筛选
     if (currentImageType.value !== 'all') {
       params.fileType = currentImageType.value;
     }
-    
+
     // 原始上传筛选
     if (filterOriginal.value) {
       params.isOriginal = 1;
     }
-    
+
     // 业务 ID 筛选
     if (searchIds.value) {
       params.targetIds = searchIds.value;
@@ -311,15 +311,15 @@ const loadBusinessData = async () => {
 
 const fetchBusinessData = async (params) => {
   const query = params.keyword || '';
-  
+
   if (businessDataCache.value.length === 0) {
     await loadBusinessData();
   }
-  
+
   if (!query) {
     return businessDataCache.value;
   }
-  
+
   const lowerQuery = query.toLowerCase();
   const PinyinMatch = await loadPinyinMatch();
   return businessDataCache.value.filter(item => {
@@ -447,7 +447,7 @@ const copyFormatOptions = [
 
 const handleCopy = async (img) => {
   let copyText = '';
-  
+
   // 根据选择的格式生成复制内容
   switch (copyFormat.value) {
     case 'uuid':
@@ -462,7 +462,7 @@ const handleCopy = async (img) => {
       copyText = `![${title}](${img.img})`;
       break;
   }
-  
+
   try {
     await navigator.clipboard.writeText(copyText);
     msg.primary('已复制到剪贴板');

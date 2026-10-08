@@ -50,7 +50,7 @@ class WebSocketManager {
       return
     }
 
-    
+
     // 重置手动关闭标志
     this.isManualClose = false
 
@@ -174,7 +174,7 @@ class WebSocketManager {
 
       // 4. 处理对象格式消息（通知、在线用户列表等）
       this.handleObjectMessage(data)
-      
+
     } catch (error) {
       console.error('解析 WebSocket 消息失败:', error)
     }
@@ -184,7 +184,7 @@ class WebSocketManager {
   handleArrayMessage(arr) {
     // 数组格式：[type, data1, data2, ...]
     const messageType = arr[0]
-    
+
     switch (messageType) {
       case 'comment':  // 评论消息
 
@@ -194,7 +194,7 @@ class WebSocketManager {
         if (!configStore.getNotificationCommentEnabled()) {
           return
         }
-        
+
         const commentUser = arr[1]  // 评论人
         const commentContent = arr[2]  // 评论内容
         // 格式：评论人：\n 评论内容
@@ -244,7 +244,7 @@ class WebSocketManager {
           icon: SYSTEM_ICON
         })
         break
-      
+
       case 'carousel':
         const carouselStatus = arr[1]    // SUCCESS 或 FAILED
         const carouselMessage = arr[2]   // 消息内容

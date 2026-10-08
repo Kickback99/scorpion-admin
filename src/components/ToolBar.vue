@@ -284,7 +284,7 @@ const handleToggleCollapse = async () => {
     // 2. 调用后端 API 更新配置
     // 3. 显示成功/失败提示
     await userConfigStore.toggleCollapse()
-    
+
     // 可选：如果需要触发其他组件响应折叠状态变化，可以发送事件
     // emitter.emit('collapse-change', userConfigStore.getUserCollapseEnabled())
 }

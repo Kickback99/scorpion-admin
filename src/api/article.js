@@ -55,11 +55,11 @@ export const removeCarouselApi = (id, articleId) => {
 // ==================== 轮播管理相关 api ====================
 
 // 分页查询轮播列表
-export const getCarouselListApi = (pageNum, pageSize, searchData) => 
+export const getCarouselListApi = (pageNum, pageSize, searchData) =>
     http.get(`${API.CAROUSEL_URL}/${pageNum}/${pageSize}`, { params: searchData })
 
 // 根据 ID 查询轮播详情
-export const getCarouselByIdApi = (id) => 
+export const getCarouselByIdApi = (id) =>
     http.get(`${API.CAROUSEL_URL}/${id}`)
 
 

@@ -176,7 +176,7 @@
           />
           <el-switch v-else-if="addForm.type === 'boolean'" v-model="addForm.value" size="small" />
         </el-form-item>
-        
+
         <!-- 阈值设置开关 -->
         <el-form-item v-if="addForm.type === 'number'">
           <el-checkbox v-model="addForm.enableThreshold">
@@ -184,19 +184,19 @@
           </el-checkbox>
           <div class="form-tip">不设置则使用系统默认配置</div>
         </el-form-item>
-        
+
         <!-- 阈值设置区域（仅在开启时显示） -->
         <template v-if="addForm.type === 'number' && addForm.enableThreshold">
           <el-form-item label="最小值">
-            <el-input-number 
-              v-model="addForm.min" 
-              :min="-Infinity" 
+            <el-input-number
+              v-model="addForm.min"
+              :min="-Infinity"
               :max="addForm.max !== null ? addForm.max : Infinity"
             />
           </el-form-item>
           <el-form-item label="最大值">
-            <el-input-number 
-              v-model="addForm.max" 
+            <el-input-number
+              v-model="addForm.max"
               :min="addForm.min !== null ? addForm.min : -Infinity"
               :max="Infinity"
             />
@@ -588,7 +588,7 @@ const handleSave = async (row) => {
     } else if (row.type === 'boolean') {
       newValue = row.editValue === true || row.editValue === 'true'
     }
-    
+
     // 调用单个配置更新接口
     const res = await updateConfigValueApi(buildApiKey(row), newValue)
     if (res.code === 200) {
@@ -661,7 +661,7 @@ const handleDelete = async (row) => {
     if (row.type === 'number') {
       configStore.removeNumberLimit(row.key)
     }
-    
+
     const res = await deleteConfigValueApi(buildApiKey(row))
     if (res.code === 200) {
       msg.primary('删除成功')
@@ -720,10 +720,10 @@ const handleAddChild = (row) => {
 // 确认新增
 const handleConfirmAdd = async () => {
   if (!addFormRef.value) return
-  
+
   await addFormRef.value.validate(async (valid) => {
     if (valid) {
-      try {        
+      try {
         const fullKey = addForm.parentPath ? `${addForm.parentPath}.${addForm.key}` : addForm.key
 
         // 检查是否在 CONFIG_DEFINITIONS 中已存在
@@ -731,7 +731,7 @@ const handleConfirmAdd = async () => {
           msg.warning(`配置项 "${addForm.key}" 已在 CONFIG_DEFINITIONS 源码中定义，不能重复添加`)
           return
         } */
-        
+
         const fullConfig = buildFullConfig()
 
         // 防御：fullConfig 由已加载的表格数据构建，而更新接口是全量覆盖。
@@ -743,7 +743,7 @@ const handleConfirmAdd = async () => {
         }
 
         let targetObj = fullConfig
-        
+
         if (addForm.parentPath) {
           // 带上分组前缀，定位到唯一路径；
           // 不再按 groups 顺序盲搜（client / admin 同名 key 时会命中错误的分类）
@@ -756,13 +756,13 @@ const handleConfirmAdd = async () => {
             targetObj = getNestedObject(fullConfig, pathParts)
           }
         }
-        
+
         // 检查 key 是否已存在
         if (addForm.key in targetObj) {
           msg.error(`配置项 "${addForm.key}" 已存在`)
           return
         }
-        
+
         // 设置新值
         let value = addForm.value
 
@@ -797,9 +797,9 @@ const handleConfirmAdd = async () => {
         } else if (addForm.type === 'object') {
           value = {}
         }
-        
+
         targetObj[addForm.key] = value
-        
+
         const res = await updateAllConfigApi(fullConfig)
         if (res.code === 200) {
           msg.primary('新增成功')
@@ -886,11 +886,11 @@ onMounted(() => {
 const adjustValueToRange = () => {
   if (addForm.type !== 'number') return
   if (!addForm.enableThreshold) return  // 未启用阈值时，不调整
-  
+
   let currentValue = addForm.value
   let min = addForm.min
   let max = addForm.max
-  
+
   // 注意：min 和 max 可能为 null，需要处理
   if (min !== null && currentValue < min) {
     addForm.value = min

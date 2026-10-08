@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/user"
 export function getDynamicRouteComponents(excludes = []) {
   const userStore = useUserStore()
   const menuData = userStore.userMenu
-  
+
   // 递归扁平化路由树
   const flattenRoutes = (routes) => {
     return routes.flatMap(route => {
@@ -13,7 +13,7 @@ export function getDynamicRouteComponents(excludes = []) {
 
       // 检查是否在排除列表中
       const shouldExclude = excludes.includes(route.name)
-      
+
       // 添加当前路由组件（排除 Layout 组件和指定名称的组件）
       if (route.component && route.component.__name !== 'Layout' && !shouldExclude) {
         components.push({
@@ -22,19 +22,19 @@ export function getDynamicRouteComponents(excludes = []) {
           component: route.component
         })
       }
-      
+
       // 递归处理子路由
       if (route.children && !shouldExclude) {
         components.push(...flattenRoutes(route.children))
       }
-      
+
       return components
     })
   }
-  
+
   // 获取扁平化后的路由组件
   const flatComponents = flattenRoutes(menuData)
-  
+
   // 转换为目标格式
   return convertToDesiredFormat(flatComponents)
 }
@@ -56,9 +56,9 @@ export function getLocalRouteComponents(excludes = []) {
     if (excludes.includes(route.name)) {
       return []; // 如果主路由被排除，直接返回空数组（包括它的所有子路由）
     }
-    
+
     const components = [];
-    
+
     // 添加主路由组件
     if (route.component && route.path !== '/') {
       components.push({
@@ -68,7 +68,7 @@ export function getLocalRouteComponents(excludes = []) {
         isLocal: true
       });
     }
-    
+
     // 添加子路由组件
     if (route.children) {
       route.children.forEach(child => {
@@ -83,7 +83,7 @@ export function getLocalRouteComponents(excludes = []) {
         }
       });
     }
-    
+
     return components;
   });
 }

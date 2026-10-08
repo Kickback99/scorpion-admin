@@ -449,11 +449,11 @@ const save = async () => {
   /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) {
     width: 100%;
   } */
-   
+
   /* .el-tree-node__children .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
     padding-right: 16px;
   } */
-   
+
   // 顶层叶子节点（配置管理、任务管理等无父节点包裹）→ 独立右间距
   > .el-tree-node:has(> .el-tree-node__content > .el-tree-node__expand-icon.is-leaf) > .el-tree-node__content {
     padding-right: 76px;

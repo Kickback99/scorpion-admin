@@ -3,7 +3,7 @@
       <use :xlink:href="symbolId" :fill="fill" />
     </svg>
   </template>
-  
+
   <script setup>
   import { computed } from 'vue'
     const props = defineProps({
