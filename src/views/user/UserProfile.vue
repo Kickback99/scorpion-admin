@@ -5,9 +5,9 @@
         <div class="card-header">
           <span class="title">个人信息</span>
           <el-button
-            size="small" 
-            type="primary" 
-            icon="Edit" 
+            size="small"
+            type="primary"
+            icon="Edit"
             @click="editMode = !editMode"
             plain
           >
@@ -21,9 +21,9 @@
         <!-- 头像区域 -->
         <div class="avatar-section">
           <div class="avatar-upload">
-            <el-avatar 
-              :size="100" 
-              :src="imgUrl || avatar" 
+            <el-avatar
+              :size="100"
+              :src="imgUrl || avatar"
               class="user-avatar"
             />
             <el-upload
@@ -42,9 +42,9 @@
         </div>
 
         <!-- 基本信息表单 -->
-        <el-form 
-          :model="userInfo" 
-          :rules="rules" 
+        <el-form
+          :model="userInfo"
+          :rules="rules"
           ref="formRef"
           label-width="100px"
           class="info-form"
@@ -53,18 +53,18 @@
           <el-row :gutter="20">
             <el-col :xs="24" :sm="12">
               <el-form-item label="用户名">
-                <el-input 
-                  v-model="userInfo.username" 
+                <el-input
+                  v-model="userInfo.username"
                   :disabled="true"
                   placeholder="请输入用户名"
                 />
               </el-form-item>
             </el-col>
-            
+
             <el-col :xs="24" :sm="12">
               <el-form-item label="昵称" prop="nickname">
-                <el-input 
-                  v-model="userInfo.nickname" 
+                <el-input
+                  v-model="userInfo.nickname"
                   :disabled="!editMode"
                   placeholder="请输入昵称"
                 />
@@ -73,8 +73,8 @@
 
             <el-col :xs="24" :sm="12">
               <el-form-item label="邮箱" prop="email">
-                <el-input 
-                  v-model="userInfo.email" 
+                <el-input
+                  v-model="userInfo.email"
                   :disabled="!editMode"
                   placeholder="请输入邮箱"
                 />
@@ -83,8 +83,8 @@
 
             <el-col :xs="24" :sm="12">
               <el-form-item label="手机号" prop="phone">
-                <el-input 
-                  v-model="userInfo.phone" 
+                <el-input
+                  v-model="userInfo.phone"
                   :disabled="!editMode"
                   placeholder="请输入手机号"
                 />
@@ -136,8 +136,8 @@
             <div class="info-item">
               <span class="label">用户角色：</span>
                 <div class="role-tags">
-                <el-tag 
-                  v-for="(role, index) in userStore.roleNames" 
+                <el-tag
+                  v-for="(role, index) in userStore.roleNames"
                   :key="index"
                   type="success"
                   size="default"
@@ -189,7 +189,7 @@ const userStore = useUserStore()
 
 // 用户信息数据（写死的数据）
 const userInfo = reactive({
-  ...userStore.userInfo  
+  ...userStore.userInfo
 })
 
 // 统计数据用本地 ref（不与 store 混合）
@@ -269,7 +269,7 @@ const fetchProfileStats = async () => {
 const handleSave = async () => {
   console.log(userInfo === userStore.userInfo)
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
     loading.value = true
@@ -279,7 +279,7 @@ const handleSave = async () => {
     // 发送请求
     await userUpdateInfoApi(userInfo)
     const res = await userInfoApi()
-    Object.assign(userStore.userInfo, res.data.userInfo) 
+    Object.assign(userStore.userInfo, res.data.userInfo)
     editMode.value = false
     loading.value = false
     msg.primary('个人信息更新成功')
@@ -406,11 +406,11 @@ onMounted(async() => {
   .user-profile-container {
     padding: 10px;
   }
-  
+
   .profile-content {
     align-items: stretch;
   }
-  
+
   .avatar-upload {
     flex-direction: column;
   }

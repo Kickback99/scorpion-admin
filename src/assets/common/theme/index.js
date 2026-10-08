@@ -440,7 +440,7 @@ function injectSelectCss() {
     'color:var(--el-color-primary)!important;' +
     'background-color:var(--el-color-primary-plain-bg)!important;' +
     'font-weight:400!important;' +
-    '}' + 
+    '}' +
     // plain - 未选中
     '.ui-plain .el-select-dropdown__item:not(.is-disabled):not(.is-selected):hover{' +
     'color:var(--el-text-color-regular)!important;' +

@@ -18,7 +18,7 @@
           <el-menu-item index="/index">
                    <el-icon> <SingleIcon :icon="'ri:dashboard-3-line'"></SingleIcon> </el-icon> <span>仪表盘</span>
           </el-menu-item>
-      
+
           <menu-tree :listData="listData"></menu-tree>
 
           <!-- 多级菜单 -->
@@ -40,9 +40,9 @@
                   <el-icon> <singleIcon icon="ri:zzz-fill"></singleIcon> </el-icon>
                   <span>模板页面</span>
                 </template>
-                
-                <el-menu-item 
-                  v-for="item in tempMenuConfig" 
+
+                <el-menu-item
+                  v-for="item in tempMenuConfig"
                   :key="item.path"
                   :index="item.path"
                 >
@@ -52,7 +52,7 @@
             </el-sub-menu>
 
             <el-menu-item v-if="userStore.isAdmin" index="/test">
-                   <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试</span> 
+                   <el-icon> <SingleIcon icon="ri:bard-line"></SingleIcon> </el-icon> <span>测试</span>
             </el-menu-item>
         </el-menu>
       </el-scrollbar>

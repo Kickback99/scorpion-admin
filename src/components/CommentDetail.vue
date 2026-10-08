@@ -25,9 +25,9 @@
       <!-- 子评论列表 -->
       <div class="sub-title">子评论（{{ children.length }}）</div>
       <div class="children-list">
-        <div 
-          v-for="child in children" 
-          :key="child.id" 
+        <div
+          v-for="child in children"
+          :key="child.id"
           class="comment-card child-card"
           :class="{ 'direct-reply': child.toCommentId === child.rootId }"
         >
@@ -322,7 +322,7 @@ const loadDetail = async () => {
           parentData = null
         }
         parentComment.value = parentData || fallbackComment(comment)
-        const res = await getCommentsApi(1, 999, { 
+        const res = await getCommentsApi(1, 999, {
             rootId: comment.rootId,
             toCommentId: comment.id  // 后端支持这个参数
         })

@@ -48,7 +48,7 @@ export const routes = [
             meta: {
                 title: '测试',
                 icon: 'ri:bard-line'
-            }            
+            }
         }
     ]}
 ]
@@ -96,7 +96,7 @@ function routesHandler(router,parentType=null){
                 default:
                     modules = null
             }
-            
+
             if(modules){
                 const compName = route.component
                 // 注意：这里 component 字段存储的是相对路径，如 'config/sysConfig/list'
@@ -162,7 +162,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     const configStore = useConfigStore()
     const userConfigStore = useUserConfigStore();
      console.log('==================== 请求菜单 ====================')
-   
+
     try {
         // ================= 1. 数据获取阶段 =================
         let menuData
@@ -197,9 +197,9 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         if (menuData.routers.length === 0 ) {
             console.log('情况2拦截')
         add403Routes(router); // 确保 403 路由存在
-        return Promise.reject({ 
-            noMenuPermission: true, 
-            message: '该用户无菜单权限' 
+        return Promise.reject({
+            noMenuPermission: true,
+            message: '该用户无菜单权限'
         });
         }
 
@@ -207,7 +207,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // 清除旧路由
     // 移除现有的 404 路由，确保动态路由优先匹配
     // remove404Routes()
-        
+
 
     // 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
@@ -225,7 +225,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         }
     });
 
-  
+
 
     // 更新 Store 中的菜单引用
     userStore.setUserMenu(menuData.routers);
@@ -245,8 +245,8 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
       routes: router.getRoutes(),
       permissions: menuData.permissions
     }); */
-    
-    
+
+
     // 仅刷新菜单的场景（loadMenu(false)）没有导航上下文，跳过守卫校验
     if (!to || typeof next !== 'function') {
         return true
@@ -302,7 +302,7 @@ const modules = import.meta.glob('../views/temp/*.vue')
 export const tempRoutes = Object.entries(modules).map(([filePath, component]) => {
     // 提取文件名（不含扩展名）
     const fileName = filePath.split('/').pop().replace('.vue', '')
-    
+
     return {
         path: `/${fileName.toLowerCase()}`, // 路径，如：/temp1
         name: fileName, // 路由名称，如：temp1

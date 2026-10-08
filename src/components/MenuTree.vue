@@ -60,13 +60,13 @@ const handleChildren = (menu) => {
         // 配置管理菜单，直接返回 /config 路径
         return `/${prefix}`
     }
-    
+
      // 处理有 level 标记的二级菜单（如日志管理下的子菜单）
     if(menu.level) {
         // 如果路径中包含 log，则添加 log 父路径
         return `/${prefix}/${menu.parentPath}/${menu.path}`
     }
-    
+
     // 普通菜单
     return `/${prefix}/${menu.path}`
     // return menu.path.includes('Log') === true ? `/system/log/${menu.path}`:`/system/${menu.path}`

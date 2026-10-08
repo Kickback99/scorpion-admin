@@ -39,7 +39,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      
+
       <!-- ==================== 操作栏 ==================== -->
       <el-table-column v-if="showPermColumn(['btn.task.update', 'btn.task.execute', 'btn.task.remove'])" label="操作" width="350" fixed="right" align="center">
         <template #default="{ row }">
@@ -72,36 +72,36 @@
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="auto" size="small">
         <!-- 任务编码（新增时可编辑，编辑时禁用） -->
         <el-form-item label="任务编码" prop="taskCode">
-          <el-input 
-            v-model="formData.taskCode" 
+          <el-input
+            v-model="formData.taskCode"
             placeholder="请输入任务编码，如: SYNC_COMMENT"
             :disabled="isEditMode"
           />
           <div class="form-hint">⚠️ 任务编码一旦创建不可修改</div>
         </el-form-item>
-        
+
         <!-- 任务名称 -->
         <el-form-item label="任务名称" prop="taskName">
-          <el-input 
-            v-model="formData.taskName" 
+          <el-input
+            v-model="formData.taskName"
             placeholder="请输入任务名称，如: 评论同步任务"
           />
         </el-form-item>
-        
+
         <!-- 任务描述 -->
         <el-form-item label="任务描述" prop="description">
-          <el-input 
-            v-model="formData.description" 
-            type="textarea" 
+          <el-input
+            v-model="formData.description"
+            type="textarea"
             rows="2"
             placeholder="请输入任务描述"
           />
         </el-form-item>
-        
+
         <!-- Cron 表达式 -->
         <el-form-item label="Cron表达式" prop="cronExpression">
-          <el-input 
-            v-model="formData.cronExpression" 
+          <el-input
+            v-model="formData.cronExpression"
             placeholder="请输入Cron表达式，如: 0 0/10 * * * ?"
           />
           <div class="cron-hint">
@@ -112,7 +112,7 @@
             <el-button link type="primary" @click="setCron('0 0/30 * * * ?')">每30分钟</el-button>
             <el-button link type="primary" @click="setCron('0 0 0/1 * * ?')">每小时</el-button>
             <el-button link type="primary" @click="setCron('0 0 2 * * ?')">每天凌晨2点</el-button>
-          
+
             <div class="test-hint">
               <span class="hint-label">测试表达式：</span>
               <el-button link type="warning" @click="setCron('0/5 * * * * ?')">每5秒</el-button>
@@ -123,7 +123,7 @@
             </div>
           </div>
         </el-form-item>
-        
+
         <!-- 任务状态 -->
         <el-form-item label="任务状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -132,7 +132,7 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <el-button size="small" type="info" @click="dialogVisible = false" plain>取消</el-button>
         <el-button size="small" type="primary" @click="submitTask" plain>
@@ -236,10 +236,10 @@ const editTask = async(row) => {
 // ==================== 提交任务（新增/更新） ====================
 const submitTask = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     try {
       if (isEditMode.value) {
         // ==================== 编辑模式：全字段更新 ====================
@@ -256,7 +256,7 @@ const submitTask = async () => {
         await addApi(formData.value)
         msg.primary('任务新增成功')
       }
-      
+
       dialogVisible.value = false
       await loadTaskList()
     } catch (error) {
@@ -278,7 +278,7 @@ const executeTask = async (row) => {
         type: 'warning'
       }
     )
-    
+
     msg.primary(`【${row.taskName}】已开始执行`)
     await executeApi(row.taskCode)
   } catch (error) {
@@ -300,7 +300,7 @@ const refreshSingleTask = async (row) => {
         type: 'info'
       }
     )
-    
+
     await refreshTaskApi(row.taskCode)
     msg.primary(`【${row.taskName}】定时配置已刷新`)
     await loadTaskList()
@@ -323,7 +323,7 @@ const refreshAllTasks = async () => {
         type: 'info'
       }
     )
-    
+
     await refreshAllApi()
     msg.primary('所有定时任务已刷新')
     await loadTaskList()
@@ -338,7 +338,7 @@ const refreshAllTasks = async () => {
 const toggleStatus = async (row) => {
   const newStatus = row.status === 0 ? 1 : 0
   const action = newStatus === 0 ? '启用' : '禁用'
-  
+
   try {
     await ElMessageBox.confirm(
       `确定要${action}【${row.taskName}】吗？`,
@@ -349,7 +349,7 @@ const toggleStatus = async (row) => {
         type: 'warning'
       }
     )
-    
+
     const updateData = {
       taskName: row.taskName,
       description: row.description,
@@ -357,7 +357,7 @@ const toggleStatus = async (row) => {
       status: newStatus
     }
     await updateApi(row.id, updateData)
-    
+
     msg.primary(`任务已${action}`)
     await loadTaskList()
   } catch (error) {
@@ -389,14 +389,14 @@ const translateCron = (cronExpression) => {
   if (!cronExpression) return '未设置'
   try {
     // 1. 获取中文翻译
-    let result = cronstrue.toString(cronExpression, { 
+    let result = cronstrue.toString(cronExpression, {
       locale: 'zh_CN'
     })
-    
+
     // 2. 提取翻译中的小时数字（1-12 点）
     // 匹配 "上午 XX:XX" 或 "上午 XX 点" 格式，提取小时数
     const hourMatch = result.match(/上午\s*(\d{1,2})/)
-    
+
     if (hourMatch) {
       const hour = parseInt(hourMatch[1])
       // 3. 判断是否为凌晨时段（1:00 - 5:59）
@@ -406,7 +406,7 @@ const translateCron = (cronExpression) => {
       // 6:00 - 11:59 保持 "上午" 不变
       // 12:00 以后不会有"上午"（cronstrue 会用"下午"）
     }
-    
+
     return result
   } catch (error) {
     console.warn('Cron翻译失败:', cronExpression, error)
@@ -424,23 +424,23 @@ onMounted(() => {
 .task-container {
   // 水平留白交给 Layout 的 .main-container 统一给，页面不自叠一层（与其它列表页一致）
   padding: 20px 0;
-  
+
   .toolbar {
     margin-bottom: 20px;
     display: flex;
     justify-content: flex-start;
     gap: 12px;
   }
-  
+
   .cron-hint {
     margin-top: 8px;
     font-size: 12px;
     color: #909399;
-    
+
     .hint-label {
       margin-right: 8px;
     }
-    
+
     .el-button {
       margin-left: 4px;
       font-size: 12px;
@@ -452,7 +452,7 @@ onMounted(() => {
       border-top: 1px dashed #e4e7ed;
     }
   }
-  
+
   .form-hint {
     margin-top: 4px;
     font-size: 12px;

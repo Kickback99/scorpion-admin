@@ -16,7 +16,7 @@
             </el-form-item>
 
             <el-form-item>
-                 <el-input v-model="searchData.keyword" placeholder="请输入评论内容/评论人"></el-input>   
+                 <el-input v-model="searchData.keyword" placeholder="请输入评论内容/评论人"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -56,8 +56,8 @@
             <el-form-item>
                 <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
                 <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
-            </el-form-item>            
-        </el-form> 
+            </el-form-item>
+        </el-form>
 
         <!-- 顶部操作栏：新增「回复」按钮 -->
         <div class="top-action-bar">
@@ -149,9 +149,9 @@
             <template #default="{ row }">
                 <!-- 审核模式：显示 通过/驳回/删除/详情 -->
                 <template v-if="viewMode === 'audit'">
-                    <el-popconfirm 
-                        title="确认通过该评论吗？" 
-                        @confirm="handleApprove(row)" 
+                    <el-popconfirm
+                        title="确认通过该评论吗？"
+                        @confirm="handleApprove(row)"
                         width="200px"
                         :disabled="row.status === 0"
                     >
@@ -164,10 +164,10 @@
                             >通过</el-button>
                         </template>
                     </el-popconfirm>
-                    
-                    <el-popconfirm 
-                        title="确认驳回该评论吗？" 
-                        @confirm="handleReject(row)" 
+
+                    <el-popconfirm
+                        title="确认驳回该评论吗？"
+                        @confirm="handleReject(row)"
                         width="200px"
                         :disabled="row.status === 1"
                     >
@@ -180,7 +180,7 @@
                             >驳回</el-button>
                         </template>
                     </el-popconfirm>
-                    
+
                     <el-popconfirm :title="handleTitle(row.rootId)" @confirm="handleDelete(row.id)" width="250px" icon="WarnTriangleFilled">
                         <template #reference>
                             <el-button size="small" type="danger" plain>删除</el-button>
@@ -222,7 +222,7 @@
     <!-- 重构：回复对话框（支持原内容 或 评论类型选择） -->
     <el-dialog v-model="replyDialogVisible" :title="replyDialogTitle" width="40%">
         <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef" label-width="auto" size="small">
-            
+
             <!-- 如果是父评论（顶部回复），显示类型选择 -->
             <template v-if="replyModel.isTopReply">
                 <el-form-item label="评论类型" prop="type">
@@ -232,7 +232,7 @@
                         <el-radio :label="'2'">留言板</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                
+
                 <!-- 文章评论时显示文章选择 -->
                 <el-form-item v-if="replyModel.type === '0'" label="选择文章" prop="articleId">
                     <SmartAutoComplete
@@ -296,15 +296,15 @@
             </el-button>
         </div>
         </template>
-        
+
         <!-- 加载状态 -->
         <div v-if="drawerLoading" class="drawer-loading">
         <span class="load-spinner"></span>
         <span>加载中...</span>
         </div>
-        
+
         <!-- 详情内容 -->
-        <CommentDetail 
+        <CommentDetail
         v-else
         ref="detailRef"
         :comment="currentDetailComment"
@@ -381,7 +381,7 @@ const render = async () => {
                     searchParams.pickParent = true
                     searchParams.currentCommentId = currentPickComment.value.id
                 }
-            
+
             res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
             tableData.value = res.data.items
             total.value = res.data.total
@@ -397,7 +397,7 @@ const render = async () => {
                 // 父集模式：传当前评论的 rootId 作为 rootId
                 rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
             }
-            
+
             // 区分挑拣子集和挑拣父集
             if (isRootComment) {
                 // 子集模式（点击的是根评论）
@@ -407,14 +407,14 @@ const render = async () => {
                 searchParams.pickParent = true
                 searchParams.currentCommentId = currentPickComment.value.id
             }
-            
+
             // 添加其他筛选条件
             if (searchData.keyword) searchParams.keyword = searchData.keyword
             if (searchData.type) searchParams.type = searchData.type
             if (searchData.status !== undefined && searchData.status !== null && searchData.status !== '') searchParams.status = searchData.status
             if (searchData.sortField) searchParams.sortField = searchData.sortField
             if (searchData.sortOrder) searchParams.sortOrder = searchData.sortOrder
-            
+
             res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
             tableData.value = res.data.items
             total.value = res.data.total
@@ -479,7 +479,7 @@ const onReset = () => {
         Object.assign(searchData, { keyword: '', type: null, rootId: '', status: 2, sortOrder: 'DESC', sortField: 'status' })
     }
     currentPickComment.value = null
-    params.pageNum = 1    
+    params.pageNum = 1
     render()
 }
 
@@ -577,44 +577,44 @@ const loadAllArticles = async () => {
 // 前端搜索函数
 const fetchArticles = async (params) => {
     const query = params.keyword || ''
-    
+
     if (hasPerm('btn.comment.add') && articleList.value.length === 0) {
         await loadAllArticles()
     }
-    
+
     if (!query) {
         return articleList.value
     }
-    
+
     const lowerQuery = query.toLowerCase()
     const PinyinMatch = await loadPinyinMatch()
 
     const matched = articleList.value.filter(item => {
         const text = item.value
         const lowerText = text.toLowerCase()
-        
+
         if (lowerText.includes(lowerQuery)) return true
         if (PinyinMatch.match(text, query)) return true
-        
+
         const words = lowerText.split(/[\s\-_]+/)
         for (const word of words) {
             if (word.startsWith(lowerQuery)) return true
         }
-        
+
         if (words.length > 1) {
             const initials = words.map(word => word[0]).join('')
             if (initials.includes(lowerQuery)) return true
         }
-        
+
         let charIndex = 0
         for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
             if (lowerText[i] === lowerQuery[charIndex]) charIndex++
         }
         if (charIndex === lowerQuery.length) return true
-        
+
         return false
     })
-    
+
     return matched
 }
 
@@ -683,7 +683,7 @@ const onSwitchCommentType = (val) => {
 // 顶部回复按钮 - 父评论
 const handleTopReply = () => {
     // console.log('顶部回复 - 父评论')
-    
+
     // 重置模型为父评论模式
     replyModel.isTopReply = true
     replyModel.type = '0'
@@ -693,13 +693,13 @@ const handleTopReply = () => {
     replyModel.rootId = -1
     replyModel.toCommentId = -1
     replyModel.toCommentUserId = -1
-    
+
     selectedArticles.value = []
     replyDialogTitle.value = '回复根评论'
-    
+
     // 打开对话框
     replyDialogVisible.value = true
-    
+
     nextTick(() => {
         replyModelRef.value?.resetFields(['content', 'articleId'])
         setTimeout(() => {
@@ -711,16 +711,16 @@ const handleTopReply = () => {
 // 子评论回复（点击表格中的回复按钮）
 const handleReply = (row) => {
     // console.log('回复的评论：', row)
-    
+
     // 重置为子评论模式
     replyModel.isTopReply = false
     replyModel.originalContent = row.content
     replyModel.content = ''
     replyModel.type = row.type
-    
+
     // 设置请求参数
     replyModel.articleId = row.articleId
-    
+
     if (row.rootId === -1) {
         // 回复根评论
         replyModel.rootId = row.id
@@ -732,12 +732,12 @@ const handleReply = (row) => {
         replyModel.toCommentId = row.id
         replyModel.toCommentUserId = row.createBy
     }
-    
+
     replyDialogTitle.value = '回复评论'
-    
+
     // 打开对话框
     replyDialogVisible.value = true
-    
+
     nextTick(() => {
         replyModelRef.value?.resetFields(['content'])
         setTimeout(() => {
@@ -753,9 +753,9 @@ const handleReply = (row) => {
 const submitReply = async () => {
     // 表单验证
     await replyModelRef.value.validate()
-    
+
     let requestData
-    
+
     if (replyModel.isTopReply) {
         // 父评论：rootId = -1, toCommentId = -1, toCommentUserId = -1
         requestData = {
@@ -765,7 +765,7 @@ const submitReply = async () => {
             toCommentUserId: -1,
             content: replyModel.content
         }
-        
+
         // 文章评论需要 articleId
         if (replyModel.type === '0') {
             requestData.articleId = replyModel.articleId
@@ -781,13 +781,13 @@ const submitReply = async () => {
             content: replyModel.content
         }
     }
-    
+
     console.log('提交数据:', requestData)
-    
+
     await addCommentApi(requestData)
     msg.primary('回复成功')
     replyDialogVisible.value = false
-    
+
     // 刷新列表
     render()
 }
@@ -805,17 +805,17 @@ const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726
  */
 const handleInfo = async (comment) => {
   console.log('🔍 点击详情按钮，评论数据:', comment)
-  
+
   // 设置当前评论
   currentDetailComment.value = comment
-  
+
   // 打开抽屉并显示加载状态
   drawerVisible.value = true
   drawerLoading.value = true
-  
+
   // 等待详情组件加载完成
   await nextTick()
-  
+
   // 延迟一点关闭加载状态（让组件有时间加载）
   setTimeout(() => {
     drawerLoading.value = false
@@ -836,7 +836,7 @@ const onDetailError = (error) => {
 
 const handleTitle = (rootId) => {
     if(rootId === -1) return '删除父评论，该子评论一律删除'
-    else return '你确定要删除这条评论吗？' 
+    else return '你确定要删除这条评论吗？'
 }
 
 // 批量业务相关
@@ -853,14 +853,14 @@ const handleMultiple = (raw) => {
 const batchApproveRows = async () => {
     // 检查选中项是否全部为待通过状态
     const check = checkApproveValid(multipleSelection.value)
-    
+
     if (!check.valid) {
         msg.warning(check.message)
         return
     }
-    
+
     await confirmBatchAction(check.validRows.length, '通过')
-    
+
     const ids = multipleSelection.value.map(row => row.id)
     await auditCommentsApi(ids, 0)
     msg.primary(`成功通过${ids.length}条评论`)
@@ -870,14 +870,14 @@ const batchApproveRows = async () => {
 // 批量驳回
 const batchRejectRows = async () => {
     const check = checkRejectValid(multipleSelection.value)
-    
+
     if (!check.valid) {
         msg.warning(check.message)
         return
     }
-    
+
     await confirmBatchAction(check.validRows.length, '驳回')
-    
+
     const ids = multipleSelection.value.map(row => row.id)
     await auditCommentsApi(ids, 1)
     msg.primary(`成功驳回${ids.length}条评论`)
@@ -895,7 +895,7 @@ const batchDeleteRows = async() => {
     const rowIds = multipleSelection.value.map(row => row.id)
     const rootIds = multipleSelection.value.map(row => row.rootId)
     if(rootIds.length > 0){
-        title = 
+        title =
         `你选择了${rootIds.length}个根评论，你确认要删除吗？
         删除后，子评论也一律删除
         `
@@ -953,18 +953,18 @@ const statistics = reactive({
 // 构建统计参数（通用方法）
 const buildStatsParams = () => {
     const statsParams = { ...searchData }
-    
+
     // 审核模式：只有当用户没有主动选择状态时，才默认查询待审核状态
     /* if (viewMode.value === 'audit') {
         // 检查 searchData.status 是否为空（未选择）或为 undefined
-        const hasUserSelectedStatus = searchData.status !== undefined 
-                                    && searchData.status !== null 
+        const hasUserSelectedStatus = searchData.status !== undefined
+                                    && searchData.status !== null
                                     && searchData.status !== ''
         if (!hasUserSelectedStatus) {
             statsParams.status = 2  // 默认查询待审核
         }
     } */
-    
+
     // 如果有挑拣上下文（无论是 pick 模式还是 audit 模式从挑拣进来）
     if (currentPickComment.value) {
         const isRootComment = currentPickComment.value.rootId === -1
@@ -979,7 +979,7 @@ const buildStatsParams = () => {
             delete statsParams.pickChildren
         }
     }
-    
+
     return statsParams
 }
 
@@ -1022,7 +1022,7 @@ const loadStatistics = async () => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  
+
   .drawer-title {
     font-size: 18px;
     // font-weight: bold;
@@ -1038,7 +1038,7 @@ const loadStatistics = async () => {
   padding: 60px;
   color: var(--el-color-primary);
   font-size: 14px;
-  
+
   .el-icon {
     font-size: 24px;
   }

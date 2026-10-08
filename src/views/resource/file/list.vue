@@ -66,7 +66,7 @@
                     <offlineIcon icon="ri:file-add-line"></offlineIcon>批量上传
                 </el-button>
             </el-upload>
-           
+
         </div>
     </div>
 
@@ -290,7 +290,7 @@ const handleDownload = async(row) => {
 // 文件预检查
 const beforeUpload = (file) => {
   const maxSize = 10 * 1024 * 1024 // 10MB
-  
+
   // 检查文件大小
   if (file.size > maxSize) {
     msg.error(`"${file.name}" 大小 ${(file.size / 1024 / 1024).toFixed(2)}MB，超过 10MB 限制`)
@@ -306,7 +306,7 @@ const onSuccess = (res,file) => {
         msg.error(res.message)
         return;
     }
-    
+
     // 文件上传成功
     msg.primary(res.message)
     render()
@@ -314,10 +314,10 @@ const onSuccess = (res,file) => {
 
 const onError = (error, file, fileList) => {
       console.error('上传错误:', error)
-  
+
   // 处理大文件错误
-  if (error.status === 0 || 
-      error.message?.includes('CONNECTION') || 
+  if (error.status === 0 ||
+      error.message?.includes('CONNECTION') ||
       error.message?.includes('Network Error')) {
     msg.error('文件太大，请上传 10MB 以内的文件')
   } else {
