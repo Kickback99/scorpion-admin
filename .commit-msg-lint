@@ -1,0 +1,2 @@
+# 启用「提交信息规范」校验（git-commit skill 的 commit-msg 拦截器）
+# 删除本文件即在本仓关闭该校验
