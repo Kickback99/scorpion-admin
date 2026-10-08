@@ -168,7 +168,7 @@ const handleLogin = async() => {
       eventBus.emit('adjustTabScroll');
 
     } catch (error) {
-        // console.log(error)
+        // console.error(error)
         // 客户端侧错误（未完成验证码 / 未填答案）不进拦截器，需在此补提示；接口错误拦截器已弹过窗
         if (error instanceof Error && !error.isAxiosError) msg.warning(error.message)
         loading.value = false

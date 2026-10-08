@@ -2,7 +2,6 @@
 <template>
   <div class="image-reference">
     <div class="image-reference-header">
-      <!-- <span class="image-reference-title">{{ title }}</span> -->
       <el-button
         size="small"
         type="info"

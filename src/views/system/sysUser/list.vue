@@ -316,8 +316,6 @@ render()
 //点击分页事件
 const onSizeChange = (size) => {
     //console.log(`onSizeChange：每页显示${size}条`)
-    //每页条数发生变化时，重新从第一页渲染
-    // params.value.pageNum = 1
     //更新每页条数
     params.value.pageSize = size
     //重新渲染
@@ -326,8 +324,6 @@ const onSizeChange = (size) => {
 
 const onCurrentChange = (page) => {
     //console.log(`onCurrentChange：当前第${size}页`)
-    //更新当前页
-    // params.value.pageNum = page
     //重新渲染
     render(page)
 }
@@ -346,9 +342,6 @@ const removeMultiple = (raw) =>{
 const toggleSelection = (rows) => {
   if (rows) {
     rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       multipleTableRef.value.toggleRowSelection(row, undefined)
     })
   } else {

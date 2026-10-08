@@ -871,7 +871,6 @@ const handleConfirm = async () => {
         renderCarouselList()
     } catch (error) {
         console.log(error.message)
-        // msg.error(formModel.id ? '修改失败' : '添加失败')
     }
 }
 
@@ -910,7 +909,6 @@ const handleCarouselUploadComplete = (event) => {
         message,
         customClass: 'message-right-top'
     })
-    // formModel.uploadStatus = 'SUCCESS'
 }
 
 const handleCarouselUploadFailed = (event) => {
@@ -921,7 +919,6 @@ const handleCarouselUploadFailed = (event) => {
           message,
           customClass: 'message-right-top'
     })
-    // formModel.uploadStatus = 'FAILED' 
 }
 
 onMounted(() => {
