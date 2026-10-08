@@ -50,7 +50,7 @@ export const useTabStore = defineStore({
   },
     persist: true,  // 开启当前仓库的持久化
 	/* persist: {
-		key: 'wzCount', //修改localStorage的key，默认用仓库唯一标识做为key
-		paths:['count'] //存储的是哪些数据，默认存储整个state数据
+		key: 'wzCount', // 修改localStorage的key，默认用仓库唯一标识做为key
+		paths:['count'] // 存储的是哪些数据，默认存储整个state数据
 	} */
 })

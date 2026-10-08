@@ -221,22 +221,22 @@ const fetchLoginLogList = async() => {
 
 fetchLoginLogList()
 
-//点击分页事件
+// 点击分页事件
 const handleSizeChange = (size) => {
-    //console.log(`handleSizeChange：每页显示${size}条`)
-    //每页条数发生变化时，重新从第一页渲染
+    // console.log(`handleSizeChange：每页显示${size}条`)
+    // 每页条数发生变化时，重新从第一页渲染
     params.value.pageNum = 1
-    //更新每页条数
+    // 更新每页条数
     params.value.pageSize = size
-    //重新渲染
+    // 重新渲染
     fetchLoginLogList()
 }
 
 const handlePageChange = (page) => {
-    //console.log(`handlePageChange：当前第${page}页`)
-    //更新当前页
+    // console.log(`handlePageChange：当前第${page}页`)
+    // 更新当前页
     params.value.pageNum = page
-    //重新渲染
+    // 重新渲染
     fetchLoginLogList()
 }
 

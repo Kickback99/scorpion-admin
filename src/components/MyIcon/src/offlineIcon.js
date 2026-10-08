@@ -38,7 +38,7 @@ export default defineComponent({
       // 存入store
     setup(props) {
       // 批量注册已改为异步：注册完成后 bump 版本号触发重渲染
-      //（离线 storage 是普通对象，addCollection 不触发响应式更新）
+      // （离线 storage 是普通对象，addCollection 不触发响应式更新）
       const lazyIconVersion = ref(0)
       whenBatchIconsReady().then(() => { lazyIconVersion.value++ })
 

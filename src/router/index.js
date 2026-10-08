@@ -71,7 +71,7 @@ function routesHandler(router,parentType=null){
               const newStr =  route.path.substring(1)
               route.name = newStr
               route.type = newStr
-            //   route.redirect = `${route.path}/${route.children[0].path}` //这样处理会报错
+            // route.redirect = `${route.path}/${route.children[0].path}` // 这样处理会报错
               if(route.children && route.children.length > 0){
                   route.redirect = `${route.path}/${route.children[0].path}`
               }
@@ -265,8 +265,8 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         }
         return next('/404')
     }
-//    console.log('router.getRoutes()',router.getRoutes())
-//    console.log('用户菜单权限充足')
+// console.log('router.getRoutes()',router.getRoutes())
+// console.log('用户菜单权限充足')
     return true;
     } catch (error) {
         console.log('error,',error)
@@ -283,8 +283,8 @@ const hasRouteByPath = (path) => {
 // 创建路由对象
 
 const router = createRouter({
-    //t_env：router
-    history:createWebHistory(import.meta.env.VITE_ROUTER_URL), //采用 html5 路由模式
+    // t_env：router
+    history:createWebHistory(import.meta.env.VITE_ROUTER_URL), // 采用 html5 路由模式
     routes
 })
 
@@ -292,8 +292,8 @@ let count = 1;
 
 function addDynamicRoutes(routerData){
     routerData.forEach(r => {
-        //router.addRoute('/',r) //错误写法
-        router.addRoute('parentNode',r) //此处必须填写的父路由名字（name）
+        // router.addRoute('/',r) // 错误写法
+        router.addRoute('parentNode',r) // 此处必须填写的父路由名字（name）
     })
 }
 
@@ -429,7 +429,7 @@ router.beforeEach((to, from, next) => {
         if (!userStore.isAdmin && ADMIN_ONLY_PATHS.has(to.path)) {
             return next('/404')
         }
-        //放行
+        // 放行
         console.log('==================== 已登录，有菜单 ====================')
         return next()
     }
