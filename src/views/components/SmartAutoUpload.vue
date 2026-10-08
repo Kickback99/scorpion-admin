@@ -33,7 +33,7 @@ let modelValue = defineModel()
 const tokenStore = useTokenStore()
 
 // 定义 props
-const props = defineProps({ 
+const props = defineProps({
     // 形状类型：'square' | 'rectangle'
     shape: {
       type: String,
@@ -76,8 +76,8 @@ const uploaderClass = computed(() => {
 
 // 计算建议尺寸文本
 const sizeTip = computed(() => {
-  return props.shape === 'rectangle' 
-    ? '建议尺寸：16 / 9' 
+  return props.shape === 'rectangle'
+    ? '建议尺寸：16 / 9'
     : '建议尺寸：1 / 1'
 })
 
@@ -98,7 +98,7 @@ const beforeAvatarUpload = (rawFile) => {
 // 上传时的回调
 const handleProgress = (event) => {
   percentage.value =  Math.floor(event.percent)
-} 
+}
 
 // 对外暴露 handleImage 方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {

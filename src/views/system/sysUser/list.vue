@@ -560,7 +560,7 @@ const modifyUser = async() => {
 
 // 绑定表单校验规则
 const rules = {
-    username : [    
+    username : [
       { required: true, message: '请输入用户名', trigger: 'blur' },
       { min: 3, max: 15, message: '用户名必须是 3-15位 的字符', trigger: 'blur' },
   ],

@@ -1,7 +1,7 @@
 <template>
   <div class="icon-switcher">
-    <el-radio-group 
-      v-model="isSearch" 
+    <el-radio-group
+      v-model="isSearch"
       size="small"
       @change="toggleComponent"
     >

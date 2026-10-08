@@ -1,9 +1,9 @@
 <template>
-      <el-upload 
-          class="avatar-uploader" 
+      <el-upload
+          class="avatar-uploader"
           :class="uploaderClass"
           :auto-upload="false"
-          name="cover" 
+          name="cover"
           :show-file-list="false"
           :onChange="handleSelectAvatar"
           >
@@ -44,8 +44,8 @@ const uploaderClass = computed(() => {
 
 // 计算建议尺寸文本
 const sizeTip = computed(() => {
-  return props.shape === 'rectangle' 
-    ? '建议尺寸：16 / 9' 
+  return props.shape === 'rectangle'
+    ? '建议尺寸：16 / 9'
     : '建议尺寸：1 / 1'
 })
 

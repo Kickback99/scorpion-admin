@@ -18,19 +18,19 @@
       @blur="handleBlur"
       @keydown="handleKeydown"
     />
-    
+
     <!-- 自定义下拉建议框 -->
-    <div 
-      v-if="showDropdown && filteredSuggestions.length > 0" 
+    <div
+      v-if="showDropdown && filteredSuggestions.length > 0"
       class="suggestions-popover"
       :style="suggestionsStyle"
       ref="suggestionsRef"
     >
-      <div 
-        v-for="(item, index) in filteredSuggestions" 
+      <div
+        v-for="(item, index) in filteredSuggestions"
         :key="index"
         class="suggestion-item"
-        :class="{ 
+        :class="{
           'suggestion-active': activeIndex === index,
           'suggestion-hover': hoverIndex === index && activeIndex !== index
         }"
@@ -165,7 +165,7 @@ const keyboardTimer = ref(null)
 // 过滤后的建议（排除已选择的 + 拼音匹配）
 const filteredSuggestions = computed(() => {
   const selectedValues = modelValue.value
-  
+
   // 如果启用多 ID 模式，按标题去重
   if (props.multipleIdMode) {
     const map = new Map()
@@ -194,14 +194,14 @@ const filteredSuggestions = computed(() => {
         map.set(key, newItem)
       }
     })
-    
+
     const result = Array.from(map.values())
     // 过滤已选择的
     return result.filter(item => !selectedValues.includes(item.value))
   }
-  
+
   // 原有逻辑：不过滤已选择的
-  return suggestions.value.filter(item => 
+  return suggestions.value.filter(item =>
     !isTagSelected(item.value)
   )
 })
@@ -227,10 +227,10 @@ const highlightMatch = (text) => {
   console.log('highlightMatch 调用:', { query, text, queryLength: query?.length })
 
   if (!query || !query.trim() || !text) return text
-  
+
   const lowerText = text.toLowerCase()
   const lowerQuery = query.toLowerCase()
-  
+
   // 1. 英文直接匹配（优先）
   const index = lowerText.indexOf(lowerQuery)
   if (index !== -1) {
@@ -239,14 +239,14 @@ const highlightMatch = (text) => {
     const after = text.substring(index + query.length)
     return `${before}<strong>${match}</strong>${after}`
   }
-  
+
   // 2. PinyinMatch（中文拼音）— 返回 [startIndex, endIndex]
   const pinyinResult = PinyinMatch.value?.match(text, query)
   if (pinyinResult && pinyinResult.length >= 2) {
     const from = pinyinResult[0], to = pinyinResult[1] + 1
     return text.substring(0, from) + '<strong>' + text.substring(from, to) + '</strong>' + text.substring(to)
   }
-  
+
   // 3. 复合词首字母匹配（使用 props.separators）
   const words = text.split(props.separators)
   if (words.length > 1) {
@@ -256,7 +256,7 @@ const highlightMatch = (text) => {
       let currentPos = 0
       const queryChars = lowerQuery.split('')
       let queryIndex = 0
-      
+
       for (let i = 0; i < words.length; i++) {
         const word = words[i]
         if (i > 0) {
@@ -267,7 +267,7 @@ const highlightMatch = (text) => {
             currentPos += separator.length
           }
         }
-        
+
         if (queryIndex < queryChars.length && word[0].toLowerCase() === queryChars[queryIndex]) {
           html += `<strong>${word[0]}</strong>`
           html += word.substring(1)
@@ -280,13 +280,13 @@ const highlightMatch = (text) => {
       return html
     }
   }
-  
+
   // 4. 单词内字符匹配（使用 props.separators）
   if (lowerQuery.length > 1) {
     let html = ''
     let lastIndex = 0
     let queryIndex = 0
-    
+
     for (let i = 0; i < text.length && queryIndex < lowerQuery.length; i++) {
       if (text[i].toLowerCase() === lowerQuery[queryIndex]) {
         if (i > lastIndex) {
@@ -297,7 +297,7 @@ const highlightMatch = (text) => {
         queryIndex++
       }
     }
-    
+
     if (queryIndex === lowerQuery.length) {
       if (lastIndex < text.length) {
         html += text.substring(lastIndex)
@@ -305,7 +305,7 @@ const highlightMatch = (text) => {
       return html
     }
   }
-  
+
   return text
 }
 
@@ -325,7 +325,7 @@ const updateCurrentInput = () => {
     clearTimeout(debounceTimer)
     return
   }
-  
+
   // 如果输入内容长度达到最小搜索长度，触发搜索
   if (inputValue.length >= props.minSearchLength) {
     debounceSearch(inputValue)
@@ -349,16 +349,16 @@ const debounceSearch = (query) => {
 // 获取联想数据
 const fetchSuggestions = async (query) => {
   if (!props.fetchSuggestionsApi) return
-  
+
   loading.value = true
-  
+
   try {
     // 调用父组件的搜索函数（内部使用 pinyin-match）
     const result = await props.fetchSuggestionsApi({ keyword: query })
-    
+
     // ✅ 直接使用，假设 result 已经是数组
     const data = Array.isArray(result) ? result : []
-    
+
     suggestions.value = data
     // 构建原始数据映射（用于多 ID 模式）
     rawDataMap.value.clear()
@@ -375,8 +375,8 @@ const fetchSuggestions = async (query) => {
           }
         }
       } else {
-        rawDataMap.value.set(key, { 
-          ...item, 
+        rawDataMap.value.set(key, {
+          ...item,
           ids: item.id !== undefined && item.id !== null ? [item.id] : []
         })
       }
@@ -385,7 +385,7 @@ const fetchSuggestions = async (query) => {
     showDropdown.value = suggestions.value.length > 0
     activeIndex.value = -1
     updateSuggestionsPosition()
-    
+
   } catch (error) {
     console.error('获取建议失败:', error)
     suggestions.value = []
@@ -462,12 +462,12 @@ const scrollToHighlighted = (index) => {
   requestAnimationFrame(() => {
     nextTick(() => {
       if (!suggestionsRef.value) return
-      
+
       const items = suggestionsRef.value.querySelectorAll('.suggestion-item')
       if (!items.length || index < 0 || index >= items.length) return
-      
+
       const targetItem = items[index]
-      
+
       // 瞬间滚动到可视区域，无动画
       targetItem.scrollIntoView({
         block: 'nearest',
@@ -523,11 +523,11 @@ const handleKeydown = (event) => {
   if (event.key === 'Process') {
     return
   }
-  
+
   // 更新当前输入
   const value = getCurrentInputValue()
   currentInput.value = value
-  
+
   switch (event.key) {
     case 'Enter':
       // 如果正在输入中文，不处理
@@ -563,7 +563,7 @@ const handleKeydown = (event) => {
         }
       }
       break
-      
+
     case 'ArrowDown':
       if (showDropdown.value) {
         event.preventDefault()
@@ -583,7 +583,7 @@ const handleKeydown = (event) => {
         }, 200)
       }
       break
-      
+
     case 'ArrowUp':
       if (showDropdown.value) {
         event.preventDefault()
@@ -604,7 +604,7 @@ const handleKeydown = (event) => {
         }, 200)
       }
       break
-      
+
     case 'Escape':
       if (showDropdown.value) {
         event.preventDefault()
@@ -613,7 +613,7 @@ const handleKeydown = (event) => {
         immediateClearInput()
       }
       break
-      
+
     case 'Tab':
       if (showDropdown.value && activeIndex.value >= 0 && activeIndex.value < filteredSuggestions.value.length) {
         event.preventDefault()
@@ -632,21 +632,21 @@ const handleSuggestionMouseDown = (event, item) => {
 // 从建议添加标签
 const addTagFromSuggestion = (tagValue) => {
   const trimmedValue = tagValue.trim()
-  
+
   if (!trimmedValue) return
-  
+
   if (modelValue.value.includes(trimmedValue)) {
     msg.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
-  
+
   if (modelValue.value.length >= props.max) {
     msg.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
-  
+
   // 添加标签
   modelValue.value = [...modelValue.value, trimmedValue]
 
@@ -659,7 +659,7 @@ const addTagFromSuggestion = (tagValue) => {
       ids: ids
     })
   }
-  
+
   // 清空输入和下拉
   immediateClearInput()
   showDropdown.value = false
@@ -684,21 +684,21 @@ const addCurrentInputAsTag = (inputValue) => {
     }
   }
 
-  
+
   if (modelValue.value.includes(trimmedValue)) {
     msg.warning(`标签 "${trimmedValue}" 已存在`)
     clearInput()
     showDropdown.value = false
     return
   }
-  
+
   if (modelValue.value.length >= props.max) {
     msg.warning(`最多只能添加 ${props.max} 个标签`)
     return
   }
-  
+
   modelValue.value = [...modelValue.value, trimmedValue]
-  
+
   immediateClearInput()
   showDropdown.value = false
   suggestions.value = []
@@ -728,7 +728,7 @@ const handleTagRemove = (tag, index) => {
   console.log("处理标签移除事件",tag)
   // modelValue.value = modelValue.value.filter((_, i) => i !== index)
   modelValue.value = modelValue.value.filter(item => item !== tag)
-  
+
   // 通知父组件
   if(props.multipleIdMode){
     emit('tag-removed', {
@@ -785,7 +785,7 @@ watch(showDropdown, (visible) => {
 onMounted(() => {
   // 添加文档点击监听
   document.addEventListener('click', handleDocumentClick)
-  
+
   // 监听输入框的 input 事件
   nextTick(() => {
     const inputElement = inputTagRef.value?.$el?.querySelector('input')
@@ -801,7 +801,7 @@ onMounted(() => {
 onUnmounted(() => {
   clearTimeout(debounceTimer)
   document.removeEventListener('click', handleDocumentClick)
-  
+
   const inputElement = inputTagRef.value?.$el?.querySelector('input')
   if (inputElement) {
     inputElement.removeEventListener('input', handleInputChange)

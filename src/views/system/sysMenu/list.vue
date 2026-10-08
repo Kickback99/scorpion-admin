@@ -348,18 +348,18 @@ const addDir = () =>{
     // 添加为目录或菜单
     title.value = '添加目录/菜单'
     dialogVisible.value = true
-    
+
     // 重置数据
     formModel.value = {...defaultForm}
     formModel.value.parentId = 0
     formModel.value.parentName = ''
-    
+
     // 不禁用任何类型，让用户可以选择目录或菜单，只禁用按钮
     typeDisabled.value = false
     type0Disabled.value = false
     type1Disabled.value = false
     type2Disabled.value = true  // 禁用按钮选项
-    
+
     // 默认选中目录类型
     formModel.value.type = 0
     formModel.value.component = 'Layout'  // 目录默认组件为 Layout
@@ -388,17 +388,17 @@ const addMenuButton = (row) => {
     // 重置数据
     formModel.value = {...defaultForm}
 
-    formModel.value.parentName = row.name 
+    formModel.value.parentName = row.name
     formModel.value.parentId = row.id
     dialogVisible.value = true
     title.value = '添加下级节点'
     isComponentDisabled .value = false
-    
+
     if(row.type === 0){
         // 在目录中点击的添加，可以添加目录或菜单
         type2Disabled.value = true  // 禁用按钮
         typeDisabled.value = false   // 不禁用类型选择
-        
+
         // 默认选中菜单类型
         formModel.value.type = 1
         formModel.value._isChildAdd = true  // 标记为子节点添加

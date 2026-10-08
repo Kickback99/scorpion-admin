@@ -25,7 +25,7 @@ export const useUserStore = defineStore({
                 console.log('==================== 请求菜单，懒加载用户信息 ====================')
                 return {data: this.menuData}
             }
-            
+
             if(forceRefreshMenu == false){
                 console.log('==================== 用户信息全量请求 ====================')
                     // t_user_request：获取用户权限请求
@@ -51,7 +51,7 @@ export const useUserStore = defineStore({
                 this.roleNames = res.data.roleNames
                 return res.data.userInfo
             }
-      
+
         },
         // 仅刷新菜单数据
         async refreshMenuOnly() {

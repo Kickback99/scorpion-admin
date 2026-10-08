@@ -88,7 +88,7 @@ instance.interceptors.response.use(
         if(res.data.code === 0 || res.data.code === 200){
             return res.data
         }
-        
+
 
        // 匹配状态码为 40 开头的正则，以及认证失效码 215（token 过期）/ 216（账号已退出）
        let regex = /^40[0-9]$/

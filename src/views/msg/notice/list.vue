@@ -123,24 +123,24 @@
                 >推送</el-button>
 
                 <!-- 下架按钮 -->
-                <el-button 
+                <el-button
                     v-if="row.status === 0 || row.status === 1"
                     v-perm="'btn.notice.update'"
-                    size="small" 
-                    type="warning" 
-                    icon="Bottom" 
-                    @click="handleOffline(row)" 
+                    size="small"
+                    type="warning"
+                    icon="Bottom"
+                    @click="handleOffline(row)"
                     plain
                 >下架</el-button>
 
                 <!-- 上架按钮 -->
-                <el-button 
+                <el-button
                     v-if="row.status === 2"
                     v-perm="'btn.notice.update'"
-                    size="small" 
-                    type="primary" 
-                    icon="Top" 
-                    @click="handleOnline(row)" 
+                    size="small"
+                    type="primary"
+                    icon="Top"
+                    @click="handleOnline(row)"
                     plain
                 >上架</el-button>
 
@@ -179,7 +179,7 @@
     <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%" class="notice-dialog">
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
-            
+
             <!-- 公告标题 -->
             <el-form-item prop="title" label="公告标题">
                 <el-input

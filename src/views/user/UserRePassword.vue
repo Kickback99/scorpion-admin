@@ -61,8 +61,8 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             @click="handleSubmit"
             :loading="loading"
             size="small"
@@ -174,7 +174,7 @@ const handleSubmit = async () => {
   try {
     // 表单验证
     await formRef.value.validate()
-    
+
     // 确认对话框
     await ElMessageBox.confirm(
       '确定要修改密码吗？修改后需要重新登录。',
@@ -190,7 +190,7 @@ const handleSubmit = async () => {
 
     // 模拟 API 调用
     // await new Promise(resolve => setTimeout(resolve, 1500))
-    
+
     // 这里应该是实际的 API 调用
     // await changePasswordApi({
     // oldPassword: formModel.oldPassword,
@@ -200,17 +200,17 @@ const handleSubmit = async () => {
     await userUpdatePwdApi(formModel)
 
     msg.primary('密码修改成功，请重新登录')
-    
+
     // 清空表单
     handleReset()
 
     // 清除用户记住密码凭证
     tokenStore.clearCredentials()
-    
+
     // 这里可以触发重新登录逻辑
     // await userStore.logout()
     // router.push('/login')
-    
+
   } catch (error) {
     if (error === 'cancel') {
       // 用户取消操作
@@ -281,13 +281,13 @@ const handleReset = () => {
   .change-password-container {
     padding: 10px;
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .password-form :deep(.el-form-item__label) {
     width: 100px !important;
   }

@@ -1,19 +1,19 @@
 <template>
     <!-- 隐藏的预加载容器 -->
     <div style="display: none;">
-      <component 
-        v-for="(item, index) in preloadedComponents" 
+      <component
+        v-for="(item, index) in preloadedComponents"
         :key="index"
-        :is="item.component" 
+        :is="item.component"
       />
     </div>
     <!-- 添加 v-loading 指令的容器 -->
-  <div 
-    v-loading="loading" 
+  <div
+    v-loading="loading"
     element-loading-text="图标加载中..."
     :element-loading-background="userConfigStore.isDarkEnabled ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'"
     class="icons-container"
-  >  
+  >
 
     <div class="icons-container">
         <el-input
@@ -22,21 +22,21 @@
           placeholder="搜索图标"
           @clear="onClear"
         />
-        
+
       <div class="flex justify-between" v-if="configStore.getIconEnabled()">
         <div class="flex items-center">
           <span class="ml-2">内联图标控制</span>  <!-- 固定文本 -->
-          <el-switch 
-            v-model="iconStore.isExcludeInline" 
+          <el-switch
+            v-model="iconStore.isExcludeInline"
             @change="changeIconDisplay"
           />
         </div>
-        
+
         <div class="flex items-center">
           <span class="ml-2">批量图标显示</span>  <!-- 固定文本 -->
-          <el-switch 
-            v-model="iconStore.showBatchUsedIcons" 
-            @change="changeIconUsed" 
+          <el-switch
+            v-model="iconStore.showBatchUsedIcons"
+            @change="changeIconUsed"
             :disabled="currentActiveType != 'batch'"
           />
         </div>
@@ -70,14 +70,14 @@
                   <el-icon v-else-if="currentActiveType === 'element'">
                     <component :is="item.icon" />
                   </el-icon>
-                  <SvgIcon v-else-if="currentActiveType === 'svg'" 
+                  <SvgIcon v-else-if="currentActiveType === 'svg'"
                   :name="item.name" :color="item.color?item.color:''" />
                   <template v-else-if="currentActiveType ===  'alibaba'">
                     <IconFont v-if="item.type == 'iconfont'" :icon="item.icon" :style="{color:item.color?item.color:''}" />
                     <IconFont v-else-if="item.type == 'uni'" :icon="item.icon" :fill="item.color?item.color:''"  uni />
                     <IconFont v-else  :icon="item.icon" :fill="item.color?item.color:''" />
                   </template>
-                  <OfflineIcon 
+                  <OfflineIcon
                     v-else
                     :icon="item"
                     width="20px"
@@ -150,13 +150,13 @@ onMounted(async () => {
     // 获取所有路由组件（本地 + 动态）
     const localComponents = getLocalRouteComponents(loadStore.excludeLocalComponents);
     const dynamicComponents = getDynamicRouteComponents(loadStore.excludeDynamicComponents);
-    
+
     const allComponents = [...plainComData,...localComponents,...dynamicComponents];
     /* allComponents.forEach((item)=>{
       console.log('打印每个元素的 component',item.component)
     }) */
     // console.log('All route components:', allComponents);
-    
+
     // 初始化预加载组件数组
     preloadedComponents.value = allComponents.map(route => ({
       path: route.path,
@@ -166,18 +166,18 @@ onMounted(async () => {
       hasIcon: false,
       iconName: null
     }));
-    
+
     // 并行加载所有组件
     const loadPromises = allComponents.map(async (route, index) => {
       if (loadStore.isComponentLoaded(route.name)) {
         console.log(`⏩ 已跳过加载: ${route.name} (已缓存)`)
         return
       }
-      
+
       try {
         // ========== 静态分析阶段 ==========
         let hasIcon = false;
-          
+
         const importPath = getComponentImportPath(route.component);
         if (importPath) {
           // console.log(`🔍 分析组件：${importPath}`);
@@ -185,22 +185,22 @@ onMounted(async () => {
         } else {
           // console.warn(`⚠️ 无法分析组件 ${route.name}`);
         }
-        
+
         // ========== 组件加载阶段 ==========
         // 只有包含图标的组件才进行实际加载
         if (hasIcon) {
           // 如果是动态导入函数则执行，否则直接使用组件
-          const module = typeof route.component === 'function' 
-            ? await route.component() 
+          const module = typeof route.component === 'function'
+            ? await route.component()
             : route.component;
-          
+
           console.log('module',module)
           preloadedComponents.value[index].component = module.default || module;
           preloadedComponents.value[index].loaded = true;
           preloadedComponents.value[index].hasIcon = true;
-          
+
           loadStore.setComponentLoaded(route.name);
-          
+
           console.log(`✅ 已加载包含图标的组件: ${route.name}`);
         } else {
           // 不包含图标的组件，只标记为已加载但不实际加载组件
@@ -212,7 +212,7 @@ onMounted(async () => {
         // console.error(`❌ 处理组件 ${route.name} 失败：`, error);
       }
     });
-    
+
     console.log('preloadedComponents', preloadedComponents.value);
     await Promise.all(loadPromises);
     // console.log("所有路由组件已处理完成");
@@ -245,7 +245,7 @@ onMounted(async () => {
    const module = await import("@/views/Index.vue");
   IndexComponent.value = module.default;
       await collectIconsFromSource()
-  console.log("Index.vue 已加载并挂载（但隐藏）"); 
+  console.log("Index.vue 已加载并挂载（但隐藏）");
 }); */
 
 /* onMounted(async () => {
@@ -323,7 +323,7 @@ const filteredTabsList = computed(() => {
 const currentIcons = computed(() => {
   const tab = tabsList.find(t => t.name === currentActiveType.value)
   if (!tab) return []
-  
+
   return tab.icons().filter(icon => {
     if (typeof icon === 'string') {
       return icon.toLowerCase().includes(filterValue.value.toLowerCase())
@@ -422,7 +422,7 @@ const visibleInlineIcon = (item) => {
     const iconArr = iconStore.batchUsedIcons
     console.log(iconArr)
     if(iconArr.length > 0 && iconArr.includes(item)){
-      return true 
+      return true
     }else return false
   }
   return true
@@ -504,7 +504,7 @@ const visibleInlineIcon = (item) => {
 :deep(.el-tabs__nav-next) {
   margin-left: 30px;
   box-shadow: -5px 0 5px -6px #ccc;
-  
+
 }
 
 :deep(.el-tabs__nav-prev) {

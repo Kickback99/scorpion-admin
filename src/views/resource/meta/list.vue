@@ -32,25 +32,25 @@
                 </el-form-item>
 
                 <el-form-item label="文件类型">
-                    <SmartSelector 
-                        v-model="searchModel.fileType" 
-                        :data="fileTypeOptions" 
+                    <SmartSelector
+                        v-model="searchModel.fileType"
+                        :data="fileTypeOptions"
                         placeholder="请选择文件类型"
                         style="width: 160px"
                     />
                 </el-form-item>
 
                 <el-form-item label="文件 UUID">
-                    <el-input 
-                        v-model="searchModel.uuid" 
-                        placeholder="请输入文件 UUID" 
+                    <el-input
+                        v-model="searchModel.uuid"
+                        placeholder="请输入文件 UUID"
                     />
                 </el-form-item>
-                
+
                 <el-form-item label="删除状态">
-                    <SmartSelector 
-                        v-model="searchModel.isDeleted" 
-                        :data="deleteStatusOptions" 
+                    <SmartSelector
+                        v-model="searchModel.isDeleted"
+                        :data="deleteStatusOptions"
                         placeholder="请选择删除状态"
                         style="width: 160px"
                     />
@@ -119,19 +119,19 @@
         </el-collapse>
 
         <!-- 表格区域 -->
-        <el-table 
-            :data="tableData" 
-            style="width: 100%" 
+        <el-table
+            :data="tableData"
+            style="width: 100%"
             border
             :max-height="tableMaxHeight"
             v-loading="loading"
         >
             <el-table-column prop="id" label="ID" width="80" align="center" />
-            
+
             <el-table-column label="图片" width="200" align="center">
                 <template #default="{ row }">
                     <div style="width: 100px; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; border: 1px solid #ebeef5; margin: 4px auto;">
-                        <el-image 
+                        <el-image
                             :src="row.img"
                             :fit="'cover'"
                             style="width: 100%; height: 100%; border-radius: 4px; cursor: pointer;"
@@ -148,11 +148,11 @@
                      {{  row.title ? row.title : '该业务不存在'  }}
                   </template>
             </el-table-column>
-            
+
             <el-table-column prop="uuid" label="文件 UUID" width="200" show-overflow-tooltip />
-            
+
             <el-table-column prop="ossPath" label="OSS 路径" min-width="250" show-overflow-tooltip />
-            
+
             <el-table-column prop="fileType" label="文件类型" width="120" align="center">
                 <template #default="{ row }">
                     <el-button size="small" :type="getFileTypeTag(row.fileType)" plain>
@@ -160,7 +160,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            
+
             <el-table-column prop="targetId" label="业务 ID" width="120" align="center">
                 <template #default="{ row }">
                     <span v-if="row.targetId === 0">-</span>
@@ -181,7 +181,7 @@
                     {{ row.createTime }}
                 </template>
             </el-table-column>
-            
+
             <el-table-column prop="updateTime" label="更新时间" width="200" align="center">
                 <template #default="{ row }">
                     {{ row.updateTime }}
@@ -370,33 +370,33 @@ const loadBusinessData = async () => {
  */
 const fetchBusinessData = async (params) => {
     const query = params.keyword || '';
-    
+
     // 如果还没有加载数据，先加载
     if (businessDataCache.value.length === 0) {
         await loadBusinessData();
     }
-    
+
     if (!query) {
         return businessDataCache.value;
     }
-    
+
     const lowerQuery = query.toLowerCase();
-    
+
     const PinyinMatch = await loadPinyinMatch();
     const matched = businessDataCache.value.filter(item => {
         const text = item.value;
         const lowerText = text.toLowerCase();
-        
+
         // 1. 英文直接包含匹配
         if (lowerText.includes(lowerQuery)) {
             return true;
         }
-        
+
         // 2. PinyinMatch（中文拼音）
         if (PinyinMatch.match(text, query)) {
             return true;
         }
-        
+
         // 3. 单词前缀匹配
         const words = lowerText.split(/[\s\-_]+/);
         for (const word of words) {
@@ -404,7 +404,7 @@ const fetchBusinessData = async (params) => {
                 return true;
             }
         }
-        
+
         // 4. 复合词首字母匹配
         if (words.length > 1) {
             const initials = words.map(word => word[0]).join('');
@@ -412,7 +412,7 @@ const fetchBusinessData = async (params) => {
                 return true;
             }
         }
-        
+
         // 5. 单词内字符匹配
         let charIndex = 0;
         for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
@@ -423,10 +423,10 @@ const fetchBusinessData = async (params) => {
         if (charIndex === lowerQuery.length) {
             return true;
         }
-        
+
         return false;
     });
-    
+
     return matched;
 };
 
@@ -446,7 +446,7 @@ const handleSelectMultipleIds = (data) => {
     selectedIds.value = (data.ids || []).join(',');
     // 赋值给 searchModel.targetIds
     searchModel.targetIds = selectedIds.value;
-    
+
     // 自动触发搜索
     if (selectedIds.value) {
         onSearch();
@@ -456,11 +456,11 @@ const handleSelectMultipleIds = (data) => {
 // 处理标签移除事件
 const handleTagRemoved = (data) => {
     console.log('标签已移除:', data.tag, '剩余标签:', data.remainingTags)
-    
+
     // 清空选中的 ID
     selectedIds.value = ''
     searchModel.targetIds = ''
-    
+
     // 重新触发搜索（刷新列表）
     onSearch()
 }
@@ -602,11 +602,11 @@ const renderFileMeta = async () => {
         if (searchModel.updateTimeEnd) params.updateTimeEnd = searchModel.updateTimeEnd;
 
         const res = await fileMetaListApi(
-            pagination.pageNum, 
-            pagination.pageSize, 
+            pagination.pageNum,
+            pagination.pageSize,
             params
         );
-        
+
         if (res.code === 200) {
             tableData.value = res.data.items || [];
             console.log("==================== res ====================",res)

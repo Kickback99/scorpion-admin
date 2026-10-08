@@ -1,14 +1,14 @@
 <template>
     <div :class="{'dark-mode': userConfigStore.isDarkEnabled}" style="width: 100%;">
-        <component 
-        :is="MarkdownPreview" 
+        <component
+        :is="MarkdownPreview"
         :modelValue="modelValue"
         :height="height + 'px'" :include-level="[1, 2, 3, 4, 5, 6]" :disabled-menus="[]"
         @change="onChange"
         :config="{mode:'markdown'}"
         @upload-image="handleUploadImage"
         :key="userConfigStore.isDarkEnabled"
-        />  
+        />
 
     </div>
 </template>

@@ -68,6 +68,6 @@ export function useWebSocket(role = 'admin') {
     closeWebSocket,
     getWebSocketStatus,
     sendWebSocketMessage,
-    getSocket 
+    getSocket
   }
 }

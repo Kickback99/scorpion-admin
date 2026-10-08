@@ -25,10 +25,10 @@
     </div>
 
     <!-- 表格 -->
-    <el-table 
+    <el-table
     v-loading="loading"
-    :data="tableData" 
-    style="width: 100%" 
+    :data="tableData"
+    style="width: 100%"
     @selection-change="removeMultiple"
     border stripe>
         <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
@@ -56,11 +56,11 @@
     width="30%"
     >
         <!-- 弹层内容 -->
-        <el-form 
-        :model="dialogData" 
-        label-width="auto" 
+        <el-form
+        :model="dialogData"
+        label-width="auto"
         ref="ruleFormRef"
-        size="small"  
+        size="small"
         :rules="rules">
             <el-form-item label="角色名称" prop="roleName">
                 <el-input :prefix-icon="useRenderIcon('ri:group-line')" v-model="dialogData.roleName" placeholder="请输入角色名称" />
@@ -106,7 +106,7 @@
         @current-change="onCurrentChange"
         style="margin-top: 20px; justify-content: flex-end;"
     />
-        
+
 </template>
 
 <script setup>
@@ -339,7 +339,7 @@ const editDialog = async (row) => {
 
     // 绑定表单校验规则
     const rules = {
-        roleName : [    
+        roleName : [
         { required: true, message: '请输入角色名称', trigger: 'blur' },
         {pattern:/^\S{1,7}$/, message: '角色名必须是 1- 7 位非空字符', trigger: 'blur' },
     ],

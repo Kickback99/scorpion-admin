@@ -14,7 +14,7 @@ export const checkApproveValid = (rows) => {
             validRows: []
         }
     }
-    
+
     // 过滤出已是通过状态的评论
     const alreadyApproved = rows.filter(row => row.status === 0)
     if (alreadyApproved.length > 0) {
@@ -29,10 +29,10 @@ export const checkApproveValid = (rows) => {
             validRows: []
         }
     }
-    
+
     // 可通过的：待审核（2）和 已驳回（1）
     const validRows = rows.filter(row => row.status === 2 || row.status === 1)
-    
+
     return {
         valid: validRows.length === rows.length,
         message: validRows.length === rows.length ? '' : '部分评论状态异常',
@@ -54,7 +54,7 @@ export const checkRejectValid = (rows) => {
             validRows: []
         }
     }
-    
+
     // 过滤出已经是驳回状态的评论
     const alreadyRejected = rows.filter(row => row.status === 1)
     if (alreadyRejected.length > 0) {
@@ -69,10 +69,10 @@ export const checkRejectValid = (rows) => {
             validRows: []
         }
     }
-    
+
     // 可驳回的：待审核（2）和 已通过（0）
     const validRows = rows.filter(row => row.status === 2 || row.status === 0)
-    
+
     return {
         valid: validRows.length === rows.length,
         message: validRows.length === rows.length ? '' : '部分评论状态异常',
@@ -90,19 +90,19 @@ export const checkRejectValid = (rows) => {
  */
 export const confirmBatchAction = async (count, action, options = {}) => {
     const { type = 'warning', confirmText = '确认', cancelText = '取消' } = options
-    
+
     let title = `你选择了${count}条评论，确认批量${action}吗？`
-    
+
     // 删除操作的特殊提示
     if (action === '删除') {
         title = `你选择了${count}条评论，确认批量删除吗？`
     }
-    
+
     await ElMessageBox.confirm(title, '温馨提示', {
         type,
         confirmButtonText: confirmText,
         cancelButtonText: cancelText
     })
-    
+
     return true
 }

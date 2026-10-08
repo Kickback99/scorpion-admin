@@ -24,8 +24,8 @@
         <el-table :data="filteredTableData" style="width: 100%" stripe max-height="500">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
-                    <el-avatar 
-                        :src="row.avatar || avatar" 
+                    <el-avatar
+                        :src="row.avatar || avatar"
                         :size="40"
                         :fit="'cover'"
                     />
@@ -138,21 +138,21 @@ const handleOnlineUsersUpdate = (event) => {
 // 更新筛选和分页数据
 const updateFilteredData = () => {
     let filtered = [...allTableData.value]
-    
+
     // 按用户名筛选
     if (searchModel.keyword) {
-        filtered = filtered.filter(item => 
+        filtered = filtered.filter(item =>
             item.username && item.username.includes(searchModel.keyword)
         )
     }
-    
+
     // 按角色筛选
     if (searchModel.role) {
         filtered = filtered.filter(item => item.role === searchModel.role)
     }
-    
+
     total.value = filtered.length
-    
+
     // 分页
     const start = (pagination.pageNum - 1) * pagination.pageSize
     const end = start + pagination.pageSize
@@ -193,10 +193,10 @@ const handleKick = async (row) => {
     }
 
     const key = `${row.userId}_${row.role}`
-    
+
     // 如果已经在 loading，直接返回
     if (kickingMap.value[key]) return
-    
+
     // 设置 loading 状态
     kickingMap.value[key] = true
 
@@ -221,7 +221,7 @@ const loadOnlineList = async () => {
         const onlineData = res.data.data || res.data || []
         allTableData.value = onlineData
         updateFilteredData()
-        resetKickingMap() 
+        resetKickingMap()
     } catch (error) {
         console.error('加载在线列表失败:', error)
     }
@@ -250,7 +250,7 @@ const cleanZombieUsers = async () => {
 
 // 监听 window 上的自定义事件
 onMounted(() => {
-    
+
     // console.log('list.vue 挂载')
 
     // 1. 取缓存（解决管理端刷新问题）

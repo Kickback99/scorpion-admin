@@ -29,29 +29,29 @@
             <template #default="{ row }">
                 <!-- 显示标题 -->
                 <span style="position: relative;">{{ row.articleId ? (row.title || row.articleTitle) : (row.title || '未命名') }}</span>
-                
+
                 <!-- 自定义标题标识：articleId 存在 且 title 存在 且 title 不等于文章标题 -->
-                <el-text 
-                    v-if="row.articleId && row.title && row.title !== row.articleTitle" 
-                    type="warning" 
-                    size="small" 
-                    effect="plain" 
+                <el-text
+                    v-if="row.articleId && row.title && row.title !== row.articleTitle"
+                    type="warning"
+                    size="small"
+                    effect="plain"
                     style="position: relative; top: -6px; font-size: 10px; margin-left: 2px;"
                 >
                     改
                 </el-text>
-                
+
                 <!-- 外链标识：没有 articleId -->
-                <el-text 
-                    v-if="!row.articleId" 
-                    type="info" 
-                    size="small" 
-                    effect="plain" 
+                <el-text
+                    v-if="!row.articleId"
+                    type="info"
+                    size="small"
+                    effect="plain"
                     style="position: relative; top: -6px; font-size: 10px; margin-left: 2px;"
                 >
                     外链
                 </el-text>
-            </template> 
+            </template>
         </el-table-column>
 
         <!-- 类型列 -->
@@ -66,8 +66,8 @@
             <template #default="{ row }">
                 <!-- 有进度且未完成 -->
                 <div v-if="uploadProgressMap.has(row.id) && uploadProgressMap.get(row.id) < 100">
-                    <el-progress 
-                        :percentage="uploadProgressMap.get(row.id)" 
+                    <el-progress
+                        :percentage="uploadProgressMap.get(row.id)"
                         :stroke-width="16"
                         :text-inside="true"
                         :striped="true"
@@ -222,7 +222,7 @@
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 1" label="上传图片" prop="img">
                     <SmartUpload
-                        ref="uploadRef" 
+                        ref="uploadRef"
                         v-model="formModel.img"
                         :onValidate="handleImgValidate"
                         shape="rectangle"
@@ -251,7 +251,7 @@
                 </el-form-item>
                 <el-form-item v-if="formModel.imgOption === 1" label="轮播图" prop="img">
                     <SmartUpload
-                        ref="uploadRef" 
+                        ref="uploadRef"
                         v-model="formModel.img"
                         :onValidate="handleImgValidate"
                         shape="rectangle"
@@ -537,33 +537,33 @@ const rules = {
 // 前端搜索函数（参考 fetchTags 风格）
 const fetchArticles = async (params) => {
     const query = params.keyword || ''
-    
+
     // 如果还没有加载文章列表，先加载
     if (hasPerm('btn.carousel.add') && articleList.value.length === 0) {
         await loadAllArticles()
     }
-    
+
     if (!query) {
         return articleList.value
     }
-    
+
     const lowerQuery = query.toLowerCase()
     const PinyinMatch = await loadPinyinMatch()
 
     const matched = articleList.value.filter(item => {
         const text = item.value
         const lowerText = text.toLowerCase()
-        
+
         // 1. 英文直接包含匹配
         if (lowerText.includes(lowerQuery)) {
             return true
         }
-        
+
         // 2. PinyinMatch（中文拼音）
         if (PinyinMatch.match(text, query)) {
             return true
         }
-        
+
         // 3. 单词前缀匹配
         const words = lowerText.split(/[\s\-_]+/)
         for (const word of words) {
@@ -571,7 +571,7 @@ const fetchArticles = async (params) => {
                 return true
             }
         }
-        
+
         // 4. 复合词首字母匹配
         if (words.length > 1) {
             const initials = words.map(word => word[0]).join('')
@@ -579,7 +579,7 @@ const fetchArticles = async (params) => {
                 return true
             }
         }
-        
+
         // 5. 单词内字符匹配
         let charIndex = 0
         for (let i = 0; i < lowerText.length && charIndex < lowerQuery.length; i++) {
@@ -590,10 +590,10 @@ const fetchArticles = async (params) => {
         if (charIndex === lowerQuery.length) {
             return true
         }
-        
+
         return false
     })
-    
+
     return matched
 }
 
@@ -629,7 +629,7 @@ const handleAdd = async () => {
         ...defaultForm,
         carouselType: 0
     })
-    
+
     selectedArticles.value = []
 
     if(formModel.imgOption === 1){
@@ -736,7 +736,7 @@ const handleEdit = async (row) => {
 // ==================== 重试 ====================
 const handleRetry = (row) => {
     try {
-        formModel.uploadStatus = 'FAILED' 
+        formModel.uploadStatus = 'FAILED'
         // 跳转到编辑弹窗，让用户重新上传图片
         handleEdit(row)
         // 在弹窗中，用户可以重新选择图片并提交
@@ -770,10 +770,10 @@ const handleTypeChange = (val) => {
     formModel.link = ''
     formModel.hasCustomLink = false
     selectedArticles.value = []
-    
+
     // 2. 切换类型
     formModel.carouselType = val
-    
+
     // 3. 清除校验状态
     nextTick(() => {
         ruleFormRef.value?.clearValidate(['link', 'title', 'articleId', 'customImgLink'])
@@ -931,7 +931,7 @@ onMounted(() => {
 })
 
 onUnmounted(()=> {
-    
+
     // 移除事件监听
     window.removeEventListener('carousel-upload-progress', handleCarouselProgress)
     window.removeEventListener('carousel-upload-complete', handleCarouselUploadComplete)

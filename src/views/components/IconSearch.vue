@@ -108,7 +108,7 @@ const tabsList = [
 ];
 
 // 提取当前页显示的元素列表
-  /* 
+  /*
     算法如下：
       第 1 页（提取 0-35）
       0
@@ -118,7 +118,7 @@ const tabsList = [
       70
       第 3 页（提取 70-105）
       70
-      105 
+      105
   */
 const pageList = computed(() =>{
   console.log(currentActiveType.value)

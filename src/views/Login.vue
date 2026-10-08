@@ -46,7 +46,7 @@ const SmartCaptcha = defineAsyncComponent(() => import('@/views/components/Smart
 import { useRoute, useRouter } from 'vue-router'; // 编程式导航需要引入 useRouter
 import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
-import { eventBus } from '@/utils/event-bus'; 
+import { eventBus } from '@/utils/event-bus';
 
 const router = useRouter()
 const route = useRoute()
@@ -89,7 +89,7 @@ function handleMediaChange(e) {
 
   // 绑定表单校验规则
   const rules = {
-      username : [    
+      username : [
         { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 4, max: 20, message: '用户名必须是 4-20位 的字符', trigger: 'blur' },
     ],
@@ -181,7 +181,7 @@ const handleCheckbox = async() => {
         // 先校验表单
         await loginRef.value.validate()
         // 如果校验通过，允许勾选状态改变（这里不需要额外操作，因为 v-model 会自动更新）
-        
+
     } catch (error) {
         // 校验失败时，阻止复选框状态改变
         formModel.value.checkPwd = !formModel.value.checkPwd
@@ -332,11 +332,11 @@ a {
 :deep(.el-input__wrapper){
     box-shadow: none;
     .el-input__inner {
-       color: #606266 !important; 
+       color: #606266 !important;
    }
 }
 
 :deep(span.el-checkbox__label){
-       color: #606266 !important; 
+       color: #606266 !important;
 }
 </style>

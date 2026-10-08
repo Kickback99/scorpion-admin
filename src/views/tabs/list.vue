@@ -4,16 +4,16 @@
     <span v-show="isShowArrow" class="arrow-left" @click="handleScroll(200)">
       <el-icon><ArrowLeft /></el-icon>
     </span>
-    
+
     <!-- 标签容器 -->
-    <div 
-      ref="scrollbarDom" 
+    <div
+      ref="scrollbarDom"
       class="scroll-container"
       @wheel.prevent="handleWheel"
     >
-      <div 
-        ref="tabDom" 
-        class="tab select-none" 
+      <div
+        ref="tabDom"
+        class="tab select-none"
         :style="{ transform: `translateX(${translateX}px)` }"
       >
         <div
@@ -40,12 +40,12 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 右滚动按钮 -->
     <span v-show="isShowArrow" class="arrow-right" @click="handleScroll(-200)">
       <el-icon><ArrowRight /></el-icon>
     </span>
-    
+
     <!-- 下拉菜单 -->
     <el-dropdown trigger="click" @command="handleCommand" :popper-class="tagModePopperClass">
       <span class="arrow-down">
@@ -76,7 +76,7 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    
+
     <!-- 右键菜单 -->
     <ul
       v-show="contextmenuVisible"
@@ -118,7 +118,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { cleanupTabsByCurrentRoutes } from '@/router';
 import { onClickOutside } from '@vueuse/core';
 // 导入全局事件总线对象
-import { eventBus } from '@/utils/event-bus'; 
+import { eventBus } from '@/utils/event-bus';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useSettingStore } from '@/setting'
 const userConfigStore = useUserConfigStore()
@@ -262,12 +262,12 @@ const removeTab = (targetName) => {
 // 调整滚动位置 - 修复版本
 const adjustScrollPosition = () => {
   if (!scrollbarDom.value || !tabDom.value) return
-  
+
   const scrollbarWidth = scrollbarDom.value.offsetWidth
   const tabWidth = tabDom.value.scrollWidth
-  
+
   isShowArrow.value = tabWidth > scrollbarWidth
-  
+
   // 确保当前激活的标签在可视区域内且完全显示
   const activeIndex = tabs.value.findIndex(tab => tab.path === route.path)
   if (activeIndex !== -1) {
@@ -278,29 +278,29 @@ const adjustScrollPosition = () => {
 // 移动激活标签到可视区域 - 修复版本
 const moveActiveTabToView = (index) => {
   if (!scrollbarDom.value || !tabDom.value) return
-  
+
   const tabItemEl = tabDom.value.children[index]
   if (!tabItemEl) return
-  
+
   const tabItemLeft = tabItemEl.offsetLeft
   const tabItemWidth = tabItemEl.offsetWidth
   const scrollbarWidth = scrollbarDom.value.offsetWidth
   const totalTabWidth = tabDom.value.scrollWidth
-  
+
   // 如果总宽度不超过容器宽度，不需要滚动
   if (totalTabWidth <= scrollbarWidth) {
     translateX.value = 0
     return
   }
-  
+
   // 计算标签的左右边界
   const tabRight = tabItemLeft + tabItemWidth
   const visibleLeft = -translateX.value
   const visibleRight = visibleLeft + scrollbarWidth
-  
+
   // 检查标签是否完全在可视区域内
   const isFullyVisible = tabItemLeft >= visibleLeft && tabRight <= visibleRight
-  
+
   if (!isFullyVisible) {
     // 如果标签不在可视区域内或部分显示，调整位置
     if (tabItemLeft < visibleLeft) {
@@ -311,7 +311,7 @@ const moveActiveTabToView = (index) => {
       translateX.value = -(tabRight - scrollbarWidth)
     }
   }
-  
+
   // 确保不会滚动过度
   const maxTranslate = scrollbarWidth - totalTabWidth
   if (translateX.value > 0) {
@@ -325,15 +325,15 @@ const moveActiveTabToView = (index) => {
 const handleScroll = (offset) => {
   const scrollbarWidth = scrollbarDom.value.offsetWidth
   const tabWidth = tabDom.value.scrollWidth
-  
+
   if (tabWidth <= scrollbarWidth) {
     translateX.value = 0
     return
   }
-  
+
   const newTranslate = translateX.value + offset
   const maxTranslate = scrollbarWidth - tabWidth
-  
+
   // 限制滚动范围
   if (newTranslate > 0) {
     translateX.value = 0
@@ -348,7 +348,7 @@ const handleScroll = (offset) => {
 const handleWheel = (event) => {
   const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
   const scrollAmount = 80
-  
+
   if (delta > 0) {
     // 向右滚动
     handleScroll(scrollAmount)
@@ -362,21 +362,21 @@ const handleWheel = (event) => {
 const openMenu = (tab, event) => {
   event.preventDefault()
   currentContextMenuTab.value = tab
-  
+
   // 直接使用鼠标在容器内的相对位置
   const tagsViewContainer = event.currentTarget.closest('.tags-view')
   if (!tagsViewContainer) return
-  
+
   const containerRect = tagsViewContainer.getBoundingClientRect()
-  
+
   // 计算相对于容器的位置
   const relativeLeft = event.clientX - containerRect.left
   const relativeTop = event.clientY - containerRect.top
-  
+
   // 设置菜单位置
   contextmenuLeft.value = relativeLeft
   contextmenuTop.value = relativeTop
-  
+
   contextmenuVisible.value = true
 }
 
@@ -384,7 +384,7 @@ const openMenu = (tab, event) => {
 // 处理右键菜单点击
 const handleContextMenu = (command) => {
   if (!currentContextMenuTab.value) return
-  
+
   switch (command) {
     case 'refresh':
       // 仅重载当前标签页（销毁重建 router-view，非整页刷新）
@@ -405,7 +405,7 @@ const handleContextMenu = (command) => {
       closeAllTabs()
       break
   }
-  
+
   contextmenuVisible.value = false
 }
 
@@ -522,7 +522,7 @@ onClickOutside(contextmenuRef, () => {
 onMounted(() => {
   setActiveTab()
   addTab()
-  
+
   // 延迟执行，确保 DOM 完全渲染
     setTimeout(() => {
       adjustScrollPosition()
@@ -533,7 +533,7 @@ onMounted(() => {
       // await nextTick()
       adjustScrollPosition();
     });
-  
+
   // 监听窗口大小变化
   window.addEventListener('resize', adjustScrollPosition)
 })

@@ -6,10 +6,10 @@ import http from '@/utils/request'
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Number} articleId 文章 ID
- * @returns 
+ * @returns
  */
-export const getCommentsApi = (pageNum, pageSize, searchData) => 
-  http.get(`/admin/msg/comment/${pageNum}/${pageSize}`, { 
+export const getCommentsApi = (pageNum, pageSize, searchData) =>
+  http.get(`/admin/msg/comment/${pageNum}/${pageSize}`, {
     params: searchData
   })
 
@@ -23,21 +23,21 @@ export const getCommentsApi = (pageNum, pageSize, searchData) =>
  * @param {Number} [data.rootId] 根评论 ID
  * @param {Number} [data.toCommentId] 回复的目标评论 ID
  * @param {Number} [data.toCommentUserId] 回复的目标评论用户 ID
- * @returns 
+ * @returns
  */
-export const addCommentApi = ( data ) => 
+export const addCommentApi = ( data ) =>
   http.post('/admin/msg/comment', data)
 
 
 // 根据 ID 获取单个评论
-export const getCommentByIdApi = (id) => 
+export const getCommentByIdApi = (id) =>
   http.get(`/admin/msg/comment/${id}`)
 
 
 /**
- * 
+ *
  * @param {ids} ids 评论 ids
- * @returns 
+ * @returns
  */
 export const removeCommentApi = (ids) =>
 http.delete(`/admin/msg/comment/${ids}`)

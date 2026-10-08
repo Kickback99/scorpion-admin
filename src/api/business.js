@@ -51,7 +51,7 @@ export const getAllUsersApi = () => http.get('/admin/system/users/list/all')
  * @returns {Promise}
  */
 export const getAllRolesApi = () => http.get('/admin/system/roles/list/all')
-  
+
 /**
  * 分页查询标签列表（用于 SmartAutoComplete 联想搜索）
  * @param {Number} pageNum 页码

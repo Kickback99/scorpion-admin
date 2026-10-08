@@ -49,12 +49,12 @@ export function getPlugins(){
             IconsResolver({
               // prefix: 'i', 默认为 i，所以可以不用声明
               enabledCollections:['ep','ant-design'] // 指定图标集合，@iconify-json/ep 是 Element plus 的图标库
-    
+
           }),
           ],
           dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
         }),
-    
+
         // 开启 Icons 图标自动下载
         Icons({
           autoInstall: true,
