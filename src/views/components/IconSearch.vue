@@ -5,7 +5,7 @@
             size="small"
             placeholder="搜索图标"
           />
-          <!-- tabs标签页 -->
+          <!-- tabs 标签页 -->
           <el-tabs v-model="currentActiveType" @tab-click="handleClick">
             <el-tab-pane
               v-for="(pane, index) in tabsList"
@@ -14,7 +14,7 @@
               :name="pane.name"
             >
               <el-scrollbar class="icon-scrollbar">
-                <!-- t_question: li标签 tailwind -->
+                <!-- t_question: li 标签 tailwind -->
                 <ul class="flex flex-wrap px-2 ml-2">
                   <li
                     v-for="(item, key) in pageList"
@@ -80,14 +80,14 @@ const currentActiveType = ref("ep:");
 // 深拷贝图标数据，前端做搜索
 const copyIconList = cloneDeep(iconList.value);
 const totalPage = ref(0);
-// 每页显示35个图标
+// 每页显示 35 个图标
 const pageSize = ref(33);
 const currentPage = ref(1);
 
 // 搜索条件
 const filterValue = ref("");
 
-// tabs数据
+// tabs 数据
 const tabsList = [
   {
     label: "Element Plus",
@@ -110,13 +110,13 @@ const tabsList = [
 // 提取当前页显示的元素列表
   /* 
     算法如下：
-      第1页（提取0-35）
+      第 1 页（提取 0-35）
       0
       35
-      第2页（提取35-70）
+      第 2 页（提取 35-70）
       35
       70
-      第3页（提取70-105）
+      第 3 页（提取 70-105）
       70
       105 
   */
@@ -157,7 +157,7 @@ function onCurrentChange(page) {
 
 
 
-// 当 pageList.value 发生变化时，重新计算 totalPage.value的值，totalPage.value的值根据过滤的元素决定
+// 当 pageList.value 发生变化时，重新计算 totalPage.value 的值，totalPage.value 的值根据过滤的元素决定
 watch(
   () => pageList.value,
   () =>
@@ -186,7 +186,7 @@ watch(
     gap: 8px; /* 减少间距 */
 }
 
-// tabs内容区的总高度
+// tabs 内容区的总高度
 .icon-scrollbar {
     height: 140px;
 }
@@ -200,7 +200,7 @@ watch(
   margin-top: 4px; /* 减少上边距 */
 }
 
-/* 保持与Select.vue一致的标签页样式 */
+/* 保持与 Select.vue 一致的标签页样式 */
 :deep(.el-tabs__nav-next),
 :deep(.el-tabs__nav-prev) {
   font-size: 15px;

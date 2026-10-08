@@ -146,7 +146,7 @@ class WebSocketManager {
     }
   }
 
-  // 处理接收到的消息（兼容 string、JSON对象、JSON数组）
+  // 处理接收到的消息（兼容 string、JSON 对象、JSON 数组）
   handleMessage(messageData) {
     try {
       // 1. 处理纯文本消息（定时任务结果等）
@@ -197,7 +197,7 @@ class WebSocketManager {
         
         const commentUser = arr[1]  // 评论人
         const commentContent = arr[2]  // 评论内容
-        // 格式：评论人：\n评论内容
+        // 格式：评论人：\n 评论内容
         const commentMessage = `${commentUser} 发来了评论：<br><br>${commentContent}`
         msg.primary({
           message: commentMessage,
@@ -248,7 +248,7 @@ class WebSocketManager {
       case 'carousel':
         const carouselStatus = arr[1]    // SUCCESS 或 FAILED
         const carouselMessage = arr[2]   // 消息内容
-        const businessId = arr[3]        // 轮播ID
+        const businessId = arr[3]        // 轮播 ID
         // 进度消息
         if (carouselStatus === 'PROGRESS') {
             const progress = parseInt(carouselMessage)

@@ -153,7 +153,7 @@ onMounted(async () => {
     
     const allComponents = [...plainComData,...localComponents,...dynamicComponents];
     /* allComponents.forEach((item)=>{
-      console.log('打印每个元素的component',item.component)
+      console.log('打印每个元素的 component',item.component)
     }) */
     // console.log('All route components:', allComponents);
     
@@ -225,7 +225,7 @@ onMounted(async () => {
     }))); */
 
 
-    // 所有组件加载完成后，在下一个tick中统一销毁
+    // 所有组件加载完成后，在下一个 tick 中统一销毁
     if (preloadedComponents.value.some(comp => comp.loaded)) {
       nextTick(() => {
         console.log('所有组件已挂载，开始清理...')
@@ -261,12 +261,12 @@ const currentPage = ref(1)
 const currentActiveType = ref('online')
 const filterValue = ref('')
 
-// tabs数据 - 按照你提供的分类方式
+// tabs 数据 - 按照你提供的分类方式
 const tabsList = [
   {
     label: "在线图标",
     name: "online",
-    icons: () => iconStore.onlineIcons // 使用getter
+    icons: () => iconStore.onlineIcons // 使用 getter
   },
   {
     label: "批量图标",
@@ -458,7 +458,7 @@ const visibleInlineIcon = (item) => {
   // padding: 0 12px;
 }
 
-// tabs内容区的总高度
+// tabs 内容区的总高度
 .icon-scrollbar {
     height: 140px;
 }
@@ -493,7 +493,7 @@ const visibleInlineIcon = (item) => {
   margin-left: 12px;
 }
 
-/* 保持与Select.vue一致的标签页样式 */
+/* 保持与 Select.vue 一致的标签页样式 */
 :deep(.el-tabs__nav-next),
 :deep(.el-tabs__nav-prev) {
   font-size: 15px;

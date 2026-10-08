@@ -176,12 +176,12 @@ const params = ref({
 
 const total = ref(null)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const multipleSelection = ref([])
 
-const copiedId = ref(null) // 记录当前已复制的行ID
+const copiedId = ref(null) // 记录当前已复制的行 ID
 
 // 计算属性：返回需要禁用的选项值
 const disabledStatusOptions = computed(() => {
@@ -206,7 +206,7 @@ watch(() => searchData.type, (newType) => {
 // ============================================================
 // t_log_request：日志列表请求
 const fetchLoginLogList = async() => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
         const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,queryParams.value)
@@ -214,7 +214,7 @@ const fetchLoginLogList = async() => {
         total.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }
@@ -250,11 +250,11 @@ const handleSelectionChange = (raw) =>{
 const handleCopy = (text, id) => {
   try {
     navigator.clipboard.writeText(text)
-    copiedId.value = id // 设置当前复制的行ID
+    copiedId.value = id // 设置当前复制的行 ID
 
     msg.primary('复制成功')
 
-    // 3秒后恢复原图标
+    // 3 秒后恢复原图标
     setTimeout(() => {
       if (copiedId.value === id) {
         copiedId.value = null

@@ -21,14 +21,14 @@ const currentActiveType = ref("ep:");
 // 深拷贝图标数据，前端做搜索
 const copyIconList = cloneDeep(iconList.value);
 const totalPage = ref(0);
-// 每页显示35个图标
+// 每页显示 35 个图标
 const pageSize = ref(35);
 const currentPage = ref(1);
 
 // 搜索条件
 const filterValue = ref("");
 
-// tabs数据
+// tabs 数据
 const tabsList = [
   {
     label: "Element Plus",
@@ -51,13 +51,13 @@ const tabsList = [
 // 提取当前页显示的元素列表
   /* 
     算法如下：
-      第1页（提取0-35）
+      第 1 页（提取 0-35）
       0
       35
-      第2页（提取35-70）
+      第 2 页（提取 35-70）
       35
       70
-      第3页（提取70-105）
+      第 3 页（提取 70-105）
       70
       105 
   */
@@ -89,7 +89,7 @@ const tabNames = tabsList.map(item => {
   return item.name
 })
 
-// 把inputValue.value的值赋值给currentActiveType.value和icon.value
+// 把 inputValue.value 的值赋值给 currentActiveType.value 和 icon.value
 function setVal() {
   if(startsWithAnyPrefix(inputValue.value,tabNames)){
     // 提取：号之前的字符串
@@ -112,7 +112,7 @@ function setVal() {
   return prefixes.some(prefix => input.startsWith(prefix));
 }
 
-// popover弹出层显示之前调用，回显图标所在的当前页
+// popover 弹出层显示之前调用，回显图标所在的当前页
 function onBeforeEnter() {
   if (isAllEmpty(icon.value)) return;
   setVal();
@@ -123,7 +123,7 @@ function onBeforeEnter() {
   currentPage.value = Math.ceil((curIconIndex + 1) / pageSize.value);
 }
 
-// popover弹出层隐藏之后调用，清除过滤条件
+// popover 弹出层隐藏之后调用，清除过滤条件
 function onAfterLeave() {
   filterValue.value = "";
 }
@@ -134,7 +134,7 @@ function handleClick({ props }) {
   currentActiveType.value = props.name;
 }
 
-// 点击icon触发事件
+// 点击 icon 触发事件
 function onChangeIcon(item) {
   icon.value = item;
   inputValue.value = currentActiveType.value + item;
@@ -150,9 +150,9 @@ function onClear() {
   inputValue.value = "";
 }
 
-// 向外部暴露一个removeIcon，用于删除icon.value的值
+// 向外部暴露一个 removeIcon，用于删除 icon.value 的值
 const removeIcon = () => {
-  // console.log('删除icon中')
+  // console.log('删除 icon 中')
   icon.value = ''
 }
 
@@ -162,7 +162,7 @@ defineExpose({
 
 
 
-// 当 pageList.value 发生变化时，重新计算 totalPage.value的值，totalPage.value的值根据过滤的元素决定
+// 当 pageList.value 发生变化时，重新计算 totalPage.value 的值，totalPage.value 的值根据过滤的元素决定
 watch(
   () => pageList.value,
   () =>
@@ -172,7 +172,7 @@ watch(
     // 在监听开始时立即执行一次回调
   { immediate: true }
 );
-// 当 inputValue.value 发生变化时，如果新的值val为真，则调用setVal()函数
+// 当 inputValue.value 发生变化时，如果新的值 val 为真，则调用 setVal()函数
 watch(
   () => inputValue.value,
   val => val && setVal(),
@@ -217,9 +217,9 @@ watch(
             <div
               class="w-[40px] h-[32px] cursor-pointer flex justify-center items-center"
             >
-            <!-- 如果icon数据属性不存在，则显示一个离线图标 -->
+            <!-- 如果 icon 数据属性不存在，则显示一个离线图标 -->
               <SingleIcon v-if="!icon" :icon=search />
-            <!-- 如果icon数据属性存在，则显示一个在线图标 -->
+            <!-- 如果 icon 数据属性存在，则显示一个在线图标 -->
               <OnlineIcon v-else :icon="inputValue" :isCollect="false" />
             </div>
           </template>
@@ -229,7 +229,7 @@ watch(
             class="px-2 pt-2"
             placeholder="搜索图标"
           />
-          <!-- tabs标签页 -->
+          <!-- tabs 标签页 -->
           <el-tabs v-model="currentActiveType" @tab-click="handleClick">
             <el-tab-pane
               v-for="(pane, index) in tabsList"
@@ -238,7 +238,7 @@ watch(
               :name="pane.name"
             >
               <el-scrollbar height="220px">
-                <!-- t_question: li标签 tailwind -->
+                <!-- t_question: li 标签 tailwind -->
                 <ul class="flex flex-wrap px-2 ml-2">
                   <li
                     v-for="(item, key) in pageList"

@@ -1,4 +1,4 @@
-// 添加404路由的函数
+// 添加 404 路由的函数
 export const add404Routes = (router) => {
 
     if (!router.hasRoute('NotFound')) {

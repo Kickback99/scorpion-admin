@@ -5,7 +5,7 @@ const commonApi = 'admin/system/task'
 // 查询所有任务列表
 export const listApi = () => request.get(`${commonApi}/list`)
 
-// 根据ID查询任务
+// 根据 ID 查询任务
 export const getByIdApi = (id) => request.get(`${commonApi}/${id}`)
 
 // 根据任务编码查询任务
@@ -14,7 +14,7 @@ export const getByCodeApi = (taskCode) => request.get(`${commonApi}/code/${taskC
 // 新增任务
 export const addApi = (data) => request.post(`${commonApi}/add`, data)
 
-// 更新任务（只更新cron表达式）
+// 更新任务（只更新 cron 表达式）
 export const updateApi = (id, data) => request.put(`${commonApi}/${id}`, data)
 
 // 立即执行任务

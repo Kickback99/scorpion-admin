@@ -8,7 +8,7 @@ import { useIconStore } from "@/store/icon";
 addIcon("check", Check);
 addIcon("bell", Bell);
 
-// Iconify Icon在Vue里本地使用（用于内网环境）
+// Iconify Icon 在 Vue 里本地使用（用于内网环境）
 export default defineComponent({
   name: "SingleIcon",
   components: { IconifyIcon },
@@ -22,7 +22,7 @@ export default defineComponent({
     }
   },
     // t_store_icon：singleIcon.js(单个图标收集)
-    // 存入store
+    // 存入 store
   setup(props) {
     // 图标集按前缀懒加载：本地没有该图标时异步拉取，到位后 bump 版本号触发重渲染
     // （离线 storage 是普通对象，addIcon 不触发响应式更新）

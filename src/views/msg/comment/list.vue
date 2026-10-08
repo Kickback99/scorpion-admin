@@ -354,7 +354,7 @@ const params = reactive({
 })
 
 const total = ref(null)
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const searchData = reactive({
@@ -365,7 +365,7 @@ const searchData = reactive({
 })
 
 const render = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try{
         let res
@@ -393,7 +393,7 @@ const render = async () => {
         if (viewMode.value === 'pick' && currentPickComment.value) {
             const isRootComment = currentPickComment.value.rootId === -1
             const searchParams = {
-                // 子集模式：传当前评论id作为 rootId
+                // 子集模式：传当前评论 id 作为 rootId
                 // 父集模式：传当前评论的 rootId 作为 rootId
                 rootId: isRootComment ? currentPickComment.value.id : currentPickComment.value.rootId
             }
@@ -428,7 +428,7 @@ const render = async () => {
 
         await loadStatistics()
     }finally{
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }
@@ -637,12 +637,12 @@ const replyDialogTitle = ref('回复评论')
 const replyModel = reactive({
     isTopReply: false,      // 是否是父评论（顶部回复）
     type: '0',              // 评论类型：0=文章评论，1=友链评论，2=留言板
-    articleId: null,        // 文章ID（文章评论时需要）
+    articleId: null,        // 文章 ID（文章评论时需要）
     originalContent: '',    // 原内容（子评论时显示）
     content: '',            // 回复内容
-    rootId: -1,             // 根评论ID（固定为-1）
-    toCommentId: -1,        // 目标评论ID（固定为-1）
-    toCommentUserId: -1     // 目标评论用户ID（固定为-1）
+    rootId: -1,             // 根评论 ID（固定为-1）
+    toCommentId: -1,        // 目标评论 ID（固定为-1）
+    toCommentUserId: -1     // 目标评论用户 ID（固定为-1）
 })
 
 // 回复校验规则

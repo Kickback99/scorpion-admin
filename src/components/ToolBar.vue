@@ -296,7 +296,7 @@ const modifyRefresh = () => {
 // 处理全屏
 const fullScreen = () => {
     let full = document.fullscreenElement
-    // 切换全屏模式，是全屏则为true，不是则为false
+    // 切换全屏模式，是全屏则为 true，不是则为 false
     if (!full) {
         document.documentElement.requestFullscreen()
     } else document.exitFullscreen()
@@ -314,7 +314,7 @@ const handleCommand = async (key) => {
         // 发送注销请求
         const res = await adminLogoutApi()
         closeWebSocket()
-        // 清空token
+        // 清空 token
         tokenStore.removeToken()
         console.log('清空前', router.getRoutes())
         // 清空用户信息
@@ -395,7 +395,7 @@ const onPageThemeChange = async (val) => {
     }
 }
 
-// 灵动模式切换（标签主题+菜单主题+深色plain，统一跟随）
+// 灵动模式切换（标签主题+菜单主题+深色 plain，统一跟随）
 const onDynamicModeChange = (val) => {
     stringStore.dynamicMode = val
     if (val) {
@@ -505,7 +505,7 @@ const onTextColorModeChange = (mode) => {
     flex-shrink: 0;
 }
 
-// 隐藏颜色选择器清空按钮的2种方式
+// 隐藏颜色选择器清空按钮的 2 种方式
 
 // 组件内颜色选择器包含 popper-class="colorPic" 生效
 /* :deep(.colorPic .el-color-dropdown__link-btn){

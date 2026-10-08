@@ -21,7 +21,7 @@ export const useUserConfigStore = defineStore({
   actions: {
     /**
      * 获取用户配置
-     * @param {boolean} forceRefresh - 是否强制刷新（默认false）
+     * @param {boolean} forceRefresh - 是否强制刷新（默认 false）
      */
     async fetchUserConfig(forceRefresh = false) {
       const userStore = useUserStore();

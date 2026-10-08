@@ -249,7 +249,7 @@ const fetchImages = async () => {
       params.isOriginal = 1;
     }
     
-    // 业务ID筛选
+    // 业务 ID 筛选
     if (searchIds.value) {
       params.targetIds = searchIds.value;
     }
@@ -341,7 +341,7 @@ const fetchBusinessData = async (params) => {
 
 const handleSearchSelect = (data) => {
   if (data.ids && data.ids.length > 0) {
-    // 多ID模式：强制切换到 all
+    // 多 ID 模式：强制切换到 all
     if (data.ids.length > 1) {
       currentImageType.value = 'all';
     }

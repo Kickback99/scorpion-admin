@@ -57,7 +57,7 @@ const props = defineProps({
 });
 
 const loading = ref(false);
-// 默认关闭loading（树形权限数据请求）
+// 默认关闭 loading（树形权限数据请求）
 const treeLoading = ref(false);
 const sysMenuList = ref([]);
 const treeRef = ref(null);
@@ -68,7 +68,7 @@ const defaultProps = {
 
 // t_role_request: 获取角色菜单数据请求
 const render = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     treeLoading.value = true
     try {
       const roleId = route.query.id
@@ -84,7 +84,7 @@ const render = async () => {
     } catch (error) {
       console.error('获取角色权限列表失败:', error)
     } finally {
-      // 关闭loading动效
+      // 关闭 loading 动效
       treeLoading.value = false
     }
 };
@@ -94,7 +94,7 @@ render()
 // 组件复用时（同一路由不同 query），自动重新请求
 watch(() => route.query.id, () => { if (route.query.id) render() })
 
-// 得到所有选中的id列表（递归收集所有 select 为 true 的叶子节点）
+// 得到所有选中的 id 列表（递归收集所有 select 为 true 的叶子节点）
 const getCheckedIds = (auths) => {
     const ids = []
     const walk = (nodes) => {
@@ -266,7 +266,7 @@ const save = async () => {
     // 获得当前所有选中包括上级所组成的数组
     const allCheckedNodes = treeRef.value.getCheckedNodes(false, true)
     // console.log('selectedArr',allCheckedNodes)
-     // 获得当前所有选中包括上级所组成的ids
+     // 获得当前所有选中包括上级所组成的 ids
     let idList = allCheckedNodes.map(node => node.id);
     // console.log('selectedIds',idList)
     let assignMenuVo = {
@@ -280,7 +280,7 @@ const save = async () => {
     /* if(userStore.userInfo.id != 1){
         // 清空路由
         clearRoute(userStore.userMenu)
-        // 重新加载路由配置文件和pinia数据
+        // 重新加载路由配置文件和 pinia 数据
         try {
           await loadMenu(false)
         } catch (error) {

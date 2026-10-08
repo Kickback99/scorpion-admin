@@ -20,7 +20,7 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
 
 /**
  * 恢复被软删除的文件元数据
- * @param {number} id 文件元数据ID
+ * @param {number} id 文件元数据 ID
  * @returns {Promise}
  */
 export const recoverFileMetaApi = (id) => 

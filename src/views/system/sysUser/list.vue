@@ -262,7 +262,7 @@ const params = ref({
 const total = ref(null)
 
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 // 搜索相关
@@ -293,7 +293,7 @@ const tableData = ref([])
 
 // t_user_request：用户列表请求
 const render = async(pager = 1) =>{
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     params.value.pageNum =  pager
     try {
@@ -305,7 +305,7 @@ const render = async(pager = 1) =>{
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }
@@ -588,7 +588,7 @@ const isIndeterminate = ref(false) // 判断当前状态是否半选
 const checkedCities = ref([]) // 选中的数组集合
 const allRoles = ref([]) // 全部的数组集合
 const allocRolesVisible = ref(false)
-const isRolesLocked = ref(false) // 角色复选框是否禁用（id=1的admin用户）
+const isRolesLocked = ref(false) // 角色复选框是否禁用（id=1 的 admin 用户）
 
 // t_user_request：获取用户角色数据请求
 const showAllocRoles = async(row) =>{
@@ -605,7 +605,7 @@ const showAllocRoles = async(row) =>{
         isIndeterminate.value = false
         isRolesLocked.value = true
     } else {
-        // 把对应用户id的角色ids存入 checkedCities
+        // 把对应用户 id 的角色 ids 存入 checkedCities
         checkedCities.value = res.data.userRoleIds
         checkAll.value = allRoles.value.length === checkedCities.value.length
         isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
@@ -650,7 +650,7 @@ const doAllocRoles = async() => {
     /* if(userStore.userInfo.id != 1){
         // 清空路由
         clearRoute(userStore.userMenu)
-        // 重新加载路由配置文件和pinia数据
+        // 重新加载路由配置文件和 pinia 数据
         try {
           await loadMenu(false)
         } catch (error) {

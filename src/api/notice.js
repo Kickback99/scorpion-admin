@@ -29,21 +29,21 @@ export const noticeRemoveApi = (ids) => http.delete(`/admin/msg/notice/delete/${
 
 /**
  * 上架公告
- * @param {Number} id 公告ID
+ * @param {Number} id 公告 ID
  * @returns {Promise}
  */
 export const noticeOnlineApi = (id) => http.put(`/admin/msg/notice/online/${id}`)
 
 /**
  * 下架公告
- * @param {Number} id 公告ID
+ * @param {Number} id 公告 ID
  * @returns {Promise}
  */
 export const noticeOfflineApi = (id) => http.put(`/admin/msg/notice/offline/${id}`)
 
 /**
  * 推送公告
- * @param {Number} id 公告ID
+ * @param {Number} id 公告 ID
  * @returns {Promise}
  */
 export const noticePushApi = (id) => http.post(`/admin/msg/notice/push/${id}`)
@@ -59,7 +59,7 @@ export const noticeUnreadListApi = (pageNum, pageSize) =>
 
 /**
  * 标记公告已读
- * @param {Number} noticeId 公告ID
+ * @param {Number} noticeId 公告 ID
  * @returns {Promise}
  */
 export const noticeMarkReadApi = (noticeId) =>
@@ -90,7 +90,7 @@ export const noticeReadListApi = (pageNum, pageSize) =>
 
 /**
  * 获取公告详情（含推送目标用户）
- * @param {Number} id 公告ID
+ * @param {Number} id 公告 ID
  * @returns {Promise}
  */
 export const noticeDetailApi = (id) =>
@@ -98,5 +98,5 @@ export const noticeDetailApi = (id) =>
 
 // 公告图片上传
 export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
-  timeout: 35000 // 本次公告图上传请求超时35秒
+  timeout: 35000 // 本次公告图上传请求超时 35 秒
 })

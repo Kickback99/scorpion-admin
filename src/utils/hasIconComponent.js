@@ -129,8 +129,8 @@ function isValidElementIconName(name) {
   // 基本格式验证
   const isValidFormat = (
     /^[A-Z][A-Za-z0-9]*$/.test(name) && // 首字母大写，只包含字母数字
-    name.length >= 3 && // 长度至少3个字符
-    name.length <= 20 // 长度不超过20个字符
+    name.length >= 3 && // 长度至少 3 个字符
+    name.length <= 20 // 长度不超过 20 个字符
   );
   
   // 必须在白名单中

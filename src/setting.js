@@ -22,7 +22,7 @@ export const useSettingStore = defineStore({
         menuThemeColor: false,
         /** 页面主题：true=主容器跟随标签主题色深底，与标签栏形成层次 */
         pageTheme: false,
-        /** 灵动模式：标签主题+菜单主题+深色plain，统一跟随 */
+        /** 灵动模式：标签主题+菜单主题+深色 plain，统一跟随 */
         dynamicMode: false,
         /** 登录页动态背景（图片预览 URL，空则回退 $login-bg 默认背景） */
         loginBgUrl: '',

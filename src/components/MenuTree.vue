@@ -55,7 +55,7 @@ const handleChildren = (menu) => {
             prefix = 'write'
             break
     }
-    // 判断是否是配置管理类菜单（component为list且通过parentNode添加的）
+    // 判断是否是配置管理类菜单（component 为 list 且通过 parentNode 添加的）
     if(menu._addToParentNode){
         // 配置管理菜单，直接返回 /config 路径
         return `/${prefix}`

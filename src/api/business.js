@@ -3,7 +3,7 @@ import http from '@/utils/request'
 /**
  * 获取文章业务数据（用于 SmartAutoComplete 联想搜索）
  * @param {Number} id 文章 ID（可选）
- * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认false）
+ * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认 false）
  * @returns {Promise}
  */
 export const getArticleBusinessDataApi = (id, includeDeleted = false) => {
@@ -20,7 +20,7 @@ export const getArticleBusinessDataApi = (id, includeDeleted = false) => {
 /**
  * 获取文章+内容业务数据（用于 SmartAutoComplete 联想搜索，如 ImageReference）
  * @param {Number} id 文章 ID（可选）
- * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认false）
+ * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认 false）
  * @returns {Promise}
  */
 export const getArticleContentBusinessDataApi = (id, includeDeleted = false) => {
@@ -64,7 +64,7 @@ export const getTagListApi = (pageNum, pageSize, searchData) =>
 
 /**
  * 获取全业务搜索数据（用于 SmartAutoComplete 联想搜索）
- * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认false）
+ * @param {Boolean} includeDeleted 是否包含已删除的文件记录（true=包含，false=过滤掉，默认 false）
  * @returns {Promise}
  */
 export const getAllBusinessDataApi = (includeDeleted = false) => {

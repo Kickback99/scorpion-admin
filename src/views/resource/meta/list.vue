@@ -244,7 +244,7 @@ const loading = ref(false);
 // 缓存所有业务数据（用于联想搜索）
 const businessDataCache = ref([]);
 const selectedTargetId = ref([]);
-// 存储选中的多个ID
+// 存储选中的多个 ID
 const selectedIds = ref('');
 
 // 排序字段选项
@@ -430,7 +430,7 @@ const fetchBusinessData = async (params) => {
     return matched;
 };
 
-// 处理多ID选择事件
+// 处理多 ID 选择事件
 const handleSelectMultipleIds = (data) => {
     console.log('选中的标题:', data.title, '对应的所有ID:', data.ids);
 
@@ -442,7 +442,7 @@ const handleSelectMultipleIds = (data) => {
         return
     }
 
-    // 将多个ID用逗号拼接成字符串
+    // 将多个 ID 用逗号拼接成字符串
     selectedIds.value = (data.ids || []).join(',');
     // 赋值给 searchModel.targetIds
     searchModel.targetIds = selectedIds.value;
@@ -457,7 +457,7 @@ const handleSelectMultipleIds = (data) => {
 const handleTagRemoved = (data) => {
     console.log('标签已移除:', data.tag, '剩余标签:', data.remainingTags)
     
-    // 清空选中的ID
+    // 清空选中的 ID
     selectedIds.value = ''
     searchModel.targetIds = ''
     
@@ -468,7 +468,7 @@ const handleTagRemoved = (data) => {
 // 监听选中值变化
 watch(selectedTargetId, (newVal) => {
     if (newVal.length > 0) {
-        // 单个ID模式（当 multipleIdMode 为 false 时使用）
+        // 单个 ID 模式（当 multipleIdMode 为 false 时使用）
         // 但由于我们启用了 multipleIdMode，由 handleSelectMultipleIds 处理
         // 这里保留作为降级处理
         const selected = businessDataCache.value.find(item => item.value === newVal[0]);
@@ -692,7 +692,7 @@ const onReset = () => {
 
 /**
  * 恢复文件元数据
- * @param row filemeta对应的一条记录
+ * @param row filemeta 对应的一条记录
  */
 const handleRecover = async (row) => {
     try {

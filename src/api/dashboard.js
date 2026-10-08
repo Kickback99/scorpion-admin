@@ -16,13 +16,13 @@ const API = {
 export const getDashboardApi = () => http.get(API.DASHBOARD)
 
 /**
- * 获取近7天柱状图数据
+ * 获取近 7 天柱状图数据
  * @returns {Promise} { xData:[], y1:[] }
  */
 export const getChartsBarApi = () => http.get(API.CHARTS_BAR)
 
 /**
- * 获取近7天折线图数据
+ * 获取近 7 天折线图数据
  * @param {number} [offset=0] 周偏移（0=本周，1=上周...）
  * @returns {Promise} { xData:[], y1:[], y2:[], y3:[], periodLabel, hasData, offset }
  */
@@ -36,7 +36,7 @@ export const getChartLineApi = (offset = 0, initialOffset = null, direction = 'p
 export const getChartPieApi = (mode = 'category') => http.get(API.CHART_PIE, { params: { mode } })
 
 /**
- * 获取近7天面积图数据
+ * 获取近 7 天面积图数据
  * @param {number} [offset=0] 周偏移
  * @param {number} [initialOffset=null]
  * @param {string} [direction='prev'] 切换方向

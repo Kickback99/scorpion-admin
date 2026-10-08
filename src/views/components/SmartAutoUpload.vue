@@ -58,7 +58,7 @@ const handleAction = computed(()=>{
 // 图片上传成功之后的回调
 const onSuccess = (res,uploadFile) => {
     console.log(res)
-    // 用URL来做图片的本地预览
+    // 用 URL 来做图片的本地预览
     imageUrl.value = URL.createObjectURL(uploadFile.raw)
     // 把后端图片的地址传递给父组件 formModel.cover
     modelValue.value = res.data
@@ -100,7 +100,7 @@ const handleProgress = (event) => {
   percentage.value =  Math.floor(event.percent)
 } 
 
-// 对外暴露handleImage方法，用与处理新增时清空图片，编辑时回显图片
+// 对外暴露 handleImage 方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {
   // 如果 params 是 File 对象，转换为 URL
   // 新增时，上传图片是 File 对象，编辑是 图片 显示的是 url 字符串

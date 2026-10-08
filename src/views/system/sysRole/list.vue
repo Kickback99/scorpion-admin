@@ -131,13 +131,13 @@ const params = ref({
 
 const total = ref(null)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 
 // t_role_request：角色列表请求
 const render = async(pager = 1) => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     params.value.pageNum =  pager
     const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
@@ -145,7 +145,7 @@ const render = async(pager = 1) => {
     console.log(res.data.items)
     console.log('表格数据')
     total.value = res.data.total
-    // 关闭loading动效
+    // 关闭 loading 动效
     loading.value = false
 }
 

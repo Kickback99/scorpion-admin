@@ -21,7 +21,7 @@ export function whenBatchIconsReady() {
  */
 export function addBatchIconList(icons) {
     // t_store_icon：iconifyBachOffline.js(所有批量图标)
-    // 存入store（与图标数据加载无关，保持同步，供 IconCollect 使用）
+    // 存入 store（与图标数据加载无关，保持同步，供 IconCollect 使用）
     const iconStore = useIconStore()
     iconStore.setBatchIcons([...icons])
 

@@ -67,7 +67,7 @@
                     <CateSelect v-model="formModel.categoryId"></CateSelect>
                 </el-form-item>
 
-              <!-- 将el-input-tag放在el-form-item中 -->
+              <!-- 将 el-input-tag 放在 el-form-item 中 -->
               <el-form-item label="文章标签" prop="tagNames">
                 <SmartAutoComplete
                     v-model="formModel.tagNames"
@@ -546,7 +546,7 @@ const handlePublish = async (status) => {
   // 最后一次确认 description 值
   if (formModel.descriptionType === 'custom') {
     formModel.description = formModel.customDescription
-    // formModel.isAutoDescription = null; // 明确设置为null
+    // formModel.isAutoDescription = null; // 明确设置为 null
   }
 
   let cover
