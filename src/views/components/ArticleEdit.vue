@@ -902,9 +902,9 @@ const handleImageClear = () => {
 
 // 编辑回显时展开，新增时收缩
 // watch(() => formModel.id, (newVal) => {
-//   if (newVal) {
-//     hasSelectedArticle.value = true
-//   }
+// if (newVal) {
+// hasSelectedArticle.value = true
+// }
 // }, { immediate: true })
 
 // ============================================================

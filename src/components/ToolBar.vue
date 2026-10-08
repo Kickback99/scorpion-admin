@@ -457,10 +457,10 @@ const onTextColorModeChange = (mode) => {
     min-width: 0;
 
     // 顶栏按钮「视觉间距」——每个设备档位一个单旋钮，两者互不影响：
-    //   --btn-visual-gap     PC / 平板（>480px，当前 18px）
-    //   --btn-visual-gap-xs  ≤480px 移动端（当前 14px，由下方媒体查询切过去）
+    // --btn-visual-gap     PC / 平板（>480px，当前 18px）
+    // --btn-visual-gap-xs  ≤480px 移动端（当前 14px，由下方媒体查询切过去）
     // 依据：图标按钮去掉圆圈底后，24px 盒内只剩 15px 图标、两侧各 4.5px 空白
-    //（下方各处减数 -12 / -6 仍是图标 12px 时代的解，未随图标放大同步）
+    // （下方各处减数 -12 / -6 仍是图标 12px 时代的解，未随图标放大同步）
     --btn-visual-gap: 18px;
     --btn-visual-gap-xs: 14px;
 

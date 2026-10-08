@@ -66,7 +66,7 @@ const defaultProps = {
   label: 'name',
 };
 
-//t_role_request: 获取角色菜单数据请求
+// t_role_request: 获取角色菜单数据请求
 const render = async () => {
     // 开启loading动效
     treeLoading.value = true
@@ -261,7 +261,7 @@ const highlightTarget = (targetName) => {
 
 const userStore = useUserStore()
 
-//t_role_request: 为角色分配菜单请求
+// t_role_request: 为角色分配菜单请求
 const save = async () => {
     // 获得当前所有选中包括上级所组成的数组
     const allCheckedNodes = treeRef.value.getCheckedNodes(false, true)
@@ -285,11 +285,11 @@ const save = async () => {
           await loadMenu(false)
         } catch (error) {
           msg.primary(error)
-          //重新加载菜单方式一
+          // 重新加载菜单方式一
           router.push('/')
           userStore.removeUserAuth()
 
-          //重新加载菜单方式二
+          // 重新加载菜单方式二
           router.push('/').then(()=>{
             window.location.reload()
           })

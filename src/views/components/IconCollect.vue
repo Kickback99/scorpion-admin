@@ -454,7 +454,7 @@ const visibleInlineIcon = (item) => {
 }
 
 .search-container {
-//   width: 250px;
+// width: 250px;
   // padding: 0 12px;
 }
 

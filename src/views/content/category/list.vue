@@ -1,6 +1,6 @@
 <template>
   <div class="category-container">
- <!--  <div>
+ <!-- <div>
     <p>分类管理</p>
   </div> -->
    <!-- <h4> isEnd.value: {{ isEnd }}</h4> 
@@ -144,7 +144,7 @@ const loading = ref(false)
 // 除了编辑按钮额外处理，其他按钮的显示隐藏都依赖这个数据
 const allShow = ref(true)
 
-//收集数据提交服务器
+// 收集数据提交服务器
 const treeList = ref([])
 
 const inputRefs = ref({})
@@ -170,7 +170,7 @@ const handleTest = (node,data) => {
 /* watch(treeList,() => {
   if(isParentChild.value && isChild.value){
      const children = treeList.value.find(item => item.pid != -1)
-    //  找不到，说明没有子节点，就开启父节点的显示
+    // 找不到，说明没有子节点，就开启父节点的显示
     if(!children){
       console.log('treeList没有子节点了------------------------------------------------------------------')
       isChild.value = false
@@ -294,7 +294,7 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
 
 } */
 
-//t_category_request：分类删除请求
+// t_category_request：分类删除请求
 const batchRemove = async(node,data,isFlag) => {
   const total = treeRef.value.getCheckedKeys().length
   if(isFlag){
@@ -402,7 +402,7 @@ const category = reactive({
 
 let beforeCount = 0
 
-//t_category_request：分类修改请求（拖拽）
+// t_category_request：分类修改请求（拖拽）
 // 拖拽节点规则
 const allowDrop = (draggingNode, dropNode, type) => {
   const draggingLevel = draggingNode.level;
@@ -504,7 +504,7 @@ const append = (node, data) => {
   node.data.children = [...arr]
   Object.assign(node.data,{...node.data,disabled:true}) */
 
-  console.log('append-----------------------') //可以打印
+  console.log('append-----------------------') // 可以打印
   
   modifyNodes(node.parent.data)
 
@@ -1080,7 +1080,7 @@ const batchAddParentChild = (node,data) => {
   const parentId = node.level < 2 ? node.data.id :node.parent.data.id
 
   isDraggable.value = false
-  //禁用复选框
+  // 禁用复选框
   // modifyNodes(node.parent.data)
   // disabledCheckboxes()
 
@@ -1128,7 +1128,7 @@ const batchAdd = (node, data) => {
   disabledAddParent.value = true
   console.log(node)
   isDraggable.value = false
-  //禁用复选框
+  // 禁用复选框
   modifyNodes(node.parent.parent.data)
   // disabledCheckboxes()
   isNormal.value = true
@@ -1189,7 +1189,7 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
       console.log('表达式1.2执行...')
       return isEnd.value === data.id
     } */
-  //  return  isNative.value ?!isEdit.value && data.isSave && isLastParentChild(node, data) : isEnd.value === data.id
+  // return  isNative.value ?!isEdit.value && data.isSave && isLastParentChild(node, data) : isEnd.value === data.id
 }
 
 
@@ -1456,7 +1456,7 @@ const handleEdit = (node, data) => {
   data.isSave = true
   data.isReset = false
   data.isEdit = false
-  //视图数据 点击了哪个编辑按钮，就隐藏哪个编辑按钮，
+  // 视图数据 点击了哪个编辑按钮，就隐藏哪个编辑按钮，
   if (currentEditID.value == data.id) {
     data.isEdit = true
   }
@@ -1526,8 +1526,8 @@ const handleBatchSave = async(node) => {
 
   // 提交查询父分类请求
   const cateIds = newParents.map(item => item.cateId)
-  const res = await listApi(cateIds+'') //要把它转成json串数组
-  // const res = await listApi(cateIds) //这样传会报错
+  const res = await listApi(cateIds+'') // 要把它转成json串数组
+  // const res = await listApi(cateIds) // 这样传会报错
   console.log('res.data',res.data)
 
   const parentMap = res.data.reduce((cate,item) => {
@@ -1556,8 +1556,8 @@ const handleBatchSave = async(node) => {
 }
 
 
-//t_category_request：分类新增请求
-//t_category_request：分类修改请求
+// t_category_request：分类新增请求
+// t_category_request：分类修改请求
 const handleSave = async (e, node, data) => {
   data.isSave = false
   e.stopPropagation()
@@ -1571,7 +1571,7 @@ const handleSave = async (e, node, data) => {
   }
   
 
-  //编辑事件的提交
+  // 编辑事件的提交
   if (isEdit.value) {
     const cateNames = []
     for (const prop in category) {
@@ -1601,7 +1601,7 @@ const handleSave = async (e, node, data) => {
     await modifyApi(cateNames)
     msg.primary('修改成功')
 
-  } //新增事件的提交
+  } // 新增事件的提交
   else {
     if (treeList.value.length > 0) {
       await addApi(treeList.value)
@@ -1761,9 +1761,9 @@ const handleParentToggle = (node,data) => {
 
     if(node.level < 2){
     // 以下两种方式都可以
-    //方式一：
+    // 方式一：
     // return node.data.children.length === 0
-    //方式二： 该节点是否为叶子节点，也就是没有子节点的节点
+    // 方式二： 该节点是否为叶子节点，也就是没有子节点的节点
     // return node.isLeaf
     if(node.isLeaf){
         return true
@@ -2195,7 +2195,7 @@ const isLastParentChild = (node, data) => {
   return children.indexOf(data) === children.length - 1
 }
 
-//处理确定按钮的折叠
+// 处理确定按钮的折叠
 const showParent = (node,data) => {
 
     if(node.level < 2 ){

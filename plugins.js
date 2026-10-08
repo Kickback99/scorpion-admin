@@ -35,7 +35,7 @@ export function getPlugins(){
           // 这里每加一种，vite.config.js 的 optimizeDeps.include 必须同步补一行，否则首次进 markdown 预览会触发重载
           languages:['json','javascript','java','markup','css','bash','typescript','sql','yaml','nginx','markdown']
         }),
-        //element plus 自动导入插件
+        // element plus 自动导入插件
         AutoImport({
           // 自动导入 Vue 和 Vue-router 相关函数，如 ref, reactive, createRouter 等
           imports:['vue','vue-router'],
@@ -48,7 +48,7 @@ export function getPlugins(){
             // 自动导入图标组件
             IconsResolver({
               // prefix: 'i', 默认为i，所以可以不用声明
-              enabledCollections:['ep','ant-design'] //指定图标集合，@iconify-json/ep 是 Element plus 的图标库
+              enabledCollections:['ep','ant-design'] // 指定图标集合，@iconify-json/ep 是 Element plus 的图标库
     
           }),
           ],
