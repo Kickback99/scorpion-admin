@@ -458,6 +458,7 @@ const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         msg.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
     } */
+
     // 只有切换到正常模式时才清空挑拣上下文
     // 切换到审核模式时，保留 currentPickComment（因为需要它的数据）
     if (viewMode.value === 'normal') {
@@ -550,26 +551,6 @@ const handleModeChange = () => {
     }
     render()
 }
-
-
-// 返回根评论列表（挑拣父集）
-/* const backToRootList = () => {
-    // 返回时重置模式
-    pickMode.value = null
-    currentPickComment.value = null
-
-    
-    // 重置搜索条件
-    searchData.rootId = -1
-    
-    // 重置分页
-    params.pageNum = 1
-    
-    // 重新渲染
-    render()
-    
-    msg.info('已返回根评论列表')
-} */
 
 // ==================== 回复相关 ====================
 

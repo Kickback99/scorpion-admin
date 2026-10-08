@@ -120,29 +120,6 @@
         />
 
         <el-dialog v-model="dialogVisible" title="查看日志详情" width="50%">
-          <!--   <el-form  :model="formModel" :rules="rules" label-width="120px" class="demo-ruleForm"
-                :size="formSize">
-                <el-form-item label="请求 IP" >
-                    <el-input  v-model="formModel.ip" />
-                </el-form-item>
-
-                <el-form-item label="请求路径" >
-                    <el-input  v-model="formModel.reqUrl" />
-                </el-form-item>
-
-                <el-form-item label="方法名称" >
-                    <el-input  v-model="formModel.method" />
-                </el-form-item>
-
-                <el-form-item label="请求参数" >
-                    <el-input  v-model="formModel.reqParam" />
-                </el-form-item>
-
-                <el-form-item label="响应数据" >
-                    <el-input  v-model="formModel.resData" />
-                </el-form-item>
-            </el-form> -->
-
               <el-tabs type="border-card">
                 <!-- 基础信息 -->
                 <el-tab-pane label="基础信息">
@@ -155,13 +132,6 @@
 
                 <!-- 请求参数 -->
                 <el-tab-pane label="请求参数">
-                <!-- <v-md-editor 
-                    :model-value="formatJson(formModel.reqParam)" 
-                    mode="preview"
-                    height="400px"
-                    @copy-code-success="handleCopySuccess"
-                /> -->
-
                     <component
                     :is="MarkdownPreview"
                     :text="formatJson(formModel.reqParam)"
@@ -172,13 +142,6 @@
 
                 <!-- 响应数据 -->
                 <el-tab-pane label="响应数据">
-                <!-- <v-md-editor 
-                    :model-value="formatJson(formModel.resData)" 
-                    mode="preview"
-                    height="400px"
-                    @copy-code-success="handleCopySuccess"
-                /> -->
-
                     <component
                     :is="MarkdownPreview"
                     :text="formatJson(formModel.resData)"

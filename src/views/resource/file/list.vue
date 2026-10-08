@@ -234,9 +234,6 @@ const onCurrentChange = (page) => {
 }
 
 const onSearch = () => {
-    /* if(Boolean(searchData.sortField) != Boolean(searchData.sortOrder)){
-        msg.error(searchData.sortField?'请选择排序':'请选择排序字段')
-    } */
     params.pageNum = 1
     render()
 }
@@ -335,10 +332,6 @@ const formModel = reactive({})
 // t_file_request：文件同步删除请求
 const handleSyncDelete = async() => {
     const res = await syncDeleteApi()
-    /* msg.primary(res.message)
-    render() */
-
-    
     if (res.code === 200) {
         // 成功消息
         msg.primary({
@@ -447,9 +440,6 @@ const handleUpdateRecords = async() => {
 </script>
 
 <style lang="scss" scoped>
-/* .toolbar {
-    @include flex(space-between,null,null)
-} */
  .bottom {
     display: flex;
     align-items: center;
