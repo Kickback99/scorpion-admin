@@ -4,7 +4,7 @@ import CryptoJS from 'crypto-js'
 import { useUserStore } from './user';
 import { isCookieMode, clearAdminAuthFlag } from '@/utils/auth'
 
-// 定义store
+// 定义 store
 // defineStore('仓库的唯一标识',()=>{...})
 
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;

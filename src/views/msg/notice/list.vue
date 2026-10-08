@@ -381,7 +381,7 @@ const quickDateOptions = [
 const tableData = ref([])
 const totalCount = ref(0)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const pagination = reactive({
@@ -817,7 +817,7 @@ const handleTypeChange = (val) => {
  * 获取公告列表（后端分页）
  */
 const fetchNotices = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
         const res = await noticeListApi(pagination.pageNum, pagination.pageSize, searchModel)
@@ -828,7 +828,7 @@ const fetchNotices = async () => {
         tableData.value = []
         totalCount.value = 0
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }

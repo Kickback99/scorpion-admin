@@ -7,7 +7,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 import prismjs from 'vite-plugin-prismjs';
-import svgLoader from 'vite-svg-loader'  // svg加载器
+import svgLoader from 'vite-svg-loader'  // svg 加载器
 
 // pathSrc 是给自动导入图标库使用的
 const pathSrc = path.relative(__dirname,'src')
@@ -15,7 +15,7 @@ const pathSrc = path.relative(__dirname,'src')
 export function getPlugins(){
     return [
         vue(),
-        // svg组件
+        // svg 组件
         createSvgIconsPlugin({
           iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
           symbolId: 'icon-[dir]-[name]',
@@ -47,7 +47,7 @@ export function getPlugins(){
             ElementPlusResolver(),
             // 自动导入图标组件
             IconsResolver({
-              // prefix: 'i', 默认为i，所以可以不用声明
+              // prefix: 'i', 默认为 i，所以可以不用声明
               enabledCollections:['ep','ant-design'] // 指定图标集合，@iconify-json/ep 是 Element plus 的图标库
     
           }),
@@ -55,7 +55,7 @@ export function getPlugins(){
           dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
         }),
     
-        // 开启Icons图标自动下载
+        // 开启 Icons 图标自动下载
         Icons({
           autoInstall: true,
         }),

@@ -65,7 +65,7 @@ const writeModules = import.meta.glob('../views/write/*.vue')
 // 处理前端需要的路由规则格式
 function routesHandler(router,parentType=null){
     return router.map(route => {
-        // 处理顶层路由：为顶层路由设置type属性
+        // 处理顶层路由：为顶层路由设置 type 属性
         if(route.component === 'Layout'){
               route.component = Layout
               const newStr =  route.path.substring(1)
@@ -81,7 +81,7 @@ function routesHandler(router,parentType=null){
             const newStr =  route.path.substring(1)
             route.name = newStr
             route.type = newStr
-            // 根据父路由的type来决定使用哪个模块导入
+            // 根据父路由的 type 来决定使用哪个模块导入
             let modules;
             switch(route.type){
                 case 'config':
@@ -104,9 +104,9 @@ function routesHandler(router,parentType=null){
                 // console.log('加载配置管理组件：', path)
                 route.component = modules[path]
             }}else {
-            // 如果是子路由，继承父路由的type属性
+            // 如果是子路由，继承父路由的 type 属性
             route.type = parentType
-            // 根据父路由的type来决定使用哪个模块导入
+            // 根据父路由的 type 来决定使用哪个模块导入
             // const modules = parentType === 'system'?sysModules:conModules;
             let modules;
             switch(parentType){
@@ -129,7 +129,7 @@ function routesHandler(router,parentType=null){
 
 
 
-            // 处理二级子菜单：为这些孩子构建新的属性（parentPath，level）便于menu来添加父级路径
+            // 处理二级子菜单：为这些孩子构建新的属性（parentPath，level）便于 menu 来添加父级路径
             if(route.children != null && route.component == 'ParentView'){
                 let parent = route.path
                 route.redirect = route.children[0].path
@@ -149,7 +149,7 @@ function routesHandler(router,parentType=null){
             }
         }
 
-        // 处理children
+        // 处理 children
         if(route.children && route.children.length > 0){
             route.children = routesHandler(route.children,route.type)
         }
@@ -167,14 +167,14 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         // ================= 1. 数据获取阶段 =================
         let menuData
         if(loadUserInfo){
-            // 场景1：完整获取用户信息+菜单
+            // 场景 1：完整获取用户信息+菜单
             const res = await userStore.getUserInfo();
             menuData = {
                     routers: res.data.routers,
                     permissions: res.data.permissions
             };
         } else {
-            // 场景2：仅刷新菜单（修改菜单后调用）
+            // 场景 2：仅刷新菜单（修改菜单后调用）
             const res = await userStore.refreshMenuOnly();
             menuData = {
                 routers: res.routers,
@@ -196,7 +196,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
         // 无菜单权限拦截
         if (menuData.routers.length === 0 ) {
             console.log('情况2拦截')
-        add403Routes(router); // 确保403路由存在
+        add403Routes(router); // 确保 403 路由存在
         return Promise.reject({ 
             noMenuPermission: true, 
             message: '该用户无菜单权限' 
@@ -205,7 +205,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
     // ================= 3. 路由处理阶段 =================
     // 清除旧路由
-    // 移除现有的404路由，确保动态路由优先匹配
+    // 移除现有的 404 路由，确保动态路由优先匹配
     // remove404Routes()
         
 
@@ -227,7 +227,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
   
 
-    // 更新Store中的菜单引用
+    // 更新 Store 中的菜单引用
     userStore.setUserMenu(menuData.routers);
     userStore.setUserPerm(menuData.permissions);
 
@@ -237,7 +237,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // 将当前已注册路由持久化，供无 token 前置守卫识别菜单路径
     localStorage.setItem(MENU_ROUTES_STORAGE_KEY, JSON.stringify(router.getRoutes().map(route => route.path)))
 
-    // 确保403路由存在
+    // 确保 403 路由存在
     add404Routes(router)
     add403Routes(router);
 
@@ -270,7 +270,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     return true;
     } catch (error) {
         console.log('error,',error)
-    // 请求失败（如网络错误或API错误）
+    // 请求失败（如网络错误或 API 错误）
     return Promise.reject(error);
     }
 
@@ -390,11 +390,11 @@ router.beforeEach((to, from, next) => {
       return next();
     }
 
-    // 如果没有token跳转到登录页
+    // 如果没有 token 跳转到登录页
     // cookie 模式无法同步判断登录态：跳过此检查，交给下方 loadMenu → userDetailInfo
     // 200=已登录（填菜单放行）；401=未登录（request.js 拦截器兜底跳 /login）
     if(!isCookieMode() && !tokenStore.token && to.path != '/login') {
-        // msg.error('如果没有token跳转到登录页')
+        // msg.error('如果没有 token 跳转到登录页')
         // 清除主动退出标记，让 redirect 正常生效
         const settings = useSettingStore()
         settings.setLogoutIntent(false)
@@ -465,17 +465,17 @@ router.beforeEach((to, from, next) => {
                 abortNavigation(next)
                 return
             }
-            // 无菜单权限的后台用户 -> 跳转403
+            // 无菜单权限的后台用户 -> 跳转 403
             if (error.noMenuPermission) {
                 if(hasRouteByPath(to.path)){
                     next()
                 }else {
-                    // console.log('拦截2')
+                    // console.log('拦截 2')
                 settings.isManualTo403 = true;
                 next('/403');
                 }
             }else if(error.noMenuAccess){
-                // console.log('拦截1')
+                // console.log('拦截 1')
                 settings.isManualTo403 = true;
                 next('/403');
                 // 权限收回后清理不在当前路由表中的标签页

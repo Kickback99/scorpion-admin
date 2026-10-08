@@ -24,7 +24,7 @@ export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_
 
 // t_upload_api
 export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData,{
-    timeout: 35000 // 本次内容图上传请求超时35秒
+    timeout: 35000 // 本次内容图上传请求超时 35 秒
 })
 
 // t_upload_api
@@ -32,17 +32,17 @@ export const uploadCoverApi = (articleId,cover) => {
     const formData = new FormData()
     formData.append('articleId', articleId)
     formData.append('cover', cover)
-    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) // 封面上传超时35秒
+    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) // 封面上传超时 35 秒
 }
 
 // 修改文章置顶
 export const isTopApi = (id,isTop) => http.put(`${API.ARTICLE_BY_ISTOP}/${id}/${isTop}`)
 
 
-// ==================== 文章编辑页轮播设置相关api ====================
-// 根据文章ID查询轮播信息
+// ==================== 文章编辑页轮播设置相关 api ====================
+// 根据文章 ID 查询轮播信息
 export const getCarouselByArticleApi = (articleId) => http.get(`${API.CAROUSEL_BY_ARTICLE_URL}/${articleId}`)
-// 删除轮播（通过ID或文章ID）
+// 删除轮播（通过 ID 或文章 ID）
 export const removeCarouselApi = (id, articleId) => {
     if (id) {
         return http.delete(`${API.CAROUSEL_URL}/${id}`)
@@ -52,13 +52,13 @@ export const removeCarouselApi = (id, articleId) => {
 }
 
 
-// ==================== 轮播管理相关api ====================
+// ==================== 轮播管理相关 api ====================
 
 // 分页查询轮播列表
 export const getCarouselListApi = (pageNum, pageSize, searchData) => 
     http.get(`${API.CAROUSEL_URL}/${pageNum}/${pageSize}`, { params: searchData })
 
-// 根据ID查询轮播详情
+// 根据 ID 查询轮播详情
 export const getCarouselByIdApi = (id) => 
     http.get(`${API.CAROUSEL_URL}/${id}`)
 

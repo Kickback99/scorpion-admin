@@ -8,7 +8,7 @@ export const clearRoute = (res) => {
             clearRoute(item.children)
         }
     })
-    // 删除404路由
+    // 删除 404 路由
     router.removeRoute('NotFound')
     router.removeRoute('404')
 }

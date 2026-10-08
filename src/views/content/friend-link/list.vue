@@ -116,7 +116,7 @@ const tableData = ref([])
 
 const totalCount = ref(null)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const pagination = reactive({
@@ -155,7 +155,7 @@ const handleImage = (row) => {
  * 请求后端分页数据并刷新表格
  */
 const fetchFriendLinks = async() => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
         const res = await friendLinkListApi(pagination.pageNum,pagination.pageSize,searchModel)
@@ -163,7 +163,7 @@ const fetchFriendLinks = async() => {
         totalCount.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }

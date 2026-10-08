@@ -124,12 +124,12 @@ const props = defineProps({
     type: String,
     default: '请输入已存在的选项'
   },
-  // 是否启用多ID模式（相同标题返回多个ID）
+  // 是否启用多 ID 模式（相同标题返回多个 ID）
   multipleIdMode: {
     type: Boolean,
     default: false
   },
-  // 是否在按回车时自动触发多ID搜索
+  // 是否在按回车时自动触发多 ID 搜索
   autoSearchOnEnter: {
     type: Boolean,
     default: false
@@ -137,7 +137,7 @@ const props = defineProps({
 })
 
 // ==================== Emits ====================
-// 多ID选择事件
+// 多 ID 选择事件
 const emit = defineEmits(['select-multiple-ids', 'tag-removed', 'dropdown-visible'])
 
 // ==================== Refs ====================
@@ -155,7 +155,7 @@ let isComposing = false
 // 建议数据（存储所有标签）
 const suggestions = ref([])
 
-// 存储原始数据（包含所有ID）
+// 存储原始数据（包含所有 ID）
 const rawDataMap = ref(new Map())
 
 const hoverIndex = ref(-1)
@@ -166,7 +166,7 @@ const keyboardTimer = ref(null)
 const filteredSuggestions = computed(() => {
   const selectedValues = modelValue.value
   
-  // 如果启用多ID模式，按标题去重
+  // 如果启用多 ID 模式，按标题去重
   if (props.multipleIdMode) {
     const map = new Map()
     suggestions.value.forEach(item => {
@@ -175,7 +175,7 @@ const filteredSuggestions = computed(() => {
         const existing = map.get(key)
         // 原始出现次数 +1（不管 ID 是否重复）
         existing.count = (existing.count || 1) + 1
-        // 收集所有唯一ID
+        // 收集所有唯一 ID
         if (item.id !== undefined && item.id !== null) {
           if (!Array.isArray(existing.ids)) {
             existing.ids = [existing.id]
@@ -360,7 +360,7 @@ const fetchSuggestions = async (query) => {
     const data = Array.isArray(result) ? result : []
     
     suggestions.value = data
-    // 构建原始数据映射（用于多ID模式）
+    // 构建原始数据映射（用于多 ID 模式）
     rawDataMap.value.clear()
     data.forEach(item => {
       const key = item.value
@@ -483,7 +483,7 @@ const handleMouseEnter = (index) => {
 }
 
 /**
- * 多ID模式 + 回车：收集当前搜索结果的【所有 ID】并 emit 后选中
+ * 多 ID 模式 + 回车：收集当前搜索结果的【所有 ID】并 emit 后选中
  * 与 addTagFromSuggestion 的区别：addTagFromSuggestion 只取单个标题对应的 ID，
  * 而这里把 suggestions 里所有项的 ID 全部收集 emit
  * @returns {boolean} 是否成功（找到了至少一个 ID）
@@ -543,11 +543,11 @@ const handleKeydown = (event) => {
 
       // ② autoSearchOnEnter + 有建议 → 自动选中（不管输入是否有文字）
       if (props.autoSearchOnEnter && showDropdown.value && filteredSuggestions.value.length > 0) {
-        // 多ID模式 + 有输入文字：收集所有匹配 ID 后 emit
+        // 多 ID 模式 + 有输入文字：收集所有匹配 ID 后 emit
         if (props.multipleIdMode && currentInput.value.trim() && handleEnterMultipleIds()) {
           break
         }
-        // 普通模式 / 空输入 / 多ID降级：自动选第一条建议
+        // 普通模式 / 空输入 / 多 ID 降级：自动选第一条建议
         addTagFromSuggestion(filteredSuggestions.value[0].value)
         break
       }
@@ -650,7 +650,7 @@ const addTagFromSuggestion = (tagValue) => {
   // 添加标签
   modelValue.value = [...modelValue.value, trimmedValue]
 
-    // 多ID模式下，触发事件传递所有ID
+    // 多 ID 模式下，触发事件传递所有 ID
   if (props.multipleIdMode) {
     const rawData = rawDataMap.value.get(trimmedValue)
     const ids = rawData?.ids || (item.id !== undefined && item.id !== null ? [item.id] : [])

@@ -23,11 +23,11 @@ import msg from '@/components/msg'
 const handleAuthExpired = (config, message) => {
     // 请求时已保存的路径（避免 401 到达前路由已被篡改）
     const currentPath = config._currentPath || router.currentRoute.value.fullPath
-    // 处理token过期或者篡改
+    // 处理 token 过期或者篡改
     const tokenStore = useTokenStore()
     const userStore = useUserStore()
     const tabStore = useTabStore()
-    // 清空token（cookie 模式会自动同步清除登录标记 cookie）
+    // 清空 token（cookie 模式会自动同步清除登录标记 cookie）
     tokenStore.removeToken()
     // 清空动态路由数据
     clearRoute(userStore.userMenu)
@@ -90,7 +90,7 @@ instance.interceptors.response.use(
         }
         
 
-       // 匹配状态码为40开头的正则，以及认证失效码 215（token过期）/ 216（账号已退出）
+       // 匹配状态码为 40 开头的正则，以及认证失效码 215（token 过期）/ 216（账号已退出）
        let regex = /^40[0-9]$/
 
        if(regex.test(res.data.code) || res.data.code === 215 || res.data.code === 216) {
