@@ -327,10 +327,10 @@ const defaultForm = {
   }
 
 
-const typeDisabled = ref(false) //控制以下是否全部禁用
-const type0Disabled = ref(false) //目录
-const type1Disabled = ref(false) //菜单
-const type2Disabled = ref(false) //按钮
+const typeDisabled = ref(false) // 控制以下是否全部禁用
+const type0Disabled = ref(false) // 目录
+const type1Disabled = ref(false) // 菜单
+const type2Disabled = ref(false) // 按钮
 
 const formModel = ref({
     ...defaultForm

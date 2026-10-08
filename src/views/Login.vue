@@ -21,7 +21,7 @@
                 </el-button>
             </el-form-item>
         </el-form>
-        <!--  底部  -->
+        <!-- 底部 -->
         <div class="el-login-footer">
             <span>Copyright © 2021 <a href="https://www.scorpioncode.cn" target="_blank">scorpioncode.cn</a> 版权所有.</span>
         </div>
@@ -43,7 +43,7 @@ const tokenStore = useTokenStore()
 const userStore = useUserStore()
 // 验证码组件懒加载（管理端强制按需加载，仅登录页用到）
 const SmartCaptcha = defineAsyncComponent(() => import('@/views/components/SmartCaptcha.vue'))
-import { useRoute, useRouter } from 'vue-router'; //编程式导航需要引入useRouter
+import { useRoute, useRouter } from 'vue-router'; // 编程式导航需要引入useRouter
 import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
@@ -102,7 +102,7 @@ function handleMediaChange(e) {
 // 认证模式错配提示：生产环境对网友降级为通用错误（避免暴露前后端配置细节），其余环境保留具体原因便于排查
 const authMismatchTip = (detail) => import.meta.env.PROD ? '服务异常，请稍后重试' : detail
 
-//t_user_request：用户登录请求
+// t_user_request：用户登录请求
 const handleLogin = async() => {
     await loginRef.value.validate()
     loading.value = true

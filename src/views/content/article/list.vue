@@ -183,7 +183,7 @@ const handleImage = (row) => {
     else return cover
 }
 
-//搜索相关
+// 搜索相关
 const searchData = ref({
         // sortField: 'create_time',  // 保留默认排序字段
         sortOrder: 'DESC',           // 保留默认排序方向
@@ -226,22 +226,22 @@ const render = async() => {
 
 render()
 
-//点击分页事件
+// 点击分页事件
 const onSizeChange = (size) => {
-    //console.log(`onSizeChange：每页显示${size}条`)
-    //每页条数发生变化时，重新从第一页渲染
+    // console.log(`onSizeChange：每页显示${size}条`)
+    // 每页条数发生变化时，重新从第一页渲染
     params.value.pageNum = 1
-    //更新每页条数
+    // 更新每页条数
     params.value.pageSize = size
-    //重新渲染
+    // 重新渲染
     render()
 }
 
 const onCurrentChange = (page) => {
-    //console.log(`onCurrentChange：当前第${page}页`)
-    //更新当前页
+    // console.log(`onCurrentChange：当前第${page}页`)
+    // 更新当前页
     params.value.pageNum = page
-    //重新渲染
+    // 重新渲染
     render()
 }
 
@@ -298,7 +298,7 @@ const handleDelete = async(id) => {
     render()
 }
 
-//  t_article_request：更改文章状态请求
+// t_article_request：更改文章状态请求
 const modifySwitch = async(row) =>{
     
    const res = await isTopApi(row.id,row.isTop)

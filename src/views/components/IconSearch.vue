@@ -14,7 +14,7 @@
               :name="pane.name"
             >
               <el-scrollbar class="icon-scrollbar">
-                <!-- t_question: li标签 tailwind-->
+                <!-- t_question: li标签 tailwind -->
                 <ul class="flex flex-wrap px-2 ml-2">
                   <li
                     v-for="(item, key) in pageList"

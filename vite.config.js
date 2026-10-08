@@ -10,7 +10,7 @@ export default defineConfig(({mode}) => {
   // 生产环境用 terser 剔除 console/debugger，其余环境（dev/local-cookie/test）保留日志
   const isProd = mode === 'production'
   return {
-    //t_env：base
+    // t_env：base
     base: env.VITE_BASE_URL,
     build: {
       minify: 'terser',
@@ -46,7 +46,7 @@ export default defineConfig(({mode}) => {
         { find: /^punycode$/, replacement: fileURLToPath(new URL('./src/utils/punycode-stub.js', import.meta.url)) },
       ]
     },
-    //配置代理
+    // 配置代理
     server: {
       proxy: {
         // 把 /images 放在最前面，优先匹配
@@ -68,7 +68,7 @@ export default defineConfig(({mode}) => {
         [env.VITE_API]: {
           target: env.VITE_HOST, // 后端服务器地址
           changeOrigin: true, // 是否改变请求域名
-          rewrite: (path) => path.replace(new RegExp(`^${env.VITE_API}`), '')//将原有请求路径中的api替换为''
+          rewrite: (path) => path.replace(new RegExp(`^${env.VITE_API}`), '')// 将原有请求路径中的api替换为''
         }
       },
     },

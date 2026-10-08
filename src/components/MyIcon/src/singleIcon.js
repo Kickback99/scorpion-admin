@@ -25,7 +25,7 @@ export default defineComponent({
     // 存入store
   setup(props) {
     // 图标集按前缀懒加载：本地没有该图标时异步拉取，到位后 bump 版本号触发重渲染
-    //（离线 storage 是普通对象，addIcon 不触发响应式更新）
+    // （离线 storage 是普通对象，addIcon 不触发响应式更新）
     const lazyIconVersion = ref(0)
     watch(() => props.icon, async (icon) => {
       if (typeof icon !== 'string' || !icon.includes(':')) return

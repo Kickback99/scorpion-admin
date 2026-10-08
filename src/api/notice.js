@@ -98,5 +98,5 @@ export const noticeDetailApi = (id) =>
 
 // 公告图片上传
 export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
-  timeout: 35000 //本次公告图上传请求超时35秒
+  timeout: 35000 // 本次公告图上传请求超时35秒
 })

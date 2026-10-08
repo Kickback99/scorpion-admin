@@ -22,17 +22,17 @@ export const findApi = (articleId) => http.get(`${API.ARTICLE_BY_ID_URL}/${artic
 
 export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData})
 
-//t_upload_api
+// t_upload_api
 export const uploadApi = (formData) => http.post(API.UPLOAD_CONTENT_URL,formData,{
-    timeout: 35000 //本次内容图上传请求超时35秒
+    timeout: 35000 // 本次内容图上传请求超时35秒
 })
 
-//t_upload_api
+// t_upload_api
 export const uploadCoverApi = (articleId,cover) => {
     const formData = new FormData()
     formData.append('articleId', articleId)
     formData.append('cover', cover)
-    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) //封面上传超时35秒
+    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) // 封面上传超时35秒
 }
 
 // 修改文章置顶

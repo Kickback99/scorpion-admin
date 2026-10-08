@@ -265,7 +265,7 @@ const total = ref(null)
 // 默认关闭loading
 const loading = ref(false)
 
-//搜索相关
+// 搜索相关
 const searchData = ref({
     sortOrder: 'ASC', // 默认升序
     timeField: 'create_time', // 默认按创建时间筛选
@@ -277,7 +277,7 @@ const onSearch = () =>{
     render()
 }
 
-//重置
+// 重置
 const onReset = () => {
     params.value.pageNum = 1
     searchData.value = {}
@@ -313,18 +313,18 @@ const render = async(pager = 1) =>{
 render()
 
 
-//点击分页事件
+// 点击分页事件
 const onSizeChange = (size) => {
-    //console.log(`onSizeChange：每页显示${size}条`)
-    //更新每页条数
+    // console.log(`onSizeChange：每页显示${size}条`)
+    // 更新每页条数
     params.value.pageSize = size
-    //重新渲染
+    // 重新渲染
     render()
 }
 
 const onCurrentChange = (page) => {
-    //console.log(`onCurrentChange：当前第${size}页`)
-    //重新渲染
+    // console.log(`onCurrentChange：当前第${size}页`)
+    // 重新渲染
     render(page)
 }
 
@@ -374,7 +374,7 @@ const removeUsers = async(ids) =>{
     render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
 }
 
-//  t_user_request：更改用户状态请求
+// t_user_request：更改用户状态请求
 const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
     row.status === 0 ? msg.primary('用户已激活'):msg.error('用户已禁用')
@@ -382,7 +382,7 @@ const modifySwitch = async(row) =>{
 }
 
 
-//弹层相关
+// 弹层相关
 const dialogVisible = ref(false)
 
 const defaultData = {
@@ -448,10 +448,10 @@ watch(selectedRoleName, (names) => {
 // 预加载角色数据（供新增/编辑弹窗使用）
 if (hasPerm('btn.sysUser.assignRole')) loadAllRoles()
 
-//校验相关
+// 校验相关
 const ruleFormRef = ref(null)
 
-    //新增弹层
+    // 新增弹层
 const addDialog = () =>{
     dialogVisible.value = true
     title.value = '新增用户'
@@ -583,12 +583,12 @@ const rules = {
 // 分配角色相关
 
 
-const checkAll = ref(false) //控制大复选框的全选和半选
-const isIndeterminate = ref(false) //判断当前状态是否半选
-const checkedCities = ref([]) //选中的数组集合
-const allRoles = ref([]) //全部的数组集合
+const checkAll = ref(false) // 控制大复选框的全选和半选
+const isIndeterminate = ref(false) // 判断当前状态是否半选
+const checkedCities = ref([]) // 选中的数组集合
+const allRoles = ref([]) // 全部的数组集合
 const allocRolesVisible = ref(false)
-const isRolesLocked = ref(false) //角色复选框是否禁用（id=1的admin用户）
+const isRolesLocked = ref(false) // 角色复选框是否禁用（id=1的admin用户）
 
 // t_user_request：获取用户角色数据请求
 const showAllocRoles = async(row) =>{
@@ -614,13 +614,13 @@ const showAllocRoles = async(row) =>{
     console.log(checkedCities.value)
 }
 
-  //大复选框的事件回调
+  // 大复选框的事件回调
   const handleCheckAllChange = (val) => {
     console.log(val)
     checkedCities.value = val ? allRoles.value.map(item => item.id) : []
     isIndeterminate.value = false
   }
-  //小复选框的事件回调
+  // 小复选框的事件回调
   const handleCheckedCitiesChange = (value) => {
     console.log(value)
     const checkedCount = value.length
@@ -655,11 +655,11 @@ const doAllocRoles = async() => {
           await loadMenu(false)
         } catch (error) {
           msg.error(error)
-          //重新加载菜单方式一
+          // 重新加载菜单方式一
           router.push('/')
           userStore.removeUserAuth()
 
-          //重新加载菜单方式二
+          // 重新加载菜单方式二
           router.push('/').then(()=>{
             window.location.reload()
           })
