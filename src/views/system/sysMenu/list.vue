@@ -73,7 +73,7 @@
             <el-input v-model="formModel.name" />
           </el-form-item>
           <el-form-item label="图标" prop="icon" v-if="formModel.type !== 2">
-            <!-- 菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search -->
+            <!-- 菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示 search -->
             <IconSelect v-model="formModel.icon" ref="iconRef" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
@@ -146,17 +146,17 @@ import { findRowById, findByName } from '@/utils/tree'
 
 const userStore = useUserStore()
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 // t_menu_request：菜单树形列表请求
 const render = async() => {
-     // 开启loading动效
+     // 开启 loading 动效
      loading.value = true
      const res = await listApi()
      console.log(res)
      tableData.value = res.data
-     // 关闭loading动效
+     // 关闭 loading 动效
      loading.value = false
 }
 
@@ -362,7 +362,7 @@ const addDir = () =>{
     
     // 默认选中目录类型
     formModel.value.type = 0
-    formModel.value.component = 'Layout'  // 目录默认组件为Layout
+    formModel.value.component = 'Layout'  // 目录默认组件为 Layout
 
     // 标记为工具条新增模式
     formModel.value._isToolbarAdd = true
@@ -373,7 +373,7 @@ const addDir = () =>{
 watch(
     () => formModel.value.type,
     (newType) => {
-        // 仅在工具条新增模式且没有id（新增）且父级为0时执行
+        // 仅在工具条新增模式且没有 id（新增）且父级为 0 时执行
         if (formModel.value._isToolbarAdd && !formModel.value.id && formModel.value.parentId === 0) {
             formModel.value.component = newType === 0 ? 'Layout' : 'list'
             formModel.value.type = newType ===0 ? 0 : 1
@@ -494,7 +494,7 @@ const modifyMenu = async() => {
     render()
     // 清空路由
     // clearRoute(userStore.userMenu)
-    // 重新加载路由配置文件和pinia数据
+    // 重新加载路由配置文件和 pinia 数据
     loadMenu(false)
 }
 </script>

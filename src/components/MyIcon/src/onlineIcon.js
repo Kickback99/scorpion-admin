@@ -2,7 +2,7 @@ import { h, defineComponent,onMounted } from "vue";
 import { Icon as IconifyIcon } from "@iconify/vue";
 import { useIconStore } from "@/store/icon";
 
-// Iconify Icon在Vue里在线使用（用于外网环境）
+// Iconify Icon 在 Vue 里在线使用（用于外网环境）
 export default defineComponent({
   name: "OnlineIcon",
   components: { IconifyIcon },
@@ -17,7 +17,7 @@ export default defineComponent({
     }
   },
     // t_store_icon：onlineIcon.js(在线图标收集)
-    // 存入store
+    // 存入 store
   setup(props) {
     if (props.isCollect && props.icon) {
       const iconStore = useIconStore();

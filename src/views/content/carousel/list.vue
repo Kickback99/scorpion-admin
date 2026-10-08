@@ -30,7 +30,7 @@
                 <!-- 显示标题 -->
                 <span style="position: relative;">{{ row.articleId ? (row.title || row.articleTitle) : (row.title || '未命名') }}</span>
                 
-                <!-- 自定义标题标识：articleId存在 且 title存在 且 title不等于文章标题 -->
+                <!-- 自定义标题标识：articleId 存在 且 title 存在 且 title 不等于文章标题 -->
                 <el-text 
                     v-if="row.articleId && row.title && row.title !== row.articleTitle" 
                     type="warning" 
@@ -41,7 +41,7 @@
                     改
                 </el-text>
                 
-                <!-- 外链标识：没有articleId -->
+                <!-- 外链标识：没有 articleId -->
                 <el-text 
                     v-if="!row.articleId" 
                     type="info" 
@@ -333,7 +333,7 @@ import SmartUpload from '@/views/components/SmartUpload.vue'
 const tableData = ref([])
 const total = ref(0)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const pagination = reactive({
@@ -366,7 +366,7 @@ const loadAllArticles = async () => {
 }
 
 const renderCarouselList = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
         const res = await getCarouselListApi(pagination.pageNum, pagination.pageSize, searchModel)
@@ -374,7 +374,7 @@ const renderCarouselList = async () => {
         total.value = res.data.total || 0
     } catch (e) {
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }

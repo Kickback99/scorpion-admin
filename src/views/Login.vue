@@ -43,7 +43,7 @@ const tokenStore = useTokenStore()
 const userStore = useUserStore()
 // 验证码组件懒加载（管理端强制按需加载，仅登录页用到）
 const SmartCaptcha = defineAsyncComponent(() => import('@/views/components/SmartCaptcha.vue'))
-import { useRoute, useRouter } from 'vue-router'; // 编程式导航需要引入useRouter
+import { useRoute, useRouter } from 'vue-router'; // 编程式导航需要引入 useRouter
 import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus'; 
@@ -180,7 +180,7 @@ const handleCheckbox = async() => {
         try {
         // 先校验表单
         await loginRef.value.validate()
-        // 如果校验通过，允许勾选状态改变（这里不需要额外操作，因为v-model会自动更新）
+        // 如果校验通过，允许勾选状态改变（这里不需要额外操作，因为 v-model 会自动更新）
         
     } catch (error) {
         // 校验失败时，阻止复选框状态改变

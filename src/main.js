@@ -6,12 +6,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 // 导入路由
 import router from './router'
-// 导入pinia
+// 导入 pinia
 import {createPinia} from 'pinia'
 // 导入持久化插件
 import persist from 'pinia-plugin-persistedstate'
 
-// 导入tailwindcss
+// 导入 tailwindcss
 import './assets/style/tailwind.css'
 
 // element 暗黑模式样式
@@ -28,13 +28,13 @@ ElInput.props.clearable = { type: Boolean, default: true }
 
 const app = createApp(App)
 app.use(router)
-const pinia = createPinia() // 创建Pinia实例
-app.use(pinia.use(persist)) // 安装pinia插件
+const pinia = createPinia() // 创建 Pinia 实例
+app.use(pinia.use(persist)) // 安装 pinia 插件
 
-// 引入svg脚本
+// 引入 svg 脚本
 import 'virtual:svg-icons-register'
 
-// 全局注册@iconify/vue图标库
+// 全局注册@iconify/vue 图标库
 import {
   OfflineIcon,
   OnlineIcon,

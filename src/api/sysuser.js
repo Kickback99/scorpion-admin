@@ -22,8 +22,8 @@ export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/
 export const statusApi = (id,status) => http.get(`/admin/system/users/${id}`,{params:{status}})
 
 /**
- * 获取用户详情（含角色ID列表）
- * @param {Number} id 用户ID
+ * 获取用户详情（含角色 ID 列表）
+ * @param {Number} id 用户 ID
  * @returns {Promise}
  */
 export const getDetailApi = (id) => http.get(`/admin/system/users/detail/${id}`)

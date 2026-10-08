@@ -11,7 +11,7 @@ export function useTagTable() {
   const params = ref({ pageNum: 1, pageSize: 10 })
   const total = ref(null)
 
-  // 默认关闭loading
+  // 默认关闭 loading
   const loading = ref(false)
 
   const { registerReload } = useTagEditor()
@@ -20,7 +20,7 @@ export function useTagTable() {
   // 渲染
   // ============================================================
   const render = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
       const res = await listApi(params.value.pageNum, params.value.pageSize, searchData.value)
@@ -29,7 +29,7 @@ export function useTagTable() {
     } catch (error) {
       console.error('获取标签列表失败:', error)
     } finally {
-      // 关闭loading动效
+      // 关闭 loading 动效
       loading.value = false
     }
   }

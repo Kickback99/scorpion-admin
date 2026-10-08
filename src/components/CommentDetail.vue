@@ -8,7 +8,7 @@
 -->
 <template>
   <div class="comment-detail-container">
-    <!-- 情况1：根评论 - 展示所有子评论 -->
+    <!-- 情况 1：根评论 - 展示所有子评论 -->
     <div v-if="detailMode === 'parent'" class="detail-box">
       <!-- 父评论（当前评论） -->
       <div class="comment-card">
@@ -55,7 +55,7 @@
       <div v-else-if="children.length > 0" class="load-more-tip">没有更多了</div>
     </div>
 
-    <!-- 情况2：子评论（直接回复父评论）- 展示父评论 + 当前子评论（当前高亮） -->
+    <!-- 情况 2：子评论（直接回复父评论）- 展示父评论 + 当前子评论（当前高亮） -->
     <div v-else-if="detailMode === 'childReply'" class="detail-box">
       <!-- 父评论（普通样式） -->
       <div class="sub-title">父评论</div>
@@ -105,7 +105,7 @@
       <div v-else class="empty-tip">暂无回复</div>
     </div>
 
-    <!-- 情况3：嵌套评论（回复子评论）- 展示父评论 + 被回复评论 + 当前评论（当前高亮） -->
+    <!-- 情况 3：嵌套评论（回复子评论）- 展示父评论 + 被回复评论 + 当前评论（当前高亮） -->
     <div v-else-if="detailMode === 'nestedReply'" class="detail-box">
         <!-- 父评论 -->
         <div class="sub-title">父评论</div>
@@ -221,14 +221,14 @@ const emit = defineEmits(['loaded', 'error'])
 // 数据
 const loading = ref(false)
 const detailMode = ref(null)  // 'parent', 'childReply', 'nestedReply'
-const children = ref([])      // 子评论列表（情况1使用）
+const children = ref([])      // 子评论列表（情况 1 使用）
 // 子评论滚动分页状态
 const childrenPage = ref(0)          // 已加载页码
 const childrenLoading = ref(false)   // 加载中
 const hasMoreChildren = ref(true)    // 是否还有更多
 const loadMoreRef = ref(null)        // 滚动触底哨兵元素
-const parentComment = ref(null)  // 父评论信息（情况2、3使用）
-const replyToComment = ref(null)  // 被回复的评论（情况3使用）
+const parentComment = ref(null)  // 父评论信息（情况 2、3 使用）
+const replyToComment = ref(null)  // 被回复的评论（情况 3 使用）
 // 谁回复了我
 const whoRepliedToMe = ref([])
 
@@ -309,11 +309,11 @@ const loadDetail = async () => {
     // 3. toCommentUserId !== -1 && toCommentId !== rootId : 嵌套评论（回复子评论）
 
     if (comment.rootId === -1) {
-      // 情况1：根评论 - 查询子评论列表（滚动分页）
+      // 情况 1：根评论 - 查询子评论列表（滚动分页）
       detailMode.value = 'parent'
       await loadChildren(1)
     } else {
-        // 情况2和3：先查询父评论
+        // 情况 2 和 3：先查询父评论
         let parentData = null
         try {
           const parentRes = await getCommentByIdApi(comment.rootId)
@@ -368,7 +368,7 @@ const resetState = () => {
   whoRepliedToMe.value = []
 }
 
-// 监听comment变化
+// 监听 comment 变化
 watch(
   () => props.comment,
   () => {

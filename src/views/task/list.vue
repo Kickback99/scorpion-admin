@@ -98,7 +98,7 @@
           />
         </el-form-item>
         
-        <!-- Cron表达式 -->
+        <!-- Cron 表达式 -->
         <el-form-item label="Cron表达式" prop="cronExpression">
           <el-input 
             v-model="formData.cronExpression" 
@@ -155,7 +155,7 @@ import 'cronstrue/locales/zh_CN'
 // ==================== 表格数据 ====================
 const tableData = ref([])
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 // ==================== 弹窗相关 ====================
@@ -188,7 +188,7 @@ const formRules = {
 
 // ==================== 加载任务列表 ====================
 const loadTaskList = async () => {
-  // 开启loading动效
+  // 开启 loading 动效
   loading.value = true
   try {
     const res = await listApi()
@@ -198,7 +198,7 @@ const loadTaskList = async () => {
     msg.error('加载任务列表失败')
     console.error(error)
   } finally {
-    // 关闭loading动效
+    // 关闭 loading 动效
     loading.value = false
   }
 }
@@ -378,13 +378,13 @@ const deleteTask = async (row) => {
   }
 }
 
-// ==================== 快速设置Cron表达式 ====================
+// ==================== 快速设置 Cron 表达式 ====================
 const setCron = (cronValue) => {
   formData.value.cronExpression = cronValue
   msg.primary(`已设置为：${cronValue}`)
 }
 
-// ==================== Cron表达式翻译 ====================
+// ==================== Cron 表达式翻译 ====================
 const translateCron = (cronExpression) => {
   if (!cronExpression) return '未设置'
   try {
@@ -393,8 +393,8 @@ const translateCron = (cronExpression) => {
       locale: 'zh_CN'
     })
     
-    // 2. 提取翻译中的小时数字（1-12点）
-    // 匹配 "上午 XX:XX" 或 "上午 XX点" 格式，提取小时数
+    // 2. 提取翻译中的小时数字（1-12 点）
+    // 匹配 "上午 XX:XX" 或 "上午 XX 点" 格式，提取小时数
     const hourMatch = result.match(/上午\s*(\d{1,2})/)
     
     if (hourMatch) {

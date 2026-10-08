@@ -1,4 +1,4 @@
-// 工具函数：添加403路由
+// 工具函数：添加 403 路由
 export const add403Routes = (router) => {
   /* if (!router.hasRoute('NotFound')) {
     router.addRoute({

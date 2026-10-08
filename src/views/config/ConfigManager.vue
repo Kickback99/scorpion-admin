@@ -227,7 +227,7 @@ const userConfigStore = useUserConfigStore()
 
 // 表格数据
 const tableData = ref([])
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 const tableRef = ref(null)
 const fullTableData = ref([]) // 全量数据备份，搜索过滤时不变
@@ -443,7 +443,7 @@ const buildGroupedTreeData = (apiData) => {
 
 // 加载配置数据
 const loadConfigData = async () => {
-  // 开启loading动效
+  // 开启 loading 动效
   loading.value = true
   try {
     const res = await getConfigApi()
@@ -457,7 +457,7 @@ const loadConfigData = async () => {
     console.error('加载配置失败:', error)
     msg.error('加载配置失败')
   } finally {
-    // 关闭loading动效
+    // 关闭 loading 动效
     loading.value = false
   }
 }
@@ -757,7 +757,7 @@ const handleConfirmAdd = async () => {
           }
         }
         
-        // 检查key是否已存在
+        // 检查 key 是否已存在
         if (addForm.key in targetObj) {
           msg.error(`配置项 "${addForm.key}" 已存在`)
           return
@@ -876,7 +876,7 @@ const updateNestedValue = (obj, pathParts, value) => {
   current[pathParts[pathParts.length - 1]] = value
 }
 
-// 监听配置store变化，同步表格数据
+// 监听配置 store 变化，同步表格数据
 onMounted(() => {
   configStore.initNumberLimits()
   loadConfigData()

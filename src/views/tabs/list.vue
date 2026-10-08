@@ -523,7 +523,7 @@ onMounted(() => {
   setActiveTab()
   addTab()
   
-  // 延迟执行，确保DOM完全渲染
+  // 延迟执行，确保 DOM 完全渲染
     setTimeout(() => {
       adjustScrollPosition()
     }, 100);

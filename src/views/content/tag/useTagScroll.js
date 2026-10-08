@@ -28,7 +28,7 @@ export function useTagScroll() {
   // ============================================================
   /** 回到第一页并刷新（替换式） */
   const render = async () => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
       page.value = 1
@@ -39,7 +39,7 @@ export function useTagScroll() {
     } catch (error) {
       console.error('获取标签列表失败:', error)
     } finally {
-      // 关闭loading动效
+      // 关闭 loading 动效
       loading.value = false
     }
   }

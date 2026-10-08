@@ -188,10 +188,10 @@ const handleSubmit = async () => {
 
     loading.value = true
 
-    // 模拟API调用
+    // 模拟 API 调用
     // await new Promise(resolve => setTimeout(resolve, 1500))
     
-    // 这里应该是实际的API调用
+    // 这里应该是实际的 API 调用
     // await changePasswordApi({
     // oldPassword: formModel.oldPassword,
     // newPassword: formModel.newPassword

@@ -8,10 +8,10 @@ $menu-color:white;
 // 左侧菜单折叠时的宽度
 $menu-min-width:60px;
 
-// 左侧菜单logo高度设置
+// 左侧菜单 logo 高度设置
 $base-menu-logo-height:60px;
 
-// 左侧菜单logo图标与标题间距
+// 左侧菜单 logo 图标与标题间距
 $base-logo-gap:10px;
 
 // 登录页背景
@@ -22,10 +22,10 @@ $login-bg:url("../assets/images/wallhaven-g75r7d.jpg");
 } */
 
 // v-md-editor
-// 文章预览视图的code标签，如``，
+// 文章预览视图的 code 标签，如``，
 $code-color:var(--el-text-color-regular);
 
-// css变量
+// css 变量
 :root{
     --text:#FFFFFF;
 }
@@ -37,7 +37,7 @@ $code-color:var(--el-text-color-regular);
 }
 
 
-// flex函数
+// flex 函数
 @mixin flex($row:flex-start, $col:stretch, $multiCol:stretch) {
     display: flex;
     justify-content:$row;

@@ -193,7 +193,7 @@ const displayMode = ref('label')
 
 const total = ref(null)
 
-// 默认关闭loading
+// 默认关闭 loading
 const loading = ref(false)
 
 const searchData = reactive({})
@@ -206,7 +206,7 @@ const queryParams = computed(() => ({
 }))
 
 const render = async() => {
-    // 开启loading动效
+    // 开启 loading 动效
     loading.value = true
     try {
         const res = await operlogListApi(params.pageNum,params.pageSize,queryParams.value)
@@ -214,7 +214,7 @@ const render = async() => {
         total.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭loading动效
+        // 关闭 loading 动效
         loading.value = false
     }
 }
@@ -275,13 +275,13 @@ const onDetail = (row) => {
     Object.assign(formModel,{...row})
 }
 
-// JSON格式化（添加Markdown代码块语法）
+// JSON 格式化（添加 Markdown 代码块语法）
 const formatJson = (str) => {
   try {
     const parsed = JSON.parse(str)
     return '```json\n' + JSON.stringify(parsed, null, 2) + '\n```'
   } catch {
-    return str // 非JSON数据保持原样
+    return str // 非 JSON 数据保持原样
   }
 }
 

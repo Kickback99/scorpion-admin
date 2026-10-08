@@ -79,7 +79,7 @@ const handleSelectAvatar = (file) => {
     }
 }
 
-// 对外暴露handleImage方法，用与处理新增时清空图片，编辑时回显图片
+// 对外暴露 handleImage 方法，用与处理新增时清空图片，编辑时回显图片
 const handleImage = (params) => {
   // 如果 params 是 File 对象，转换为 URL
   // 新增时，上传图片是 File 对象，编辑是 图片 显示的是 url 字符串
