@@ -7,24 +7,6 @@ export function useWebSocket(role = 'admin') {
 
   const route = useRoute()
 
-  // 初始化 WebSocket 监听
-/*   const initWebSocketListener = () => {
-    // 监听用户信息变化
-    const stopWatch = watch(
-      () => userStore.userInfo?.id,
-      (newUserId, oldUserId) => {
-        console.log('👤 用户ID变化：', { old: oldUserId, new: newUserId })
-        
-        if (newUserId && newUserId !== oldUserId) {
-          console.log('✅ 检测到新用户ID，初始化 WebSocket')
-          websocketManager.init(newUserId)
-        } else if (!newUserId && oldUserId) {
-          console.log('❌ 用户ID被清空，关闭 WebSocket')
-          websocketManager.close()
-        }
-      },
-      { immediate: true }
-    ) */
  // 初始化 WebSocket 监听
   const initWebSocketListener = () => {
       const userStore = useUserStore()

@@ -46,7 +46,7 @@ class WebSocketManager {
   // 初始化 WebSocket 连接
   init(userId, role = 'admin') { // 管理端默认 role='admin'
     if (!userId) {
-      console.warn('❌ 没有用户ID，无法初始化 WebSocket')
+      console.warn('没有用户ID，无法初始化 WebSocket')
       return
     }
 
@@ -57,7 +57,7 @@ class WebSocketManager {
     // 如果正在连接或已连接，先关闭
     if (this.isConnecting || this.socket) {
       if (this.socket) {
-        console.log('🔌 关闭现有连接，准备重新连接')
+        console.log('关闭现有连接，准备重新连接')
         // 先摘掉旧连接的 onclose：它是异步触发的，内部会把 this.socket 置 null，
         // 而此时该字段已指向新连接，会让新连接变成无人引用的孤儿，导致退出时 close() 关不掉它
         this.socket.onclose = null
@@ -75,7 +75,7 @@ class WebSocketManager {
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        // console.log(`✅ WebSocket 连接成功，角色：${role}，用户ID: ${userId}`)
+        // console.log(`WebSocket 连接成功，角色：${role}，用户 ID: ${userId}`)
         this.isConnecting = false
         this.reconnectAttempts = 0
       }
@@ -85,7 +85,7 @@ class WebSocketManager {
       }
 
       this.socket.onclose = (event) => {
-        console.log('🔌 WebSocket 连接关闭:', event.code, event.reason)
+        console.log('WebSocket 连接关闭:', event.code, event.reason)
         this.isConnecting = false
         this.socket = null
         // this.handleReconnect(userId)
@@ -100,13 +100,13 @@ class WebSocketManager {
         // 后台服务不可用时只提示一次，避免控制台刷屏；不影响页面请求，重连由 onclose 驱动
         if (!this.hasLoggedFailOnce) {
           this.hasLoggedFailOnce = true
-          console.warn(`⚠️ WebSocket 连接失败（后台服务未启动或不可达）: ${wsUrl}，不影响页面请求，将自动重连`)
+          console.warn(`WebSocket 连接失败（后台服务未启动或不可达）: ${wsUrl}，不影响页面请求，将自动重连`)
         }
         this.isConnecting = false
       }
 
     } catch (error) {
-      console.error('❌ 创建 WebSocket 失败:', error)
+      console.error('创建 WebSocket 失败:', error)
       this.isConnecting = false
     }
   }
@@ -136,13 +136,13 @@ class WebSocketManager {
   handleReconnect(userId, role) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
-      console.log(`🔄 后台服务不可用，自动重连中（第${this.reconnectAttempts}/${this.maxReconnectAttempts}次），${this.reconnectInterval / 1000}s 后重试`)
+      console.log(`后台服务不可用，自动重连中（第${this.reconnectAttempts}/${this.maxReconnectAttempts}次），${this.reconnectInterval / 1000}s 后重试`)
       this.clearReconnectTimer()
       this.reconnectTimer = setTimeout(() => {
         this.init(userId, role)
       }, this.reconnectInterval)
     } else {
-      console.warn('❌ 达到最大重连次数，停止重连')
+      console.warn('达到最大重连次数，停止重连')
     }
   }
 
@@ -176,7 +176,7 @@ class WebSocketManager {
       this.handleObjectMessage(data)
       
     } catch (error) {
-      console.error('❌ 解析 WebSocket 消息失败:', error)
+      console.error('解析 WebSocket 消息失败:', error)
     }
   }
 
@@ -401,7 +401,7 @@ class WebSocketManager {
     // readyState 小于 2 表示正在连接或已连接
     if (this.socket && this.socket.readyState < 2) {
       this.isManualClose = true  // 标记为手动关闭，防止重连
-      console.log('🔌 手动关闭 WebSocket 连接')
+      console.log('手动关闭 WebSocket 连接')
       this.socket.close(1000, 'Manual close')
       this.socket = null
     }
