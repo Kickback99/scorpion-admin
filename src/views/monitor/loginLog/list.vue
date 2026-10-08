@@ -247,23 +247,6 @@ const handleSelectionChange = (raw) =>{
     // console.log(multipleSelection.value)
 }
 
-// 复制到剪贴板的方法
-/* const copyToClipboard = (text) => {
-  try {
-    navigator.clipboard.writeText(text)
-    msg.primary('复制成功')
-  } catch (err) {
-    // 兼容性处理
-    const textarea = document.createElement('textarea')
-    textarea.value = text
-    document.body.appendChild(textarea)
-    textarea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textarea)
-    msg.primary('复制成功')
-  }
-} */
-
 const handleCopy = (text, id) => {
   try {
     navigator.clipboard.writeText(text)

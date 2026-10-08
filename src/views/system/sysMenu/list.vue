@@ -73,15 +73,7 @@
             <el-input v-model="formModel.name" />
           </el-form-item>
           <el-form-item label="图标" prop="icon" v-if="formModel.type !== 2">
-<!--             <el-select v-model="formModel.icon" clearable>
-              <el-option v-for="item in iconList" :key="item.class" :label="item.class" :value="item.class">
-              <span style="float: left;">
-               <i :class="item.class"></i>
-              </span>
-                <span style="padding-left: 6px;">{{ item.class }}</span>
-              </el-option>
-            </el-select> -->
-            <!-- 菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search(已解决) -->
+            <!-- 菜单编辑时图标的显示问题，点击有图标在点击没有图标的菜单，图标不显示search -->
             <IconSelect v-model="formModel.icon" ref="iconRef" class="w-[200px]" />
           </el-form-item>
           <el-form-item label="排序">
@@ -312,42 +304,9 @@ const removeMenu = async(id) =>{
     render()
 }
 
-// 批量删除相关
-// const multipleSelection = ref([])
-
 const treeProps = reactive({
   checkStrictly: false,
 })
-
-/* const removeMultiple = (raw) =>{
-    console.log(raw)
-    multipleSelection.value = raw
-    // console.log(multipleSelection.value)
-} */
-
-/* const selectable = (row) => {
-      return !row.children.length > 0
-} */
-
-// 批量删除
-//批量删除菜单问题
-/* const deleteSelectRows = () => {
-    if(multipleSelection.value.length === 0){
-        msg.error('请先勾选要删除的行')
-        return
-    }
-    const rowIds = multipleSelection.value.map(row => row.id)
-    removeMenu(rowIds)
-
-} */
-
-//  t_menu_request：更改菜单状态请求
-/* const modifySwitch = async(row) =>{
-    await statusApi(row.id,row.status)
-    row.status === 1 ? msg.primary('菜单已激活'):msg.error('菜单已禁用')
-    //t_question：菜单状态被禁用了，强制刷新路由
-    window.location.reload()
-} */
 
 // 弹层相关
 
