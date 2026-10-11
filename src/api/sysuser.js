@@ -1,7 +1,5 @@
 import http from '@/utils/request'
 
-// t_user_api：用户管理
-
 // 新增用户
 export const addApi = (params) => http.post('/admin/system/users',params)
 

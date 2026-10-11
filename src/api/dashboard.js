@@ -1,4 +1,3 @@
-// api/dashboard.js
 import http from '@/utils/request'
 
 const API = {
