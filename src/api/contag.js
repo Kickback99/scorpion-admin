@@ -13,4 +13,3 @@ export const removeApi = (params) => http.delete(`${API.TAG_URL}/${params}`)
 export const modifyApi = (params) => http.put(API.TAG_URL,params)
 
 export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.TAG_URL}/${pageNum}/${pageSize}`,{params:searchData})
-

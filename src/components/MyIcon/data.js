@@ -4700,4 +4700,3 @@ export const IconJson = {
       "yin-yang"
     ]
   };
-

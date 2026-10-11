@@ -19,4 +19,3 @@ export const modifyApi = (params) => http.put(API.CATEGORY_URL,params)
 
 // 正确
 export const listApi = (params) => http.get(`${API.CATEGORY_URL}`,{params:{cateIds:params}})
-
