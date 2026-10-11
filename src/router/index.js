@@ -54,7 +54,7 @@ export const routes = [
 ]
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
-const conModules = import.meta.glob('../views/content/**/*.vue')
+const blogModules = import.meta.glob('../views/blog/**/*.vue')
 const msgModules = import.meta.glob('../views/msg/**/*.vue')
 const monitorModules = import.meta.glob("../views/monitor/**/*.vue")
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
@@ -107,14 +107,14 @@ function routesHandler(router,parentType=null){
             // 如果是子路由，继承父路由的 type 属性
             route.type = parentType
             // 根据父路由的 type 来决定使用哪个模块导入
-            // const modules = parentType === 'system'?sysModules:conModules;
+            // const modules = parentType === 'system'?sysModules:blogModules;
             let modules;
             switch(parentType){
                 case 'system':
                     modules = sysModules
                     break
-                case 'content':
-                    modules = conModules
+                case 'blog':
+                    modules = blogModules
                     break
                 case 'msg':
                     modules = msgModules

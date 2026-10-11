@@ -1,7 +1,7 @@
 import http from '@/utils/request'
 
 const API = {
-    CATEGORY_URL : '/admin/content/category',
+    CATEGORY_URL : '/admin/blog/category',
 }
 
 /**

@@ -1,7 +1,7 @@
 import http from '@/utils/request'
 
 const API = {
-    TAG_URL : '/admin/content/tag',
+    TAG_URL : '/admin/blog/tag',
 }
 
 /**
