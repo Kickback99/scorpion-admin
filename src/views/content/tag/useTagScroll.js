@@ -4,7 +4,7 @@
  * 滚动触底自动加载下一页，每页 PAGE_SIZE 条。
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { listApi } from '@/api/contag'
+import { listApi } from '@/api/tag'
 import { useTagEditor } from './useTagEditor'
 
 // 滚动分页：每页条数
