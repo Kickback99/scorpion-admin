@@ -218,7 +218,7 @@ export const useConfigStore = defineStore({
   // ============================================================
   actions: {
 
-    // ==================== 元数据 & 工具 ====================
+    // ===== 元数据 & 工具 =====
 
     /** 判断是否为系统字段 */
     isSystemConfig(key) {
@@ -270,7 +270,7 @@ export const useConfigStore = defineStore({
       return this.numberLimits[key]?.max
     },
 
-    // ==================== 核心：通用读写 ====================
+    // ===== 核心：通用读写 =====
 
     /**
      * 按 configItems 中的 key 读取配置值
@@ -323,7 +323,7 @@ export const useConfigStore = defineStore({
       deepSet(this, fullPath.split('.'), value)
     },
 
-    // ==================== 核心：加载 & 更新 ====================
+    // ===== 核心：加载 & 更新 =====
 
     // t_config_request：加载所有配置请求
     /** 加载所有配置 */
@@ -435,7 +435,7 @@ export const useConfigStore = defineStore({
       }
     },
 
-    // ==================== 专用 getter / setter / toggle（thin wrapper） ====================
+    // ===== 专用 getter / setter / toggle（thin wrapper） =====
 
     // -- icon_enabled --
     getIconEnabled()               { return this.getValue('icon_enabled') === true },
@@ -453,7 +453,7 @@ export const useConfigStore = defineStore({
     getTagViewMode()               { return this.getValue('tag_view_mode') || 'card' },
     setTagViewMode(v)              { this.updateConfig('tag_view_mode', v) },
 
-    // ==================== websocket ====================
+    // ===== websocket =====
 
     getWebsocketEnabled()          { return this.getValue('websocket.enabled') ?? true },
     toggleWebsocketEnabled()       { this.updateConfig('websocket.enabled', !this.getValue('websocket.enabled')) },
@@ -461,7 +461,7 @@ export const useConfigStore = defineStore({
     getWebsocketBackendEnabled()   { return this.getValue('websocket.backend_enabled') === true },
     setWebsocketBackendEnabled(v)  { this.updateConfig('websocket.backend_enabled', v) },
 
-    // ==================== notice ====================
+    // ===== notice =====
 
     getNoticeEnabled()             { return this.getValue('notice.enabled') === true },
     toggleNoticeEnabled()          { this.updateConfig('notice.enabled', !this.getValue('notice.enabled')) },
@@ -492,7 +492,7 @@ export const useConfigStore = defineStore({
     getNoticeBellPosition()        { return this.getValue('notice.bell_position') || 'top' },
     setNoticeBellPosition(v)       { this.updateConfig('notice.bell_position', v) },
 
-    // ==================== tree ====================
+    // ===== tree =====
 
     getTreeAuthLineStyle()         { return this.getValue('tree.auth.line_style') || 'dashed' },
     setTreeAuthLineStyle(v)        { this.updateConfig('tree.auth.line_style', v) },
@@ -512,7 +512,7 @@ export const useConfigStore = defineStore({
     getTreeCateChildMode()         { return this.getValue('tree.cate.child_mode') || 'fill' },
     setTreeCateChildMode(v)        { this.updateConfig('tree.cate.child_mode', v) },
 
-    // ==================== article ====================
+    // ===== article =====
 
     getArticleTopLimit()           { return this.getValue('article.top_limit') ?? 3 },
     setArticleTopLimit(v)          { this.updateConfig('article.top_limit', v) },
@@ -526,7 +526,7 @@ export const useConfigStore = defineStore({
     getArticleSaveEdit()           { return this.getValue('article.save_edit') === true },
     toggleArticleSaveEdit()        { this.updateConfig('article.save_edit', !this.getValue('article.save_edit')) },
 
-    // ==================== comment ====================
+    // ===== comment =====
 
     getArticleCommentEnabled()     { return this.getValue('comment.article_comment_enabled') ?? true },
     toggleArticleCommentEnabled()  { this.updateConfig('comment.article_comment_enabled', !this.getValue('comment.article_comment_enabled')) },
@@ -546,7 +546,7 @@ export const useConfigStore = defineStore({
     getCommentEmojiEnabled()       { return this.getValue('comment.emoji_enabled') ?? true },
     toggleCommentEmojiEnabled()    { this.updateConfig('comment.emoji_enabled', !this.getValue('comment.emoji_enabled')) },
 
-    // ==================== nav ====================
+    // ===== nav =====
 
     getFriendLinkEnabled()         { return this.getValue('nav.friend_link_enabled') === true },
     toggleFriendLinkEnabled()      { this.updateConfig('nav.friend_link_enabled', !this.getValue('nav.friend_link_enabled')) },
@@ -554,7 +554,7 @@ export const useConfigStore = defineStore({
     getAboutEnabled()              { return this.getValue('nav.about_enabled') === true },
     toggleAboutEnabled()           { this.updateConfig('nav.about_enabled', !this.getValue('nav.about_enabled')) },
 
-    // ==================== user（前台认证） ====================
+    // ===== user（前台认证） =====
 
     getUserLoginEnabled()          { return this.getValue('user.login_enabled') === true },
     toggleUserLoginEnabled()       { this.updateConfig('user.login_enabled', !this.getValue('user.login_enabled')) },
@@ -562,7 +562,7 @@ export const useConfigStore = defineStore({
     getUserOtherLoginEnabled()     { return this.getValue('user.other_login_enabled') === true },
     toggleUserOtherLoginEnabled()  { this.updateConfig('user.other_login_enabled', !this.getValue('user.other_login_enabled')) },
 
-    // ==================== profile ====================
+    // ===== profile =====
 
     getMyFeedbackEnabled()         { return this.getValue('profile.my_feedback_enabled') ?? true },
     toggleMyFeedbackEnabled()      { this.updateConfig('profile.my_feedback_enabled', !this.getValue('profile.my_feedback_enabled')) },
@@ -576,7 +576,7 @@ export const useConfigStore = defineStore({
     getMyFavoritesEnabled()        { return this.getValue('profile.my_favorites_enabled') ?? true },
     toggleMyFavoritesEnabled()     { this.updateConfig('profile.my_favorites_enabled', !this.getValue('profile.my_favorites_enabled')) },
 
-    // ==================== article_detail ====================
+    // ===== article_detail =====
 
     getArticleTheme()              { return this.getValue('article_detail.theme') },
     setArticleTheme(v)             { this.updateConfig('article_detail.theme', v) },
@@ -590,7 +590,7 @@ export const useConfigStore = defineStore({
     getTocPosition()               { return this.getValue('article_detail.toc_position') || 'outer'},
     setTocPosition(v)              { this.updateConfig('article_detail.toc_position', v) },
 
-    // ==================== article_list ====================
+    // ===== article_list =====
 
     getListViewEnabled()           { return this.getValue('article_list.view_enabled') ?? true },
     toggleListViewEnabled()        { this.updateConfig('article_list.view_enabled', !this.getValue('article_list.view_enabled')) },
@@ -613,7 +613,7 @@ export const useConfigStore = defineStore({
     getListTitleBoneCount()        { return this.getValue('article_list.title_bone_count') ?? 1 },
     setListTitleBoneCount(v)       { this.updateConfig('article_list.title_bone_count', v) },
 
-    // ==================== notification ====================
+    // ===== notification =====
 
     getNotificationOnlineEnabled()    { return this.getValue('notification.online_enabled') ?? true },
     toggleNotificationOnlineEnabled() { this.updateConfig('notification.online_enabled', !this.getValue('notification.online_enabled')) },
@@ -621,12 +621,12 @@ export const useConfigStore = defineStore({
     getNotificationCommentEnabled()   { return this.getValue('notification.comment_enabled') ?? true },
     toggleNotificationCommentEnabled(){ this.updateConfig('notification.comment_enabled', !this.getValue('notification.comment_enabled')) },
 
-    // ==================== comment（admin 组） ====================
+    // ===== comment（admin 组） =====
 
     getCommentReplyEmojiEnabled()          { return this.getValue('comment.reply_emoji_enabled') ?? true },
     toggleCommentReplyEmojiEnabled()       { this.updateConfig('comment.reply_emoji_enabled', !this.getValue('comment.reply_emoji_enabled')) },
 
-    // ==================== user_config ====================
+    // ===== user_config =====
 
     getUserCollapseEnabled()       { return this.getValue('collapse_enabled') ?? true },
     toggleUserCollapseEnabled()    { this.updateConfig('collapse_enabled', !this.getValue('collapse_enabled')) },
@@ -637,7 +637,7 @@ export const useConfigStore = defineStore({
     getUserConfigTheme()           { return this.getValue('theme') || 'default' },
     setUserConfigTheme(v)          { this.updateConfig('theme', v) },
 
-    // ==================== storage ====================
+    // ===== storage =====
 
     getStorageDataRetentionDays()  { return this.getValue('storage.data_retention_days') ?? 30 },
     setStorageDataRetentionDays(v) { this.updateConfig('storage.data_retention_days', v) },
@@ -651,7 +651,7 @@ export const useConfigStore = defineStore({
     getStorageOperLogRetentionDays()   { return this.getValue('storage.oper_log_retention_days') ?? 7 },
     setStorageOperLogRetentionDays(v)  { this.updateConfig('storage.oper_log_retention_days', v) },
 
-    // ==================== logo ====================
+    // ===== logo =====
 
     getAdminDarkLogo()             { return this.getValue('logo.admin_dark_logo') || 'neon' },
     setAdminDarkLogo(v, silent = false) { this.updateConfig('logo.admin_dark_logo', v, silent) },
@@ -665,7 +665,7 @@ export const useConfigStore = defineStore({
     getAdminLightLogo()            { return this.getValue('logo.admin_light_logo') || 'stroke-scan' },
     setAdminLightLogo(v)           { this.updateConfig('logo.admin_light_logo', v) },
 
-    // ==================== dashboard.line_chart ====================
+    // ===== dashboard.line_chart =====
 
     getDashboardLineChartYValidField()  { return this.getValue('dashboard.line_chart.y_valid_field') },
     setDashboardLineChartYValidField(v) { this.updateConfig('dashboard.line_chart.y_valid_field', v) },
@@ -676,12 +676,12 @@ export const useConfigStore = defineStore({
     getDashboardLineChartWeekOffset()   { return this.getValue('dashboard.line_chart.week_offset') },
     setDashboardLineChartWeekOffset(v)  { this.updateConfig('dashboard.line_chart.week_offset', v) },
 
-    // ==================== dashboard ====================
+    // ===== dashboard =====
 
     getDashboardTopCardEnabled()   { return this.getValue('dashboard.top_card_enabled') === true },
     toggleDashboardTopCardEnabled(){ this.updateConfig('dashboard.top_card_enabled', !this.getValue('dashboard.top_card_enabled')) },
 
-    // ==================== dashboard.pie_chart ====================
+    // ===== dashboard.pie_chart =====
 
     getDashboardPieChartMode()     { return this.getValue('dashboard.pie_chart.mode') || 'category' },
     // 仪表盘下拉切换只重绘图表，静默更新；配置页改才弹提示

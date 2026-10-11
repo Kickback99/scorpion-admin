@@ -3,6 +3,10 @@
 import { defineStore } from "pinia"
 export const useLoadStore = defineStore({
   id: 'load',
+
+  // ============================================================
+  // 数据
+  // ============================================================
   state: () => ({
     loadedComponents: {}, // 改为动态键值对
     // t_setting：在 icons 组件加载之前排除以下动态名字路由的预加载
@@ -11,6 +15,10 @@ export const useLoadStore = defineStore({
     excludeLocalComponents:['404'],
     plainComponent:[]
   }),
+
+  // ============================================================
+  // 方法
+  // ============================================================
   actions: {
     setComponentLoaded(name) {
       this.loadedComponents[name] = true
