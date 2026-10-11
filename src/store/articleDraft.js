@@ -5,6 +5,10 @@ import { defineStore } from 'pinia'
 
 export const useArticleDraftStore = defineStore({
   id: 'articleDraft',
+
+  // ============================================================
+  // 数据
+  // ============================================================
   state: () => ({
     blogData: null,                // { title, content }
     formModel: null,               // 弹窗表单数据（分类、标签、封面等）
@@ -16,6 +20,10 @@ export const useArticleDraftStore = defineStore({
     imageRefSelectedArticleId: null, // ImageReference 选中的文章 ID（用于 loadByArticleId 恢复）
     updatedAt: null,               // 最后更新时间戳
   }),
+
+  // ============================================================
+  // 计算属性
+  // ============================================================
   getters: {
     /**
      * 是否有有效草稿 — blogData 存在且有标题或内容
@@ -25,6 +33,10 @@ export const useArticleDraftStore = defineStore({
       return !!(state.blogData.title || state.blogData.content)
     },
   },
+
+  // ============================================================
+  // 方法
+  // ============================================================
   actions: {
     /**
      * 保存草稿 — 深拷贝避免引用污染
@@ -73,6 +85,10 @@ export const useArticleDraftStore = defineStore({
       this.updatedAt = null
     },
   },
+
+  // ============================================================
+  // 持久化
+  // ============================================================
   persist: {
     storage: sessionStorage,
   },

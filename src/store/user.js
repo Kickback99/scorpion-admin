@@ -3,6 +3,10 @@ import {userInfoApi} from '@/api/admin'
 
 export const useUserStore = defineStore({
     id:'user',
+
+    // ============================================================
+    // 数据
+    // ============================================================
     state:()=>({
         userMenu:[],
         userPerm:[],
@@ -14,9 +18,17 @@ export const useUserStore = defineStore({
         },
         hasUserInfo: false
     }),
+
+    // ============================================================
+    // 计算属性
+    // ============================================================
     getters:{
         isAdmin: (state) => state.userInfo?.isAdmin || false,
     },
+
+    // ============================================================
+    // 方法
+    // ============================================================
     actions:{
         async getUserInfo(forceRefreshMenu = false){
 

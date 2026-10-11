@@ -2,8 +2,8 @@ import http from '@/utils/request'
 
 /**
  * 分页查询文件元数据
- * @param {number} pageNum 页码
- * @param {number} pageSize 每页大小
+ * @param {Number} pageNum 页码
+ * @param {Number} pageSize 每页大小
  * @param {Object} searchData 查询条件
  * @returns {Promise}
  */
@@ -20,7 +20,7 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
 
 /**
  * 恢复被软删除的文件元数据
- * @param {number} id 文件元数据 ID
+ * @param {Number} id 文件元数据 ID
  * @returns {Promise}
  */
 export const recoverFileMetaApi = (id) =>

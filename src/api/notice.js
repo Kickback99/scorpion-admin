@@ -1,7 +1,10 @@
 import http from '@/utils/request'
 
 /**
- * 查询公告列表
+ * 分页查询公告列表
+ * @param {Number} pageNum 页码
+ * @param {Number} pageSize 每页数量
+ * @param {Object} searchData 查询条件
  * @returns {Promise}
  */
 export const noticeListApi = (pageNum,pageSize,searchData) => http.get(`/admin/msg/notice/list/${pageNum}/${pageSize}`,{params:searchData})
@@ -96,7 +99,11 @@ export const noticeReadListApi = (pageNum, pageSize) =>
 export const noticeDetailApi = (id) =>
   http.get(`/admin/msg/notice/detail/${id}`)
 
-// 公告图片上传
+/**
+ * 上传公告图片
+ * @param {FormData} formData 图片表单
+ * @returns {Promise}
+ */
 export const noticeUploadApi = (formData) => http.post('/admin/upload/notice', formData, {
   timeout: 35000 // 本次公告图上传请求超时 35 秒
 })

@@ -7,6 +7,9 @@ import { applyTheme } from '@/assets/common/theme'
 export const useUserConfigStore = defineStore({
   id: 'userConfig',
 
+  // ============================================================
+  // 数据
+  // ============================================================
   state: () => ({
     // 用户配置数据
     collapse_enabled: false,
@@ -18,8 +21,11 @@ export const useUserConfigStore = defineStore({
     hasLoadedConfig: false,
   }),
 
-  // t_user_config_request：获取用户配置请求
+  // ============================================================
+  // 方法
+  // ============================================================
   actions: {
+    // t_user_config_request：获取用户配置请求
     /**
      * 获取用户配置
      * @param {boolean} forceRefresh - 是否强制刷新（默认 false）
@@ -150,6 +156,9 @@ export const useUserConfigStore = defineStore({
     },
   },
 
+  // ============================================================
+  // 计算属性
+  // ============================================================
   getters: {
     isCollapseEnabled: (state) => state.collapse_enabled,
     isDarkEnabled: (state) => state.dark_enabled,
