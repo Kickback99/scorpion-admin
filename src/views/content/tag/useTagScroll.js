@@ -26,6 +26,7 @@ export function useTagScroll() {
   // ============================================================
   // 渲染
   // ============================================================
+  // t_tag_request：标签列表请求
   /** 回到第一页并刷新（替换式） */
   const render = async () => {
     // 开启 loading 动效
@@ -51,6 +52,7 @@ export function useTagScroll() {
    */
   const skeletonCount = computed(() => Math.min(total.value || PAGE_SIZE, PAGE_SIZE))
 
+  // t_tag_request：标签列表加载更多请求
   /** 触底加载下一页（追加式） */
   const loadMore = async () => {
     if (loading.value || loadingMore.value || !hasMore.value) return

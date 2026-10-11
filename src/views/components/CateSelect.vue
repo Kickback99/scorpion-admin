@@ -24,6 +24,7 @@ const modelValue = defineModel()
 
 const cateData = ref([])
 
+// t_category_request：分类列表请求
 const render = async() => {
   console.log('分类列表...')
     const res = await listApi()

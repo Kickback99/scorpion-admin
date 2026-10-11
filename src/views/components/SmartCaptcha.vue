@@ -229,6 +229,7 @@ const onClickCaptcha = (e) => {
 // 生成
 // ============================================================
 
+// t_captcha_request：生成验证码请求
 const generate = async () => {
     verified.value = false
     backgroundLoaded.value = false
@@ -264,6 +265,7 @@ const answerMaxLength = 6
 // 低代码校验规则（el-form 内置，仅必填）
 const answerRules = { answer: [{ required: true, message: '请输入验证码', trigger: 'blur' }] }
 
+// t_captcha_request：校验验证码请求
 // 对外暴露：提交登录 / 注册前调用，返回一次性 verifyToken；失败抛错（阻止提交）
 const verify = async () => {
     // 行为类：校验请求可能仍在飞行中（拖完/点完立刻提交），先等它落地再取 token，否则本次提交会被丢掉
@@ -296,6 +298,7 @@ const verify = async () => {
 }
 defineExpose({ verify })
 
+// t_captcha_request：滑块验证码校验请求
 const handleSliderVerify = async () => {
     try {
         const track = {
@@ -317,6 +320,7 @@ const handleSliderVerify = async () => {
     }
 }
 
+// t_captcha_request：点选验证码校验请求
 const handleClickVerify = async () => {
     try {
         const track = {

@@ -441,6 +441,7 @@ const buildGroupedTreeData = (apiData) => {
   return result
 }
 
+// t_config_request：配置列表请求
 // 加载配置数据
 const loadConfigData = async () => {
   // 开启 loading 动效
@@ -562,6 +563,7 @@ const cloneValue = (value) => {
   return value
 }
 
+// t_config_request：更新单个配置项请求
 // 保存配置
 const handleSave = async (row) => {
   try {
@@ -625,6 +627,7 @@ const hasChildren = (row) => {
   return row.children && row.children.length > 0
 }
 
+// t_config_request：删除配置项请求
 // 删除配置
 const handleDelete = async (row) => {
 
@@ -717,6 +720,7 @@ const handleAddChild = (row) => {
   addDialogVisible.value = true
 }
 
+// t_config_request：更新全部配置请求
 // 确认新增
 const handleConfirmAdd = async () => {
   if (!addFormRef.value) return

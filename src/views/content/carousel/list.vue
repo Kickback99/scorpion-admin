@@ -355,6 +355,7 @@ const uploadProgressMap = ref(new Map())
 
 // ==================== 渲染列表 ====================
 
+// t_business_request：获取全部文章请求
 // 加载所有文章
 const loadAllArticles = async () => {
     const res = await getAllArticlesApi()
@@ -365,6 +366,7 @@ const loadAllArticles = async () => {
     console.log('加载所有文章:', articleList.value.length, '条')
 }
 
+// t_article_request：轮播列表请求
 const renderCarouselList = async () => {
     // 开启 loading 动效
     loading.value = true
@@ -641,6 +643,7 @@ const handleAdd = async () => {
 
 // ==================== 编辑 ====================
 
+// t_article_request：轮播详情请求
 const handleEdit = async (row) => {
 
     const savedUploadStatus =  formModel.uploadStatus
@@ -797,6 +800,7 @@ const handleImgOptionChange = async(val) => {
 }
 
 // ==================== 保存 ====================
+// t_article_request：轮播新增/修改请求
 const handleConfirm = async () => {
         try {
 
@@ -876,6 +880,7 @@ const handleConfirm = async () => {
 
 // ==================== 删除 ====================
 
+// t_article_request：轮播删除请求
 const handleDelete = async (id) => {
     try {
         await removeCarouselApi(id)

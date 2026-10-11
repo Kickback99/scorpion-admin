@@ -18,6 +18,7 @@ export const useUserConfigStore = defineStore({
     hasLoadedConfig: false,
   }),
 
+  // t_user_config_request：获取用户配置请求
   actions: {
     /**
      * 获取用户配置
@@ -66,6 +67,7 @@ export const useUserConfigStore = defineStore({
       return config;
     },
 
+    // t_user_config_request：更新单个配置项请求
     /**
      * 更新单个配置项
      * @param {string} key - 配置键

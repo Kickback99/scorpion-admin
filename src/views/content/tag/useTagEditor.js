@@ -52,6 +52,7 @@ const handleEdit = async (row) => {
 // 保存 / 删除
 // ============================================================
 
+// t_tag_request：标签新增/修改请求
 /** 表单提交：根据 formModel.id 判断新增或编辑 */
 const confirm = async () => {
   await ruleFormRef.value.validate()
@@ -66,6 +67,7 @@ const confirm = async () => {
   reloadList?.()
 }
 
+// t_tag_request：标签删除请求
 /** 删除标签 */
 const removeRole = async (id) => {
   await removeApi(id)

@@ -364,6 +364,7 @@ const searchData = reactive({
 
 })
 
+// t_comment_request：评论列表请求
 const render = async () => {
     // 开启 loading 动效
     loading.value = true
@@ -564,6 +565,7 @@ const articleList = ref([])
 // 用于 SmartAutoComplete 的选中值
 const selectedArticles = ref([])
 
+// t_business_request：获取全部文章请求
 // 加载所有文章
 const loadAllArticles = async () => {
     const res = await getAllArticlesApi()
@@ -749,6 +751,7 @@ const handleReply = (row) => {
     })
 }
 
+// t_comment_request：新增评论请求
 // 提交回复
 const submitReply = async () => {
     // 表单验证
@@ -849,6 +852,7 @@ const handleMultiple = (raw) => {
 }
 
 
+// t_comment_request：批量审核通过请求
 // 批量通过
 const batchApproveRows = async () => {
     // 检查选中项是否全部为待通过状态
@@ -867,6 +871,7 @@ const batchApproveRows = async () => {
     render()
 }
 
+// t_comment_request：批量审核驳回请求
 // 批量驳回
 const batchRejectRows = async () => {
     const check = checkRejectValid(multipleSelection.value)
@@ -885,6 +890,7 @@ const batchRejectRows = async () => {
 }
 
 
+// t_comment_request：批量删除评论请求
 // 批量删除
 const batchDeleteRows = async() => {
     let title;
@@ -911,18 +917,21 @@ const batchDeleteRows = async() => {
 
 }
 
+// t_comment_request：单个审核通过请求
 const handleApprove = async (row) => {
     await auditCommentApi(row.id, 0)
     msg.primary('审核通过')
     render()
 }
 
+// t_comment_request：单个审核驳回请求
 const handleReject = async (row) => {
     await auditCommentApi(row.id, 1)
     msg.primary('已驳回')
     render()
 }
 
+// t_comment_request：删除评论请求
 const handleDelete = async(ids) => {
     await removeCommentApi(ids)
     msg.primary('删除成功')
@@ -983,6 +992,7 @@ const buildStatsParams = () => {
     return statsParams
 }
 
+// t_comment_request：评论统计请求
 /**
  * 加载统计数据（复用当前筛选条件）
  */
