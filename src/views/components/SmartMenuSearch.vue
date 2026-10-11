@@ -597,7 +597,9 @@ onUnmounted(() => {
 </style>
 
 <style lang="scss">
-/* ===== SmartMenuSearch ui-mode 适配（非 scoped，匹配 html 上的 .ui-full / .ui-plain） ===== */
+// ============================================================
+// SmartMenuSearch ui-mode 适配（非 scoped，匹配 html 上的 .ui-full / .ui-plain）
+// ============================================================
 
 /* full — 键盘/鼠标 高亮行：实心底色+白字 */
 /*.ui-full .smart-menu-search .result-item:hover,

@@ -1,5 +1,6 @@
 <template>
   <div class="config-management" :class="userConfigStore.isDarkEnabled ? 'dark-mode' : 'light-mode'">
+    <!-- ===== 工具栏 ===== -->
     <div class="header-actions">
       <div class="header-left">
         <el-button text size="small" @click="handleToggleExpand">
@@ -21,6 +22,7 @@
       <SmartConfigSearch @select="handleConfigSelect" />
     </div>
 
+    <!-- ===== 数据表格 ===== -->
     <el-table
       v-loading="loading"
       ref="tableRef"
@@ -139,7 +141,7 @@
       </el-table-column>
     </el-table>
 
-    <!-- 新增配置对话框 -->
+    <!-- ===== 新增配置弹窗 ===== -->
     <el-dialog
       v-model="addDialogVisible"
       :title="addDialogTitle"
@@ -225,7 +227,9 @@ import { updateAllConfigApi, getConfigApi, updateConfigValueApi, deleteConfigVal
 const configStore = useConfigStore()
 const userConfigStore = useUserConfigStore()
 
-// 表格数据
+// ============================================================
+// 数据
+// ============================================================
 const tableData = ref([])
 // 默认关闭 loading
 const loading = ref(false)
@@ -258,6 +262,9 @@ const addRules = {
 
 let nextId = 100
 
+// ============================================================
+// 配置元数据
+// ============================================================
 // 检查是否为系统预设配置（使用 store 的 isSystemConfig 方法）
 const isSystemField = (key) => {
   return configStore.isSystemConfig(key)
@@ -333,6 +340,9 @@ const getConfigMeta = (fullPath) => {
   return { label: def?.label || '', desc: '' }
 }
 
+// ============================================================
+// 树形数据
+// ============================================================
 // 将配置对象转换为树形表格数据（按 configItems.js 顺序排列）
 const convertToTreeData = (obj, parentPath = '', _groupKey = '') => {
   const result = []
@@ -441,6 +451,9 @@ const buildGroupedTreeData = (apiData) => {
   return result
 }
 
+// ============================================================
+// 数据加载
+// ============================================================
 // t_config_request：配置列表请求
 // 加载配置数据
 const loadConfigData = async () => {
@@ -492,6 +505,9 @@ const handleToggleExpand = () => {
   walk(tableData.value, tableExpanded.value)
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 /** 搜索选中配置项 — 过滤表格数据并滚动到目标行 */
 const handleConfigSelect = (item) => {
   filterKeyword.value = item.isGroup ? item.groupLabel || item.label : (item.configKey || item.label)
@@ -549,7 +565,9 @@ const handleReset = async () => {
   }
 }
 
-// 编辑配置
+// ============================================================
+// 编辑
+// ============================================================
 const handleEdit = (row) => {
   row.isEditing = true
   row.editValue = cloneValue(row.value)
@@ -563,8 +581,10 @@ const cloneValue = (value) => {
   return value
 }
 
+// ============================================================
+// 保存
+// ============================================================
 // t_config_request：更新单个配置项请求
-// 保存配置
 const handleSave = async (row) => {
   try {
     // 验证输入值类型
@@ -620,6 +640,9 @@ const handleCancel = (row) => {
   row.editValue = cloneValue(row.value)
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // 判断节点是否有子节点（非空对象）
 const hasChildren = (row) => {
   if (!row.isObject) return false
@@ -681,6 +704,9 @@ const handleDelete = async (row) => {
   }
 }
 
+// ============================================================
+// 新增
+// ============================================================
 // 重置新增表单
 const resetAddForm = () => {
   addForm.key = ''
@@ -880,12 +906,18 @@ const updateNestedValue = (obj, pathParts, value) => {
   current[pathParts[pathParts.length - 1]] = value
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 // 监听配置 store 变化，同步表格数据
 onMounted(() => {
   configStore.initNumberLimits()
   loadConfigData()
 })
 
+// ============================================================
+// 表单联动
+// ============================================================
 // 调整默认值使其在范围内
 const adjustValueToRange = () => {
   if (addForm.type !== 'number') return

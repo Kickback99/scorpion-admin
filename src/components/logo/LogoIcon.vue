@@ -12,6 +12,9 @@
 <script setup>
 import { useUserConfigStore } from '@/store/userConfig'
 
+// ============================================================
+// 数据
+// ============================================================
 defineProps({
   hideImage: { type: Boolean, default: false }
 })

@@ -150,6 +150,9 @@ const { initWebSocketListener, closeWebSocket } = useWebSocket()
 import { useTabStore } from "@/store/tabs";
 import msg from '@/components/msg'
 
+// ============================================================
+// 数据
+// ============================================================
 const userStore = useUserStore()
 const userConfigStore = useUserConfigStore()
 const uiStore = useUiStore()
@@ -249,6 +252,9 @@ function onHoverChange(hover) {
   applyTheme(userConfigStore.currentTheme, userConfigStore.isDarkEnabled)
 }
 
+// ============================================================
+// 数据
+// ============================================================
 const handleAvatar = computed(()=>{
     return userStore.userInfo.avatar || avatar
 })
@@ -277,6 +283,9 @@ const displayName = computed(() => {
 // 处理菜单折叠
 const stringStore = useSettingStore()
 
+// ============================================================
+// 方法
+// ============================================================
 const handleToggleCollapse = async () => {
     // 调用 userConfigStore 的 toggleCollapse 方法
     // 该方法会：
@@ -348,6 +357,9 @@ const handleCommand = async (key) => {
     }
 }
 
+// ============================================================
+// 设置切换
+// ============================================================
 // 暗黑模式切换
 const toggleDark = async () => {
     await userConfigStore.toggleDark()

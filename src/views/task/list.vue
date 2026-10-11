@@ -1,6 +1,6 @@
 <template>
   <div class="task-container">
-    <!-- ==================== 头部工具栏 ==================== -->
+    <!-- ===== 工具栏 ===== -->
     <div class="toolbar">
       <el-button v-perm="'btn.task.add'" size="small" type="primary" icon="Plus" @click="openAddDialog" plain>
         新增任务
@@ -10,7 +10,7 @@
       </el-button>
     </div>
 
-    <!-- ==================== 任务表格 ==================== -->
+    <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" border>
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="taskCode" label="任务编码" width="180">
@@ -40,7 +40,7 @@
         </template>
       </el-table-column>
 
-      <!-- ==================== 操作栏 ==================== -->
+      <!-- ===== 操作栏 ===== -->
       <el-table-column v-if="showPermColumn(['btn.task.update', 'btn.task.execute', 'btn.task.remove'])" label="操作" width="350" fixed="right" align="center">
         <template #default="{ row }">
           <!-- 编辑任务 -->
@@ -67,7 +67,7 @@
       </el-table-column>
     </el-table>
 
-    <!-- ==================== 新增/编辑弹窗 ==================== -->
+    <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="550px">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="auto" size="small">
         <!-- 任务编码（新增时可编辑，编辑时禁用） -->
@@ -152,13 +152,17 @@ import { listApi, addApi, updateApi, executeApi, refreshAllApi, refreshTaskApi, 
 import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
 
-// ==================== 表格数据 ====================
+// ============================================================
+// 数据
+// ============================================================
 const tableData = ref([])
 
 // 默认关闭 loading
 const loading = ref(false)
 
-// ==================== 弹窗相关 ====================
+// ============================================================
+// 新增/编辑弹窗
+// ============================================================
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const isEditMode = ref(false)  // true=编辑模式，false=新增模式
@@ -172,7 +176,9 @@ const formData = ref({
   status: 0  // 0=启用，1=禁用
 })
 
-// ==================== 表单验证规则 ====================
+// ============================================================
+// 表单校验
+// ============================================================
 const formRules = {
   taskCode: [
     { required: true, message: '请输入任务编码', trigger: 'blur' },
@@ -186,7 +192,9 @@ const formRules = {
   ]
 }
 
-// ==================== 加载任务列表 ====================
+// ============================================================
+// 渲染
+// ============================================================
 // t_task_request：任务列表请求
 const loadTaskList = async () => {
   // 开启 loading 动效
@@ -204,7 +212,9 @@ const loadTaskList = async () => {
   }
 }
 
-// ==================== 打开新增弹窗 ====================
+// ============================================================
+// 新增
+// ============================================================
 const openAddDialog = async() => {
   isEditMode.value = false
   dialogVisible.value = true
@@ -222,7 +232,9 @@ const openAddDialog = async() => {
   }
 }
 
-// ==================== 编辑任务 ====================
+// ============================================================
+// 编辑
+// ============================================================
 const editTask = async(row) => {
   isEditMode.value = true
   dialogVisible.value = true
@@ -234,7 +246,9 @@ const editTask = async(row) => {
   formData.value = { ...row }
 }
 
-// ==================== 提交任务（新增/更新） ====================
+// ============================================================
+// 保存
+// ============================================================
 // t_task_request：任务新增/更新请求
 const submitTask = async () => {
   if (!formRef.value) return
@@ -244,7 +258,7 @@ const submitTask = async () => {
 
     try {
       if (isEditMode.value) {
-        // ==================== 编辑模式：全字段更新 ====================
+        // ===== 编辑模式：全字段更新 =====
         const updateData = {
           taskName: formData.value.taskName,
           description: formData.value.description,
@@ -254,7 +268,7 @@ const submitTask = async () => {
         await updateApi(formData.value.id, updateData)
         msg.primary('任务更新成功，定时任务已自动刷新')
       } else {
-        // ==================== 新增模式 ====================
+        // ===== 新增模式 =====
         await addApi(formData.value)
         msg.primary('任务新增成功')
       }
@@ -268,7 +282,9 @@ const submitTask = async () => {
   })
 }
 
-// ==================== 立即执行任务 ====================
+// ============================================================
+// 立即执行
+// ============================================================
 // t_task_request：立即执行任务请求
 const executeTask = async (row) => {
   try {
@@ -291,7 +307,9 @@ const executeTask = async (row) => {
   }
 }
 
-// ==================== 刷新单个任务 ====================
+// ============================================================
+// 刷新单个任务
+// ============================================================
 // t_task_request：刷新单个任务请求
 const refreshSingleTask = async (row) => {
   try {
@@ -315,7 +333,9 @@ const refreshSingleTask = async (row) => {
   }
 }
 
-// ==================== 刷新所有任务 ====================
+// ============================================================
+// 刷新所有任务
+// ============================================================
 // t_task_request：刷新所有任务请求
 const refreshAllTasks = async () => {
   try {
@@ -339,7 +359,9 @@ const refreshAllTasks = async () => {
   }
 }
 
-// ==================== 切换任务状态 ====================
+// ============================================================
+// 切换状态
+// ============================================================
 // t_task_request：切换任务状态请求
 const toggleStatus = async (row) => {
   const newStatus = row.status === 0 ? 1 : 0
@@ -373,6 +395,9 @@ const toggleStatus = async (row) => {
   }
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // t_task_request：删除任务请求
 const deleteTask = async (row) => {
   try {
@@ -385,13 +410,17 @@ const deleteTask = async (row) => {
   }
 }
 
-// ==================== 快速设置 Cron 表达式 ====================
+// ============================================================
+// Cron 快捷设置
+// ============================================================
 const setCron = (cronValue) => {
   formData.value.cronExpression = cronValue
   msg.primary(`已设置为：${cronValue}`)
 }
 
-// ==================== Cron 表达式翻译 ====================
+// ============================================================
+// Cron 表达式翻译
+// ============================================================
 const translateCron = (cronExpression) => {
   if (!cronExpression) return '未设置'
   try {
@@ -421,7 +450,9 @@ const translateCron = (cronExpression) => {
   }
 }
 
-// ==================== 页面加载 ====================
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(() => {
   loadTaskList()
 })

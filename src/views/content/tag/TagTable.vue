@@ -1,5 +1,5 @@
 <template>
-  <!-- ===== 表格：搜索栏 + 数据表格 + 分页 ===== -->
+  <!-- ===== 搜索栏 ===== -->
   <div class="tt-page">
     <div class="tt-toolbar">
       <el-form label-width="auto" inline>
@@ -14,6 +14,7 @@
       </el-form>
     </div>
 
+    <!-- ===== 数据表格 ===== -->
     <!-- 列宽约定：一律用 min-width 作基准，剩余宽度由表格按各列基准比例分配；新增列写个 min-width 即可自动参与 -->
     <el-table v-loading="loading" :data="tableData" class="tt-table" empty-text="暂无标签数据">
       <el-table-column type="index" label="序号" min-width="60" align="center" />
@@ -33,6 +34,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <div class="tt-pagination">
       <el-pagination
         size="small"

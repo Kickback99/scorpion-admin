@@ -14,6 +14,9 @@
 import { listApi } from '@/api/category';
 import { ref } from 'vue';
 
+// ============================================================
+// 数据
+// ============================================================
 const defaultProps = {
   children: 'children',
   label: 'name',
@@ -24,6 +27,9 @@ const modelValue = defineModel()
 
 const cateData = ref([])
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_category_request：分类列表请求
 const render = async() => {
   console.log('分类列表...')

@@ -1,7 +1,7 @@
-<!-- src/views/online-user/list.vue -->
+<!-- src/views/monitor/online-user/list.vue -->
 <template>
     <div>
-        <!-- 筛选区域 -->
+        <!-- ===== 搜索栏 ===== -->
         <div class="flex justify-between">
             <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
                 <el-form-item>
@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <!-- 表格 -->
+        <!-- ===== 数据表格 ===== -->
         <el-table :data="filteredTableData" style="width: 100%" stripe max-height="500">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
@@ -63,7 +63,7 @@
             </el-table-column>
         </el-table>
 
-        <!-- 分页 -->
+        <!-- ===== 分页 ===== -->
         <el-pagination
             size="small"
             v-model:current-page="pagination.pageNum"
@@ -87,7 +87,9 @@ import { cleanZombieApi, getOnlineListApi, kickUserApi } from '@/api/onlineUser'
 import websocketManager from '@/server/websocketManager'
 import avatar from '@/assets/images/avatar-circle.png'
 
+// ============================================================
 // 数据
+// ============================================================
 const allTableData = ref([])      // 原始数据（来自 WebSocket）
 const searchModel = reactive({
     keyword: '',
@@ -112,6 +114,9 @@ const roleOptions = [
 // 记录每行的 loading 状态（用对象）
 const kickingMap = ref({})
 
+// ============================================================
+// 渲染
+// ============================================================
 // 处理数据更新（统一重置 loading）
 const resetKickingMap = () => {
     kickingMap.value = {}
@@ -159,6 +164,9 @@ const updateFilteredData = () => {
     filteredTableData.value = filtered.slice(start, end)
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 // 搜索
 const onSearch = () => {
     pagination.pageNum = 1
@@ -183,6 +191,9 @@ const onCurrentChange = () => {
     updateFilteredData()
 }
 
+// ============================================================
+// 用户操作
+// ============================================================
 // t_online_request：强退用户请求
 // 强退
 const handleKick = async (row) => {
@@ -251,6 +262,9 @@ const cleanZombieUsers = async () => {
     }
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 // 监听 window 上的自定义事件
 onMounted(() => {
 

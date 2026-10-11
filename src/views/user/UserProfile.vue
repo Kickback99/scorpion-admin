@@ -180,7 +180,10 @@ import { useUserStore } from '@/store/user'
 import avatar from '@/assets/images/avatar-circle.png'
 import { userInfoApi, userStatsApi, userUpdateInfoApi } from '@/api/admin'
 import msg from '@/components/msg'
-// 响应式数据
+
+// ============================================================
+// 数据
+// ============================================================
 const editMode = ref(false)
 const loading = ref(false)
 const formRef = ref()
@@ -204,7 +207,9 @@ const profileStats = ref({
 // 备份原始数据用于取消编辑时恢复
 const originalUserInfo = ref({})
 
-// 表单验证规则
+// ============================================================
+// 表单校验
+// ============================================================
 const rules = reactive({
   email: [
     { required: true, message: '请输入邮箱地址', trigger: 'blur' },
@@ -218,7 +223,9 @@ const rules = reactive({
   ]
 })
 
-// 方法定义
+// ============================================================
+// 方法
+// ============================================================
 const validateFile = (file) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   const isLt2M = file.size / 1024 / 1024 < 2
@@ -305,6 +312,9 @@ const handleCancel = () => {
   imgUrl.value = originalUserInfo.value.avatar
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 // 初始化备份数据
 onMounted(async() => {
   Object.assign(originalUserInfo.value, { ...userInfo })
