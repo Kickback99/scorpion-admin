@@ -183,6 +183,7 @@ const onCurrentChange = () => {
     updateFilteredData()
 }
 
+// t_online_request：强退用户请求
 // 强退
 const handleKick = async (row) => {
 
@@ -212,6 +213,7 @@ const handleKick = async (row) => {
 
 // 监听 WebSocket 消息
 
+// t_online_request：在线用户列表请求
 // 主动加载在线列表（HTTP 拉取）
 const loadOnlineList = async () => {
     try {
@@ -229,6 +231,7 @@ const loadOnlineList = async () => {
 
 const cleaning = ref(false)
 
+// t_online_request：清理僵尸用户请求
 const cleanZombieUsers = async () => {
     cleaning.value = true
     try {

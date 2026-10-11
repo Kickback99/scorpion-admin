@@ -246,6 +246,7 @@ const handleSelectAvatar = (file) => {
 
 }
 
+// t_user_request：用户统计信息请求
 /**
  * 获取用户统计数据
  */
@@ -266,6 +267,7 @@ const fetchProfileStats = async () => {
     }
 }
 
+// t_user_request：修改用户信息请求
 const handleSave = async () => {
   console.log(userInfo === userStore.userInfo)
   if (!formRef.value) return

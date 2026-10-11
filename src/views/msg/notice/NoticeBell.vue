@@ -185,6 +185,7 @@ const {
 // ============================================================
 // 数据获取
 // ============================================================
+// t_notice_request：未读公告数量请求
 const fetchUnreadCount = async () => {
   try {
     const res = await noticeUnreadCountApi()
@@ -227,6 +228,7 @@ const handleViewDetail = (notice) => {
   detailVisible.value = true
 }
 
+// t_notice_request：标记公告已读请求
 const handleMarkRead = async (noticeId) => {
   try {
     await noticeMarkReadApi(noticeId)
@@ -248,6 +250,7 @@ const handleMarkRead = async (noticeId) => {
   }
 }
 
+// t_notice_request：一键全部已读请求
 const handleMarkAllRead = async () => {
   try {
     await noticeMarkAllReadApi()

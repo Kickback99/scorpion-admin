@@ -312,6 +312,7 @@ const fetchHitokoto = async () => {
 // ============================================================
 // 数据请求
 // ============================================================
+// t_dashboard_request：仪表盘统计请求
 const fetchDashboard = async () => {
   try {
     const res = await getDashboardApi()
@@ -319,6 +320,7 @@ const fetchDashboard = async () => {
   } catch { /* keep defaults */ }
 }
 
+// t_dashboard_request：折线图数据请求
 const fetchLineChart = async (direction = 'prev') => {
   lineLoading.value = true
   try {
@@ -342,6 +344,7 @@ const fetchLineChart = async (direction = 'prev') => {
   lineLoading.value = false
 }
 
+// t_dashboard_request：饼图数据请求
 const fetchPieChart = async (mode = pieMode.value) => {
   pieLoading.value = true
   try {
@@ -421,6 +424,7 @@ onUnmounted(() => {
 // ============================================================
 // Gauge + Area
 // ============================================================
+// t_dashboard_request：环形仪表盘数据请求
 const fetchGauge = async () => {
   try {
     const res = await getChartsGaugeApi()
@@ -428,6 +432,7 @@ const fetchGauge = async () => {
   } catch { /* keep defaults */ }
 }
 
+// t_dashboard_request：面积图数据请求
 const fetchAreaChart = async (direction = 'prev') => {
   areaLoading.value = true
   try {

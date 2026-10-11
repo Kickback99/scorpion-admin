@@ -302,6 +302,7 @@ const fullScreen = () => {
     } else document.exitFullscreen()
 }
 
+// t_user_request：退出登录请求
 // 处理下拉事件
 const handleCommand = async (key) => {
     console.log('下拉事件执行了')

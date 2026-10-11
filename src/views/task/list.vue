@@ -187,6 +187,7 @@ const formRules = {
 }
 
 // ==================== 加载任务列表 ====================
+// t_task_request：任务列表请求
 const loadTaskList = async () => {
   // 开启 loading 动效
   loading.value = true
@@ -234,6 +235,7 @@ const editTask = async(row) => {
 }
 
 // ==================== 提交任务（新增/更新） ====================
+// t_task_request：任务新增/更新请求
 const submitTask = async () => {
   if (!formRef.value) return
 
@@ -267,6 +269,7 @@ const submitTask = async () => {
 }
 
 // ==================== 立即执行任务 ====================
+// t_task_request：立即执行任务请求
 const executeTask = async (row) => {
   try {
     await ElMessageBox.confirm(
@@ -289,6 +292,7 @@ const executeTask = async (row) => {
 }
 
 // ==================== 刷新单个任务 ====================
+// t_task_request：刷新单个任务请求
 const refreshSingleTask = async (row) => {
   try {
     await ElMessageBox.confirm(
@@ -312,6 +316,7 @@ const refreshSingleTask = async (row) => {
 }
 
 // ==================== 刷新所有任务 ====================
+// t_task_request：刷新所有任务请求
 const refreshAllTasks = async () => {
   try {
     await ElMessageBox.confirm(
@@ -335,6 +340,7 @@ const refreshAllTasks = async () => {
 }
 
 // ==================== 切换任务状态 ====================
+// t_task_request：切换任务状态请求
 const toggleStatus = async (row) => {
   const newStatus = row.status === 0 ? 1 : 0
   const action = newStatus === 0 ? '启用' : '禁用'
@@ -367,6 +373,7 @@ const toggleStatus = async (row) => {
   }
 }
 
+// t_task_request：删除任务请求
 const deleteTask = async (row) => {
   try {
     await deleteApi(row.id)

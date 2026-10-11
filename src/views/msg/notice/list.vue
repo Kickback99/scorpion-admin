@@ -585,6 +585,7 @@ const MarkdownPreview = computed(() => {
   )
 })
 
+// t_business_request：获取全部用户请求
 /**
  * 加载后台用户列表（用于 SmartAutoComplete 联想搜索）
  */
@@ -619,6 +620,7 @@ const fetchUsers = async (params) => {
     })
 }
 
+// t_business_request：获取全部角色请求
 const loadAllRoles = async () => {
     const res = await getAllRolesApi()
     const items = res.data || []
@@ -813,6 +815,7 @@ const handleTypeChange = (val) => {
 // ============================================================
 // 数据渲染
 // ============================================================
+// t_notice_request：公告列表请求
 /**
  * 获取公告列表（后端分页）
  */
@@ -919,6 +922,7 @@ const handleAdd = async () => {
 // ============================================================
 // 编辑
 // ============================================================
+// t_notice_request：公告详情请求
 const handleEdit = async (row) => {
 
     if (row.status === 1) {
@@ -1003,6 +1007,7 @@ const handleEdit = async (row) => {
 // ============================================================
 // 详情（只读查看）
 // ============================================================
+// t_notice_request：公告详情查看请求
 const handleDetail = async (row) => {
   try {
     const res = await noticeDetailApi(row.id)
@@ -1077,6 +1082,7 @@ const handlePreview = (row) => {
 // ============================================================
 // 保存
 // ============================================================
+// t_notice_request：公告新增/修改请求
 const handleConfirm = async () => {
     await ruleFormRef.value.validate()
     try {
@@ -1122,6 +1128,7 @@ const handleConfirm = async () => {
 // ============================================================
 // 删除
 // ============================================================
+// t_notice_request：公告批量删除请求
 const handleBatchDelete = async () => {
     if (selectedRows.value.length === 0) {
         msg.error('请先勾选要删除的行')
@@ -1141,6 +1148,7 @@ const handleBatchDelete = async () => {
     await handleDelete(ids)
 }
 
+// t_notice_request：公告删除请求
 const handleDelete = async (row) => {
     // 批量删除传的是 id 数组
     if (Array.isArray(row)) {
@@ -1169,6 +1177,7 @@ const handleCopyCodeSuccess = (e) => {
   setTimeout(() => btn.classList.remove('copied'), 1500)
 }
 
+// t_notice_request：公告上架请求
 const handleOnline = async (row) => {
     await noticeOnlineApi(row.id)
     msg.primary('上架成功')
@@ -1176,6 +1185,7 @@ const handleOnline = async (row) => {
     notifyRefresh()
 }
 
+// t_notice_request：公告下架请求
 const handleOffline = async (row) => {
     await noticeOfflineApi(row.id)
     msg.primary('下架成功')
@@ -1183,6 +1193,7 @@ const handleOffline = async (row) => {
     notifyRefresh()
 }
 
+// t_notice_request：公告推送请求
 const handlePush = async (row) => {
   if (row.status === 1) {
     msg.error('该公告已推送，不能重复推送')

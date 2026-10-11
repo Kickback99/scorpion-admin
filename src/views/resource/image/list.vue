@@ -231,6 +231,7 @@ const getFileTypeTag = (type) => {
 // 渲染
 // ============================================================
 
+// t_filemeta_request：图片列表请求
 /**
  * 分页加载图片列表，根据当前筛选条件请求数据
  */
@@ -295,6 +296,7 @@ const handleSizeChange = (size) => {
 // 搜索和重置
 // ============================================================
 
+// t_business_request：获取全部业务数据请求
 const loadBusinessData = async () => {
   try {
     const res = await getAllBusinessDataApi();
