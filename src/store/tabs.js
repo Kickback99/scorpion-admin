@@ -1,15 +1,27 @@
-// stores/load.js
+// stores/tabs.js
 
 import { defineStore } from "pinia"
 export const useTabStore = defineStore({
   id: 'tabs',
+
+  // ============================================================
+  // 数据
+  // ============================================================
   state: () => ({
     tabList:[],
     collapseStates:{}  // 搜索面板折叠偏好 { '/system/sysUser': ['search'], ... }
   }),
+
+  // ============================================================
+  // 计算属性
+  // ============================================================
   getters:{
     getTabs:(state) => state.tabList
   },
+
+  // ============================================================
+  // 方法
+  // ============================================================
   actions: {
     addTabs(tab){
         const existing = this.tabList.find(item => item.path === tab.path)
@@ -48,6 +60,10 @@ export const useTabStore = defineStore({
        localStorage.removeItem('tabs');
     }
   },
+
+  // ============================================================
+  // 持久化
+  // ============================================================
     persist: true,  // 开启当前仓库的持久化
 	/* persist: {
 		key: 'wzCount', // 修改 localStorage 的 key，默认用仓库唯一标识做为 key

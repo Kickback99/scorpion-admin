@@ -10,6 +10,10 @@ import { isCookieMode, clearAdminAuthFlag } from '@/utils/auth'
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
 
 export const useTokenStore = defineStore('token',{
+
+    // ============================================================
+    // 数据
+    // ============================================================
     state:()=>({
         token:'',
 
@@ -18,6 +22,10 @@ export const useTokenStore = defineStore('token',{
         savedPassword:'',
         rememberMe:false
     }),
+
+    // ============================================================
+    // 方法
+    // ============================================================
     actions:{
         setToken(newToken) {
             // cookie 模式：token 在 HttpOnly Cookie 中由浏览器管理，前端不存储（置空顺带覆盖历史残留）
@@ -66,5 +74,9 @@ export const useTokenStore = defineStore('token',{
         }
 
     },
+
+    // ============================================================
+    // 持久化
+    // ============================================================
     persist:true
 })

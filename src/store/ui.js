@@ -2,10 +2,12 @@ import { defineStore } from 'pinia'
 
 export const useUiStore = defineStore({
   id: 'ui',
+
+  // ============================================================
+  // 数据
+  // ============================================================
   state: () => ({
-    // ============================================================
-    // UI 样式配置
-    // ============================================================
+    // ===== UI 样式配置 =====
 
     /** full | plain — 影响按钮 / 标签页等所有组件 */
     uiMode: 'full',
@@ -21,6 +23,10 @@ export const useUiStore = defineStore({
     /** 退出时暂存主题名，供登录页读取（避开 userConfig 被清空后丢失） */
     lastTheme: 'default',
   }),
+
+  // ============================================================
+  // 方法
+  // ============================================================
   actions: {
     setUiMode(mode) {
       this.uiMode = mode
@@ -44,6 +50,10 @@ export const useUiStore = defineStore({
       this.lastTheme = theme
     },
   },
+
+  // ============================================================
+  // 持久化
+  // ============================================================
   persist: {
     key: 'ui-store',
     paths: ['uiMode', 'uiDepthFull', 'uiDepthPlain', 'hoverFull', 'hoverPlain', 'textColorMode', 'lastTheme'],
