@@ -16,6 +16,9 @@
 <script setup>
 import GaugeRing from './GaugeRing.vue'
 
+// ============================================================
+// 数据
+// ============================================================
 const gaugeColors = ['primary', 'success', 'danger']
 
 defineProps({

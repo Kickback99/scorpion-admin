@@ -1,4 +1,5 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <div class="toolbar">
         <el-form label-width="auto" inline size="small">
             <el-form-item>
@@ -70,6 +71,7 @@
         </div>
     </div>
 
+    <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" max-height="500"   @selection-change="removeMultiple">
         <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
@@ -103,6 +105,7 @@
         </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -115,6 +118,7 @@
         style="margin-top: 20px; justify-content: flex-end;"
     />
 
+    <!-- ===== 修改文件名弹窗 ===== -->
     <el-dialog v-model="dialogVisible" title="修改文件名" width="30%" :close-on-click-modal="false">
         <el-form ref="ruleFormRef"  :model="formModel" :rules="rules" label-width="auto" class="demo-ruleForm" size="small">
             <el-form-item label="文件名称" prop="name">
@@ -143,6 +147,9 @@ import { useTokenStore } from '@/store/token';
 import { useSettingStore } from '@/setting';
 import { isCookieMode } from '@/utils/auth';
 import offlineIcon from '@/components/MyIcon/src/offlineIcon';
+// ============================================================
+// 数据
+// ============================================================
 const tokenStore = useTokenStore()
 const settingStore = useSettingStore()
 const searchData = reactive({
@@ -187,6 +194,9 @@ const downloadMode = ref('uuid')
 
 const exts = ref([])
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_file_request：文件列表请求
 const render = async() => {
     // 开启 loading 动效
@@ -233,6 +243,9 @@ const onCurrentChange = (page) => {
     render()
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () => {
     params.pageNum = 1
     render()
@@ -244,6 +257,9 @@ const onReset = () => {
     render()
 }
 
+// ============================================================
+// 上传与下载
+// ============================================================
 // 手动设置请求头（cookie 模式由浏览器自动携带 HttpOnly Cookie，无需带 authorization）
 const headers = computed(() => {
   return isCookieMode() ? {} : {
@@ -325,10 +341,16 @@ const onError = (error, file, fileList) => {
   }
 }
 
+// ============================================================
+// 修改文件名弹窗
+// ============================================================
 const dialogVisible = ref(false)
 
 const formModel = reactive({})
 
+// ============================================================
+// 同步删除
+// ============================================================
 // t_file_request：文件同步删除请求
 const handleSyncDelete = async() => {
     const res = await syncDeleteApi()
@@ -354,7 +376,9 @@ const handleSyncDelete = async() => {
 }
 
 const ruleFormRef = ref()
+// ============================================================
 // 表单校验
+// ============================================================
 const rules = reactive({
    name:[
         {required:true,message:'请输入文件名',trigger:'blur'},
@@ -362,6 +386,9 @@ const rules = reactive({
     ]
 })
 
+// ============================================================
+// 编辑
+// ============================================================
 const handleEdit = async(row) => {
   dialogVisible.value = true
   // 等待对话框渲染完成
@@ -372,6 +399,9 @@ const handleEdit = async(row) => {
   Object.assign(formModel, row)
 }
 
+// ============================================================
+// 保存
+// ============================================================
 // t_file_request：文件名字修改请求
 const handleConfirm = async() => {
     await ruleFormRef.value.validate()
@@ -389,6 +419,9 @@ const removeMultiple = (raw) =>{
     // console.log(multipleSelection.value)
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // t_file_request：文件删除请求
 const handleRemove = async(id) => {
     const res = await removeApi(id)
@@ -413,6 +446,9 @@ const deleteSelectRows = async() => {
     render()
 }
 
+// ============================================================
+// 同步更新
+// ============================================================
 // t_file_request：更新数据库请求
 const handleUpdateRecords = async() => {
     const res = await updateRecordApi()

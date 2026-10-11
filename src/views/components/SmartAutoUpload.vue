@@ -28,6 +28,10 @@ import {Plus} from '@element-plus/icons-vue'
 import { useTokenStore } from '@/store/token';
 import { isCookieMode } from '@/utils/auth';
 import msg from '@/components/msg'
+
+// ============================================================
+// 数据
+// ============================================================
 const imageUrl = ref('')
 let modelValue = defineModel()
 const tokenStore = useTokenStore()
@@ -41,6 +45,9 @@ const props = defineProps({
     }
 })
 
+// ============================================================
+// 计算属性
+// ============================================================
 // 手动设置请求头（cookie 模式由浏览器自动携带 HttpOnly Cookie，无需带 authorization）
 const headers = computed(() => {
   return isCookieMode() ? {} : {
@@ -55,6 +62,9 @@ const handleAction = computed(()=>{
   return `${import.meta.env.VITE_API}/admin/upload/cover`
 })
 
+// ============================================================
+// 上传回调
+// ============================================================
 // 图片上传成功之后的回调
 const onSuccess = (res,uploadFile) => {
     console.log(res)
@@ -64,6 +74,9 @@ const onSuccess = (res,uploadFile) => {
     modelValue.value = res.data
 }
 
+// ============================================================
+// 进度与尺寸
+// ============================================================
 // 进度条业务
 const percentage = ref(0)
 
@@ -81,6 +94,9 @@ const sizeTip = computed(() => {
     : '建议尺寸：1 / 1'
 })
 
+// ============================================================
+// 上传处理
+// ============================================================
 // 准备上传的回调
 const beforeAvatarUpload = (rawFile) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -147,7 +163,9 @@ defineExpose({
   text-align: center;
 }
 
-/* ==================== 正方形样式 ==================== */
+/* ============================================================ */
+/* 正方形样式 */
+/* ============================================================ */
 .square-uploader .avatar {
   width: 150px;
   height: 150px;
@@ -158,7 +176,9 @@ defineExpose({
   height: 150px;
 }
 
-/* ==================== 长方形样式 ==================== */
+/* ============================================================ */
+/* 长方形样式 */
+/* ============================================================ */
 .rectangle-uploader .avatar {
   width: 178px;
   height: 100px;

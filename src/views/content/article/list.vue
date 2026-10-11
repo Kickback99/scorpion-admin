@@ -1,4 +1,5 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <el-collapse class="search-collapse" v-model="searchActiveNames">
         <el-collapse-item title="" name="search">
             <div class="layout">
@@ -94,6 +95,7 @@
         </el-collapse-item>
     </el-collapse>
 
+    <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight">
         <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
@@ -130,6 +132,7 @@
         </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -144,7 +147,7 @@
 
     <ArticleEdit ref="maskRef" @reRender="render"></ArticleEdit>
 
-    <!-- 文章预览弹窗 -->
+    <!-- ===== 文章预览弹窗 ===== -->
     <el-dialog v-model="previewVisible" :title="previewTitle" width="50%" align-center destroy-on-close
         class="preview-dialog md-dialog" :class="{ 'md-vuepress': userConfigStore.isDarkEnabled }">
         <div :class="{ 'dark-mode': userConfigStore.isDarkEnabled }">
@@ -165,6 +168,9 @@ import { useUserConfigStore } from '@/store/userConfig';
 import { useArticleDraftStore } from '@/store/articleDraft';
 import { useSearchCollapse } from '@/utils/useSearchCollapse';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
+// ============================================================
+// 数据
+// ============================================================
 const userConfigStore = useUserConfigStore()
 // 懒加载文章编辑器（完整 markdown 编辑器），仅打开新增/编辑弹窗时加载
 const ArticleEdit = defineAsyncComponent(() => import('@/views/components/ArticleEdit.vue'))
@@ -208,6 +214,9 @@ const endTime = ref('')
 // 点日历选日期时的默认时间：不设则结束端落 00:00:00，结束日当天 00:00:00 之后的记录会被整天漏掉
 const endOfDay = new Date(2000, 0, 1, 23, 59, 59)
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_article_request：文章列表请求
 const render = async() => {
     // 开启 loading 动效
@@ -245,6 +254,9 @@ const onCurrentChange = (page) => {
     render()
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         msg.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
@@ -268,6 +280,9 @@ const onReset = () => {
 
 const maskRef = ref()
 
+// ============================================================
+// 新增
+// ============================================================
 const handleAdd = async (param) => {
     if (draftStore.hasDraft) {
       try {
@@ -285,11 +300,17 @@ const handleAdd = async (param) => {
     maskRef.value.handleToggle(param)
 }
 
+// ============================================================
+// 编辑
+// ============================================================
 const handleEdit = (param) => {
     maskRef.value.openMask()
     maskRef.value.handleToggle(param)
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // t_article_request：文章删除请求
 const handleDelete = async(id) => {
     console.log(id)
@@ -298,6 +319,9 @@ const handleDelete = async(id) => {
     render()
 }
 
+// ============================================================
+// 状态切换
+// ============================================================
 // t_article_request：更改文章状态请求
 const modifySwitch = async(row) =>{
 
@@ -312,6 +336,9 @@ const modifySwitch = async(row) =>{
     render()
 }
 
+// ============================================================
+// 排序与时间筛选
+// ============================================================
 // 设置排序方向
 const setSortOrder = (order) => {
   searchData.value.sortOrder = order
@@ -414,7 +441,9 @@ const setQuickDate = (type) => {
     updateEndTime(endTime.value)
 }
 
-// ==================== 预览相关 ====================
+// ============================================================
+// 预览
+// ============================================================
 const previewVisible = ref(false)
 const previewTitle = ref('')
 const previewContent = ref('')

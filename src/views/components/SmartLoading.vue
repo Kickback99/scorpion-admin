@@ -12,6 +12,9 @@
 import { computed } from 'vue'
 import { useUserConfigStore } from '@/store/userConfig'
 
+// ============================================================
+// 数据
+// ============================================================
 const userConfigStore = useUserConfigStore()
 
 const props = defineProps({
@@ -27,6 +30,9 @@ const props = defineProps({
     }
 })
 
+// ============================================================
+// 计算属性
+// ============================================================
 // 遮罩底色跟随深浅模式，取值对齐 IconCollect.vue
 const maskBg = computed(() =>
     userConfigStore.isDarkEnabled ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'

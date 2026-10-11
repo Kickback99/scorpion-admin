@@ -124,6 +124,9 @@ import msg from '@/components/msg';
 import { useConfigStore } from '@/store/config';
 import { useSettingStore } from '@/setting';
 
+// ============================================================
+// 数据
+// ============================================================
 const configStore = useConfigStore()
 const settingStore = useSettingStore()
 const lineClass = computed(() => `tree-line-${configStore.getTreeCateLineStyle()}`)
@@ -180,6 +183,9 @@ const handleTest = (node,data) => {
 },{deep:true}) */
 
 
+// ============================================================
+// 新增
+// ============================================================
 const addParent = () => {
   isParentChild.value = true
   disabledAddParent.value = false
@@ -294,6 +300,9 @@ const getCheck = (checkedNodes,{checkedKeys}) => {
 
 } */
 
+// ============================================================
+// 删除
+// ============================================================
 // t_category_request：分类删除请求
 const batchRemove = async(node,data,isFlag) => {
   const total = treeRef.value.getCheckedKeys().length
@@ -349,6 +358,9 @@ const defaultProps = {
 
 let nativeData = []
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_category_request：分类列表请求
 const render = async () => {
   // 开启 loading 动效
@@ -402,6 +414,9 @@ const category = reactive({
 
 let beforeCount = 0
 
+// ============================================================
+// 拖拽排序
+// ============================================================
 // t_category_request：分类修改请求（拖拽）
 // 拖拽节点规则
 const allowDrop = (draggingNode, dropNode, type) => {
@@ -611,6 +626,9 @@ const disabledCheckboxes = () => {
   cateData.value = modifyDisabled(cateData.value,isCheckboxDisabled.value)
 }
 
+// ============================================================
+// 编辑与校验
+// ============================================================
 const handleParentBlur = (node,data) => {
 
     console.log("treeList.value",treeList.value)
@@ -1249,6 +1267,9 @@ if(isParentChild.value && isEnd.value || isHasChild.value) {
   }
 }
 
+// ============================================================
+// 工具函数
+// ============================================================
 const handleInclude = (id) => {
   return differentArr.some(item => item=== id)
 }
@@ -1502,6 +1523,9 @@ const handleParentDuplicate = (node,res) => {
   // console.log("arr",arr)
 }
 
+// ============================================================
+// 保存
+// ============================================================
 // t_category_request：分类列表请求（一级分类）
 // t_category_request：分类新增请求（一级分类）
 const handleBatchSave = async(node) => {
@@ -1824,6 +1848,9 @@ const isEnd = ref(null)
 
 const isHasChild = ref(false)
 
+// ============================================================
+// 还原
+// ============================================================
 const handleParentRevert = (node,data) => {
         // isChild.value = true
 
@@ -2239,6 +2266,9 @@ const handleLastParent = (node,data) => {
 }
 
 
+// ============================================================
+// 重置
+// ============================================================
 // t_handle：重置数据这样太麻烦，解决：kwq-inspiration-mount
 const handleReset = () => {
   render()

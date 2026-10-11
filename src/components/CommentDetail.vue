@@ -218,7 +218,9 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['loaded', 'error'])
 
+// ============================================================
 // 数据
+// ============================================================
 const loading = ref(false)
 const detailMode = ref(null)  // 'parent', 'childReply', 'nestedReply'
 const children = ref([])      // 子评论列表（情况 1 使用）
@@ -235,6 +237,9 @@ const whoRepliedToMe = ref([])
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
 
+// ============================================================
+// 方法
+// ============================================================
 // 评论查询失败时的降级兜底数据
 const fallbackComment = (comment) => {
     return {
@@ -330,8 +335,6 @@ const loadDetail = async () => {
         })
         // 前端过滤：谁回复了我（toCommentId === comment.id）
         whoRepliedToMe.value = (res.data.items || []).filter(item => item.toCommentId === comment.id)
-        // ====================================================
-
         // 判断当前评论类型
         if (comment.toCommentUserId !== -1 && comment.toCommentId === comment.rootId) {
           detailMode.value = 'childReply'

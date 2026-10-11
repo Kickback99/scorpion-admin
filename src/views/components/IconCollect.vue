@@ -134,6 +134,10 @@ import SvgIcon from '@/components/MyIcon/src/SvgIcon.vue'
 import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
 import msg from '@/components/msg'
+
+// ============================================================
+// 数据
+// ============================================================
 const configStore =  useConfigStore()
 
 const preloadedComponents = ref([])
@@ -142,6 +146,10 @@ const iconStore = useIconStore()
 const userConfigStore = useUserConfigStore()
 // 添加 loading 状态
 const loading = ref(false)
+
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(async () => {
   loading.value = true // 开始加载
   // 后台延迟执行「收集全站路由组件」扫描，让图标页首屏（online 等 tab）先渲染，不阻塞主线程
@@ -175,7 +183,7 @@ onMounted(async () => {
       }
 
       try {
-        // ========== 静态分析阶段 ==========
+        // ===== 静态分析阶段 =====
         let hasIcon = false;
 
         const importPath = getComponentImportPath(route.component);
@@ -186,7 +194,7 @@ onMounted(async () => {
           // console.warn(`⚠️ 无法分析组件 ${route.name}`);
         }
 
-        // ========== 组件加载阶段 ==========
+        // ===== 组件加载阶段 =====
         // 只有包含图标的组件才进行实际加载
         if (hasIcon) {
           // 如果是动态导入函数则执行，否则直接使用组件
@@ -255,12 +263,18 @@ onMounted(async () => {
       }, 2000)
     }) */
 
+// ============================================================
+// 分页与筛选
+// ============================================================
 // 每页显示的图标数量
 const pageSize = ref(33)
 const currentPage = ref(1)
 const currentActiveType = ref('online')
 const filterValue = ref('')
 
+// ============================================================
+// 标签页数据
+// ============================================================
 // tabs 数据 - 按照你提供的分类方式
 const tabsList = [
   {
@@ -307,6 +321,9 @@ const tabsList = [
   },
 ]
 
+// ============================================================
+// 计算属性
+// ============================================================
 // 过滤后的标签页列表（不显示空分类）
 const filteredTabsList = computed(() => {
   return tabsList.filter(tab => {
@@ -345,6 +362,9 @@ const totalPage = computed(() => {
   return Math.ceil(currentIcons.value.length / pageSize.value)
 })
 
+// ============================================================
+// 方法
+// ============================================================
 // 切换页码
 function onCurrentChange(page) {
   currentPage.value = page

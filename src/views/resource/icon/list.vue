@@ -25,7 +25,13 @@ import { Search, Collection } from '@element-plus/icons-vue'
 import IconCollect from '@/views/components/IconCollect.vue'
 import IconSearch from '@/views/components/IconSearch.vue'
 
+// ============================================================
+// 数据
+// ============================================================
 const isSearch = ref(true)
+// ============================================================
+// 方法
+// ============================================================
 const toggleComponent = () => {
   // 无需手动切换，v-model 已绑定
 }

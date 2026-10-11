@@ -6,12 +6,18 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
+// ============================================================
+// 数据
+// ============================================================
 const props = defineProps({
   endVal: { type: Number, default: 0 },
   startVal: { type: Number, default: 0 },
   duration: { type: Number, default: 400 }
 })
 
+// ============================================================
+// 方法
+// ============================================================
 // easeOutCubic 缓动：数值分布比 easeOutExpo 均匀，前 1/4 时长走约 58%
 const easeOutCubic = (t, b, c, d) => c * (1 - Math.pow(1 - t / d, 3)) + b
 
@@ -47,6 +53,9 @@ const run = () => {
   rafId = requestAnimationFrame(step)
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(run)
 watch(() => props.endVal, run)
 onUnmounted(() => cancelAnimationFrame(rafId))
