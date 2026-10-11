@@ -19,4 +19,3 @@ export const operlogListApi = (pageNum,pageSize,searchData) => http.get(`${API.O
 
 export const operLogRemoveApi = (params) => http.delete(`${API.OPER_LOG_URL}/${params}`)
 export const operlogEnumsListApi = () => http.get(API.OPER_LOG_ENUMS_URL)
-
