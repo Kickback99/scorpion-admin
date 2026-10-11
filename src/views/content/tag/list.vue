@@ -5,7 +5,7 @@
     <TagCard v-else-if="mode === 'card'" />
     <TagCloud v-else />
 
-    <!-- 共享弹窗 -->
+    <!-- ===== 新增/编辑弹窗（三个变体共享） ===== -->
     <el-dialog v-model="dialogVisible" :title="title" width="380px">
       <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
         <el-form-item label="标签名称" prop="name">

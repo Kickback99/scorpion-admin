@@ -88,10 +88,13 @@ import { userUpdatePwdApi } from '@/api/admin'
 import { PASSWORD_REGEX, PASSWORD_MESSAGE } from '@/utils/password'
 import { useTokenStore } from '@/store/token'
 import { useRouter } from 'vue-router'
+
+// ============================================================
+// 数据
+// ============================================================
 const tokenStore = useTokenStore()
 // const router = useRouter()
 
-// 响应式数据
 const formRef = ref()
 const loading = ref(false)
 
@@ -101,7 +104,9 @@ const formModel = reactive({
   confirmPassword: ''
 })
 
-// 密码强度计算
+// ============================================================
+// 密码强度
+// ============================================================
 const passwordStrength = computed(() => {
   const password = formModel.newPassword
   if (!password) {
@@ -134,7 +139,9 @@ const passwordStrength = computed(() => {
   }
 })
 
-// 自定义验证规则
+// ============================================================
+// 表单校验
+// ============================================================
 // 新密码不能与原密码相同
 const validateNewPassword = (rule, value, callback) => {
   if (value === formModel.oldPassword) {
@@ -151,7 +158,6 @@ const validateConfirmPassword = (rule, value, callback) => {
   callback()
 }
 
-// 表单验证规则
 const rules = reactive({
   oldPassword: [
     { required: true, message: '请输入原密码', trigger: 'blur' }
@@ -167,8 +173,10 @@ const rules = reactive({
   ]
 })
 
+// ============================================================
+// 方法
+// ============================================================
 // t_user_request：修改用户密码请求
-// 处理方法
 const handleSubmit = async () => {
   if (!formRef.value) return
 

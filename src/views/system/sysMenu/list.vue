@@ -1,4 +1,5 @@
 <template>
+         <!-- ===== 搜索栏 ===== -->
          <div class="toolbar">
            <div class="toolbar-left">
              <el-button text size="small" @click="handleToggleExpand">
@@ -9,7 +10,7 @@
            <SmartMenuSearch action-mode="expand" @expand-menu="handleExpandMenu" />
          </div>
 
-        <!-- 表格 -->
+        <!-- ===== 数据表格 ===== -->
         <el-table
         v-loading="loading"
         :data="tableData" style="width: 100%;"
@@ -51,7 +52,7 @@
         </el-table-column>
     </el-table>
 
-    <!-- 弹层 -->
+    <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog
     v-model="dialogVisible"
     :title="title"
@@ -133,6 +134,9 @@
 <script setup>
 import { IconSelect } from "@/components/MyIcon";
 import {listApi,addApi,modifyApi,removeApi} from '@/api/sysmenu'
+// ============================================================
+// 数据
+// ============================================================
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
 import { computed, nextTick, ref, watch } from 'vue';
@@ -149,6 +153,9 @@ const userStore = useUserStore()
 // 默认关闭 loading
 const loading = ref(false)
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_menu_request：菜单树形列表请求
 const render = async() => {
      // 开启 loading 动效
@@ -292,6 +299,9 @@ const highlightTarget = (targetName) => {
   }
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // t_menu_request：删除菜单请求
 const removeMenu = async(id) =>{
     await ElMessageBox.confirm('你确认要进行删除么','温馨提示', {
@@ -308,8 +318,9 @@ const treeProps = reactive({
   checkStrictly: false,
 })
 
-// 弹层相关
-
+// ============================================================
+// 新增/编辑弹窗
+// ============================================================
 const dialogVisible = ref(false)
 const title = ref('')
 

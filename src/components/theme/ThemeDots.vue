@@ -22,6 +22,9 @@ import { useUserConfigStore } from '@/store/userConfig'
 import { useConfigStore } from '@/store/config'
 import { themePresets, themeList } from '@/assets/common/theme/presets'
 
+// ============================================================
+// 数据
+// ============================================================
 defineProps({
   columns: { type: Number, default: 0 }
 })
@@ -34,6 +37,9 @@ const dotClass = computed(() => {
   return { circle: 'dot--circle', rect: 'dot--rect', square: 'dot--square' }[shape] || 'dot--circle'
 })
 
+// ============================================================
+// 方法
+// ============================================================
 function handleThemeChange(name) {
   userConfigStore.setTheme(name)
 }

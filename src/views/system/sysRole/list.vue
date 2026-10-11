@@ -1,5 +1,5 @@
 <template>
-    <!-- 工具条 -->
+    <!-- ===== 搜索栏 ===== -->
     <div class="toolbar">
         <el-form
         inline
@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <!-- 表格 -->
+    <!-- ===== 数据表格 ===== -->
     <el-table
     v-loading="loading"
     :data="tableData"
@@ -49,7 +49,7 @@
         </el-table-column>
     </el-table>
 
-    <!-- 弹层 -->
+    <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog
     v-model="dialogVisible"
     :title="title"
@@ -94,7 +94,7 @@
         </template>
     </el-dialog>
 
-    <!-- 分页 -->
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -120,6 +120,9 @@ import msg from '@/components/msg'
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { getAllUsersApi } from '@/api/business'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
+// ============================================================
+// 数据
+// ============================================================
 const tableData = ref([])
 
 const searchData = ref({})
@@ -135,6 +138,9 @@ const total = ref(null)
 const loading = ref(false)
 
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_role_request：角色列表请求
 const render = async(pager = 1) => {
     // 开启 loading 动效
@@ -151,7 +157,9 @@ const render = async(pager = 1) => {
 
 render()
 
-// 用户搜索相关
+// ============================================================
+// 用户搜索
+// ============================================================
 const userCache = ref([])
 const selectedUserNames = ref([])
 const selectedUserIds = ref([])
@@ -201,6 +209,9 @@ const onCurrentChange = (page) => {
     render(page)
 }
 
+// ============================================================
+// 删除
+// ============================================================
 // t_role_request：删除角色请求
 const removeRole = async(id) =>{
     await removeApi(id)
@@ -235,7 +246,9 @@ const deleteSelectRows = async() => {
 }
 
 
-// 参数搜索
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () => {
     params.value.pageNum = 1
     render()
@@ -250,8 +263,9 @@ const onReset = () => {
     // 校验相关
     const ruleFormRef = ref(null)
 
-// 弹层相关
-
+// ============================================================
+// 新增/编辑弹窗
+// ============================================================
     const dialogVisible = ref(false)
     const dialogData = ref({})
     const title = ref('')
@@ -337,7 +351,9 @@ const editDialog = async (row) => {
 
 
 
-    // 绑定表单校验规则
+// ============================================================
+// 表单校验
+// ============================================================
     const rules = {
         roleName : [
         { required: true, message: '请输入角色名称', trigger: 'blur' },
@@ -349,6 +365,9 @@ const editDialog = async (row) => {
         ],
     }
 
+// ============================================================
+// 授权跳转
+// ============================================================
 // 跳转到分配菜单权限路由页面
 const showAssignAuth = (row) =>{
     const path = `/system/assignAuth?id=${row.id}&roleName=${row.roleName}`

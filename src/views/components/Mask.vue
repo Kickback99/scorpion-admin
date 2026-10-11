@@ -20,6 +20,9 @@
 <script setup>
 import { useUserConfigStore } from '@/store/userConfig'
 import { useSettingStore } from '@/setting'
+// ============================================================
+// 数据
+// ============================================================
 const userConfigStore = useUserConfigStore()
 const settingStore = useSettingStore()
 const windowWidth = window.innerWidth - 260
@@ -37,6 +40,9 @@ defineProps({
 })
 
 
+// ============================================================
+// 方法
+// ============================================================
 const emit = defineEmits(['closeMask', 'openDialog'])
 const close = () => {
     emit('close')

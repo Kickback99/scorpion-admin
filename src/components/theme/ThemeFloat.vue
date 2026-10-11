@@ -29,6 +29,9 @@
 import { ref, nextTick } from 'vue'
 import ThemeDots from './ThemeDots.vue'
 
+// ============================================================
+// 数据
+// ============================================================
 const pickerRef = ref(null)
 
 /** 当前动画方向：'in' | 'out' | null，用于 mouseenter 判断是否需要恢复 */
@@ -36,6 +39,9 @@ let animDir = null
 /** 延迟触发离开动画的计时器 */
 let leaveTimer = null
 
+// ============================================================
+// 方法
+// ============================================================
 /** 执行色点动画：'in' 展开 / 'out' 聚拢 */
 function animateDots(dir) {
   const dots = pickerRef.value?.querySelectorAll('.theme-dot')

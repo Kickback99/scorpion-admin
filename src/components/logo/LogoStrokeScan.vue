@@ -15,6 +15,9 @@
 import { useSettingStore } from '@/setting'
 import LogoIcon from './LogoIcon.vue'
 
+// ============================================================
+// 数据
+// ============================================================
 defineProps({
   hideImage: { type: Boolean, default: false },
   hideText: { type: Boolean, default: false }

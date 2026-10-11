@@ -17,6 +17,9 @@ import { useSettingStore } from '@/setting'
 import { applyTheme } from '@/assets/common/theme'
 
 
+// ============================================================
+// 数据
+// ============================================================
 const route = useRoute()
 const { initWebSocketListener, closeWebSocket } = useWebSocket()
 const settingStore = useSettingStore()
@@ -26,6 +29,9 @@ watch(() => settingStore.dynamicMode, (val) => {
   document.documentElement.classList.toggle('dynamic-mode', val)
 }, { immediate: true })
 
+// ============================================================
+// 方法
+// ============================================================
 /** 根据当前路由和缓存注入主题，登录页从 uiStore 读取上次主题 */
 function applyInitialTheme() {
   const userConfigStore = useUserConfigStore()
@@ -39,6 +45,9 @@ function applyInitialTheme() {
   }
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(() => {
   initWebSocketListener()
   applyInitialTheme()

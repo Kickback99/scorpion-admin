@@ -20,6 +20,9 @@ import { useUserConfigStore } from '@/store/userConfig'
 const userConfigStore = useUserConfigStore()
 import { createMarkdownPreview } from '@/utils/markdown-config'
 
+// ============================================================
+// 数据
+// ============================================================
 // 使用 computed 每次重新创建组件
 const MarkdownPreview = computed(() => {
   console.log('创建主题:', userConfigStore.isDarkEnabled?"vuepress":"github")
@@ -43,6 +46,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue','htmlContent'])
 
+// ============================================================
+// 方法
+// ============================================================
 const onChange = (markdownContent,htmlContent) =>{
     emit('update:modelValue',markdownContent)
     // emit('htmlContent',htmlContent)

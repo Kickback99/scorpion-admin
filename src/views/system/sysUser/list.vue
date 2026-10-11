@@ -1,4 +1,5 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <el-collapse class="search-collapse" v-model="searchActiveNames">
         <el-collapse-item title="" name="search">
             <div class="layout">
@@ -72,7 +73,7 @@
         </el-collapse-item>
     </el-collapse>
 
-    <!-- 表格 -->
+    <!-- ===== 数据表格 ===== -->
     <el-table
     v-loading="loading"
     :data="tableData"
@@ -119,7 +120,7 @@
         </el-table-column>
     </el-table>
 
-    <!-- 用户新增和修改弹层 -->
+    <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
         <el-form ref="ruleFormRef" :model="formData" :rules="rules"  class="demo-ruleForm"
             size="small" label-width="auto">
@@ -170,7 +171,7 @@
         </template>
     </el-dialog>
 
-    <!-- 用户分配角色弹层 -->
+    <!-- ===== 分配角色弹窗 ===== -->
     <el-dialog v-model="allocRolesVisible" title="分配角色" >
         <el-form  :model="formData" label-width="80px" class="demo-ruleForm"
             size="small">
@@ -208,7 +209,7 @@
         </template>
     </el-dialog>
 
-    <!-- 分页 -->
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -254,6 +255,9 @@ const handleImage = (row) => {
     }else return avatar
 }
 
+// ============================================================
+// 数据
+// ============================================================
 const params = ref({
     pageNum :1,
     pageSize : 10
@@ -272,6 +276,9 @@ const searchData = ref({
 })
 
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () =>{
     params.value.pageNum = 1
     render()
@@ -291,6 +298,9 @@ const onReset = () => {
 
 const tableData = ref([])
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_user_request：用户列表请求
 const render = async(pager = 1) =>{
     // 开启 loading 动效
@@ -328,7 +338,9 @@ const onCurrentChange = (page) => {
     render(page)
 }
 
-// 批量删除相关
+// ============================================================
+// 删除
+// ============================================================
 const multipleTableRef = ref()
 const multipleSelection = ref([])
 
@@ -382,7 +394,9 @@ const modifySwitch = async(row) =>{
 }
 
 
-// 弹层相关
+// ============================================================
+// 新增/编辑弹窗
+// ============================================================
 const dialogVisible = ref(false)
 
 const defaultData = {
@@ -558,7 +572,9 @@ const modifyUser = async() => {
 
 
 
-// 绑定表单校验规则
+// ============================================================
+// 表单校验
+// ============================================================
 const rules = {
     username : [
       { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -580,9 +596,9 @@ const rules = {
     ],
   }
 
-// 分配角色相关
-
-
+// ============================================================
+// 分配角色
+// ============================================================
 const checkAll = ref(false) // 控制大复选框的全选和半选
 const isIndeterminate = ref(false) // 判断当前状态是否半选
 const checkedCities = ref([]) // 选中的数组集合
@@ -669,7 +685,9 @@ const doAllocRoles = async() => {
 
 }
 
-// 排序相关
+// ============================================================
+// 排序与时间筛选
+// ============================================================
 // 设置排序方向
 const setSortOrder = (order) => {
     searchData.value.sortOrder = order

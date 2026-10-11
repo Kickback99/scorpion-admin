@@ -20,6 +20,9 @@ import { computed, ref } from 'vue';
 import {Plus} from '@element-plus/icons-vue'
 import msg from '@/components/msg'
 
+// ============================================================
+// 数据
+// ============================================================
 // 定义 props
 const props = defineProps({
     // 父组件传递的回调函数，用于触发校验
@@ -37,6 +40,9 @@ const props = defineProps({
 const imageUrl = ref('')
 let modelValue = defineModel()
 
+// ============================================================
+// 计算属性
+// ============================================================
 // 计算动态类名
 const uploaderClass = computed(() => {
   return props.shape === 'rectangle' ? 'rectangle-uploader' : 'square-uploader'
@@ -49,6 +55,9 @@ const sizeTip = computed(() => {
     : '建议尺寸：1 / 1'
 })
 
+// ============================================================
+// 方法
+// ============================================================
 // 校验函数（从 beforeAvatarUpload 提取）
 const validateFile = (rawFile) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -125,7 +134,9 @@ defineExpose({
   text-align: center;
 }
 
-/* ==================== 正方形样式 ==================== */
+/* ============================================================ */
+/* 正方形样式 */
+/* ============================================================ */
 .square-uploader .avatar {
   width: 150px;
   height: 150px;
@@ -136,7 +147,9 @@ defineExpose({
   height: 150px;
 }
 
-/* ==================== 长方形样式 ==================== */
+/* ============================================================ */
+/* 长方形样式 */
+/* ============================================================ */
 .rectangle-uploader .avatar {
   width: 178px;
   height: 100px;

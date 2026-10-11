@@ -121,6 +121,10 @@ import { onClickOutside } from '@vueuse/core';
 import { eventBus } from '@/utils/event-bus';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useSettingStore } from '@/setting'
+
+// ============================================================
+// 标签模式
+// ============================================================
 const userConfigStore = useUserConfigStore()
 const settingStore = useSettingStore()
 
@@ -148,6 +152,9 @@ const tagModePopperClass = computed(() => {
   Remove
 } from '@element-plus/icons-vue'; */
 
+// ============================================================
+// 数据
+// ============================================================
 const route = useRoute()
 const router = useRouter()
 const tabStore = useTabStore()
@@ -169,6 +176,9 @@ const tabs = computed(() => {
   return tabStore.getTabs
 })
 
+// ============================================================
+// 标签操作
+// ============================================================
 // 检查标签是否激活
 const linkIsActive = (tab) => {
   return route.path === tab.path
@@ -259,6 +269,9 @@ const removeTab = (targetName) => {
   })
 }
 
+// ============================================================
+// 滚动定位
+// ============================================================
 // 调整滚动位置 - 修复版本
 const adjustScrollPosition = () => {
   if (!scrollbarDom.value || !tabDom.value) return
@@ -358,6 +371,9 @@ const handleWheel = (event) => {
   }
 }
 
+// ============================================================
+// 右键菜单
+// ============================================================
 // 右键菜单 - 直接使用鼠标位置
 const openMenu = (tab, event) => {
   event.preventDefault()
@@ -409,6 +425,9 @@ const handleContextMenu = (command) => {
   contextmenuVisible.value = false
 }
 
+// ============================================================
+// 下拉菜单
+// ============================================================
 // 处理下拉菜单
 const handleCommand = (command) => {
   switch (command) {
@@ -433,6 +452,9 @@ const handleCommand = (command) => {
   }
 }
 
+// ============================================================
+// 关闭标签
+// ============================================================
 // 关闭右侧标签页
 const closeRightTabs = (currentTab) => {
   const currentIndex = tabs.value.findIndex(tab => tab.path === currentTab.path)
@@ -514,6 +536,9 @@ const closeAllTabs = () => {
   nextTick(adjustScrollPosition)
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 // 点击外部关闭右键菜单
 onClickOutside(contextmenuRef, () => {
   contextmenuVisible.value = false

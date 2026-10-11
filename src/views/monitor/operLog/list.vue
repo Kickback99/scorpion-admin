@@ -1,4 +1,5 @@
 <template>
+        <!-- ===== 搜索栏 ===== -->
         <el-collapse class="search-collapse" v-model="searchActiveNames">
             <el-collapse-item title="" name="search">
         <el-form label-width="auto" inline size="small">
@@ -73,6 +74,7 @@
             </el-collapse-item>
         </el-collapse>
 
+        <!-- ===== 数据表格 ===== -->
         <el-table v-loading="loading" :data="tableData" :style="{ width: '100%' }" :max-height="tableMaxHeight" @selection-change="removeMultiple">
             <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
             <el-table-column type="index" label="序号"  width="60" align="center" />
@@ -107,6 +109,7 @@
             </el-table-column>
         </el-table>
 
+        <!-- ===== 分页 ===== -->
         <el-pagination
             size="small"
             v-model:current-page="params.pageNum"
@@ -119,6 +122,7 @@
             style="margin-top: 20px; justify-content: flex-end;"
         />
 
+        <!-- ===== 日志详情弹窗 ===== -->
         <el-dialog v-model="dialogVisible" title="查看日志详情" width="50%">
               <el-tabs type="border-card">
                 <!-- 基础信息 -->
@@ -165,6 +169,9 @@ import { useUserConfigStore } from '@/store/userConfig'
 import { useSearchCollapse } from '@/utils/useSearchCollapse';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
 import msg from '@/components/msg'
+// ============================================================
+// 数据
+// ============================================================
 const userConfigStore = useUserConfigStore()
 
 // 搜索面板折叠：标签页偏好优先，无偏好回退总开关
@@ -205,6 +212,9 @@ const queryParams = computed(() => ({
     createTimeEnd: searchData.createTimeEnd ? `${searchData.createTimeEnd} 23:59:59` : ''
 }))
 
+// ============================================================
+// 渲染
+// ============================================================
 const render = async() => {
     // 开启 loading 动效
     loading.value = true
@@ -240,6 +250,9 @@ const onCurrentChange = (page) => {
     render()
 }
 
+// ============================================================
+// 枚举
+// ============================================================
 const enumOptions = ref({
   modules: [],
   types: []
@@ -256,6 +269,9 @@ const loadEnums = async () => {
 
 loadEnums()
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () => {
     params.pageNum = 1
     render()
@@ -267,6 +283,9 @@ const onReset = () => {
     render()
 }
 
+// ============================================================
+// 详情弹窗
+// ============================================================
 const dialogVisible = ref(false)
 const formModel = reactive({})
 
@@ -313,6 +332,9 @@ const getTagType = (type) => {
 
 const multipleSelection = ref([])
 
+// ============================================================
+// 删除
+// ============================================================
 // t_log_request：操作日志删除请求
 const removeRow = async(id) => {
     await operLogRemoveApi(id)
@@ -342,7 +364,9 @@ const deleteSelectRows = async() => {
 
 }
 
-// 操作类型禁用
+// ============================================================
+// 操作类型
+// ============================================================
 const disabledTypes = computed(() => {
   const { module } = searchData;
 
@@ -386,6 +410,9 @@ watch(() => searchData.module, (newModule) => {
 });
 
 /** copy-code 插件复制成功后显示 ✓ — click 事件委托只标记被点击的按钮 */
+// ============================================================
+// 预览
+// ============================================================
 const handleCopyCodeSuccess = (e) => {
   const btn = e.target.closest('.v-md-copy-code-btn')
   if (!btn) return

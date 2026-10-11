@@ -1,4 +1,5 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <el-collapse class="search-collapse" v-model="searchActiveNames">
         <el-collapse-item title="" name="search">
     <div class="layout">
@@ -115,6 +116,7 @@
     </el-collapse>
 
 
+    <!-- ===== 数据表格 ===== -->
     <el-table :data="tableData" style="width: 100%" :max-height="tableMaxHeight"
     v-loading="loading"
     ref="multipleTableRef"
@@ -207,6 +209,7 @@
         </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="params.pageNum"
@@ -219,7 +222,8 @@
         style="margin-top: 20px; justify-content: flex-end;"
     />
 
-    <!-- 重构：回复对话框（支持原内容 或 评论类型选择） -->
+    <!-- ===== 回复弹窗 ===== -->
+    <!-- 回复对话框（支持原内容 或 评论类型选择） -->
     <el-dialog v-model="replyDialogVisible" :title="replyDialogTitle" width="40%">
         <el-form :model="replyModel" :rules="replyRules" ref="replyModelRef" label-width="auto" size="small">
 
@@ -279,7 +283,7 @@
         </template>
     </el-dialog>
 
-    <!-- 右侧抽屉 - 评论详情 -->
+    <!-- ===== 评论详情抽屉 ===== -->
     <el-drawer
         v-model="drawerVisible"
         title="评论详情"
@@ -333,6 +337,9 @@ import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import SmartEmojiPicker from '@/views/components/SmartEmojiPicker.vue';
 import msg from '@/components/msg'
 
+// ============================================================
+// 数据
+// ============================================================
 const userConfigStore = useUserConfigStore()
 
 // 搜索面板折叠：标签页偏好优先，无偏好回退总开关
@@ -364,6 +371,9 @@ const searchData = reactive({
 
 })
 
+// ============================================================
+// 渲染
+// ============================================================
 // t_comment_request：评论列表请求
 const render = async () => {
     // 开启 loading 动效
@@ -455,6 +465,9 @@ const onCurrentChange = (page) => {
     render()
 }
 
+// ============================================================
+// 搜索和重置
+// ============================================================
 const onSearch = () => {
     /* if(Boolean(searchData.value.sortField) != Boolean(searchData.value.sortOrder)){
         msg.error(searchData.value.sortField?'请选择排序':'请选择排序字段')
@@ -484,6 +497,9 @@ const onReset = () => {
     render()
 }
 
+// ============================================================
+// 挑拣模式
+// ============================================================
 // 挑选子集
 const handleSelectChildren = async (row) => {
     // console.log('挑选子集', row)
@@ -553,7 +569,9 @@ const handleModeChange = () => {
     render()
 }
 
-// ==================== 回复相关 ====================
+// ============================================================
+// 回复相关
+// ============================================================
 
 const replyDialogVisible = ref(false)
 const replyModelRef = ref()
@@ -795,6 +813,9 @@ const submitReply = async () => {
     render()
 }
 
+// ============================================================
+// 详情抽屉
+// ============================================================
 // 抽屉相关
 const drawerVisible = ref(false)
 const drawerLoading = ref(false)
@@ -842,6 +863,9 @@ const handleTitle = (rootId) => {
     else return '你确定要删除这条评论吗？'
 }
 
+// ============================================================
+// 批量操作
+// ============================================================
 // 批量业务相关
 const multipleTableRef = ref()
 const multipleSelection = ref([])
@@ -938,6 +962,9 @@ const handleDelete = async(ids) => {
     render()
 }
 
+// ============================================================
+// 排序与统计
+// ============================================================
 // 设置排序方向
 const setSortOrder = (order) => {
   searchData.sortOrder = order

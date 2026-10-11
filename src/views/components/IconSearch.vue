@@ -62,6 +62,9 @@ import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
 import { ref, computed, watch } from "vue";
 import msg from '@/components/msg'
 
+// ============================================================
+// 数据
+// ============================================================
 const search = {
   "width": 1024,
   "height": 1024,
@@ -120,6 +123,9 @@ const tabsList = [
       70
       105
   */
+// ============================================================
+// 计算属性
+// ============================================================
 const pageList = computed(() =>{
   console.log(currentActiveType.value)
   return copyIconList[currentActiveType.value]
@@ -131,6 +137,9 @@ const pageList = computed(() =>{
 }
 )
 
+// ============================================================
+// 方法
+// ============================================================
 // 点击标签页触发事件
 function handleClick({ props }) {
   currentPage.value = 1;
@@ -157,6 +166,9 @@ function onCurrentChange(page) {
 
 
 
+// ============================================================
+// 侦听
+// ============================================================
 // 当 pageList.value 发生变化时，重新计算 totalPage.value 的值，totalPage.value 的值根据过滤的元素决定
 watch(
   () => pageList.value,

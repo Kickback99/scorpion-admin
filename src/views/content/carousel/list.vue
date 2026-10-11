@@ -1,4 +1,5 @@
 <template>
+    <!-- ===== 搜索栏 ===== -->
     <div class="flex justify-between">
         <el-form ref="formRef" :model="searchModel" label-width="auto" inline size="small">
             <el-form-item>
@@ -14,6 +15,7 @@
         </div>
     </div>
 
+    <!-- ===== 数据表格 ===== -->
     <el-table v-loading="loading" :data="tableData" style="width: 100%" ref="multipleTableRef" @selection-change="handleMultiple" max-height="500">
         <el-table-column prop="id" label="ID" width="80" align="center" />
 
@@ -121,6 +123,7 @@
         </el-table-column>
     </el-table>
 
+    <!-- ===== 分页 ===== -->
     <el-pagination
         size="small"
         v-model:current-page="pagination.pageNum"
@@ -133,7 +136,7 @@
         style="margin-top: 20px; justify-content: flex-end;"
     />
 
-    <!-- 编辑弹窗 -->
+    <!-- ===== 新增/编辑弹窗 ===== -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="45%">
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
 
@@ -328,7 +331,9 @@ import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
 import SmartUpload from '@/views/components/SmartUpload.vue'
 
-// ==================== 数据 ====================
+// ============================================================
+// 数据
+// ============================================================
 
 const tableData = ref([])
 const total = ref(0)
@@ -353,7 +358,9 @@ const uploadRef = ref(null)
 // 进度 Map
 const uploadProgressMap = ref(new Map())
 
-// ==================== 渲染列表 ====================
+// ============================================================
+// 渲染
+// ============================================================
 
 // t_business_request：获取全部文章请求
 // 加载所有文章
@@ -381,7 +388,9 @@ const renderCarouselList = async () => {
     }
 }
 
-// ==================== 分页 ====================
+// ============================================================
+// 分页
+// ============================================================
 
 const onSizeChange = (size) => {
     pagination.pageNum = 1
@@ -394,7 +403,9 @@ const onCurrentChange = (page) => {
     renderCarouselList()
 }
 
-// ==================== 搜索/重置 ====================
+// ============================================================
+// 搜索和重置
+// ============================================================
 
 const onSearch = () => {
     pagination.pageNum = 1
@@ -407,7 +418,9 @@ const onReset = () => {
     renderCarouselList()
 }
 
-// ==================== 弹窗 ====================
+// ============================================================
+// 新增/编辑弹窗
+// ============================================================
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -534,7 +547,9 @@ const rules = {
     ]
 }
 
-// ==================== SmartAutoComplete 联想搜索 ====================
+// ============================================================
+// 联想搜索
+// ============================================================
 
 // 前端搜索函数（参考 fetchTags 风格）
 const fetchArticles = async (params) => {
@@ -616,7 +631,9 @@ watch(selectedArticles, (newVal) => {
     // ruleFormRef.value?.validateField('articleId')
 }, { deep: true })
 
-// ==================== 新增 ====================
+// ============================================================
+// 新增
+// ============================================================
 
 const handleAdd = async () => {
     dialogVisible.value = true
@@ -641,7 +658,9 @@ const handleAdd = async () => {
 }
 
 
-// ==================== 编辑 ====================
+// ============================================================
+// 编辑
+// ============================================================
 
 // t_article_request：轮播详情请求
 const handleEdit = async (row) => {
@@ -736,7 +755,9 @@ const handleEdit = async (row) => {
     }
 }
 
-// ==================== 重试 ====================
+// ============================================================
+// 重试
+// ============================================================
 const handleRetry = (row) => {
     try {
         formModel.uploadStatus = 'FAILED'
@@ -749,7 +770,9 @@ const handleRetry = (row) => {
     }
 }
 
-// ==================== 图片上传（本地预览） ====================
+// ============================================================
+// 图片上传
+// ============================================================
 
 // 图片校验回调
 const handleImgValidate = () => {
@@ -758,7 +781,9 @@ const handleImgValidate = () => {
     })
 }
 
-// ==================== 切换事件 ====================
+// ============================================================
+// 切换事件
+// ============================================================
 
 // 轮播类型切换
 const handleTypeChange = (val) => {
@@ -799,7 +824,9 @@ const handleImgOptionChange = async(val) => {
     ruleFormRef.value?.clearValidate(['img', 'customImgLink'])
 }
 
-// ==================== 保存 ====================
+// ============================================================
+// 保存
+// ============================================================
 // t_article_request：轮播新增/修改请求
 const handleConfirm = async () => {
         try {
@@ -878,7 +905,9 @@ const handleConfirm = async () => {
     }
 }
 
-// ==================== 删除 ====================
+// ============================================================
+// 删除
+// ============================================================
 
 // t_article_request：轮播删除请求
 const handleDelete = async (id) => {
@@ -891,7 +920,9 @@ const handleDelete = async (id) => {
     }
 }
 
-// ==================== 批量选择 ====================
+// ============================================================
+// 批量选择
+// ============================================================
 
 const multipleSelection = ref([])
 

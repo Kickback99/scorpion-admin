@@ -48,6 +48,9 @@ import { useSettingStore } from '@/setting'
 // 导入全局事件总线对象
 import { eventBus } from '@/utils/event-bus';
 
+// ============================================================
+// 数据
+// ============================================================
 const router = useRouter()
 const route = useRoute()
 
@@ -80,6 +83,9 @@ function handleMediaChange(e) {
     isMobile.value = e.matches
 }
 
+// ============================================================
+// 表单
+// ============================================================
   // 绑定表单数据
   const formModel = ref({
     username:'',
@@ -99,6 +105,9 @@ function handleMediaChange(e) {
       ],
     }
 
+// ============================================================
+// 登录
+// ============================================================
 // 认证模式错配提示：生产环境对网友降级为通用错误（避免暴露前后端配置细节），其余环境保留具体原因便于排查
 const authMismatchTip = (detail) => import.meta.env.PROD ? '服务异常，请稍后重试' : detail
 
@@ -189,6 +198,9 @@ const handleCheckbox = async() => {
     }
 }
 
+// ============================================================
+// 验证码配置
+// ============================================================
 // 拉取管理端验证码配置（类型 + 总开关），动态决定是否展示与类型
 const loadCaptchaConfig = async () => {
     try {
@@ -207,6 +219,9 @@ const loadCaptchaConfig = async () => {
     }
 }
 
+// ============================================================
+// 生命周期
+// ============================================================
 onMounted(()=>{
     isMobile.value = mediaQuery.matches
     mediaQuery.addEventListener('change', handleMediaChange)
