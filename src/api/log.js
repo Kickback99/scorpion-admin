@@ -1,7 +1,5 @@
 import http from '@/utils/request'
 
-// t_log_api：日志管理
-
 const API = {
     LOGIN_LOG_URL : '/admin/msg/loginLogs',
 

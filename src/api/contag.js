@@ -1,7 +1,5 @@
 import http from '@/utils/request'
 
-// t_tag_api：标签管理
-
 const API = {
     TAG_URL : '/admin/content/tag',
 }

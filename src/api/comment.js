@@ -1,4 +1,3 @@
-// api/comment.js
 import http from '@/utils/request'
 
 /**
