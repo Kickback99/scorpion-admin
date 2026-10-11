@@ -1,13 +1,13 @@
 import http from '@/utils/request'
 
 const API = {
-    ARTICLE_URL : '/admin/content/article',
-    ARTICLE_BY_ID_URL : '/admin/content/article/find',
-    ARTICLE_BY_ISTOP : '/admin/content/article/isTop',
+    ARTICLE_URL : '/admin/blog/article',
+    ARTICLE_BY_ID_URL : '/admin/blog/article/find',
+    ARTICLE_BY_ISTOP : '/admin/blog/article/isTop',
     UPLOAD_COVER_URL : '/admin/upload/cover',
     UPLOAD_CONTENT_URL : '/admin/upload/content',
-    CAROUSEL_URL : '/admin/content/carousel',
-    CAROUSEL_BY_ARTICLE_URL : '/admin/content/carousel/findByArticle'
+    CAROUSEL_URL : '/admin/blog/carousel',
+    CAROUSEL_BY_ARTICLE_URL : '/admin/blog/carousel/findByArticle'
 }
 
 /**

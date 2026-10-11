@@ -38,7 +38,7 @@ export const getArticleContentBusinessDataApi = (id, includeDeleted = false) => 
  * 获取所有文章列表（用于 SmartAutoComplete 联想搜索）
  * @returns {Promise}
  */
-export const getAllArticlesApi = () => http.get('/admin/content/article/list/all')
+export const getAllArticlesApi = () => http.get('/admin/blog/article/list/all')
 
 /**
  * 获取所有后台用户列表（用于 SmartAutoComplete 联想搜索）
@@ -60,7 +60,7 @@ export const getAllRolesApi = () => http.get('/admin/system/roles/list/all')
  * @returns {Promise}
  */
 export const getTagListApi = (pageNum, pageSize, searchData) =>
-  http.get(`/admin/content/tag/${pageNum}/${pageSize}`, { params: searchData })
+  http.get(`/admin/blog/tag/${pageNum}/${pageSize}`, { params: searchData })
 
 /**
  * 获取全业务搜索数据（用于 SmartAutoComplete 联想搜索）

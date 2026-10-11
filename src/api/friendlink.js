@@ -8,25 +8,25 @@ import http from '@/utils/request'
  * @returns {Promise}
  */
 export const friendLinkListApi = (pageNum, pageSize, searchData) =>
-  http.get(`/admin/content/friendLink/${pageNum}/${pageSize}`, { params: searchData })
+  http.get(`/admin/blog/friendLink/${pageNum}/${pageSize}`, { params: searchData })
 
 /**
  * 新增友链
  * @param {Object} params 友链数据
  * @returns {Promise}
  */
-export const friendLinkAddApi = (params) => http.post('/admin/content/friendLink',params)
+export const friendLinkAddApi = (params) => http.post('/admin/blog/friendLink',params)
 
 /**
  * 修改友链
  * @param {Object} params 友链数据（含 id）
  * @returns {Promise}
  */
-export const friendLinkModifyApi = (params) => http.put('/admin/content/friendLink',params)
+export const friendLinkModifyApi = (params) => http.put('/admin/blog/friendLink',params)
 
 /**
  * 删除友链
  * @param {Number|Number[]} ids 友链 ID 或 ID 数组
  * @returns {Promise}
  */
-export const friendLinkRemoveApi = (ids) => http.delete(`/admin/content/friendLink/${ids}`)
+export const friendLinkRemoveApi = (ids) => http.delete(`/admin/blog/friendLink/${ids}`)

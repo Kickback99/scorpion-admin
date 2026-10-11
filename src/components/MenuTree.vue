@@ -33,14 +33,14 @@ const handleMenuVisible = (menu) => {
 
 const handleChildren = (menu) => {
     // 根据 type 来决定添加哪个前缀
-    // const prefix = menu.type === 'system'?'system':'content'
+    // const prefix = menu.type === 'system'?'system':'blog'
     let prefix;
     switch(menu.type){
         case 'system':
             prefix = 'system'
             break
-        case 'content':
-            prefix = 'content'
+        case 'blog':
+            prefix = 'blog'
             break
         case 'msg':
             prefix = 'msg'
