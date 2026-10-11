@@ -151,6 +151,7 @@ const handleImage = (row) => {
 // ============================================================
 // 友链渲染
 // ============================================================
+// t_friendlink_request：友链列表请求
 /**
  * 请求后端分页数据并刷新表格
  */
@@ -296,6 +297,7 @@ const rules = {
 // 友链保存
 // ============================================================
 
+// t_friendlink_request：友链新增/修改请求
 /**
  * 表单提交：根据 formModel.id 判断新增或编辑
  */
@@ -337,6 +339,7 @@ const handleBatchDelete = async() => {
     await handleDelete(rowIds)
 }
 
+// t_friendlink_request：友链删除请求
 /**
  * 删除友链（供单行删除和批量删除复用）
  * @param {number|number[]} id - 单个 ID 或 ID 数组

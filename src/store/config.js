@@ -325,6 +325,7 @@ export const useConfigStore = defineStore({
 
     // ==================== 核心：加载 & 更新 ====================
 
+    // t_config_request：加载所有配置请求
     /** 加载所有配置 */
     async loadConfig() {
       this.loading = true
@@ -345,6 +346,7 @@ export const useConfigStore = defineStore({
       }
     },
 
+    // t_config_request：更新单个配置项请求
     /**
      * 更新单个配置项
      * @param {string} key 配置 key（configItems 中定义的 key，如 'comment.article_comment_enabled'）

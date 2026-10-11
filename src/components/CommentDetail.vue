@@ -246,6 +246,7 @@ const fallbackComment = (comment) => {
 }
 
 
+// t_comment_request：子评论列表请求
 /**
  * 加载子评论（滚动分页：每次请求 CHILDREN_PAGE_SIZE 条，滚动到底自动加载下一页）
  * @param {Number} page 页码（从 1 开始）
@@ -288,6 +289,7 @@ onBeforeUnmount(() => {
   loadMoreObserver?.disconnect()
 })
 
+// t_comment_request：评论详情请求
 /**
  * 加载详情
  * 后端返回的评论数据已包含 username、userAvatar、toCommentUserName 等字段
