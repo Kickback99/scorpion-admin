@@ -27,5 +27,3 @@ export const statusApi = (id,status) => http.get(`/admin/system/users/${id}`,{pa
  * @returns {Promise}
  */
 export const getDetailApi = (id) => http.get(`/admin/system/users/detail/${id}`)
-
-

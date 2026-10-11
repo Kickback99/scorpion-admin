@@ -30,4 +30,3 @@ export const doAllocRolesApi = (userRoleData) => http.post(`/admin/system/roles/
  * @returns {Promise}
  */
 export const getDetailApi = (id) => http.get(`/admin/system/roles/detail/${id}`)
-
