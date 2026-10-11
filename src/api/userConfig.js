@@ -1,4 +1,3 @@
-// src/api/userConfig.js
 import http from '@/utils/request'
 
 // 获取用户配置

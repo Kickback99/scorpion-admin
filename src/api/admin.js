@@ -1,28 +1,8 @@
 import http from '@/utils/request'
 
-/* export const userRegisterService = (registerData) =>{
-    const params = new URLSearchParams();
-
-    for(let key in registerData){
-        params.append(key,registerData[key])
-    }
-
-    return http.post('/user/register',params)
-} */
-
 // 用户登录
 export const adminLoginApi = (params) =>{
-
     return http.post('/admin/login',params)
-
-
-    /* const params = new URLSearchParams();
-
-    for(let key in loginData){
-        params.append(key,loginData[key])
-    }
-
-    return request.post('/user/login',params) */
 }
 
 // 获取用户信息

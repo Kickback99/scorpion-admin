@@ -1,7 +1,5 @@
 import http from '@/utils/request'
 
-// t_article_api：文章管理
-
 const API = {
     ARTICLE_URL : '/admin/content/article',
     ARTICLE_BY_ID_URL : '/admin/content/article/find',

@@ -1,7 +1,5 @@
 import http from '@/utils/request'
 
-// t_menu_api：菜单管理
-
 // 新增菜单
 export const addApi = (params) => http.post('/admin/system/menus',params)
 
