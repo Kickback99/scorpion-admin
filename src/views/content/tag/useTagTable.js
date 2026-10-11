@@ -2,7 +2,7 @@
  * 标签表格视图列表逻辑 — 分页（替换式），仅 TagTable 使用
  */
 import { ref } from 'vue'
-import { listApi } from '@/api/contag'
+import { listApi } from '@/api/tag'
 import { useTagEditor } from './useTagEditor'
 
 export function useTagTable() {

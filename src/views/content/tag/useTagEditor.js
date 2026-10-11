@@ -5,7 +5,7 @@
  * 增删改成功后通过 registerReload 注册的回调刷新当前激活视图的列表。
  */
 import { nextTick, ref } from 'vue'
-import { addApi, modifyApi, removeApi } from '@/api/contag'
+import { addApi, modifyApi, removeApi } from '@/api/tag'
 import msg from '@/components/msg'
 
 // ============================================================
