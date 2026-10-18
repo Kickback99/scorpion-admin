@@ -100,12 +100,6 @@
                       v-model="formModel.customCoverLink"
                       placeholder="请输入图片链接地址，如：https://example.com/cover.jpg"
                   />
-                  <el-tooltip placement="right">
-                      <template #content>
-                          <div>输入图片的 URL 地址，将直接作为文章封面使用</div>
-                      </template>
-                      <el-icon class="form-tip-icon"><QuestionFilled /></el-icon>
-                  </el-tooltip>
               </el-form-item>
 
               <!-- 引用封面模式 -->
