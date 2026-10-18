@@ -1,4 +1,3 @@
-<!-- src/views/components/SmartMenuSearch.vue -->
 <template>
   <!-- ===== 菜单搜索 ===== -->
   <div class="smart-menu-search" ref="containerRef">

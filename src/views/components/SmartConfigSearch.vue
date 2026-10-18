@@ -1,4 +1,3 @@
-<!-- src/views/components/SmartConfigSearch.vue -->
 <template>
   <!-- ===== 配置搜索 ===== -->
   <div class="smart-config-search" ref="containerRef">
