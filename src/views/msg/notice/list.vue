@@ -177,7 +177,7 @@
     />
 
     <!-- ===== 新增/编辑弹窗 ===== -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="55%" class="notice-dialog">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="60%" class="notice-dialog">
         <el-form ref="ruleFormRef" :model="formModel" :rules="rules" label-width="auto" size="small">
 
             <!-- 公告标题 -->
