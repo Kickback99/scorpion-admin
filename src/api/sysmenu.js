@@ -7,7 +7,6 @@ import http from '@/utils/request'
  */
 export const addApi = (params) => http.post('/admin/system/menus',params)
 
-
 /**
  * 删除菜单
  * @param {Number|Number[]} ids 菜单 ID 或 ID 数组
@@ -15,14 +14,12 @@ export const addApi = (params) => http.post('/admin/system/menus',params)
  */
 export const removeApi  = (ids) => http.delete(`/admin/system/menus/${ids}`)
 
-
 /**
  * 修改菜单
  * @param {Object} params 菜单数据
  * @returns {Promise}
  */
 export const modifyApi = (params) => http.put('/admin/system/menus',params)
-
 
 /**
  * 查询全部菜单
@@ -37,7 +34,6 @@ export const listApi = () => http.get(`/admin/system/menus`)
  * @returns {Promise}
  */
 export const statusApi = (id,status) => http.get(`/admin/system/menus/${id}`,{params:{status}})
-
 
 /**
  * 获取角色菜单数据

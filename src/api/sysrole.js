@@ -7,7 +7,6 @@ import http from '@/utils/request'
  */
 export const addApi = (params) => http.post('/admin/system/roles',params)
 
-
 /**
  * 删除角色
  * @param {Number|Number[]} ids 角色 ID 或 ID 数组
@@ -15,14 +14,12 @@ export const addApi = (params) => http.post('/admin/system/roles',params)
  */
 export const removeApi  = (ids) => http.delete(`/admin/system/roles/${ids}`)
 
-
 /**
  * 修改角色
  * @param {Object} params 角色数据
  * @returns {Promise}
  */
 export const modifyApi = (params) => http.put('/admin/system/roles',params)
-
 
 /**
  * 分页查询角色列表
@@ -32,7 +29,6 @@ export const modifyApi = (params) => http.put('/admin/system/roles',params)
  * @returns {Promise}
  */
 export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/roles/${pageNum}/${pageSize}`,{params:searchData})
-
 
 /**
  * 获取用户角色数据

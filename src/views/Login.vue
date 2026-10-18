@@ -28,7 +28,6 @@
     </div>
 </template>
 
-
 <script setup>
 import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import msg from '@/components/msg'

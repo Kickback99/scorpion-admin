@@ -337,7 +337,6 @@ const defaultForm = {
     status: 0
   }
 
-
 const typeDisabled = ref(false) // 控制以下是否全部禁用
 const type0Disabled = ref(false) // 目录
 const type1Disabled = ref(false) // 菜单
@@ -347,12 +346,9 @@ const formModel = ref({
     ...defaultForm
 })
 
-
 const AuthFields = ['Layout','ParentView','list']
 
 const isComponentDisabled  = ref(false)
-
-
 
 // 在工具条点击的添加按钮的事件
 const addDir = () =>{

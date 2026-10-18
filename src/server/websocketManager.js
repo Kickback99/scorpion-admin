@@ -50,7 +50,6 @@ class WebSocketManager {
       return
     }
 
-
     // 重置手动关闭标志
     this.isManualClose = false
 

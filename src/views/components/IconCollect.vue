@@ -232,7 +232,6 @@ onMounted(async () => {
       icon: comp.iconName
     }))); */
 
-
     // 所有组件加载完成后，在下一个 tick 中统一销毁
     if (preloadedComponents.value.some(comp => comp.loaded)) {
       nextTick(() => {
@@ -428,7 +427,6 @@ const changeIconDisplay = (data) => {
   iconStore.setIsExcludeInline = data
 }
 
-
 const changeIconUsed = (data) => {
   iconStore.setShowBatchUsedIcons = data
 }
@@ -450,8 +448,6 @@ const visibleInlineIcon = (item) => {
 
 </script>
 
-
-
 <style lang="scss" scoped>
 .flex.items-center {
   display: flex;
@@ -462,7 +458,6 @@ const visibleInlineIcon = (item) => {
       color:#aaa;
   }
 }
-
 
 .icons-container {
   height: 100%;
@@ -499,7 +494,6 @@ const visibleInlineIcon = (item) => {
     transform: scaleX(1.05);
   }
 }
-
 
 .pagination-container {
   display: flex;

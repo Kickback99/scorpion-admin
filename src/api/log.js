@@ -7,7 +7,6 @@ const API = {
     OPER_LOG_ENUMS_URL: '/admin/msg/operLogs/enums'
 }
 
-
 // 登录日志
 /**
  * 分页查询登录日志列表

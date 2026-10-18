@@ -53,7 +53,6 @@ export async function analyzeComponent(importPath) {
   }
 }
 
-
 /**
  * 收集 Element Plus 图标
  */
@@ -113,7 +112,6 @@ function collectElementPlusIcons(content, elementIcons, importPath) {
     });
   }
 }
-
 
 import elIcons from '@/data/elIcons';
 
@@ -267,7 +265,6 @@ function collectAlibabaIcons(template, styleContent, alibabaIcons) {
     console.log(`🔍 发现阿里巴巴图标:`, { type, icon, color });
   }
 }
-
 
 /**
  * 保存所有图标到 store（立即保存，不依赖临时存储）

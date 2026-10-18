@@ -1031,7 +1031,6 @@ defineExpose({
    color: #fff !important;
  }
 
-
  .form-tip-icon {
   margin-left: 8px;
   color: #909399;

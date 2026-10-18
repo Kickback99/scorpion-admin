@@ -236,7 +236,6 @@ const whoRepliedToMe = ref([])
 
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
-
 // ============================================================
 // 方法
 // ============================================================
@@ -249,7 +248,6 @@ const fallbackComment = (comment) => {
         userAvatar: comment.toCommentUserAvatar || null
     }
 }
-
 
 // t_comment_request：子评论列表请求
 /**

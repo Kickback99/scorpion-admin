@@ -37,7 +37,6 @@ export const checkApproveValid = (rows) => {
     }
 }
 
-
 /**
  * 检查选中项是否可以驳回
  * @param {Array} rows - 选中的行数据
@@ -76,7 +75,6 @@ export const checkRejectValid = (rows) => {
         validRows
     }
 }
-
 
 /**
  * 批量操作前的确认弹窗

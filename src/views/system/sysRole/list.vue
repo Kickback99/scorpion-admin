@@ -12,7 +12,6 @@
         <el-input :prefix-icon="useRenderIcon('ri:group-line')"  placeholder="请输入角色名/角色编码" v-model="searchData.roleName" /><br>
         </el-form-item>
 
-
         <el-form-item>
         <el-button size="small" type="primary" icon="Search" @click="onSearch" plain>搜索</el-button>
         <el-button size="small" type="info" icon="Refresh" @click="onReset" plain>重置</el-button>
@@ -137,7 +136,6 @@ const total = ref(null)
 // 默认关闭 loading
 const loading = ref(false)
 
-
 // ============================================================
 // 渲染
 // ============================================================
@@ -245,7 +243,6 @@ const deleteSelectRows = async() => {
 
 }
 
-
 // ============================================================
 // 搜索和重置
 // ============================================================
@@ -322,7 +319,6 @@ const editDialog = async (row) => {
     })
 }
 
-
     // 新增角色请求
     // t_role_request：新增角色请求
     const addRole = async() => {
@@ -348,8 +344,6 @@ const editDialog = async (row) => {
         render(params.value.pageNum)
 
     }
-
-
 
 // ============================================================
 // 表单校验

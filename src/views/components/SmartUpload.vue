@@ -103,7 +103,6 @@ defineExpose({
     handleImage,
 })
 
-
 </script>
 
 <style lang="scss" scoped>

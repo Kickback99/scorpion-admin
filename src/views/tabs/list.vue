@@ -223,8 +223,6 @@ const ensureHomeTabExists = () => {
   }
 }
 
-
-
 // 设置激活的选项卡
 const setActiveTab = () => {
   activeTab.value = route.path
@@ -395,7 +393,6 @@ const openMenu = (tab, event) => {
 
   contextmenuVisible.value = true
 }
-
 
 // 处理右键菜单点击
 const handleContextMenu = (command) => {

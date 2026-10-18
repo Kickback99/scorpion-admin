@@ -7,7 +7,6 @@ import http from '@/utils/request'
  */
 export const addApi = (params) => http.post('/admin/system/users',params)
 
-
 /**
  * 删除用户
  * @param {Number|Number[]} ids 用户 ID 或 ID 数组
@@ -15,14 +14,12 @@ export const addApi = (params) => http.post('/admin/system/users',params)
  */
 export const removeApi  = (ids) => http.delete(`/admin/system/users/${ids}`)
 
-
 /**
  * 修改用户
  * @param {Object} params 用户数据
  * @returns {Promise}
  */
 export const modifyApi = (params) => http.put('/admin/system/users',params)
-
 
 /**
  * 分页查询用户列表

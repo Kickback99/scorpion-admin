@@ -524,7 +524,6 @@ const validateCustomImgLink = (rule, value, callback) => {
     callback()
 }
 
-
 // 校验规则
 const rules = {
     title: [
@@ -657,7 +656,6 @@ const handleAdd = async () => {
     }
 }
 
-
 // ============================================================
 // 编辑
 // ============================================================
@@ -696,7 +694,6 @@ const handleEdit = async (row) => {
         formModel.articleId = null
         formModel.articleTitle = '外链'
     }
-
 
     // 轮播标题回显
     if (data.title) {
@@ -929,7 +926,6 @@ const multipleSelection = ref([])
 const handleMultiple = (raw) => {
     multipleSelection.value = raw
 }
-
 
 // 监听进度
 const handleCarouselProgress = (event) => {
