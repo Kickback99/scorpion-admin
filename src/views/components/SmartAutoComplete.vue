@@ -1,4 +1,3 @@
-<!-- src/components/SmartAutoComplete.vue -->
 <template>
   <div class="smart-input-tag" ref="containerRef">
     <!-- el-input-tag 基础组件 -->

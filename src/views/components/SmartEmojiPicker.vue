@@ -1,4 +1,3 @@
-<!-- src/views/components/SmartEmojiPicker.vue -->
 <template>
     <!-- ===== 表情选择 ===== -->
     <!-- 用 el-popover：点开后在光标处插入（弹层被传送到 body，不受弹窗滚动容器裁剪） -->

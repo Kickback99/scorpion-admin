@@ -1,6 +1,3 @@
-// utils/auditHelper.js
-
-
 /**
  * 检查选中项是否可通过
  * @param {Array} rows - 选中的行数据
