@@ -11,7 +11,7 @@
                     <SmartAutoComplete
                         v-model="selectedTargetId"
                         :fetch-suggestions-api="fetchBusinessData"
-                        placeholder="请输入业务名称"
+                        placeholder="请输入业务标题"
                         :max="1"
                         :debounce-delay="300"
                         :min-search-length="1"
@@ -143,7 +143,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="业务名称" width="200" show-overflow-tooltip>
+            <el-table-column label="业务标题" width="200" show-overflow-tooltip>
                   <template #default="{ row }">
                      {{  row.title ? row.title : '该业务不存在'  }}
                   </template>
