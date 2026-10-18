@@ -88,7 +88,6 @@
                 <SmartSelector v-model="formModel.status" :data="statusOptions" placeholder="请选择审核状态"></SmartSelector>
             </el-form-item>
 
-
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -218,7 +217,6 @@ const handleReset = () => {
     Object.assign(searchModel,{id:null,keyword:'',status:''})
     fetchFriendLinks()
 }
-
 
 // ============================================================
 // 新增

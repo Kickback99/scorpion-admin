@@ -17,7 +17,6 @@ export const fileMetaListApi = (pageNum, pageSize, searchData) =>
         timeout: 35000
     })
 
-
 /**
  * 恢复被软删除的文件元数据
  * @param {Number} id 文件元数据 ID

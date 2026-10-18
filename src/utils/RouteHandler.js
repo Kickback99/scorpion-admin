@@ -48,7 +48,6 @@ const convertToDesiredFormat = (components) => {
   }))
 }
 
-
 // 获取本地路由组件
 export function getLocalRouteComponents(excludes = []) {
   return routes.flatMap(route => {
@@ -87,9 +86,6 @@ export function getLocalRouteComponents(excludes = []) {
     return components;
   });
 }
-
-
-
 
 // 获取当前用户可导航的本地菜单项（供菜单搜索使用，仅含 title/icon/path）
 // 边界：/login 无 meta.title、404/403 不在 routes/tempRoutes 数据源中，均天然排除

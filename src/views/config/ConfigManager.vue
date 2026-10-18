@@ -670,7 +670,6 @@ const handleDelete = async (row) => {
     confirmMessage = `确定要删除配置项 "${row.displayKey}" 吗？此操作不可恢复！`
   }
 
-
   try {
     await ElMessageBox.confirm(
       confirmMessage,

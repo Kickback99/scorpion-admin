@@ -115,7 +115,6 @@
         </el-collapse-item>
     </el-collapse>
 
-
     <!-- ===== 数据表格 ===== -->
     <el-table :data="tableData" style="width: 100%" :max-height="tableMaxHeight"
     v-loading="loading"
@@ -875,7 +874,6 @@ const handleMultiple = (raw) => {
     multipleSelection.value = raw
 }
 
-
 // t_comment_request：批量审核通过请求
 // 批量通过
 const batchApproveRows = async () => {
@@ -912,7 +910,6 @@ const batchRejectRows = async () => {
     msg.primary(`成功驳回${ids.length}条评论`)
     render()
 }
-
 
 // t_comment_request：批量删除评论请求
 // 批量删除

@@ -318,7 +318,6 @@ const highlightMatch = (text) => {
   return text
 }
 
-
 // 更新输入框值
 const updateCurrentInput = () => {
   const inputValue = getCurrentInputValue()
@@ -345,7 +344,6 @@ const updateCurrentInput = () => {
     activeIndex.value = -1
   }
 }
-
 
 // 防抖搜索
 const debounceSearch = (query) => {
@@ -692,7 +690,6 @@ const addCurrentInputAsTag = (inputValue) => {
       return
     }
   }
-
 
   if (modelValue.value.includes(trimmedValue)) {
     msg.warning(`标签 "${trimmedValue}" 已存在`)

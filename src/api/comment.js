@@ -12,7 +12,6 @@ export const getCommentsApi = (pageNum, pageSize, searchData) =>
     params: searchData
   })
 
-
 /**
  * 添加评论
  * @param {Object} data 评论数据
@@ -27,7 +26,6 @@ export const getCommentsApi = (pageNum, pageSize, searchData) =>
 export const addCommentApi = ( data ) =>
   http.post('/admin/msg/comment', data)
 
-
 /**
  * 根据 ID 查询单个评论
  * @param {Number} id 评论 ID
@@ -36,7 +34,6 @@ export const addCommentApi = ( data ) =>
 export const getCommentByIdApi = (id) =>
   http.get(`/admin/msg/comment/${id}`)
 
-
 /**
  * 删除评论
  * @param {Number|Number[]} ids 评论 ID 或 ID 数组
@@ -44,8 +41,6 @@ export const getCommentByIdApi = (id) =>
  */
 export const removeCommentApi = (ids) =>
 http.delete(`/admin/msg/comment/${ids}`)
-
-
 
 /**
  * 批量审核评论（通过/驳回）
