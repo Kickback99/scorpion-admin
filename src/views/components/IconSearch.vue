@@ -55,7 +55,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { IconJson } from "@/components/MyIcon/data";
 import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
@@ -164,8 +163,6 @@ function onCurrentChange(page) {
   currentPage.value = page;
 }
 
-
-
 // ============================================================
 // 侦听
 // ============================================================
@@ -186,8 +183,6 @@ watch(
 );
 </script>
 
-
-
 <style lang="scss" scoped>
 .selector {
     width: 500px;
@@ -202,7 +197,6 @@ watch(
 .icon-scrollbar {
     height: 140px;
 }
-
 
 .pagination-container {
   display: flex;

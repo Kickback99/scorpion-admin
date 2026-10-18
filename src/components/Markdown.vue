@@ -72,7 +72,6 @@ const handleDefaultUpload  = async (event, insertImage, files) => {
     }
 }
 
-
 // 公告内容图片上传处理器
 const handleNoticeUpload = async (event, insertImage, files) => {
     const formData = new FormData()

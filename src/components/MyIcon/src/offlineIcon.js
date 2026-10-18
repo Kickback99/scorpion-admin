@@ -20,7 +20,6 @@ const renderIcon = (icon) => {
   addIcon(icon, getIcon(icon));
 }
 
-
 // Iconify Icon 在 Vue 里本地使用（用于内网环境）
 export default defineComponent({
   name: "OfflineIcon",

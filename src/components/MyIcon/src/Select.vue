@@ -91,7 +91,6 @@ const iconItemStyle = computed(() => {
   };
 });
 
-
 const tabNames = tabsList.map(item => {
   return item.name
 })
@@ -169,8 +168,6 @@ const removeIcon = () => {
 defineExpose({
   removeIcon
 })
-
-
 
 // ============================================================
 // 监听

@@ -265,7 +265,6 @@ const params = ref({
 
 const total = ref(null)
 
-
 // 默认关闭 loading
 const loading = ref(false)
 
@@ -274,7 +273,6 @@ const searchData = ref({
     sortOrder: 'ASC', // 默认升序
     timeField: 'create_time', // 默认按创建时间筛选
 })
-
 
 // ============================================================
 // 搜索和重置
@@ -321,7 +319,6 @@ const render = async(pager = 1) =>{
 }
 
 render()
-
 
 // 点击分页事件
 const onSizeChange = (size) => {
@@ -392,7 +389,6 @@ const modifySwitch = async(row) =>{
     row.status === 0 ? msg.primary('用户已激活'):msg.error('用户已禁用')
     render()
 }
-
 
 // ============================================================
 // 新增/编辑弹窗
@@ -567,10 +563,6 @@ const modifyUser = async() => {
     msg.primary('修改成功')
     render(params.value.pageNum)
 }
-
-
-
-
 
 // ============================================================
 // 表单校验

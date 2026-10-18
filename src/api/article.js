@@ -77,7 +77,6 @@ export const uploadCoverApi = (articleId,cover) => {
  */
 export const isTopApi = (id,isTop) => http.put(`${API.ARTICLE_BY_ISTOP}/${id}/${isTop}`)
 
-
 // ============================================================
 // 文章编辑页轮播设置
 // ============================================================
@@ -102,7 +101,6 @@ export const removeCarouselApi = (id, articleId) => {
     }
 }
 
-
 // ============================================================
 // 轮播管理
 // ============================================================
@@ -124,7 +122,6 @@ export const getCarouselListApi = (pageNum, pageSize, searchData) =>
  */
 export const getCarouselByIdApi = (id) =>
     http.get(`${API.CAROUSEL_URL}/${id}`)
-
 
 /**
  * 构建 FormData（通用函数）

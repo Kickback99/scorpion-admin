@@ -259,9 +259,6 @@ const handleAvatar = computed(()=>{
     return userStore.userInfo.avatar || avatar
 })
 
-
-
-
 const tokenStore = useTokenStore()
 const tabStore = useTabStore()
 

@@ -15,8 +15,6 @@ import { useUserConfigStore } from '@/store/userConfig'
 import msg from '@/components/msg'
 import { isCookieMode, hasAdminAuthFlag } from '@/utils/auth'
 
-
-
 // 路由规则
 export const routes = [
     {path:'/login',component:() => import('@/views/Login.vue')},
@@ -127,8 +125,6 @@ function routesHandler(router,parentType=null){
                     break
             }
 
-
-
             // 处理二级子菜单：为这些孩子构建新的属性（parentPath，level）便于 menu 来添加父级路径
             if(route.children != null && route.component == 'ParentView'){
                 let parent = route.path
@@ -208,7 +204,6 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // 移除现有的 404 路由，确保动态路由优先匹配
     // remove404Routes()
 
-
     // 处理新路由
     const asyncRoutes = routesHandler(menuData.routers);
     // console.log('后端返回',menuData.routers)
@@ -224,8 +219,6 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
             // console.log(`添加普通路由：${route.path}`);
         }
     });
-
-
 
     // 更新 Store 中的菜单引用
     userStore.setUserMenu(menuData.routers);
@@ -245,7 +238,6 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
       routes: router.getRoutes(),
       permissions: menuData.permissions
     }); */
-
 
     // 仅刷新菜单的场景（loadMenu(false)）没有导航上下文，跳过守卫校验
     if (!to || typeof next !== 'function') {
@@ -370,7 +362,6 @@ router.beforeEach((to, from, next) => {
         settings.isManualTo403 = false
         return next()
     }
-
 
     // 已登录不能输入登录地址回到登录页
     // cookie 模式无同步 token，用后端下发的登录标记 cookie 判断（刷新后依然稳定，认证真值以服务端为准）

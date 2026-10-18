@@ -16,8 +16,6 @@ import { useSettingStore } from '@/setting'
 import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 
-
-
 // 认证失效统一清理：清 token/动态路由/用户信息，并跳转登录页
 // （业务码 401/215/216 与 HTTP 401 共用，cookie 模式与 jwt 模式共用）
 const handleAuthExpired = (config, message) => {
@@ -88,7 +86,6 @@ instance.interceptors.response.use(
         if(res.data.code === 0 || res.data.code === 200){
             return res.data
         }
-
 
        // 匹配状态码为 40 开头的正则，以及认证失效码 215（token 过期）/ 216（账号已退出）
        let regex = /^40[0-9]$/
