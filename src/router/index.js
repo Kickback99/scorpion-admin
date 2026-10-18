@@ -53,7 +53,11 @@ export const routes = [
 
 const sysModules = import.meta.glob('../views/system/**/*.vue')
 const blogModules = import.meta.glob('../views/blog/**/*.vue')
-const msgModules = import.meta.glob('../views/msg/**/*.vue')
+// NoticeBell 是 Layout/ToolBar 静态引入的常驻组件，不属于路由页，收录进 glob 会触发拆包警告
+const msgModules = import.meta.glob([
+    '../views/msg/**/*.vue',
+    '!../views/msg/**/NoticeBell.vue',
+])
 const monitorModules = import.meta.glob("../views/monitor/**/*.vue")
 const resourceModules = import.meta.glob('../views/resource/**/*.vue')
 const configModules = import.meta.glob('../views/config/*.vue')
