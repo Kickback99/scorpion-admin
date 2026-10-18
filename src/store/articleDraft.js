@@ -1,4 +1,3 @@
-// stores/articleDraft.js — 文章编辑草稿持久化
 // sessionStorage 持久化，关闭浏览器自动清理；跨路由导航保持编辑状态
 
 import { defineStore } from 'pinia'

@@ -1,5 +1,3 @@
-// stores/tabs.js
-
 import { defineStore } from "pinia"
 export const useTabStore = defineStore({
   id: 'tabs',

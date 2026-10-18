@@ -1,5 +1,3 @@
-// stores/load.js
-
 import { defineStore } from "pinia"
 export const useLoadStore = defineStore({
   id: 'load',

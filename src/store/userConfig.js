@@ -1,4 +1,3 @@
-// stores/userConfig.js
 import { defineStore } from "pinia";
 import { getUserConfigApi, updateUserConfigValueApi } from "@/api/userConfig";
 import { useUserStore } from "./user";

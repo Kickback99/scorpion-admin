@@ -1,4 +1,3 @@
-<!-- src/views/components/ImageReference.vue -->
 <template>
   <div class="image-reference">
     <div class="image-reference-header">

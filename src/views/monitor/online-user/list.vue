@@ -1,4 +1,3 @@
-<!-- src/views/monitor/online-user/list.vue -->
 <template>
     <div>
         <!-- ===== 搜索栏 ===== -->

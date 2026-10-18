@@ -1,4 +1,3 @@
-// src/utils/markdown-config.js
 import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
