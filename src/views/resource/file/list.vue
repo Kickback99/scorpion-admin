@@ -379,8 +379,7 @@ const ruleFormRef = ref()
 // ============================================================
 const rules = reactive({
    name:[
-        {required:true,message:'请输入文件名',trigger:'blur'},
-        {pattern:/^\S{2,10}$/,message:'密码必须是 2-10位 的非空字符',trigger:'blur'}
+        {required:true,message:'请输入文件名',trigger:'blur'}
     ]
 })
 
@@ -403,7 +402,8 @@ const handleEdit = async(row) => {
 // t_file_request：文件名字修改请求
 const handleConfirm = async() => {
     await ruleFormRef.value.validate()
-    modifyApi(formModel.id,formModel.name)
+    // 等接口成功再关窗提示，避免请求失败也显示“修改成功”
+    await modifyApi(formModel.id,formModel.name)
     dialogVisible.value = false
     msg.primary('修改成功')
     render()
