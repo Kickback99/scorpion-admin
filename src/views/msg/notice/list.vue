@@ -1161,6 +1161,9 @@ const handleDelete = async (row) => {
         await noticeRemoveApi(row.id)
     }
     msg.primary('操作成功')
+    // 删掉当前页最后一条时回退一页，避免停在空页
+    const removed = Array.isArray(row) ? row.length : 1
+    if (tableData.value.length <= removed && pagination.pageNum > 1) pagination.pageNum--
     fetchNotices()
     notifyRefresh()
 }

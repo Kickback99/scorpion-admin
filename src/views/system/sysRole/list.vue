@@ -214,9 +214,9 @@ const onCurrentChange = (page) => {
 const removeRole = async(id) =>{
     await removeApi(id)
     msg.primary('删除成功')
-    // 重新渲染
-    render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
-
+    // 删除后当前页可能已空，按剩余条数决定是否回退一页
+    const remain = tableData.value.length - (Array.isArray(id) ? id.length : 1)
+    render(remain > 0 ? params.value.pageNum : Math.max(1, params.value.pageNum - 1))
 }
 
 const multipleSelection = ref([])

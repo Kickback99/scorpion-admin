@@ -345,6 +345,9 @@ const handleBatchDelete = async() => {
 const handleDelete = async(id) =>{
        await friendLinkRemoveApi(id)
        msg.primary('操作成功')
+       // 删掉当前页最后一条时回退一页，避免停在空页
+       const removed = Array.isArray(id) ? id.length : 1
+       if (tableData.value.length <= removed && pagination.pageNum > 1) pagination.pageNum--
        fetchFriendLinks()
 }
 </script>
