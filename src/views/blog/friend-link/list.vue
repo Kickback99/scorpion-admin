@@ -311,8 +311,7 @@ const handleConfirm = async() => {
         dialogVisible.value = false
         fetchFriendLinks()
     } catch (error) {
-        msg.error('操作失败')
-        dialogVisible.value = false
+        // 接口错误已由拦截器提示；保留弹窗与已填内容，便于修改后重试
     }
 }
 
