@@ -241,6 +241,8 @@ const generate = async () => {
         dragX.value = 0
         trackList.value = []
         clickPoints.value = []
+        // 刷新后旧答案不能沿用（文本验证码）
+        answerModel.answer = ''
         verifyToken.value = ''
     } catch (e) {
         console.error('生成验证码失败:', e)
