@@ -568,10 +568,9 @@ watch(() => route.path, () => {
   }, 150)
 })
 
-nextTick(()=>{
-  onUnmounted(()=>{
-      eventBus.off('adjustTabScroll')
-  })
+// 必须在 setup 同步阶段注册，放进 nextTick 会因组件实例已销毁而注册失败（监听器泄漏）
+onUnmounted(() => {
+  eventBus.off('adjustTabScroll')
 })
 
 </script>
