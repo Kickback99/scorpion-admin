@@ -87,13 +87,16 @@ import { Lock } from '@element-plus/icons-vue'
 import { userUpdatePwdApi } from '@/api/admin'
 import { PASSWORD_REGEX, PASSWORD_MESSAGE } from '@/utils/password'
 import { useTokenStore } from '@/store/token'
+import { useUserStore } from '@/store/user'
+import { clearRoute } from '@/utils/remove'
 import { useRouter } from 'vue-router'
 
 // ============================================================
 // 数据
 // ============================================================
 const tokenStore = useTokenStore()
-// const router = useRouter()
+const userStore = useUserStore()
+const router = useRouter()
 
 const formRef = ref()
 const loading = ref(false)
@@ -216,9 +219,11 @@ const handleSubmit = async () => {
     // 清除用户记住密码凭证
     tokenStore.clearCredentials()
 
-    // 这里可以触发重新登录逻辑
-    // await userStore.logout()
-    // router.push('/login')
+    // 后端已使登录态失效，前端同步清理并回登录页，避免停留在“已登录”的假状态
+    tokenStore.removeToken()
+    clearRoute(userStore.userMenu)
+    userStore.clearUserStore()
+    router.replace('/login')
 
   } catch (error) {
     if (error === 'cancel') {
