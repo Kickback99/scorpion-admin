@@ -66,7 +66,7 @@ export const uploadCoverApi = (articleId,cover) => {
     const formData = new FormData()
     formData.append('articleId', articleId)
     formData.append('cover', cover)
-    http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) // 封面上传超时 35 秒
+    return http.post(API.UPLOAD_COVER_URL,formData,{ timeout: 35000 }) // 封面上传超时 35 秒
 }
 
 /**
