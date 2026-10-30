@@ -214,9 +214,11 @@ const handleKick = async (row) => {
     try {
         await kickUserApi(row.userId, row.role)
         msg.primary(`已向 ${row.username} 发送强退指令`)
+        // 在线列表推送只发给超管，其他账号收不到，主动刷新一次避免按钮一直“强退中”
+        await loadOnlineList()
     } catch (error) {
         msg.error('强退失败')
-        // 失败时才清除 loading，因为行还在
+    } finally {
         kickingMap.value[key] = false
     }
 }
