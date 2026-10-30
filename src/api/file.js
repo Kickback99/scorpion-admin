@@ -61,5 +61,7 @@ export const modifyApi = (id,name) => {
     const params = new URLSearchParams()
     params.append('id', id)
     params.append('name', name)
-    return request.put(API.FILE_UPDATE, params.toString())
+    // 传 URLSearchParams 对象，axios 才会设置 x-www-form-urlencoded；传字符串会以 text/plain 发出，
+    // 后端 @RequestParam 解析不到 body，重命名静默失效
+    return request.put(API.FILE_UPDATE, params)
 }
