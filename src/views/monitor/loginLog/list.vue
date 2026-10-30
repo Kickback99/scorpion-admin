@@ -288,7 +288,6 @@ const handleSearch = () => {
 
 const handleReset = () => {
     params.value.pageNum = 1
-    searchData.value = {}
     Object.assign(searchData,{username:'',type:null,status:null,ip:'',os:'',browser:'',location:'',createTimeBegin:'',createTimeEnd:''})
     fetchLoginLogList()
 }
