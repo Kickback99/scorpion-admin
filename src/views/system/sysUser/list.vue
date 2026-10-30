@@ -415,6 +415,8 @@ const title = ref('')
 const roleCache = ref([])
 const selectedRoleName = ref([])
 const selectedRoleIds = ref([])
+// 缓存中找不到的角色（禁用角色 / 页面加载后新建的角色）不在下拉里展示，但提交时必须原样保留
+const hiddenRoleIds = ref([])
 
 /**
  * 加载所有角色列表（用于 SmartAutoComplete 联想搜索）
@@ -470,6 +472,7 @@ const addDialog = () =>{
     formData.value = {...defaultData}
     selectedRoleName.value = []
     selectedRoleIds.value = []
+    hiddenRoleIds.value = []
     // 重置上一次的表单验证
     nextTick(()=>{
         ruleFormRef.value.clearValidate('username')
@@ -504,21 +507,19 @@ const editDialog = async (row) =>{
             if (row.id === 1) {
                 // admin 回显全部角色并禁用（对齐分配角色弹窗行为）
                 selectedRoleName.value = roleCache.value.map(r => r.value)
+                hiddenRoleIds.value = []
             } else {
                 const roleIds = user.roleIdList || []
-                if (roleIds.length > 0) {
-                    selectedRoleName.value = roleIds
-                        .map(id => roleCache.value.find(r => r.id === id))
-                        .filter(Boolean)
-                        .map(r => r.value)
-                } else {
-                    selectedRoleName.value = []
-                }
+                const matched = roleIds.map(id => roleCache.value.find(r => r.id === id)).filter(Boolean)
+                // 未命中的角色 ID 不展示，但保存时与勾选结果合并，避免先删后插将其清掉
+                hiddenRoleIds.value = roleIds.filter(id => !roleCache.value.some(r => r.id === id))
+                selectedRoleName.value = matched.map(r => r.value)
             }
         } else {
             // 无分配角色权限：不回显角色名称，仅保留原角色 ID 原样提交（防止提交空角色清空用户角色）
             selectedRoleName.value = []
             selectedRoleIds.value = user.roleIdList || []
+            hiddenRoleIds.value = []
         }
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
@@ -556,9 +557,9 @@ const modifyUser = async() => {
         msg.error('已选角色仅限后台用户，请将用户类型切换为"后台"')
         return
     }
-    // admin 不修改角色
+    // admin 不修改角色；其余用户合并下拉里看不到但原本持有的角色
     if (formData.value.id !== 1) {
-        formData.value.roleIdList = selectedRoleIds.value
+        formData.value.roleIdList = [...new Set([...selectedRoleIds.value, ...hiddenRoleIds.value])]
     }
     await modifyApi(formData.value)
     dialogVisible.value = false
@@ -572,7 +573,8 @@ const modifyUser = async() => {
 const rules = {
     username : [
       { required: true, message: '请输入用户名', trigger: 'blur' },
-      { min: 3, max: 15, message: '用户名必须是 3-15位 的字符', trigger: 'blur' },
+      // 与后端 SysUser 的 ^\S{4,20}$ 保持一致，避免前端放行后被后端拒绝
+      { pattern: /^\S{4,20}$/, message: '用户名必须是 4-20 位非空字符', trigger: 'blur' },
   ],
     nickname : [
       { required: false, trigger: 'blur' },
@@ -581,7 +583,8 @@ const rules = {
 
     phone : [
       { required: false, trigger: 'blur' },
-      { pattern:/^(?:(?:\+|00)86)?1[3-9]\d{9}$/,message:'手机号码格式错误',trigger:'blur'}
+      // 与后端 SysUser 的 ^(1[3-9]\d{9})?$ 保持一致（空值允许）
+      { pattern:/^(1[3-9]\d{9})?$/,message:'手机号码格式错误',trigger:'blur'}
     ],
 
     email : [
@@ -604,24 +607,33 @@ const isRolesLocked = ref(false) // 角色复选框是否禁用（id=1 的 admin
 const showAllocRoles = async(row) =>{
     formData.value.username = row.username
     formData.value.id = row.id
-    allocRolesVisible.value = true
-    const res = await allocRolesApi(row.id)
-    // 把所有角色集合赋值给 allRoles
-    allRoles.value = res.data.allRoles
-    if (row.id === 1) {
-        // admin 用户：全选所有角色并禁用
-        checkedCities.value = allRoles.value.map(item => item.id)
-        checkAll.value = true
-        isIndeterminate.value = false
-        isRolesLocked.value = true
-    } else {
-        // 把对应用户 id 的角色 ids 存入 checkedCities
-        checkedCities.value = res.data.userRoleIds
-        checkAll.value = allRoles.value.length === checkedCities.value.length
-        isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
-        isRolesLocked.value = false
+    // 先清空上一个用户的状态：请求失败或未返回时不能沿用旧勾选，否则确认后会写错角色
+    checkedCities.value = []
+    checkAll.value = false
+    isIndeterminate.value = false
+    isRolesLocked.value = false
+    allRoles.value = []
+    try {
+        const res = await allocRolesApi(row.id)
+        // 把所有角色集合赋值给 allRoles
+        allRoles.value = res.data.allRoles
+        if (row.id === 1) {
+            // admin 用户：全选所有角色并禁用
+            checkedCities.value = allRoles.value.map(item => item.id)
+            checkAll.value = true
+            isIndeterminate.value = false
+            isRolesLocked.value = true
+        } else {
+            // 把对应用户 id 的角色 ids 存入 checkedCities
+            checkedCities.value = res.data.userRoleIds
+            checkAll.value = allRoles.value.length === checkedCities.value.length
+            isIndeterminate.value = checkedCities.value.length > 0 && checkedCities.value.length < allRoles.value.length
+            isRolesLocked.value = false
+        }
+        allocRolesVisible.value = true
+    } catch (e) {
+        // 请求失败不打开弹窗，request.js 已提示错误
     }
-    console.log(checkedCities.value)
 }
 
   // 大复选框的事件回调
@@ -634,7 +646,7 @@ const showAllocRoles = async(row) =>{
   const handleCheckedCitiesChange = (value) => {
     console.log(value)
     const checkedCount = value.length
-    checkAll.value = checkedCount === allRoles.value.length && allRoles.length>0
+    checkAll.value = checkedCount === allRoles.value.length && allRoles.value.length > 0
     isIndeterminate.value = checkedCount > 0 && checkedCount < allRoles.value.length
   }
 
