@@ -590,6 +590,11 @@ const handleSave = async (row) => {
     // 验证输入值类型
     let newValue = row.editValue
     if (row.type === 'number') {
+      // Number(null) / Number('') 都是 0，清空输入后必须先拦下
+      if (newValue === null || newValue === undefined || newValue === '') {
+        msg.error('请输入有效的数字')
+        return
+      }
       newValue = Number(newValue)
       if (isNaN(newValue)) {
         msg.error('请输入有效的数字')
@@ -796,6 +801,10 @@ const handleConfirmAdd = async () => {
         let value = addForm.value
 
         if (addForm.type === 'number') {
+          if (value === null || value === undefined || value === '') {
+            msg.error('请输入有效的数字')
+            return
+          }
           value = Number(value)
 
           // 未勾选阈值开关 → 放行，不保存限制（使用 configItems 源码配置）
