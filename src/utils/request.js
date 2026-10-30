@@ -72,7 +72,7 @@ instance.interceptors.request.use(
         return config
     },
 
-    err => Premise.reject(err)
+    err => Promise.reject(err)
 )
 
 // 添加响应拦截器
