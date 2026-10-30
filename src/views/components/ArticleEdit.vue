@@ -174,8 +174,8 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button size="small" type="info" @click="dialogVisible = false; hasSelectedArticle = (imageReferenceRef?.getImageList()?.length || 0) > 0" plain>取消</el-button>
-                    <el-button size="small" type="warning" @click="handlePublish(1)" plain>草稿</el-button>
-                    <el-button size="small" type="primary" @click="handlePublish(0)" plain>发布</el-button>
+                    <el-button size="small" type="warning" :disabled="submitting" :loading="submitting" @click="handlePublish(1)" plain>草稿</el-button>
+                    <el-button size="small" type="primary" :disabled="submitting" :loading="submitting" @click="handlePublish(0)" plain>发布</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -284,6 +284,8 @@ const carouselData = ref({
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const maskVisible = ref(false)
+// 提交中标记：双击发布/草稿时阻止重复请求
+const submitting = ref(false)
 
 // Markdown 编辑器高度按遮罩窗口可用空间自适应（非全屏/全屏都撑满）
 const { editorHeight } = useEditorAutoHeight(maskVisible)
@@ -453,7 +455,14 @@ const handleToggle = async (param) => {
     // 回显
     isEditMode.value = true
     dialogTitle.value = '修改文章'
-    const res = await findApi(param.id)
+    let res
+    try {
+      res = await findApi(param.id)
+    } catch (e) {
+      // 回显失败时收起遮罩，避免停留在上一篇的表单上误提交覆盖
+      maskVisible.value = false
+      return
+    }
     console.log('回显res.data', res.data)
 
     const { title, content, ...rest } = res.data
@@ -470,6 +479,8 @@ const handleToggle = async (param) => {
     formModel.refCoverUuid = null
     selectedCoverArticle.value = []
 
+    // 后端不返回 customDescription，先清空，避免切换到“自定义”时沿用上一篇的摘要
+    formModel.customDescription = ''
     if (res.data.isAutoDescription === 0) {
       formModel.descriptionType = 'auto'
       formModel.description = null
@@ -527,6 +538,8 @@ const handleToggle = async (param) => {
 }
 
 const handlePublish = async (status) => {
+  if (submitting.value) return
+  submitting.value = true
   hasSelectedArticle.value = false
   formModel.status = status
 
@@ -534,6 +547,7 @@ const handlePublish = async (status) => {
   try {
     await formRef.value?.validate()
   } catch (e) {
+    submitting.value = false
     return
   }
 
@@ -584,9 +598,9 @@ const handlePublish = async (status) => {
       console.log('==================== articleId ====================', articleId)
       // 如果是文件上传模式，上传封面
       if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
-        const coverUrl = await uploadCoverApi(articleId, formModel.cover)
-        if (coverUrl) {
-          formModel.cover = coverUrl
+        const res = await uploadCoverApi(articleId, formModel.cover)
+        if (res?.data) {
+          formModel.cover = res.data
         }
       }
     } else {
@@ -594,9 +608,9 @@ const handlePublish = async (status) => {
       await modifyApi(data)
       // 如果是文件上传模式，上传封面
       if (formModel.coverOption === 'upload' && formModel.cover instanceof File) {
-        const coverUrl = await uploadCoverApi(articleId, formModel.cover)
-        if (coverUrl) {
-          formModel.cover = coverUrl
+        const res = await uploadCoverApi(articleId, formModel.cover)
+        if (res?.data) {
+          formModel.cover = res.data
         }
       }
     }
@@ -615,6 +629,8 @@ const handlePublish = async (status) => {
     }
   } catch (error) {
     msg.error('提交失败，请重试')
+  } finally {
+    submitting.value = false
   }
 }
 
