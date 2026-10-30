@@ -1,5 +1,5 @@
 <template>
-  <div class="gauge-ring" :style="{ '--gauge-color': gaugeColor }">
+  <div class="gauge-ring">
     <div class="gauge-chart">
       <div ref="chartRef" class="gauge-ec"></div>
       <div class="gauge-center">
