@@ -54,7 +54,6 @@
                             :popper-options="{
                                 placement: 'bottom-start'
                             }"
-                            :size="default"
                             @change="updateDataTime"
                         />
                     </el-form-item>
@@ -80,11 +79,11 @@
     style="width: 100%"
     ref="multipleTableRef"
     @selection-change="removeMultiple"
-    stripe="1"
+    stripe
     border
     :max-height="tableMaxHeight"
     >
-        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
+        <el-table-column type="selection" width="55" align="center" />
         <el-table-column type="index" label="序号" width="55" align="center" />
         <el-table-column label="头像" min-width="80" align="center">
             <template #default="{row}">
@@ -389,7 +388,7 @@ const removeUsers = async(ids) =>{
 const modifySwitch = async(row) =>{
     await statusApi(row.id,row.status)
     row.status === 0 ? msg.primary('用户已激活'):msg.error('用户已禁用')
-    render()
+    render(params.value.pageNum)
 }
 
 // ============================================================
@@ -669,6 +668,7 @@ const doAllocRoles = async() => {
     await doAllocRolesApi(userRoleData)
     msg.primary("分配角色成功")
     allocRolesVisible.value = false
+    render(params.value.pageNum)
     /* if(userStore.userInfo.id != 1){
         // 清空路由
         clearRoute(userStore.userMenu)
@@ -687,8 +687,6 @@ const doAllocRoles = async() => {
           })
         }
     } */
-    render()
-
 }
 
 // ============================================================
