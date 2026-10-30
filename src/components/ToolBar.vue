@@ -406,17 +406,16 @@ const onPageThemeChange = async (val) => {
 }
 
 // 灵动模式切换（标签主题+菜单主题+深色 plain，统一跟随）
-const onDynamicModeChange = (val) => {
+const onDynamicModeChange = async (val) => {
     stringStore.dynamicMode = val
     if (val) {
         stringStore.tagMode = 'theme'
         stringStore.menuThemeColor = true
         stringStore.pageTheme = true
         uiStore.setUiMode('plain')
-        // 开启深色模式
-        const html = document.documentElement
-        html.classList.add('dark')
-        userConfigStore.dark_enabled = true
+        // 深色需走 toggleDark 落库：直接改 state 刷新后读回 false，会出现 dynamic-mode 在、dark 不在
+        if (!userConfigStore.isDarkEnabled) await userConfigStore.toggleDark()
+        document.documentElement.classList.add('dark')
         applyTheme(userConfigStore.currentTheme, true)
     }
 }
