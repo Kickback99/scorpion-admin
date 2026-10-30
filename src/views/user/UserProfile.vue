@@ -211,11 +211,17 @@ const originalUserInfo = ref({})
 // ============================================================
 const rules = reactive({
   email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+    // 允许为空：清空后提交空串，后端置 null
+    { validator: (rule, value, callback) => {
+        if (!value) return callback()
+        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        if (!emailRegex.test(value)) return callback(new Error('请输入正确的邮箱地址'))
+        callback()
+      }, trigger: 'blur' }
   ],
   phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+    // 允许为空：清空后提交空串，后端置 null
+    { pattern: /^(1[3-9]\d{9})?$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ],
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' }
@@ -288,6 +294,8 @@ const handleSave = async () => {
     await userUpdateInfoApi(userInfo)
     const res = await userInfoApi()
     Object.assign(userStore.userInfo, res.data.userInfo)
+    // 刷新取消编辑的备份，否则下次取消会回滚到进入页面时的旧资料
+    Object.assign(originalUserInfo.value, { ...userInfo })
     editMode.value = false
     loading.value = false
     msg.primary('个人信息更新成功')
