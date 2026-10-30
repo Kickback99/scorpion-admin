@@ -113,7 +113,7 @@
             <template #default="{ row }">
                 <!-- 推送按钮 -->
                 <el-button
-                    v-if="(row.status === 0 || row.status === 2) && !row.pushTime"
+                    v-if="row.status === 0 && !row.pushTime"
                     v-perm="'btn.notice.execute'"
                     size="small"
                     type="success"
@@ -1200,6 +1200,10 @@ const handleOffline = async (row) => {
 const handlePush = async (row) => {
   if (row.status === 1) {
     msg.error('该公告已推送，不能重复推送')
+    return
+  }
+  if (row.status === 2) {
+    msg.error('公告已下架，请先上架')
     return
   }
   await noticePushApi(row.id)
