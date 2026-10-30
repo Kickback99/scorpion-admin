@@ -326,16 +326,20 @@ const handleDelete = async(id) => {
 // ============================================================
 // t_article_request：更改文章状态请求
 const modifySwitch = async(row) =>{
-
-   const res = await isTopApi(row.id,row.isTop)
-    // row.isTop === "1" ? msg.primary('已置顶'):msg.error('已取消置顶')
-    // 根据返回的 message 显示不同的提示
-    if (res.message && res.message.includes("自动取消")) {
-        msg.warning(res.message)  // 警告提示
-    } else {
-        msg.primary(res.message)  // 成功提示
+    try {
+        const res = await isTopApi(row.id,row.isTop)
+        // row.isTop === "1" ? msg.primary('已置顶'):msg.error('已取消置顶')
+        // 根据返回的 message 显示不同的提示
+        if (res.message && res.message.includes("自动取消")) {
+            msg.warning(res.message)  // 警告提示
+        } else {
+            msg.primary(res.message)  // 成功提示
+        }
+        render()
+    } catch (e) {
+        // 接口失败时回滚开关，避免界面显示已置顶而服务端未生效
+        row.isTop = row.isTop === '1' ? '0' : '1'
     }
-    render()
 }
 
 // ============================================================
