@@ -5,6 +5,9 @@ import { useUserConfigStore } from '@/store/userConfig'
 import { useUiStore } from '@/store/ui'
 import router from '@/router';
 import { useConfigStore } from '@/store/config';
+import { useTabStore } from '@/store/tabs';
+import { useSettingStore } from '@/setting';
+import { clearRoute } from '@/utils/remove';
 import { applyTheme } from '@/assets/common/theme'
 import msg from '@/components/msg'
 import { useRenderIcon } from '@/components/MyIcon/src/hook'
@@ -385,7 +388,10 @@ class WebSocketManager {
     const uiStore = useUiStore()
 
     tokenStore.removeToken()
+    // 与主动退出 / 401 自愈保持一致：清动态路由，未开启保留标签时清空标签
+    clearRoute(userStore.userMenu)
     userStore.clearUserStore()
+    if (!useSettingStore().keepTabs) useTabStore().clearTabs()
     // 暂存主题到 uiStore（登录页读取用），再清除用户配置
     uiStore.setLastTheme(userConfigStore.theme)
     userConfigStore.clearUserConfig()
@@ -396,10 +402,11 @@ class WebSocketManager {
 
   // 关闭 WebSocket 连接
   close() {
+    // 无论当前 readyState 如何都算手动关闭：CLOSING 时若只等 onclose，仍会走自动重连
+    this.isManualClose = true
     // 连接正在建立或已建立，才需要关闭
     // readyState 小于 2 表示正在连接或已连接
     if (this.socket && this.socket.readyState < 2) {
-      this.isManualClose = true  // 标记为手动关闭，防止重连
       console.log('手动关闭 WebSocket 连接')
       this.socket.close(1000, 'Manual close')
       this.socket = null
