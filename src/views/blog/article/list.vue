@@ -316,6 +316,8 @@ const handleDelete = async(id) => {
     console.log(id)
     await removeApi(id)
     msg.primary('删除成功')
+    // 删掉当前页最后一条时回退一页，避免停在空页
+    if (tableData.value.length <= 1 && params.value.pageNum > 1) params.value.pageNum--
     render()
 }
 

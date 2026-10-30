@@ -380,7 +380,9 @@ const deleteSelectRows = async() => {
 const removeUsers = async(ids) =>{
     await removeApi(ids)
     msg.primary('删除成功')
-    render(tableData.value.length > 1 ? params.value.pageNum : params.value.pageNum -1)
+    // 批量删除可能清空当前页，按删除后剩余条数决定是否回退一页
+    const remain = tableData.value.length - (Array.isArray(ids) ? ids.length : 1)
+    render(remain > 0 ? params.value.pageNum : Math.max(1, params.value.pageNum - 1))
 }
 
 // t_user_request：更改用户状态请求

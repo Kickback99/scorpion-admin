@@ -956,6 +956,9 @@ const handleReject = async (row) => {
 const handleDelete = async(ids) => {
     await removeCommentApi(ids)
     msg.primary('删除成功')
+    // 删掉当前页最后一条时回退一页，避免停在空页
+    const removed = Array.isArray(ids) ? ids.length : 1
+    if (tableData.value.length <= removed && params.pageNum > 1) params.pageNum--
     render()
 }
 

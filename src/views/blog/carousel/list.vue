@@ -911,6 +911,8 @@ const handleDelete = async (id) => {
     try {
         await removeCarouselApi(id)
         msg.primary('删除成功')
+        // 删掉当前页最后一条时回退一页，避免停在空页
+        if (tableData.value.length <= 1 && pagination.pageNum > 1) pagination.pageNum--
         renderCarouselList()
     } catch (error) {
         msg.error('删除失败')
