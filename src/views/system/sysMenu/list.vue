@@ -113,7 +113,7 @@
                   </el-tooltip>
             </template>
           </el-form-item>
-          <el-form-item label="状态" prop="type">
+          <el-form-item label="状态" prop="status">
             <el-radio-group v-model="formModel.status">
               <el-radio :label="0">正常</el-radio>
               <el-radio :label="1">停用</el-radio>
@@ -471,6 +471,20 @@ const onCancel = () => {
 
 // 弹层确认事件：添加或修改
 const addOrModify = () =>{
+    // 后端没有校验，空名称/空路径会直接入库，这里按菜单类型补必填校验
+    if (!formModel.value.name?.trim()) {
+        msg.error('请输入菜单名称')
+        return
+    }
+    if (formModel.value.type !== 2 && !formModel.value.path?.trim()) {
+        msg.error('请输入路由地址')
+        return
+    }
+    if (formModel.value.type === 1 && !formModel.value.component?.trim()) {
+        msg.error('请输入组件路径')
+        return
+    }
+
     delete formModel.value._isToolbarAdd
     delete formModel.value._isChildAdd
     isComponentDisabled.value = false  // 重置状态
