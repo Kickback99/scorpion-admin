@@ -12,6 +12,13 @@ export const eventBus = {
             this.events[event] = [];
         }
         this.events[event].push(callback);
+    },
+    off(event, callback) {
+        if (!this.events[event]) return;
+        // 不传 callback 时移除该事件的全部监听
+        this.events[event] = callback
+            ? this.events[event].filter(cb => cb !== callback)
+            : [];
     }
 };
 
