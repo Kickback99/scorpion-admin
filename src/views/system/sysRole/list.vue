@@ -161,6 +161,8 @@ render()
 const userCache = ref([])
 const selectedUserNames = ref([])
 const selectedUserIds = ref([])
+// 下拉里查不到的用户（被禁用等）不展示，但保存时必须原样保留，否则先删后插会丢掉他们的角色
+const hiddenUserIds = ref([])
 
 const loadAllUsers = async () => {
     const res = await getAllUsersApi()
@@ -275,6 +277,7 @@ const onReset = () => {
         dialogData.value = {}
         selectedUserNames.value = []
         selectedUserIds.value = []
+        hiddenUserIds.value = []
         // 重置上一次的表单验证
         nextTick(()=>{
             ruleFormRef.value.clearValidate("roleName")
@@ -301,14 +304,10 @@ const editDialog = async (row) => {
         // 用户回显
         if (userCache.value.length === 0) await loadAllUsers()
         const userIds = role.userIdList || []
-        if (userIds.length > 0) {
-            selectedUserNames.value = userIds
-                .map(id => userCache.value.find(u => u.id === id))
-                .filter(Boolean)
-                .map(u => u.value)
-        } else {
-            selectedUserNames.value = []
-        }
+        const matched = userIds.map(id => userCache.value.find(u => u.id === id)).filter(Boolean)
+        // 未命中的用户（如已禁用，接口只返回启用用户）不展示，但提交时合并回原集合
+        hiddenUserIds.value = userIds.filter(id => !userCache.value.some(u => u.id === id))
+        selectedUserNames.value = matched.map(u => u.value)
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
     }
@@ -337,7 +336,7 @@ const editDialog = async (row) => {
     // t_role_request：修改角色请求
     const modifyRole = async() =>{
         await ruleFormRef.value.validate()
-        dialogData.value.userIdList = selectedUserIds.value
+        dialogData.value.userIdList = [...new Set([...selectedUserIds.value, ...hiddenUserIds.value])]
         await modifyApi(dialogData.value)
         dialogVisible.value = false
         msg.primary('修改成功')
