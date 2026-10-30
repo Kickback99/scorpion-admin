@@ -251,7 +251,7 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
     // 用户菜单权限不足校验
     if(!hasRouteByPath(to.path)){
         const menuRoutes = previousMenuRoutes || getStoredMenuRoutes()
-        if (menuRoutes.has(to.path)) {
+        if (hasMenuRoute(menuRoutes, to.path)) {
             // console.log('router.getRoutes()',router.getRoutes())
             // console.log('用户菜单权限不足')
             return Promise.reject({
@@ -259,7 +259,8 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
                 message: '该用户无菜单权限'
             });
         }
-        return next('/404')
+        // 交回守卫统一 next('/404')，这里再调 next 会触发「next 被调用两次」
+        return Promise.reject({ notFound: true })
     }
 // console.log('router.getRoutes()',router.getRoutes())
 // console.log('用户菜单权限充足')
@@ -272,8 +273,17 @@ export const loadMenu = async(loadUserInfo = true,to,from,next) => {
 
 }
 
+// Vue Router 匹配不区分大小写和尾斜杠，守卫里的字面量比较必须同样归一化，
+// 否则 /LOGIN、/system/sysUser/ 这类能命中路由的地址会被误判成 404
+const normalizePath = (path) => (path.replace(/\/+$/, '') || '/').toLowerCase()
+
+const hasMenuRoute = (routeSet, path) => {
+    const target = normalizePath(path)
+    return [...routeSet].some(p => normalizePath(p) === target)
+}
+
 const hasRouteByPath = (path) => {
-    return router.getRoutes().some(route => route.path === path)
+    return hasMenuRoute(router.getRoutes().map(route => route.path), path)
 }
 
 // 创建路由对象
@@ -362,7 +372,7 @@ router.beforeEach((to, from, next) => {
     const tokenStore = useTokenStore()
     // console.log('userStore.userMenu.length',userStore.userMenu.length )
 
-    if(to.path === '/403' && settings.isManualTo403){
+    if(normalizePath(to.path) === '/403' && settings.isManualTo403){
         settings.isManualTo403 = false
         return next()
     }
@@ -370,17 +380,17 @@ router.beforeEach((to, from, next) => {
     // 已登录不能输入登录地址回到登录页
     // cookie 模式无同步 token，用后端下发的登录标记 cookie 判断（刷新后依然稳定，认证真值以服务端为准）
     const isLogin = isCookieMode() ? hasAdminAuthFlag() : !!tokenStore.token
-    if(to.path === '/login' && isLogin) {
+    if(normalizePath(to.path) === '/login' && isLogin) {
         console.log('==================== 已登录不能输入登录地址回到登录页 ====================')
         msg.warning('请先退出登录')
         // 首次导航时 from 是 START_LOCATION（fullPath 为 '/'），回它会经 '/' 的 redirect 绕到仪表盘；
         // 且 from 为 /login 时会自环，故显式判定来源是否可用
-        const hasOrigin = from.matched.length > 0 && from.path !== '/login'
+        const hasOrigin = from.matched.length > 0 && normalizePath(from.path) !== '/login'
         return next(hasOrigin ? from.fullPath : '/index');
     }
 
     // 白名单放行
-    if(whiteList.includes(to.path)){
+    if(whiteList.includes(normalizePath(to.path))){
         console.log('==================== 白名单放行 ====================')
       return next();
     }
@@ -388,13 +398,13 @@ router.beforeEach((to, from, next) => {
     // 如果没有 token 跳转到登录页
     // cookie 模式无法同步判断登录态：跳过此检查，交给下方 loadMenu → userDetailInfo
     // 200=已登录（填菜单放行）；401=未登录（request.js 拦截器兜底跳 /login）
-    if(!isCookieMode() && !tokenStore.token && to.path != '/login') {
+    if(!isCookieMode() && !tokenStore.token && normalizePath(to.path) !== '/login') {
         // msg.error('如果没有 token 跳转到登录页')
         // 清除主动退出标记，让 redirect 正常生效
         const settings = useSettingStore()
         settings.setLogoutIntent(false)
     // /404 自身直接放行，避免循环重定向
-    if (to.path === '/404') {
+    if (normalizePath(to.path) === '/404') {
         if (!router.hasRoute('404')) {
             add404Routes(router)
             return next({ ...to, replace: true })
@@ -403,7 +413,7 @@ router.beforeEach((to, from, next) => {
     }
     // JWT 模式：目标不是已注册菜单路由时进入 404
     const menuRoutes = getStoredMenuRoutes()
-    if (!menuRoutes.has(to.path)) {
+    if (!hasMenuRoute(menuRoutes, to.path)) {
         console.log('==================== jwt not redirect ====================')
         add404Routes(router)
         return next('/404')
@@ -421,7 +431,7 @@ router.beforeEach((to, from, next) => {
     if(userStore.userMenu && userStore.userMenu.length > 0){
         // admin-only 路由对非管理员直通 404（与侧边栏隐藏保持一致）
         // 此处菜单已加载，404 路由必然已注册，无需再 add404Routes
-        if (!userStore.isAdmin && ADMIN_ONLY_PATHS.has(to.path)) {
+        if (!userStore.isAdmin && ADMIN_ONLY_PATHS.has(normalizePath(to.path))) {
             return next('/404')
         }
         // 放行
@@ -430,7 +440,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // /404 已注册时直接放行，避免 token 仍存在时再次进入 loadMenu 或循环重定向
-    if (to.path === '/404') {
+    if (normalizePath(to.path) === '/404') {
         if (!router.hasRoute('404')) {
             add404Routes(router)
             return next({ ...to, replace: true })
@@ -441,7 +451,7 @@ router.beforeEach((to, from, next) => {
     // cookie 模式，或 JWT 模式已有 token 但菜单尚未加载时，优先用本地缓存识别不存在的路径
     const persistedMenuRoutes = getPersistedMenuRoutes()
     const menuRoutes = persistedMenuRoutes || getStoredMenuRoutes()
-    if (!isLogin && menuRoutes && to.path !== '/404' && !menuRoutes.has(to.path)) {
+    if (!isLogin && menuRoutes && normalizePath(to.path) !== '/404' && !hasMenuRoute(menuRoutes, to.path)) {
         console.log('==================== cookie not redirect ====================')
         add404Routes(router)
         return next('/404')
@@ -469,6 +479,9 @@ router.beforeEach((to, from, next) => {
                 settings.isManualTo403 = true;
                 next('/403');
                 }
+            }else if(error.notFound){
+                add404Routes(router)
+                next('/404')
             }else if(error.noMenuAccess){
                 // console.log('拦截 1')
                 settings.isManualTo403 = true;
