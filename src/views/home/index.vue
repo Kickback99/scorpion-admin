@@ -15,22 +15,22 @@
         <div class="stats-row">
           <div class="stat-chip">
             <span class="stat-chip-label">文章</span>
-            <span class="stat-chip-value">{{ dashboard.articleCount ?? 0 }}</span>
+            <span class="stat-chip-value">{{ formatCount(dashboard.articleCount ?? 0) }}</span>
           </div>
           <div class="stat-divider" />
           <div class="stat-chip">
             <span class="stat-chip-label">已发布</span>
-            <span class="stat-chip-value">{{ dashboard.publishedCount ?? 0 }}</span>
+            <span class="stat-chip-value">{{ formatCount(dashboard.publishedCount ?? 0) }}</span>
           </div>
           <div class="stat-divider" />
           <div class="stat-chip">
             <span class="stat-chip-label">评论</span>
-            <span class="stat-chip-value">{{ dashboard.commentCount ?? 0 }}</span>
+            <span class="stat-chip-value">{{ formatCount(dashboard.commentCount ?? 0) }}</span>
           </div>
           <div class="stat-divider" />
           <div class="stat-chip">
             <span class="stat-chip-label">草稿</span>
-            <span class="stat-chip-value">{{ dashboard.draftCount ?? 0 }}</span>
+            <span class="stat-chip-value">{{ formatCount(dashboard.draftCount ?? 0) }}</span>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@
             <div class="card-label">总访问数</div>
             <div class="card-value"><CountTo :end-val="dashboard.totalViewCount ?? 0" /></div>
             <div class="card-stats">
-              <span class="today-val">今日 {{ dashboard.todayViewCount ?? 0 }}</span>
+              <span class="today-val">今日 {{ formatCount(dashboard.todayViewCount ?? 0) }}</span>
               <span class="growth" :class="growthClass(dashboard.viewsGrowth)">
                 <el-icon v-if="growthArrow(dashboard.viewsGrowth)"><CaretTop /></el-icon>
                 <el-icon v-else-if="growthArrowDown(dashboard.viewsGrowth)"><CaretBottom /></el-icon>
@@ -66,7 +66,7 @@
             <div class="card-label">在线总人数</div>
             <div class="card-value"><CountTo :end-val="onlineTotal" /></div>
             <div class="card-stats">
-              <span class="today-val">今日 {{ onlineTodayCount }}</span>
+              <span class="today-val">今日 {{ formatCount(onlineTodayCount) }}</span>
               <span class="growth" :class="growthClass(onlineGrowth)">
                 <el-icon v-if="growthArrow(onlineGrowth)"><CaretTop /></el-icon>
                 <el-icon v-else-if="growthArrowDown(onlineGrowth)"><CaretBottom /></el-icon>
@@ -85,7 +85,7 @@
             <div class="card-label">总文章数</div>
             <div class="card-value"><CountTo :end-val="dashboard.articleCount ?? 0" /></div>
             <div class="card-stats">
-              <span class="today-val">已发布 {{ dashboard.publishedCount ?? 0 }}</span>
+              <span class="today-val">已发布 {{ formatCount(dashboard.publishedCount ?? 0) }}</span>
               <span class="growth neutral"><SingleIcon icon="ri:pulse-fill"></SingleIcon>{{ articlePct }}%</span>
             </div>
           </div>
@@ -100,7 +100,7 @@
             <div class="card-label">总评论数</div>
             <div class="card-value"><CountTo :end-val="dashboard.commentCount ?? 0" /></div>
             <div class="card-stats">
-              <span class="today-val">今日 {{ dashboard.todayCommentCount ?? 0 }}</span>
+              <span class="today-val">今日 {{ formatCount(dashboard.todayCommentCount ?? 0) }}</span>
               <span class="growth" :class="growthClass(dashboard.commentsGrowth)">
                 <el-icon v-if="growthArrow(dashboard.commentsGrowth)"><CaretTop /></el-icon>
                 <el-icon v-else-if="growthArrowDown(dashboard.commentsGrowth)"><CaretBottom /></el-icon>
@@ -119,7 +119,7 @@
             <div class="card-label">用户总数</div>
             <div class="card-value"><CountTo :end-val="dashboard.userCount ?? 0" /></div>
             <div class="card-stats">
-              <span class="today-val">今日 {{ dashboard.todayUserCount ?? 0 }}</span>
+              <span class="today-val">今日 {{ formatCount(dashboard.todayUserCount ?? 0) }}</span>
               <span class="growth" :class="growthClass(dashboard.usersGrowth)">
                 <el-icon v-if="growthArrow(dashboard.usersGrowth)"><CaretTop /></el-icon>
                 <el-icon v-else-if="growthArrowDown(dashboard.usersGrowth)"><CaretBottom /></el-icon>
@@ -213,6 +213,7 @@ import GaugeGroup from './charts/GaugeGroup.vue'
 import AreaChart from './charts/AreaChart.vue'
 import WeekArrows from './charts/WeekArrows.vue'
 import CountTo from '@/components/CountTo/index.vue'
+import { formatCount } from '@/utils/number'
 import { PIE_CHART_MODE_OPTIONS } from '@/config/pieChartOptions'
 import { getDashboardApi, getChartLineApi, getChartPieApi, getChartsGaugeApi, getChartAreaApi } from '@/api/dashboard'
 import websocketManager from '@/server/websocketManager'
