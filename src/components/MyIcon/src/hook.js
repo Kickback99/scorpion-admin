@@ -3,7 +3,6 @@ import { OnlineIcon, SingleIcon, IconFont } from "../index";
 
 /**
  * 支持 `IconFont`、自定义 `svg` 以及 `iconify` 中所有的图标
- * @see 点击查看文档图标篇 {@link https://pure-admin.github.io/pure-admin-doc/pages/icon/}
  * @param icon 必传 图标
  * @param offline 布尔值，默认 true 为 Offline，否则 online
  * @param attrs 可选 iconType 属性
