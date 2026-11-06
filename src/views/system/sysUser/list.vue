@@ -104,6 +104,7 @@
                 <el-switch v-model="row.status" size="small" :active-value="0" :inactive-value="1" @change="modifySwitch(row)" />
             </template>
         </el-table-column>
+        <el-table-column prop="remark" label="备注" min-width="150" show-overflow-tooltip />
         <el-table-column prop="createTime" label="创建时间" align="center" width="185" />
         <el-table-column prop="updateTime" label="修改时间" align="center" width="185" />
         <el-table-column v-if="showPermColumn(['btn.sysUser.update', 'btn.sysUser.remove', 'btn.sysUser.assignRole'])" label="操作" width="200" align="center" fixed="right">
@@ -141,6 +142,10 @@
 
             <el-form-item label="用户类型">
                 <UserTypeSelect v-model="formData.type" style="width: 100%;"></UserTypeSelect>
+            </el-form-item>
+
+            <el-form-item label="备注" prop="remark">
+                <el-input prefix-icon="EditPen" placeholder="请输入备注" v-model="formData.remark" />
             </el-form-item>
 
             <el-form-item v-perm="'btn.sysUser.assignRole'" label="用户角色">
@@ -401,7 +406,8 @@ const defaultData = {
     nickname:'',
     phone:'',
     email:'',
-    type:"0"
+    type:"0",
+    remark:''
 }
 
 const formData = ref({
@@ -498,7 +504,8 @@ const editDialog = async (row) =>{
             nickname: user.nickname || '',
             phone: user.phone || '',
             email: user.email || '',
-            type: (user.type !== undefined ? user.type : 0).toString()
+            type: (user.type !== undefined ? user.type : 0).toString(),
+            remark: user.remark || ''
         }
         // 角色回显
         if (hasPerm('btn.sysUser.assignRole')) {
