@@ -23,11 +23,7 @@
         <el-table :data="filteredTableData" style="width: 100%" stripe max-height="500">
             <el-table-column label="头像" width="80" align="center">
                 <template #default="{ row }">
-                    <el-avatar
-                        :src="row.avatar || avatar"
-                        :size="40"
-                        :fit="'cover'"
-                    />
+                    <el-image style="width: 40px; height: 40px; border-radius: 50%" :src="row.avatar || avatar" :fit="'cover'" preview-teleported :preview-src-list="[row.avatar || avatar]" />
                 </template>
             </el-table-column>
             <el-table-column prop="username" label="用户名" min-width="120" />
