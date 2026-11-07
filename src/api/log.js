@@ -13,9 +13,10 @@ const API = {
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const loginLogListApi = (pageNum,pageSize,searchData) => http.get(`${API.LOGIN_LOG_URL}/${pageNum}/${pageSize}`,{params:searchData})
+export const loginLogListApi = (pageNum,pageSize,searchData,signal) => http.get(`${API.LOGIN_LOG_URL}/${pageNum}/${pageSize}`,{params:searchData,signal})
 
 /**
  * 删除登录日志
@@ -30,9 +31,10 @@ export const loginLogRemoveApi = (params) => http.delete(`${API.LOGIN_LOG_URL}/$
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const operlogListApi = (pageNum,pageSize,searchData) => http.get(`${API.OPER_LOG_URL}/${pageNum}/${pageSize}`,{params:searchData})
+export const operlogListApi = (pageNum,pageSize,searchData,signal) => http.get(`${API.OPER_LOG_URL}/${pageNum}/${pageSize}`,{params:searchData,signal})
 
 /**
  * 删除操作日志

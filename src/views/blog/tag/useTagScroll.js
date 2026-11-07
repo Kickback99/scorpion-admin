@@ -28,20 +28,25 @@ export function useTagScroll() {
   // ============================================================
   // t_tag_request：标签列表请求
   /** 回到第一页并刷新（替换式） */
+  // 新请求先中断上一次，避免筛选过快或关页后旧响应还写回数据
+  let listController = null
   const render = async () => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
       page.value = 1
-      const res = await listApi(page.value, PAGE_SIZE, searchData.value)
+      const res = await listApi(page.value, PAGE_SIZE, searchData.value, signal)
       tableData.value = res.data.items
       total.value = res.data.total
       hasMore.value = tableData.value.length < total.value
     } catch (error) {
-      console.error('获取标签列表失败:', error)
+      if (!signal.aborted) console.error('获取标签列表失败:', error)
     } finally {
-      // 关闭 loading 动效
-      loading.value = false
+      // 已中断时 loading 归新请求管，这里不复位
+      if (!signal.aborted) loading.value = false
     }
   }
 
@@ -56,14 +61,20 @@ export function useTagScroll() {
   /** 触底加载下一页（追加式） */
   const loadMore = async () => {
     if (loading.value || loadingMore.value || !hasMore.value) return
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     loadingMore.value = true
     try {
       page.value += 1
-      const res = await listApi(page.value, PAGE_SIZE, searchData.value)
+      const res = await listApi(page.value, PAGE_SIZE, searchData.value, signal)
       tableData.value = tableData.value.concat(res.data.items)
       total.value = res.data.total
       hasMore.value = tableData.value.length < total.value
+    } catch (error) {
+      if (!signal.aborted) console.error('加载更多标签失败:', error)
     } finally {
+      // loadingMore 只有本请求会写，无条件复位；被搜索中断时也不该卡住后续触底
       loadingMore.value = false
     }
   }
@@ -116,6 +127,8 @@ export function useTagScroll() {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', checkLoadMore, true)
     window.removeEventListener('resize', checkScrollable)
+    // 关闭当前标签页时中断在途请求
+    listController?.abort()
   })
 
   registerReload(render)

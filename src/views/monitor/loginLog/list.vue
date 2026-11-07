@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch, onBeforeUnmount } from 'vue';
 import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import msg from '@/components/msg';
 import { loginLogListApi, loginLogRemoveApi } from '@/api/log';
@@ -205,21 +205,29 @@ watch(() => searchData.type, (newType) => {
 // 渲染
 // ============================================================
 // t_log_request：日志列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const fetchLoginLogList = async() => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,queryParams.value)
+        const res = await loginLogListApi(params.value.pageNum,params.value.pageSize,queryParams.value,signal)
         tableData.value = res.data.items
         total.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
 fetchLoginLogList()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 点击分页事件
 const handleSizeChange = (size) => {

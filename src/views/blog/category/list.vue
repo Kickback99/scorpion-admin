@@ -115,7 +115,7 @@
 
 <script setup>
 import { addApi, listApi, modifyApi, removeApi } from '@/api/category';
-import { computed, nextTick, reactive, ref, watch } from 'vue';
+import { computed, nextTick, reactive, ref, watch, onBeforeUnmount } from 'vue';
 import msg from '@/components/msg';
 import { useConfigStore } from '@/store/config';
 import { useSettingStore } from '@/setting';
@@ -345,11 +345,16 @@ let nativeData = []
 // 渲染
 // ============================================================
 // t_category_request：分类列表请求
+// 新请求先中断上一次，避免关页后旧响应还写回数据
+let listController = null
 const render = async () => {
+  listController?.abort()
+  listController = new AbortController()
+  const { signal } = listController
   // 开启 loading 动效
   loading.value = true
   try {
-    const res = await listApi()
+    const res = await listApi(undefined,signal)
     // console.log(res.data)
     cateData.value = res.data
   /*   const originData = res.data
@@ -379,12 +384,15 @@ const render = async () => {
       }
     }
   } catch (error) {
-    console.error('获取分类列表失败:', error)
+    if (!signal.aborted) console.error('获取分类列表失败:', error)
   } finally {
-    // 关闭 loading 动效
-    loading.value = false
+    // 已中断时 loading 归新请求管，这里不复位
+    if (!signal.aborted) loading.value = false
   }
 }
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 /* const processData = computed(()=>{
   return modifyDisabled(cateData.value,isCheckboxDisabled.value)

@@ -5,16 +5,18 @@ import http from '@/utils/request'
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页大小
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const fileMetaListApi = (pageNum, pageSize, searchData) =>
+export const fileMetaListApi = (pageNum, pageSize, searchData, signal) =>
     http.get(`/admin/resource/meta`, {
         params: {
             pageNum,
             pageSize,
             ...searchData
         },
-        timeout: 35000
+        timeout: 35000,
+        signal
     })
 
 /**

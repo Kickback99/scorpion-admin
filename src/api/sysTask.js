@@ -4,9 +4,10 @@ const commonApi = 'admin/system/task'
 
 /**
  * 查询所有任务列表
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = () => request.get(`${commonApi}/list`)
+export const listApi = (signal) => request.get(`${commonApi}/list`,{signal})
 
 /**
  * 根据 ID 查询任务

@@ -139,7 +139,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref, onBeforeUnmount } from 'vue';
 import {extsApi, listApi, removeApi, syncDeleteApi,modifyApi, updateRecordApi, downloadApi} from '@/api/file';
 import msg from '@/components/msg';
 import SmartSelector from '@/views/components/SmartSelector.vue';
@@ -196,22 +196,30 @@ const exts = ref([])
 // 渲染
 // ============================================================
 // t_file_request：文件列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async() => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-        const res = await listApi(params.pageNum,params.pageSize,searchData)
+        const res = await listApi(params.pageNum,params.pageSize,searchData,signal)
         tableData.value = res.data.items
         console.log(res.data.items)
         total.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 const renderExts = async() => {
     const res = await extsApi()

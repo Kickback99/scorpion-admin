@@ -26,9 +26,10 @@ export const modifyApi = (params) => http.put('/admin/system/users',params)
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/users/${pageNum}/${pageSize}`,{params:searchData})
+export const listApi = (pageNum,pageSize,searchData,signal) => http.get(`/admin/system/users/${pageNum}/${pageSize}`,{params:searchData,signal})
 // export const listApi = (params) => http.get(`/admin/system/users/${params.pageNum}/${params.pageSize}`,{params:{roleName:params.roleName}})
 
 /**

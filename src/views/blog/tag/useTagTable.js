@@ -1,7 +1,7 @@
 /**
  * 标签表格视图列表逻辑 — 分页（替换式），仅 TagTable 使用
  */
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { listApi } from '@/api/tag'
 import { useTagEditor } from './useTagEditor'
 
@@ -20,18 +20,23 @@ export function useTagTable() {
   // 渲染
   // ============================================================
   // t_tag_request：标签列表请求
+  // 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+  let listController = null
   const render = async () => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-      const res = await listApi(params.value.pageNum, params.value.pageSize, searchData.value)
+      const res = await listApi(params.value.pageNum, params.value.pageSize, searchData.value, signal)
       tableData.value = res.data.items
       total.value = res.data.total
     } catch (error) {
-      console.error('获取标签列表失败:', error)
+      if (!signal.aborted) console.error('获取标签列表失败:', error)
     } finally {
-      // 关闭 loading 动效
-      loading.value = false
+      // 已中断时 loading 归新请求管，这里不复位
+      if (!signal.aborted) loading.value = false
     }
   }
 
@@ -66,6 +71,9 @@ export function useTagTable() {
 
   registerReload(reload)
   render()
+
+  // 关闭当前标签页时中断在途请求
+  onBeforeUnmount(() => listController?.abort())
 
   return {
     searchData, tableData, params, total, loading,

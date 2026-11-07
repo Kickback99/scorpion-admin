@@ -108,6 +108,8 @@ instance.interceptors.response.use(
         return Promise.reject(res.data.message)
     },
     err=>{
+        // 主动取消（AbortController）不是错误，静默透传，避免弹「服务异常」
+        if (axios.isCancel(err)) return Promise.reject(err)
         // HTTP 401（cookie 模式下未登录/过期的主路径）：走与业务码一致的清理跳转，否则用户会困死在页面
         if(err.response && err.response.status === 401){
             handleAuthExpired(err.config, (err.response.data && err.response.data.message) || '请重新登录')

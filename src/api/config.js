@@ -6,9 +6,10 @@ const API = {
 
 /**
  * 查询全部配置
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const getConfigApi = () => http.get(`${API.CONFIG_URL}`)
+export const getConfigApi = (signal) => http.get(`${API.CONFIG_URL}`,{signal})
 
 /**
  * 修改单个配置

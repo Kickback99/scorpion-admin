@@ -144,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
 import { showPermColumn } from '@/utils/permissions'
@@ -196,21 +196,31 @@ const formRules = {
 // 渲染
 // ============================================================
 // t_task_request：任务列表请求
+// 新请求先中断上一次，避免关页后旧响应还写回数据
+let listController = null
 const loadTaskList = async () => {
+  listController?.abort()
+  listController = new AbortController()
+  const { signal } = listController
   // 开启 loading 动效
   loading.value = true
   try {
-    const res = await listApi()
+    const res = await listApi(signal)
     tableData.value = res.data || res
     console.log('任务列表加载成功:', tableData.value)
   } catch (error) {
-    msg.error('加载任务列表失败')
-    console.error(error)
+    if (!signal.aborted) {
+      msg.error('加载任务列表失败')
+      console.error(error)
+    }
   } finally {
-    // 关闭 loading 动效
-    loading.value = false
+    // 已中断时 loading 归新请求管，这里不复位
+    if (!signal.aborted) loading.value = false
   }
 }
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // ============================================================
 // 新增

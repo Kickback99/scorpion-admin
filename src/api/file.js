@@ -15,9 +15,10 @@ const API = {
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (pageNum,pageSize,searchData) => request.get(`${API.FILE_PAGE}/${pageNum}/${pageSize}`,{params:searchData})
+export const listApi = (pageNum,pageSize,searchData,signal) => request.get(`${API.FILE_PAGE}/${pageNum}/${pageSize}`,{params:searchData,signal})
 
 /**
  * 查询文件扩展名选项

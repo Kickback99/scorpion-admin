@@ -43,9 +43,10 @@ export const findApi = (articleId) => http.get(`${API.ARTICLE_BY_ID_URL}/${artic
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData})
+export const listApi = (pageNum,pageSize,searchData,signal) => http.get(`${API.ARTICLE_URL}/${pageNum}/${pageSize}`,{params:searchData,signal})
 
 /**
  * 上传内容图片
@@ -110,10 +111,11 @@ export const removeCarouselApi = (id, articleId) => {
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const getCarouselListApi = (pageNum, pageSize, searchData) =>
-    http.get(`${API.CAROUSEL_URL}/${pageNum}/${pageSize}`, { params: searchData })
+export const getCarouselListApi = (pageNum, pageSize, searchData, signal) =>
+    http.get(`${API.CAROUSEL_URL}/${pageNum}/${pageSize}`, { params: searchData, signal })
 
 /**
  * 根据 ID 查询轮播详情

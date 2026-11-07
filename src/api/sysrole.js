@@ -26,9 +26,10 @@ export const modifyApi = (params) => http.put('/admin/system/roles',params)
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (pageNum,pageSize,searchData) => http.get(`/admin/system/roles/${pageNum}/${pageSize}`,{params:searchData})
+export const listApi = (pageNum,pageSize,searchData,signal) => http.get(`/admin/system/roles/${pageNum}/${pageSize}`,{params:searchData,signal})
 
 /**
  * 获取用户角色数据

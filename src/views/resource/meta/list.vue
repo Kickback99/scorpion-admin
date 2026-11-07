@@ -222,7 +222,7 @@ import { fileMetaListApi, recoverFileMetaApi } from '@/api/filemeta'
 import { showPermColumn } from '@/utils/permissions'
 import { getAllBusinessDataApi } from '@/api/business'
 import SmartSelector from '@/views/components/SmartSelector.vue';
-import { reactive, ref, onMounted, watch } from 'vue';
+import { reactive, ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import msg from '@/components/msg';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { useSearchCollapse } from '@/utils/useSearchCollapse';
@@ -586,7 +586,12 @@ watch(quickDate, (val) => {
 /**
  * 渲染表格数据
  */
+// 新请求先中断上一次，避免筛选过快或关页后旧响应还写回数据
+let listController = null
 const renderFileMeta = async () => {
+    listController?.abort()
+    listController = new AbortController();
+    const { signal } = listController;
     loading.value = true;
     try {
         // 过滤空值参数
@@ -612,7 +617,8 @@ const renderFileMeta = async () => {
         const res = await fileMetaListApi(
             pagination.pageNum,
             pagination.pageSize,
-            params
+            params,
+            signal
         );
 
         if (res.code === 200) {
@@ -623,15 +629,21 @@ const renderFileMeta = async () => {
             msg.error(res.msg || '查询失败');
         }
     } catch (error) {
-        console.error('查询文件元数据失败:', error);
-        msg.error('查询失败，请稍后重试');
+        if (!signal.aborted) {
+            console.error('查询文件元数据失败:', error);
+            msg.error('查询失败，请稍后重试');
+        }
     } finally {
-        loading.value = false;
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false;
     }
 };
 
 // 初始加载
 renderFileMeta();
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 预加载业务数据
 onMounted(() => {

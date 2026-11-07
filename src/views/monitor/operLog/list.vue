@@ -164,7 +164,7 @@
 
 <script setup>
 import { operlogEnumsListApi, operlogListApi, operLogRemoveApi } from '@/api/log';
-import { reactive, ref, computed, watch, defineAsyncComponent } from 'vue';
+import { reactive, ref, computed, watch, defineAsyncComponent, onBeforeUnmount } from 'vue';
 import { useUserConfigStore } from '@/store/userConfig'
 import { useSearchCollapse } from '@/utils/useSearchCollapse';
 import { useTableAutoHeight } from '@/utils/useTableAutoHeight';
@@ -215,21 +215,29 @@ const queryParams = computed(() => ({
 // ============================================================
 // 渲染
 // ============================================================
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async() => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-        const res = await operlogListApi(params.pageNum,params.pageSize,queryParams.value)
+        const res = await operlogListApi(params.pageNum,params.pageSize,queryParams.value,signal)
         tableData.value = res.data.items
         total.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 点击分页事件
 const onSizeChange = (size) => {

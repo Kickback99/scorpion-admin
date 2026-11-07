@@ -372,6 +372,9 @@ html.dark .main-container:not(.page-theme) {
 
 .main-scrollbar {
   flex: 1;
+  // 内容区自成层叠上下文，把 v-loading 的 z-index 2000 关在里面，不再盖住标签栏
+  position: relative;
+  z-index: 0;
 }
 
 .main-scrollbar--plain {

@@ -105,7 +105,7 @@ import { friendLinkAddApi, friendLinkListApi, friendLinkModifyApi, friendLinkRem
 import { showPermColumn } from '@/utils/permissions';
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import msg from '@/components/msg';
-import { reactive, ref } from 'vue';
+import { reactive, ref, onBeforeUnmount } from 'vue';
 import avatar from '@/assets/images/avatar-square.png'
 
 // ============================================================
@@ -154,19 +154,26 @@ const handleImage = (row) => {
 /**
  * 请求后端分页数据并刷新表格
  */
+let listController = null
 const fetchFriendLinks = async() => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-        const res = await friendLinkListApi(pagination.pageNum,pagination.pageSize,searchModel)
+        const res = await friendLinkListApi(pagination.pageNum,pagination.pageSize,searchModel,signal)
         tableData.value = res.data.items
         totalCount.value = res.data.total
     } catch (e) {
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 fetchFriendLinks()
 

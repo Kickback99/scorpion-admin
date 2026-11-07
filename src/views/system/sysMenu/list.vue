@@ -139,7 +139,7 @@ import {listApi,addApi,modifyApi,removeApi} from '@/api/sysmenu'
 // ============================================================
 const tableData = ref([])
 import { isAllEmpty } from "@pureadmin/utils";
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch, onBeforeUnmount } from 'vue';
 const iconRef = ref()
 const multipleTableRef = ref(null)
 import {useUserStore} from '@/store/user'
@@ -157,17 +157,30 @@ const loading = ref(false)
 // 渲染
 // ============================================================
 // t_menu_request：菜单树形列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async() => {
+     listController?.abort()
+     listController = new AbortController()
+     const { signal } = listController
      // 开启 loading 动效
      loading.value = true
-     const res = await listApi()
-     console.log(res)
-     tableData.value = res.data
-     // 关闭 loading 动效
-     loading.value = false
+     try {
+          const res = await listApi(signal)
+          console.log(res)
+          tableData.value = res.data
+     } catch (error) {
+          if (!signal.aborted) console.error('获取菜单列表失败:', error)
+     } finally {
+          // 已中断时 loading 归新请求管，这里不复位
+          if (!signal.aborted) loading.value = false
+     }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 let highlightTimer = null
 

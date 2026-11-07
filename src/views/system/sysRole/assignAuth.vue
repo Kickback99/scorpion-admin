@@ -33,7 +33,7 @@
   </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch, onBeforeUnmount } from 'vue';
 import { allocMenusApi, doAllocMenusApi } from '@/api/sysmenu';
 import { useConfigStore } from '@/store/config';
 import SmartMenuSearch from '@/views/components/SmartMenuSearch.vue'
@@ -67,7 +67,12 @@ const defaultProps = {
 };
 
 // t_role_request: 获取角色菜单数据请求
+// 新请求先中断上一次，避免切换角色后旧响应还写回数据
+let listController = null
 const render = async () => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     treeLoading.value = true
     try {
@@ -75,17 +80,17 @@ const render = async () => {
       if (!roleId) {
         return
       }
-      const result = await allocMenusApi(roleId);
+      const result = await allocMenusApi(roleId,signal);
       sysMenuList.value = result.data;
       await nextTick()
       const checkedIds = getCheckedIds(sysMenuList.value);
       // console.log('getPermissions() checkedIds', checkedIds);
       treeRef.value?.setCheckedKeys(checkedIds)
     } catch (error) {
-      console.error('获取角色权限列表失败:', error)
+      if (!signal.aborted) console.error('获取角色权限列表失败:', error)
     } finally {
-      // 关闭 loading 动效
-      treeLoading.value = false
+      // 已中断时 loading 归新请求管，这里不复位
+      if (!signal.aborted) treeLoading.value = false
     }
 };
 
@@ -93,6 +98,9 @@ render()
 
 // 组件复用时（同一路由不同 query），自动重新请求
 watch(() => route.query.id, () => { if (route.query.id) render() })
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 得到所有选中的 id 列表（递归收集所有 select 为 true 的叶子节点）
 const getCheckedIds = (auths) => {

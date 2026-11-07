@@ -322,7 +322,7 @@
 
 <script setup>
 import { addCommentApi, auditCommentApi, auditCommentsApi, getCommentsApi, getCommentStatisticsApi, removeCommentApi } from '@/api/comment';
-import { nextTick, reactive, ref, computed, watch } from 'vue';
+import { nextTick, reactive, ref, computed, watch, onBeforeUnmount } from 'vue';
 import { checkRejectValid, checkApproveValid, confirmBatchAction } from '@/utils/auditHelper'
 import SmartSelector from '@/views/components/SmartSelector.vue';
 import { storeToRefs } from 'pinia'
@@ -374,7 +374,12 @@ const searchData = reactive({
 // 渲染
 // ============================================================
 // t_comment_request：评论列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async () => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try{
@@ -392,7 +397,7 @@ const render = async () => {
                     searchParams.currentCommentId = currentPickComment.value.id
                 }
 
-            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams, signal)
             tableData.value = res.data.items
             total.value = res.data.total
             await loadStatistics()
@@ -425,25 +430,30 @@ const render = async () => {
             if (searchData.sortField) searchParams.sortField = searchData.sortField
             if (searchData.sortOrder) searchParams.sortOrder = searchData.sortOrder
 
-            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams, signal)
             tableData.value = res.data.items
             total.value = res.data.total
         } else {
             // 正常模式/审核模式
             const searchParams = { ...searchData }
-            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams)
+            res = await getCommentsApi(params.pageNum, params.pageSize, searchParams, signal)
             tableData.value = res.data.items
             total.value = res.data.total
         }
 
         await loadStatistics()
-    }finally{
-        // 关闭 loading 动效
-        loading.value = false
+    } catch (error) {
+        if (!signal.aborted) console.error('获取评论列表失败:', error)
+    } finally {
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 点击分页事件
 const onSizeChange = (size) => {

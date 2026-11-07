@@ -5,10 +5,11 @@ import http from '@/utils/request'
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const friendLinkListApi = (pageNum, pageSize, searchData) =>
-  http.get(`/admin/blog/friendLink/${pageNum}/${pageSize}`, { params: searchData })
+export const friendLinkListApi = (pageNum, pageSize, searchData, signal) =>
+  http.get(`/admin/blog/friendLink/${pageNum}/${pageSize}`, { params: searchData, signal })
 
 /**
  * 新增友链

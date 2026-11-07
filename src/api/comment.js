@@ -5,11 +5,13 @@ import http from '@/utils/request'
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const getCommentsApi = (pageNum, pageSize, searchData) =>
+export const getCommentsApi = (pageNum, pageSize, searchData, signal) =>
   http.get(`/admin/msg/comment/${pageNum}/${pageSize}`, {
-    params: searchData
+    params: searchData,
+    signal
   })
 
 /**

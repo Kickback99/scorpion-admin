@@ -30,6 +30,7 @@ export const modifyApi = (params) => http.put(API.TAG_URL,params)
  * @param {Number} pageNum 页码
  * @param {Number} pageSize 每页数量
  * @param {Object} searchData 查询条件
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (pageNum,pageSize,searchData) => http.get(`${API.TAG_URL}/${pageNum}/${pageSize}`,{params:searchData})
+export const listApi = (pageNum,pageSize,searchData,signal) => http.get(`${API.TAG_URL}/${pageNum}/${pageSize}`,{params:searchData,signal})

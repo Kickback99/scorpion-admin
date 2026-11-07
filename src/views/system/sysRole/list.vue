@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, ref, watch, onBeforeUnmount } from 'vue';
 import { useRenderIcon } from '@/components/MyIcon/src/hook'
 import {listApi,addApi,modifyApi,removeApi,getDetailApi} from '@/api/sysrole'
 import { showPermColumn } from '@/utils/permissions'
@@ -140,20 +140,33 @@ const loading = ref(false)
 // 渲染
 // ============================================================
 // t_role_request：角色列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async(pager = 1) => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     params.value.pageNum =  pager
-    const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
-    tableData.value = res.data.items
-    console.log(res.data.items)
-    console.log('表格数据')
-    total.value = res.data.total
-    // 关闭 loading 动效
-    loading.value = false
+    try {
+        const res = await listApi(params.value.pageNum,params.value.pageSize,searchData.value,signal)
+        tableData.value = res.data.items
+        console.log(res.data.items)
+        console.log('表格数据')
+        total.value = res.data.total
+    } catch (error) {
+        if (!signal.aborted) console.error('获取角色列表失败:', error)
+    } finally {
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
+    }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // ============================================================
 // 用户搜索

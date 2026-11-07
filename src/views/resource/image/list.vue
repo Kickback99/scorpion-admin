@@ -142,7 +142,7 @@
 
 <script setup>
 // 1. 框架核心
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 
 // 2. 页面组件
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue'
@@ -235,7 +235,12 @@ const getFileTypeTag = (type) => {
 /**
  * 分页加载图片列表，根据当前筛选条件请求数据
  */
+// 新请求先中断上一次，避免筛选过快或关页后旧响应还写回数据
+let listController = null
 const fetchImages = async () => {
+  listController?.abort()
+  listController = new AbortController();
+  const { signal } = listController;
   loading.value = true;
   try {
     const params = {};
@@ -264,7 +269,7 @@ const fetchImages = async () => {
       params.sortOrder = sortOrder.value;
     }
 
-    const res = await fileMetaListApi(currentPage.value, pageSize.value, params);
+    const res = await fileMetaListApi(currentPage.value, pageSize.value, params, signal);
     if (res.code === 200) {
       imageList.value = res.data.items || [];
       total.value = res.data.total || 0;
@@ -274,12 +279,18 @@ const fetchImages = async () => {
       msg.error(res.msg || '查询失败');
     }
   } catch (error) {
-    console.error('加载图片失败:', error);
-    msg.error('加载失败，请重试');
+    if (!signal.aborted) {
+      console.error('加载图片失败:', error);
+      msg.error('加载失败，请重试');
+    }
   } finally {
-    loading.value = false;
+    // 已中断时 loading 归新请求管，这里不复位
+    if (!signal.aborted) loading.value = false;
   }
 };
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 const handlePageChange = (page) => {
   currentPage.value = page;

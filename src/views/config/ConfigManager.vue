@@ -214,7 +214,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, watch, computed, onBeforeUnmount } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import msg from '@/components/msg'
 import { showPermColumn } from '@/utils/permissions'
@@ -456,11 +456,16 @@ const buildGroupedTreeData = (apiData) => {
 // ============================================================
 // t_config_request：配置列表请求
 // 加载配置数据
+// 新请求先中断上一次，避免关页后旧响应还写回数据
+let listController = null
 const loadConfigData = async () => {
+  listController?.abort()
+  listController = new AbortController()
+  const { signal } = listController
   // 开启 loading 动效
   loading.value = true
   try {
-    const res = await getConfigApi()
+    const res = await getConfigApi(signal)
     if (res.code === 200 && res.data) {
       nextId = 100
       fullTableData.value = buildGroupedTreeData(res.data)
@@ -468,13 +473,18 @@ const loadConfigData = async () => {
       filterKeyword.value = ''
     }
   } catch (error) {
-    console.error('加载配置失败:', error)
-    msg.error('加载配置失败')
+    if (!signal.aborted) {
+      console.error('加载配置失败:', error)
+      msg.error('加载配置失败')
+    }
   } finally {
-    // 关闭 loading 动效
-    loading.value = false
+    // 已中断时 loading 归新请求管，这里不复位
+    if (!signal.aborted) loading.value = false
   }
 }
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 const handleClearFilter = () => {
   filterKeyword.value = ''

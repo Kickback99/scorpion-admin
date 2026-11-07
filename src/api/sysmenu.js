@@ -23,9 +23,10 @@ export const modifyApi = (params) => http.put('/admin/system/menus',params)
 
 /**
  * 查询全部菜单
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = () => http.get(`/admin/system/menus`)
+export const listApi = (signal) => http.get(`/admin/system/menus`,{signal})
 
 /**
  * 修改菜单状态
@@ -38,9 +39,10 @@ export const statusApi = (id,status) => http.get(`/admin/system/menus/${id}`,{pa
 /**
  * 获取角色菜单数据
  * @param {Number} roleId 角色 ID
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const allocMenusApi = (roleId) => http.get(`/admin/system/menus/assign/${roleId}`)
+export const allocMenusApi = (roleId,signal) => http.get(`/admin/system/menus/assign/${roleId}`,{signal})
 
 /**
  * 给角色分配菜单

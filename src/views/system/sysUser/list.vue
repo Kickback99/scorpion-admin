@@ -236,7 +236,7 @@ import UserTypeSelect from '@/views/components/UserTypeSelect.vue';
 import SmartAutoComplete from '@/views/components/SmartAutoComplete.vue';
 import { getAllRolesApi } from '@/api/business'
 import { loadPinyinMatch } from '@/utils/pinyinMatch'
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, ref, watch, onBeforeUnmount } from 'vue';
 import msg from '@/components/msg';
 // 按钮级别权限控制
 import { getCurrentInstance } from 'vue';
@@ -304,12 +304,17 @@ const tableData = ref([])
 // 渲染
 // ============================================================
 // t_user_request：用户列表请求
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const render = async(pager = 1) =>{
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     params.value.pageNum =  pager
     try {
-        const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value)
+        const res =  await listApi(params.value.pageNum,params.value.pageSize,searchData.value,signal)
         console.log('请求用户列表-------------------------------------------')
         console.log(res.data)
         tableData.value = res.data.items
@@ -317,12 +322,15 @@ const render = async(pager = 1) =>{
     } catch (e) {
         // request.js 已统一提示接口错误，这里不重复弹错误
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
 render()
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 点击分页事件
 const onSizeChange = (size) => {

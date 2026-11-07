@@ -331,7 +331,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent, computed } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch, defineAsyncComponent, computed, onBeforeUnmount } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartSelector from '@/views/components/SmartSelector.vue'
 import { hasPerm, showPermColumn } from '@/utils/permissions'
@@ -819,20 +819,27 @@ const handleTypeChange = (val) => {
 /**
  * 获取公告列表（后端分页）
  */
+// 新请求先中断上一次，避免翻页过快或关页后旧响应还写回数据
+let listController = null
 const fetchNotices = async () => {
+    listController?.abort()
+    listController = new AbortController()
+    const { signal } = listController
     // 开启 loading 动效
     loading.value = true
     try {
-        const res = await noticeListApi(pagination.pageNum, pagination.pageSize, searchModel)
+        const res = await noticeListApi(pagination.pageNum, pagination.pageSize, searchModel, signal)
         tableData.value = res.data.items || []
         totalCount.value = res.data.total || 0
     } catch (error) {
-        console.error('获取公告列表失败:', error)
-        tableData.value = []
-        totalCount.value = 0
+        if (!signal.aborted) {
+            console.error('获取公告列表失败:', error)
+            tableData.value = []
+            totalCount.value = 0
+        }
     } finally {
-        // 关闭 loading 动效
-        loading.value = false
+        // 已中断时 loading 归新请求管，这里不复位
+        if (!signal.aborted) loading.value = false
     }
 }
 
@@ -840,6 +847,9 @@ onMounted(() => {
     fetchNotices()
     loadAllUsers()
 })
+
+// 关闭当前标签页时中断在途请求
+onBeforeUnmount(() => listController?.abort())
 
 // 预加载角色缓存（顶层立即执行；无角色权限时不加载，避免越权调用 getAllRolesApi）
 if (hasPerm('btn.sysUser.assignRole')) loadAllRoles()

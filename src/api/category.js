@@ -28,6 +28,7 @@ export const modifyApi = (params) => http.put(API.CATEGORY_URL,params)
 /**
  * 查询分类列表
  * @param {Array} params 分类 ID 集合
+ * @param {AbortSignal} [signal] 取消信号
  * @returns {Promise}
  */
-export const listApi = (params) => http.get(`${API.CATEGORY_URL}`,{params:{cateIds:params}})
+export const listApi = (params,signal) => http.get(`${API.CATEGORY_URL}`,{params:{cateIds:params},signal})
