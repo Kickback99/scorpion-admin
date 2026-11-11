@@ -292,6 +292,8 @@ html.dark .el-header:not(.page-theme) {
 }
 
 .el-aside {
+  // 自成层叠上下文：侧边栏内任何 z-index 都压不过内容区遮罩
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   width: auto;

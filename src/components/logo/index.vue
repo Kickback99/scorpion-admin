@@ -81,7 +81,8 @@ const handleLogoClick = () => {
 
   p {
     font-size: 17px;
-    z-index: 1;
+    // 保留层叠上下文，不压过内容区遮罩
+    z-index: 0;
   }
 }
 </style>
