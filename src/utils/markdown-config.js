@@ -1,4 +1,3 @@
-import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 import VMdEditor from '@kangc/v-md-editor';
@@ -54,9 +53,7 @@ export function createMarkdownPreview(theme = 'github', isPreview = false) {
     base.use(vuepressTheme, { Prism, codeHighlightExtensionMap: { vue: 'markup' } });
   }
 
-  return base
-    .use(createLineNumbertPlugin())
-    .use(createCopyCodePlugin());
+  return base.use(createCopyCodePlugin());
 }
 
 // 默认导出 github 主题的预览器
